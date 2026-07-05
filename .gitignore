@@ -1,0 +1,38 @@
+# Dados locais e coletas
+data/
+*.psydat
+*.log
+*.xlsx
+*.tsv
+*.csv
+
+# CSVs de condicoes necessarios ao experimento
+!condicoes/
+!condicoes/*.csv
+!conditions/
+!conditions/*.csv
+
+# Arquivos gerados pelo PsychoPy
+*_lastrun.py
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Ambientes e configuracoes locais
+.venv/
+venv/
+.env
+.env.*
+
+# Sistema, editor e temporarios
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+*~
+

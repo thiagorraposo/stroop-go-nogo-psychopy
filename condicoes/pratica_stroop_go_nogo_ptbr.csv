@@ -1,0 +1,9 @@
+trial_number,word,ink_color,condition,correct_response
+1,VERMELHO,red,congruente,space
+2,AZUL,green,incongruente,
+3,VERDE,green,congruente,space
+4,AMARELO,blue,incongruente,
+5,AZUL,blue,congruente,space
+6,VERDE,yellow,incongruente,
+7,AMARELO,yellow,congruente,space
+8,VERMELHO,blue,incongruente,
