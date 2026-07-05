@@ -13,10 +13,12 @@ Este projeto e mantido para fins educacionais e de pesquisa exploratoria. Ele na
 - `condicoes/bloco_principal_stroop_go_nogo_ptbr.csv`: tentativas do bloco principal.
 - `condicoes/contagem_regressiva.csv`: telas breves de preparacao antes dos blocos.
 - `data/`: pasta onde os CSVs por tentativa sao salvos pelo PsychoPy.
-- `analisar_stroop.py`: script simples para analisar os CSVs gerados.
+- `scripts/analisar_stroop.py`: script simples para analisar os CSVs gerados.
 - `docs/UX_DECISIONS.md`: notas sobre as decisoes de experiencia de usuario.
 - `AGENTS.md`: regras persistentes para agentes e contribuicoes futuras.
 - `docs/`: documentacao de governanca, decisoes e historico.
+- `assets/`: assets proprios do projeto.
+- `tests/`: espaco reservado para validacoes futuras.
 
 ## Como abrir no Builder
 
@@ -82,7 +84,7 @@ As colunas principais registradas por tentativa sao:
 Depois de coletar dados, execute:
 
 ```bash
-python3 analisar_stroop.py
+python3 scripts/analisar_stroop.py
 ```
 
 O script procura arquivos `.csv` em `data/`, calcula acuracia geral, por condicao e por bloco, e compara a mediana do tempo de reacao das respostas corretas entre condicoes congruentes e incongruentes.
@@ -95,19 +97,31 @@ O script procura arquivos `.csv` em `data/`, calcula acuracia geral, por condica
 ├── README.md
 ├── .gitignore
 ├── stroop_go_nogo_ptbr.psyexp
-├── analisar_stroop.py
+├── assets/
+│   ├── README.md
+│   └── ui/
 ├── condicoes/
+│   ├── AGENTS.md
+│   ├── README.md
 │   ├── bloco_principal_stroop_go_nogo_ptbr.csv
 │   ├── contagem_regressiva.csv
 │   └── pratica_stroop_go_nogo_ptbr.csv
+├── data/
+│   └── README.md
 ├── docs/
+│   ├── AGENTS.md
 │   ├── DECISOES_DO_EXPERIMENTO.md
+│   ├── ESTRUTURA_DO_PROJETO.md
 │   ├── PADRAO_DE_COMMITS.md
 │   ├── REGISTRO_DE_ALTERACOES.md
 │   └── UX_DECISIONS.md
-├── assets/
 ├── scripts/
-└── data/
+│   ├── AGENTS.md
+│   ├── README.md
+│   └── analisar_stroop.py
+└── tests/
+    ├── AGENTS.md
+    └── README.md
 ```
 
 Nota: a pasta existente `condicoes/` e preservada como diretoria de CSVs de condicoes do experimento. Ela cumpre o papel da pasta `conditions/` sem duplicar conteudo.

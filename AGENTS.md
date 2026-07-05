@@ -40,10 +40,19 @@ Este projeto e um experimento original Stroop Go/No-Go desenvolvido em PsychoPy,
 - Decisoes metodologicas ou de UX devem ser registradas em `docs/DECISOES_DO_EXPERIMENTO.md`.
 - Commits devem seguir o padrao definido em `docs/PADRAO_DE_COMMITS.md`.
 
+## Estrutura canonica
+
+- `.psyexp` principal permanece na raiz do projeto.
+- `condicoes/` e o nome canonico para CSVs de condicoes; nao criar pasta duplicada `conditions/`.
+- `scripts/` concentra scripts auxiliares.
+- `docs/` concentra documentacao metodologica, historico e governanca.
+- `assets/` armazena apenas assets proprios do projeto.
+- `tests/` fica reservado para validacoes futuras.
+- `data/` e local; somente `data/README.md` pode ser versionado.
+
 ## Regras de validacao
 
 - Apos alterar o experimento, validar variaveis usadas em rotinas e loops.
 - Confirmar que CSVs de condicoes tem colunas compativeis.
 - Testar em modo Pilot antes de coletar dados reais.
 - Nao alegar validacao clinica, equivalencia psicometrica ou diagnostico sem estudo apropriado.
-

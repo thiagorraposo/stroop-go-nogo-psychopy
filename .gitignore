@@ -1,5 +1,7 @@
 # Dados locais e coletas
 data/
+!data/
+!data/README.md
 *.psydat
 *.log
 *.xlsx
@@ -9,8 +11,6 @@ data/
 # CSVs de condicoes necessarios ao experimento
 !condicoes/
 !condicoes/*.csv
-!conditions/
-!conditions/*.csv
 
 # Arquivos gerados pelo PsychoPy
 *_lastrun.py
@@ -35,4 +35,3 @@ Thumbs.db
 *.bak
 *.tmp
 *~
-
