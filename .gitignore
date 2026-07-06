@@ -1,5 +1,5 @@
 # Dados locais e coletas
-data/
+data/*
 !data/
 !data/README.md
 *.psydat

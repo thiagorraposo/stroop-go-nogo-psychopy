@@ -10,5 +10,6 @@ Validacoes implementadas ou esperadas:
 - formato do CSV unificado;
 - classificacao de `hit`, `omission`, `correct_rejection` e `commission`.
 - rejeicao de CSVs automaticos de loops como fonte oficial.
+- balanceamento de 10 cores e tempos da Fase 3.
 
 Nao usar dados pessoais ou arquivos reais de participantes como fixtures versionados.

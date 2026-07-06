@@ -66,7 +66,7 @@ Tambem ha opcao de cancelamento seguro. Se o formulario for cancelado, o experim
 - Nao coletar nome completo.
 - Nao coletar CPF, e-mail, telefone, endereco, idade ou sexo nesta versao.
 - Avaliador(a) deve usar codigo ou iniciais profissionais, nao nome completo.
-- Metadados ficam no conteudo do CSV local, nao no nome do arquivo.
+- O CSV oficial usa `assessment_id` como nome-base do arquivo; demais metadados ficam apenas no conteudo do CSV local.
 - Dados reais permanecem em `data/`, pasta ignorada pelo Git.
 - Nenhum dado clinico, diagnostico ou normativo e coletado pelo formulario.
 
@@ -127,7 +127,7 @@ Na Fase 2, esses campos passaram a compor o CSV unificado oficial por execucao.
    - Avaliador(a): `AV01`
 7. Iniciar e executar uma tentativa curta.
 8. Encerrar normalmente.
-9. Conferir se o CSV local inclui todos os metadados.
+9. Conferir se o CSV local tem o nome do `assessment_id` e inclui todos os metadados.
 10. Confirmar que nenhum dado foi versionado.
 
 O checklist deve ser aprovado antes de considerar a Fase 1 completamente validada para coleta.

@@ -99,13 +99,13 @@ PILOTO_STROOP,P_EXEMPLO,,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06
 
 ## Nome do arquivo
 
-O arquivo oficial deve ser salvo em `data/` com nome generico e nao identificavel:
+O arquivo oficial deve ser salvo em `data/` usando o `assessment_id` como nome-base:
 
 ```text
-data/stroop_go_nogo_ptbr_YYYY-MM-DD_HHhMMmSSs_trials.csv
+data/<assessment_id>.csv
 ```
 
-O nome nao deve conter `participant_id`, iniciais, visita ou avaliador. Os metadados ficam no conteudo do CSV, nao no caminho do arquivo.
+O nome nao deve conter `participant_id`, iniciais, visita ou avaliador. O `assessment_id` tambem fica registrado no conteudo do CSV para permitir conferir a correspondencia entre nome do arquivo e dados da execucao.
 
 ## Execucoes abortadas
 
@@ -116,7 +116,7 @@ Nesta fase, execucoes interrompidas antes do encerramento normal nao geram CSV o
 Execute a partir da raiz do projeto:
 
 ```bash
-python3 scripts/analisar_stroop.py data/NOME_DO_ARQUIVO_trials.csv
+python3 scripts/analisar_stroop.py data/ASSESSMENT_ID.csv
 ```
 
 O script valida o contrato do CSV e calcula metricas descritivas apenas para o bloco `main`.

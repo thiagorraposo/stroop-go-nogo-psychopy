@@ -45,29 +45,30 @@ Este projeto e mantido para fins educacionais e de pesquisa exploratoria. Ele na
 
 ## Condicoes
 
-As palavras usadas sao `VERMELHO`, `AZUL`, `VERDE` e `AMARELO`.
+As palavras usadas sao `VERDE`, `AMARELO`, `ROSA`, `PRETO`, `VERMELHO`, `LARANJA`, `MARROM`, `ROXO`, `AZUL` e `CINZA`.
 
-- `congruente`: palavra e cor correspondem; resposta correta e pressionar `Espaco`.
-- `incongruente`: palavra e cor nao correspondem; resposta correta e nao pressionar nada.
+- `congruent`: palavra e cor correspondem; resposta correta e pressionar `Espaco`.
+- `incongruent`: palavra e cor nao correspondem; resposta correta e nao pressionar nada.
 
 Cada tentativa tem:
 
-- fixacao: cerca de 400 ms;
-- intervalo vazio: cerca de 100 ms;
+- fixacao: 300 ms;
 - estimulo/resposta: 1500 ms;
-- intervalo entre tentativas: cerca de 300 ms.
+- intervalo vazio entre tentativas: 200 ms.
+
+A pratica tem 10 tentativas, com 5 Go/congruentes e 5 No-Go/incongruentes. O bloco principal tem 60 tentativas, com 40 Go/congruentes e 20 No-Go/incongruentes, totalizando cerca de 120 segundos no bloco principal. O fluxo completo e maior por incluir formulario, instrucoes e pratica.
 
 ## Dados
 
 Os CSVs locais ficam em `data/`. Essa pasta e ignorada pelo Git para proteger dados de teste, execucao e participantes.
 
-Cada execucao concluida normalmente deve gerar um unico CSV oficial por tentativa, com sufixo `_trials.csv`. Pratica e bloco principal ficam no mesmo arquivo e sao diferenciados pela coluna `block`.
+Cada execucao concluida normalmente deve gerar um unico CSV oficial por tentativa, nomeado pelo `assessment_id`. Pratica e bloco principal ficam no mesmo arquivo e sao diferenciados pela coluna `block`.
 
 As colunas principais registradas por tentativa sao:
 
 `project`, `participant_id`, `initials`, `visit`, `evaluator`, `assessment_id`, `assessment_date`, `started_at`, `test_code`, `test_version`, `block`, `trial_number`, `word`, `ink_color`, `condition`, `correct_response`, `key_pressed`, `reaction_time`, `correct`, `error_type`.
 
-`ink_color` usa nomes de cor simples (`red`, `blue`, `green`, `yellow`) para manter os CSVs compativeis com pandas, R e SPSS sem campos RGB com virgulas internas.
+`ink_color` usa nomes de cor simples (`green`, `yellow`, `pink`, `black`, `red`, `orange`, `brown`, `purple`, `blue`, `gray`) para manter o CSV unificado compativel com pandas, R e SPSS sem campos RGB com virgulas internas.
 
 `block` diferencia:
 
@@ -86,7 +87,7 @@ As colunas principais registradas por tentativa sao:
 Depois de coletar dados, execute:
 
 ```bash
-python3 scripts/analisar_stroop.py data/NOME_DO_ARQUIVO_trials.csv
+python3 scripts/analisar_stroop.py data/ASSESSMENT_ID.csv
 ```
 
 O script valida o CSV unificado, calcula metricas descritivas do bloco principal e nao modifica o arquivo original. O contrato completo esta em `docs/CSV_UNIFICADO.md`.
@@ -147,7 +148,8 @@ Use identificadores pseudonimizados. Nao informe nome completo, CPF, e-mail, tel
 └── tests/
     ├── AGENTS.md
     ├── README.md
-    └── test_csv_unificado.py
+    ├── test_csv_unificado.py
+    └── test_fase3_condicoes_tempos.py
 ```
 
 Nota: a pasta existente `condicoes/` e preservada como diretoria de CSVs de condicoes do experimento. Ela cumpre o papel da pasta `conditions/` sem duplicar conteudo.

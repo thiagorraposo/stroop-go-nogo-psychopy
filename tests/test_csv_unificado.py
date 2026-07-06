@@ -110,6 +110,11 @@ class CsvUnificadoTests(unittest.TestCase):
             analisar_stroop.is_loop_csv_path("data/abc_principal_loop.csv")
         )
         self.assertFalse(analisar_stroop.is_loop_csv_path("data/abc_trials.csv"))
+        self.assertFalse(
+            analisar_stroop.is_loop_csv_path(
+                "data/00000000-0000-0000-0000-000000000000.csv"
+            )
+        )
 
     def test_exportador_canonico_ordem_e_20_colunas(self):
         output = io.StringIO()

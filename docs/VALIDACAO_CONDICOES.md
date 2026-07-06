@@ -1,140 +1,151 @@
-# Validacao estatica de condicoes e variaveis
+# Validacao estatica de condicoes e tempos
 
-Data da validacao: 2026-07-05.
+Data da validacao: 2026-07-06.
 
-## Arquivos analisados
+## Escopo
+
+Esta validacao documenta a Fase 3 do experimento Stroop Go/No-Go: ampliacao para 10 cores oficiais, balanceamento das condicoes e perfil temporal de tentativa.
+
+Arquivos validados:
 
 - `stroop_go_nogo_ptbr.psyexp`
 - `condicoes/contagem_regressiva.csv`
 - `condicoes/pratica_stroop_go_nogo_ptbr.csv`
 - `condicoes/bloco_principal_stroop_go_nogo_ptbr.csv`
-- `scripts/analisar_stroop.py`
+- `tests/test_fase3_condicoes_tempos.py`
+- `tests/test_csv_unificado.py`
 
-Nenhum arquivo em `data/` foi alterado ou usado como fonte de validacao.
+Nenhum arquivo em `data/` foi alterado ou usado como fonte de validacao. Esta configuracao e experimental propria, para fins educacionais e de pesquisa exploratoria, sem norma clinica, diagnostico ou equivalencia com instrumentos de terceiros.
 
-## Loops encontrados
+## Cores oficiais
 
-| Loop | Rotinas envolvidas | CSV de condicoes | Caminho relativo | Selecao | Repeticoes |
-|---|---|---|---|---|---|
-| `contagem_pratica_loop` | `contagem` | `contagem_regressiva.csv` | `condicoes/contagem_regressiva.csv` | `sequential` | `1` |
-| `pratica_loop` | `trial_pratica`, `feedback_pratica` | `pratica_stroop_go_nogo_ptbr.csv` | `condicoes/pratica_stroop_go_nogo_ptbr.csv` | `random` | `1` |
-| `contagem_principal_loop` | `contagem` | `contagem_regressiva.csv` | `condicoes/contagem_regressiva.csv` | `sequential` | `1` |
-| `principal_loop` | `trial_principal` | `bloco_principal_stroop_go_nogo_ptbr.csv` | `condicoes/bloco_principal_stroop_go_nogo_ptbr.csv` | `random` | `1` |
+| Palavra | `ink_color` | Cor visual |
+|---|---|---|
+| `VERDE` | `green` | `#1BAE55` |
+| `AMARELO` | `yellow` | `#B8860B` |
+| `ROSA` | `pink` | `#D42E88` |
+| `PRETO` | `black` | `#1A1A1A` |
+| `VERMELHO` | `red` | `#CF2E2E` |
+| `LARANJA` | `orange` | `#E56A00` |
+| `MARROM` | `brown` | `#6D4027` |
+| `ROXO` | `purple` | `#7837B8` |
+| `AZUL` | `blue` | `#1976D2` |
+| `CINZA` | `gray` | `#626870` |
 
-Todos os caminhos relativos referenciados pelo `.psyexp` apontam para arquivos existentes.
+`ink_color` permanece como valor logico no CSV unificado oficial. O campo `ink_color_display` existe apenas nos CSVs de condicoes para renderizar o texto no PsychoPy com hexadecimal. O exportador unificado continua gravando somente `ink_color`.
 
-## Variaveis esperadas e encontradas
+## Arquivos de condicoes
 
-| Variavel | Onde e usada | Rotina | Componente | Origem esperada | Encontrada | Risco |
-|---|---|---|---|---|---|---|
-| `countdown_text` | texto da contagem | `contagem` | `contagem_texto` | `condicoes/contagem_regressiva.csv` | sim | nenhum |
-| `word` | texto do estimulo e exportacao | `trial_pratica`, `trial_principal` | `stim_pratica`, `stim_principal`, codigo | CSVs de pratica e principal | sim | nenhum |
-| `ink_color` | cor do estimulo e exportacao | `trial_pratica`, `trial_principal` | `stim_pratica`, `stim_principal`, codigo | CSVs de pratica e principal | sim | nenhum |
-| `condition` | classificacao e exportacao | `trial_pratica`, `trial_principal` | codigo | CSVs de pratica e principal | sim | nenhum |
-| `correct_response` | resposta correta e regra Go/No-Go | `trial_pratica`, `trial_principal` | `resp_pratica`, `resp_principal`, codigo | CSVs de pratica e principal | sim | nenhum |
-| `trial_number` | exportacao | `trial_pratica`, `trial_principal` | codigo | CSVs de pratica e principal | sim | nenhum |
-| `block` | exportacao | `trial_pratica`, `trial_principal` | codigo | `practice` ou `main` definido no codigo | sim | nenhum |
-| `key_pressed` | exportacao e classificacao | `trial_pratica`, `trial_principal` | codigo | `resp_pratica.keys` ou `resp_principal.keys` | sim | nenhum |
-| `reaction_time` | exportacao | `trial_pratica`, `trial_principal` | codigo | `resp_pratica.rt` ou `resp_principal.rt` | sim | nenhum |
-| `correct` | exportacao | `trial_pratica`, `trial_principal` | codigo | classificacao no fim da rotina | sim | nenhum |
-| `error_type` | exportacao | `trial_pratica`, `trial_principal` | codigo | classificacao no fim da rotina | sim | nenhum |
-| `feedback_text` | feedback da pratica | `trial_pratica`, `feedback_pratica` | codigo, `texto_feedback` | codigo de classificacao da pratica | sim | nenhum |
-| `progress_text` | progresso do bloco principal | `trial_principal` | codigo, `progresso_principal` | codigo no inicio da rotina principal | sim | nenhum |
-| `corrAns` | nao usado | nenhum | nenhum | nao aplicavel | ausente | nenhum; a variavel usada e `correct_response` |
+| CSV | Codificacao | Delimitador | Linhas de dados | Colunas |
+|---|---|---|---:|---|
+| `pratica_stroop_go_nogo_ptbr.csv` | UTF-8 | virgula | 10 | `trial_number`, `word`, `ink_color`, `ink_color_display`, `condition`, `correct_response` |
+| `bloco_principal_stroop_go_nogo_ptbr.csv` | UTF-8 | virgula | 60 | `trial_number`, `word`, `ink_color`, `ink_color_display`, `condition`, `correct_response` |
 
-## Validacao dos CSVs
+Os testes validam UTF-8, separacao por virgula, largura uniforme e presenca das colunas esperadas.
 
-| CSV | Codificacao | Delimitador | Linhas de dados | Cabecalho | Largura uniforme | Colunas obrigatorias ausentes | Colunas nao utilizadas | Vazios indevidos | Duplicidades acidentais |
-|---|---|---|---:|---|---|---|---|---|---|
-| `contagem_regressiva.csv` | UTF-8 | virgula | 5 | `countdown_text` | sim | nenhuma | nenhuma | nenhum | nenhuma |
-| `pratica_stroop_go_nogo_ptbr.csv` | UTF-8 | virgula | 8 | `trial_number`, `word`, `ink_color`, `condition`, `correct_response` | sim | nenhuma | nenhuma | nenhum | nenhuma |
-| `bloco_principal_stroop_go_nogo_ptbr.csv` | UTF-8 | virgula | 32 | `trial_number`, `word`, `ink_color`, `condition`, `correct_response` | sim | nenhuma | nenhuma | nenhum | nenhuma |
+## Balanceamento da pratica
 
-Campos vazios em `correct_response` foram considerados esperados quando `condition` e `incongruente`, pois a resposta correta e nao pressionar tecla.
+| Propriedade | Valor |
+|---|---:|
+| Tentativas | 10 |
+| Congruentes | 5 |
+| Incongruentes | 5 |
+| Aparicoes por palavra | 1 |
+| Aparicoes por `ink_color` | 1 |
 
-## Validacao do paradigma
+Regras validadas:
 
-Resultado: nenhuma inconsistencia encontrada nos CSVs de pratica e principal.
+- cada uma das 10 palavras aparece exatamente uma vez;
+- cada uma das 10 cores aparece exatamente uma vez;
+- `correct_response` e `space` somente em tentativas `congruent`;
+- `correct_response` fica vazio em tentativas `incongruent`;
+- nenhuma tentativa `incongruent` tem palavra e cor equivalentes.
 
-- Todas as linhas `congruente` combinam palavra e cor.
-- Todas as linhas `congruente` usam `correct_response` igual a `space`.
-- Todas as linhas `incongruente` apresentam palavra e cor diferentes.
-- Todas as linhas `incongruente` deixam `correct_response` vazio.
-- Nao foi encontrada condicao ambigua.
-- Nao foi encontrada combinacao que induza classificacao incorreta de `hit`, `omission`, `correct_rejection` ou `commission`.
+## Balanceamento do bloco principal
 
-Mapeamento atual entre palavras e valores usados pelo PsychoPy:
+| Propriedade | Valor |
+|---|---:|
+| Tentativas | 60 |
+| Congruentes / Go | 40 |
+| Incongruentes / No-Go | 20 |
+| Aparicoes por palavra | 6 |
+| Aparicoes por `ink_color` | 6 |
+| Aparicoes congruentes por palavra | 4 |
+| Aparicoes incongruentes por palavra | 2 |
+| Aparicoes congruentes por `ink_color` | 4 |
+| Aparicoes incongruentes por `ink_color` | 2 |
 
-| Palavra | Valor em `ink_color` |
-|---|---|
-| `VERMELHO` | `red` |
-| `AZUL` | `blue` |
-| `VERDE` | `green` |
-| `AMARELO` | `yellow` |
+As 20 tentativas incongruentes usam duas rotacoes ciclicas das 10 cores, com deslocamentos +1 e +3. Isso preserva duas ocorrencias incongruentes por palavra e por cor, impede pares incongruentes palavra + cor equivalentes e evita duplicidade de pares incongruentes.
 
-Os valores de `ink_color` sao legiveis para PsychoPy e seguros para CSV, pois usam nomes simples sem virgulas internas.
+O loop `principal_loop` permanece com selecao `random`, preservando a randomizacao atual do Builder.
 
-## Cores
+## Regras do paradigma
 
-Cores atualmente presentes:
+- `congruent` + Espaco = `hit`;
+- `congruent` sem resposta = `omission`;
+- `incongruent` sem resposta = `correct_rejection`;
+- `incongruent` + Espaco = `commission`.
 
-- vermelho;
-- azul;
-- verde;
-- amarelo.
+Essas regras nao foram alteradas. O CSV unificado continua recebendo `word`, `ink_color`, `condition` e `correct_response` a partir das condicoes e exportando o contrato canonico de 20 colunas.
 
-Cores previstas, mas ainda ausentes:
+## Perfil temporal
 
-- rosa;
-- preto;
-- laranja;
-- marrom;
-- roxo;
-- cinza.
+Cada tentativa de pratica e do bloco principal usa:
 
-Nao foram adicionadas cores nesta etapa para evitar alterar quantidade de tentativas, distribuicao experimental ou desenho do bloco.
+| Segmento | Inicio | Duracao | Fim |
+|---|---:|---:|---:|
+| Cruz de fixacao | 0.0 s | 0.3 s | 0.3 s |
+| Estimulo e janela de resposta | 0.3 s | 1.5 s | 1.8 s |
+| Intervalo vazio | 1.8 s | 0.2 s | 2.0 s |
 
-## CSV unificado futuro
+Configuracao validada no `.psyexp`:
 
-| Coluna final | Origem atual | Disponivel | Depende de loop | Depende de codigo | Risco de divergencia | Ajuste futuro |
-|---|---|---|---|---|---|---|
-| `project` | `expInfo['project']` | sim | nao | sim | baixo | manter no CSV unificado |
-| `participant_id` | `expInfo['participant_id']` | sim | nao | sim | baixo | manter no CSV unificado |
-| `initials` | `expInfo['initials']` | sim | nao | sim | baixo | manter no CSV unificado; campo opcional |
-| `visit` | `expInfo['visit']` | sim | nao | sim | baixo | manter no CSV unificado |
-| `evaluator` | `expInfo['evaluator']` | sim | nao | sim | baixo | manter no CSV unificado |
-| `assessment_id` | `expInfo['assessment_id']` | sim | nao | sim | baixo | manter no CSV unificado |
-| `assessment_date` | `expInfo['assessment_date']` | sim | nao | sim | baixo | manter no CSV unificado |
-| `started_at` | `expInfo['started_at']` | sim | nao | sim | baixo | manter no CSV unificado |
-| `test_code` | `expInfo['test_code']` | sim | nao | sim | baixo | manter no CSV unificado |
-| `test_version` | `expInfo['test_version']` | sim | nao | sim | baixo | manter no CSV unificado |
-| `block` | codigo em `trial_pratica` e `trial_principal` | sim | nao | sim | baixo | garantir `practice` e `main` no CSV unificado |
-| `trial_number` | CSV de condicoes | sim | sim | nao | baixo | manter uma linha por tentativa |
-| `word` | CSV de condicoes | sim | sim | nao | baixo | manter valores padronizados |
-| `ink_color` | CSV de condicoes | sim | sim | nao | baixo | manter nomes simples de cor |
-| `condition` | CSV de condicoes | sim | sim | nao | baixo | validar contra `word` e `ink_color` |
-| `correct_response` | CSV de condicoes | sim | sim | nao | baixo | manter vazio para No-Go |
-| `key_pressed` | componente de teclado | sim | nao | sim | baixo | consolidar no CSV unificado |
-| `reaction_time` | componente de teclado | sim | nao | sim | baixo | consolidar no CSV unificado |
-| `correct` | codigo de classificacao | sim | nao | sim | baixo | consolidar no CSV unificado |
-| `error_type` | codigo de classificacao | sim | nao | sim | baixo | consolidar no CSV unificado |
+- `fix_pratica` e `fix_principal`: `startVal = 0`, `stopVal = 0.3`;
+- `stim_pratica`, `stim_principal`, `lembrete_pratica` e `lembrete_principal`: `startVal = 0.3`, `stopVal = 1.5`;
+- `resp_pratica` e `resp_principal`: `startVal = 0.3`, `stopVal = 1.5`, `forceEndRoutine = False`;
+- `hold_pratica` e `hold_principal`: `startVal = 0`, `stopVal = 2.0`.
 
-A estrutura atual possui base suficiente para produzir um CSV unificado por execucao. A unificacao foi implementada posteriormente na Fase 2 e deve ser validada em modo Pilot antes de coleta real.
+Pressionar Espaco nao encerra a tentativa antes do fim da janela de 1500 ms. A resposta e registrada dentro da janela, mas o estimulo permanece ate o fim do segmento. Respostas durante a fixacao e o intervalo vazio nao sao aceitas porque o componente de teclado inicia apenas aos 300 ms e termina apos 1500 ms de janela. O tempo de reacao e medido a partir do inicio do componente de teclado, alinhado ao inicio do estimulo.
 
-## Inconsistencias identificadas
+O bloco principal tem duracao estimada:
 
-Nenhuma inconsistencia bloqueante foi identificada entre `.psyexp`, loops, rotinas e CSVs de condicoes.
+```text
+60 tentativas x 2.0 s = 120 s
+```
 
-Pendencia nao bloqueante:
+Assim, o bloco principal dura cerca de 2 minutos. O fluxo completo e maior porque inclui formulario, instrucoes, contagens e pratica.
 
-- a validacao original foi feita antes da Fase 2; apos a unificacao, o contrato oficial passou a ser o documento `docs/CSV_UNIFICADO.md`.
+## Validacao automatica
 
-## Correcoes realizadas
+Comandos executados:
 
-Nenhuma correcao foi realizada em `.psyexp` ou CSVs de condicoes.
+```bash
+python3 -m unittest tests.test_fase3_condicoes_tempos -v
+python3 -m unittest tests.test_csv_unificado -v
+python3 -c "import xml.etree.ElementTree as ET; ET.parse('stroop_go_nogo_ptbr.psyexp'); print('psyexp XML ok')"
+```
 
-Esta validacao adicionou somente documentacao.
+Resultados esperados:
 
-## Conclusao
+- 6 testes da Fase 3 aprovados;
+- 10 testes do CSV unificado aprovados;
+- XML do `.psyexp` parseavel.
 
-O experimento esta estruturalmente pronto para avancar para a especificacao visual das novas telas. Antes de coleta real, ainda sera necessario testar em modo Pilot depois de qualquer mudanca visual e implementar a unificacao definitiva da exportacao em etapa separada.
+## Checklist Pilot
+
+1. Preencher formulario normalmente.
+2. Confirmar as 10 cores.
+3. Confirmar 300 ms de fixacao.
+4. Confirmar 1500 ms de estimulo/resposta.
+5. Confirmar 200 ms entre tentativas.
+6. Confirmar que Espaco nao encerra a tentativa antecipadamente.
+7. Confirmar que tentativas `congruent` aceitam Espaco.
+8. Confirmar que tentativas `incongruent` exigem ausencia de resposta.
+9. Concluir o teste.
+10. Confirmar o CSV unificado em `data/`.
+11. Executar `python3 scripts/analisar_stroop.py data/ASSESSMENT_ID.csv`.
+12. Confirmar 60 tentativas principais.
+13. Confirmar duracao aproximada de 2 minutos no bloco principal.
+14. Confirmar classificacao coerente.
+
+Nao foi realizado teste grafico real nesta validacao automatica.

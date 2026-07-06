@@ -11,7 +11,10 @@ Colunas esperadas nos CSVs de tentativas:
 - `trial_number`
 - `word`
 - `ink_color`
+- `ink_color_display`
 - `condition`
 - `correct_response`
+
+`ink_color` e o valor logico usado no CSV unificado. `ink_color_display` usa hexadecimal apenas para renderizacao do estimulo no PsychoPy.
 
 Os CSVs desta pasta sao rastreados pelo Git porque definem a logica experimental. Eles nao sao dados coletados de participantes.
