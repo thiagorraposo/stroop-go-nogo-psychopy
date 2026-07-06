@@ -5,13 +5,24 @@ Este experimento usa uma interface original para uma tarefa Stroop Go/No-Go em p
 ## Principios aplicados
 
 - Tela cheia, cursor oculto e unidades relativas (`height`) para reduzir distracoes.
-- Fundo escuro suave com texto de alto contraste.
+- Fundo neutro com texto de alto contraste.
 - Instrucoes curtas em telas separadas, evitando paragrafos longos.
 - Exemplos visuais reais antes da pratica.
 - Contagem regressiva visual antes da pratica e antes do bloco principal.
 - Feedback apenas na pratica, com texto explicito e sem depender apenas de cor.
 - Bloco principal sem feedback de desempenho, pontos, ranking ou classificacao.
 - Indicador de progresso discreto durante o bloco principal.
+
+## Decisoes para a proxima versao visual
+
+- Criar identidade visual original, propria do projeto, sem copiar interface, textos, logotipos, paletas, graficos, avaliacoes ou composicoes de terceiros.
+- Usar layout de referencia 16:9, responsivo por unidades relativas do PsychoPy, preferencialmente `height`.
+- Separar tutorial, pratica e tarefa principal com rotulos claros.
+- Manter pratica com feedback imediato e bloco principal limpo, sem feedback por tentativa.
+- Nao mostrar diagnostico, normas populacionais, recomendacoes clinicas, classificacao individual ou comparacoes como acima/abaixo da media.
+- Usar as dez cores definidas para a versao futura: verde, amarelo, rosa, preto, vermelho, laranja, marrom, roxo, azul e cinza.
+- Manter foco visual no estimulo central e evitar elementos decorativos durante a tarefa principal.
+- Oferecer botoes claros em telas de navegacao, sempre com alternativa por teclado quando aplicavel.
 
 ## Limites
 

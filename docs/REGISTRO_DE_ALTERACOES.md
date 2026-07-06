@@ -2,6 +2,12 @@
 
 Formato: entradas incrementais com data, tipo de mudanca e resumo.
 
+## 2026-07-06
+
+- `docs`: criada especificacao visual e funcional futura em `docs/ESPECIFICACAO_VISUAL_E_FLUXO.md`.
+- `docs`: criado copy sugerido das telas em `docs/COPY_DAS_TELAS.md`.
+- `docs`: atualizadas decisoes de UX e decisoes metodologicas sem alterar `.psyexp`, condicoes, scripts, dados ou exportacao.
+
 ## 2026-07-05
 
 - `test`: documentada validacao estatica de loops, variaveis e CSVs de condicoes em `docs/VALIDACAO_CONDICOES.md`, sem alterar o paradigma ou arquivos de coleta.
