@@ -205,6 +205,11 @@ class Fase3CondicoesTemposTests(unittest.TestCase):
 
         practice_code = component(practice, "CodeComponent", "codigo_pratica")
         main_code = component(main, "CodeComponent", "codigo_principal")
+        global_line = "global practice_completed, practice_correct_count, main_completed, main_correct_count, main_timer_started"
+        self.assertIn(global_line, param(practice_code, "Begin Routine"))
+        self.assertIn(global_line, param(practice_code, "End Routine"))
+        self.assertIn(global_line, param(main_code, "Begin Routine"))
+        self.assertIn(global_line, param(main_code, "End Routine"))
         self.assertIn("practice_completed += 1", param(practice_code, "End Routine"))
         self.assertIn("main_completed += 1", param(main_code, "End Routine"))
         self.assertIn("if not main_timer_started:", param(main_code, "Begin Routine"))

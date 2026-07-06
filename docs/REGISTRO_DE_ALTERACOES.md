@@ -4,6 +4,7 @@ Formato: entradas incrementais com data, tipo de mudanca e resumo.
 
 ## 2026-07-06
 
+- `fix`: declarados contadores do HUD como globais nos Code Components de pratica e bloco principal, evitando `UnboundLocalError` ao atualizar precisao e cronometro no `run()`.
 - `fix`: corrigidas cores dos cartoes de estimulo para literal constante, evitando geracao de `setColor(#F8FAFC, ...)` invalido no `lastrun.py`.
 - `fix`: corrigida a cor de fundo do tema escuro no `.psyexp` para lista RGB numerica, evitando geracao de `color=[#0B1020]` invalido no `lastrun.py`.
 - `feat`: atualizada versao para `0.2.0`, com protocolo curto de 4 tentativas de pratica e 16 tentativas principais, bloco principal de cerca de 1 minuto, HUD de precisao, cronometro principal e tema escuro com cartao claro para estimulos.
