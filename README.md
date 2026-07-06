@@ -51,19 +51,30 @@ As palavras usadas sao `VERDE`, `AMARELO`, `ROSA`, `PRETO`, `VERMELHO`, `LARANJA
 - `congruent`: palavra e cor correspondem; resposta correta e pressionar `Espaco`.
 - `incongruent`: palavra e cor nao correspondem; resposta correta e nao pressionar nada.
 
-Cada tentativa tem:
+Na versao `0.2.0`, cada tentativa da pratica tem:
 
 - fixacao: 300 ms;
-- estimulo/resposta: 1500 ms;
-- intervalo vazio entre tentativas: 200 ms.
+- estimulo/resposta: 2000 ms;
+- intervalo vazio entre tentativas: 500 ms;
+- feedback automatico: 500 ms apos cada tentativa.
 
-A pratica tem 10 tentativas, com 5 Go/congruentes e 5 No-Go/incongruentes. O bloco principal tem 60 tentativas, com 40 Go/congruentes e 20 No-Go/incongruentes, totalizando cerca de 120 segundos no bloco principal. O fluxo completo e maior por incluir formulario, instrucoes e pratica.
+Cada tentativa do bloco principal tem:
+
+- fixacao: 300 ms;
+- estimulo/resposta: 2500 ms;
+- intervalo vazio entre tentativas: 950 ms.
+
+A pratica tem 4 tentativas, com 2 Go/congruentes e 2 No-Go/incongruentes. O bloco principal tem 16 tentativas, com 12 Go/congruentes e 4 No-Go/incongruentes, totalizando cerca de 60 segundos exclusivamente no bloco principal. O fluxo completo e maior por incluir formulario, instrucoes, contagens, pratica e feedbacks.
+
+Durante a pratica e o bloco principal ha um HUD discreto com precisao acumulada. O cronometro visual inicia apenas no comeco da primeira tentativa principal e segue ate o fim do intervalo da ultima tentativa principal. A precisao ao vivo pode influenciar o comportamento do participante e e uma decisao de UX, nao uma configuracao metodologicamente neutra.
+
+A interface usa tema escuro original com fundo `#0B1020`; os estimulos aparecem sobre um cartao claro para preservar contraste, sem adicionar branco como cor de estimulo.
 
 ## Dados
 
 Os CSVs locais ficam em `data/`. Essa pasta e ignorada pelo Git para proteger dados de teste, execucao e participantes.
 
-Cada execucao concluida normalmente deve gerar um unico CSV oficial por tentativa, nomeado pelo `assessment_id`. Pratica e bloco principal ficam no mesmo arquivo e sao diferenciados pela coluna `block`.
+Cada execucao concluida normalmente deve gerar um unico CSV oficial por tentativa, nomeado pelo `participant_id`. Pratica e bloco principal ficam no mesmo arquivo e sao diferenciados pela coluna `block`.
 
 As colunas principais registradas por tentativa sao:
 
@@ -88,7 +99,7 @@ As colunas principais registradas por tentativa sao:
 Depois de coletar dados, execute:
 
 ```bash
-python3 scripts/analisar_stroop.py data/ASSESSMENT_ID.csv
+python3 scripts/analisar_stroop.py data/PARTICIPANT_ID.csv
 ```
 
 O script valida o CSV unificado, calcula metricas descritivas do bloco principal e nao modifica o arquivo original. O contrato completo esta em `docs/CSV_UNIFICADO.md`.

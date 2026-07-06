@@ -1,11 +1,5 @@
 trial_number,word,ink_color,ink_color_display,condition,correct_response
-1,VERDE,green,#1BAE55,congruent,space
-2,AMARELO,yellow,#B8860B,congruent,space
-3,ROSA,pink,#D42E88,congruent,space
-4,PRETO,black,#1A1A1A,congruent,space
-5,VERMELHO,red,#CF2E2E,congruent,space
-6,LARANJA,brown,#6D4027,incongruent,
-7,MARROM,purple,#7837B8,incongruent,
-8,ROXO,blue,#1976D2,incongruent,
-9,AZUL,gray,#626870,incongruent,
-10,CINZA,orange,#E56A00,incongruent,
+1,VERDE,green,#16803A,congruent,space
+2,AMARELO,purple,#6D28D9,incongruent,
+3,ROSA,pink,#BE185D,congruent,space
+4,PRETO,blue,#1D4ED8,incongruent,

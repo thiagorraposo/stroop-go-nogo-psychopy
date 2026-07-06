@@ -12,16 +12,16 @@ PRACTICE_PATH = ROOT / "condicoes" / "pratica_stroop_go_nogo_ptbr.csv"
 MAIN_PATH = ROOT / "condicoes" / "bloco_principal_stroop_go_nogo_ptbr.csv"
 
 WORDS_TO_COLORS = {
-    "VERDE": ("green", "#1BAE55"),
-    "AMARELO": ("yellow", "#B8860B"),
-    "ROSA": ("pink", "#D42E88"),
-    "PRETO": ("black", "#1A1A1A"),
-    "VERMELHO": ("red", "#CF2E2E"),
-    "LARANJA": ("orange", "#E56A00"),
-    "MARROM": ("brown", "#6D4027"),
-    "ROXO": ("purple", "#7837B8"),
-    "AZUL": ("blue", "#1976D2"),
-    "CINZA": ("gray", "#626870"),
+    "VERDE": ("green", "#16803A"),
+    "AMARELO": ("yellow", "#A16207"),
+    "ROSA": ("pink", "#BE185D"),
+    "PRETO": ("black", "#111827"),
+    "VERMELHO": ("red", "#B91C1C"),
+    "LARANJA": ("orange", "#C2410C"),
+    "MARROM": ("brown", "#78350F"),
+    "ROXO": ("purple", "#6D28D9"),
+    "AZUL": ("blue", "#1D4ED8"),
+    "CINZA": ("gray", "#4B5563"),
 }
 OFFICIAL_WORDS = set(WORDS_TO_COLORS)
 OFFICIAL_COLORS = {color for color, _ in WORDS_TO_COLORS.values()}
@@ -100,34 +100,31 @@ class Fase3CondicoesTemposTests(unittest.TestCase):
             else:
                 self.fail(f"Invalid condition: {row['condition']}")
 
-    def test_pratica_tem_10_cores_e_balanceamento_5_5(self):
+    def test_pratica_tem_4_linhas_e_balanceamento_2_2(self):
         rows = self.practice_rows
-        self.assertEqual(len(rows), 10)
-        self.assertEqual({row["word"] for row in rows}, OFFICIAL_WORDS)
-        self.assertEqual({row["ink_color"] for row in rows}, OFFICIAL_COLORS)
-        self.assertEqual(Counter(row["word"] for row in rows), Counter(OFFICIAL_WORDS))
-        self.assertEqual(Counter(row["ink_color"] for row in rows), Counter(OFFICIAL_COLORS))
-        self.assertEqual(Counter(row["condition"] for row in rows), {"congruent": 5, "incongruent": 5})
+        self.assertEqual(len(rows), 4)
+        self.assertEqual(Counter(row["condition"] for row in rows), {"congruent": 2, "incongruent": 2})
         self.assert_condition_rules(rows)
 
-    def test_principal_tem_60_linhas_e_balanceamento_40_20(self):
+    def test_principal_tem_16_linhas_balanceamento_12_4_e_10_cores(self):
         rows = self.main_rows
-        self.assertEqual(len(rows), 60)
-        self.assertEqual(Counter(row["condition"] for row in rows), {"congruent": 40, "incongruent": 20})
-        self.assertEqual(Counter(row["word"] for row in rows), {word: 6 for word in OFFICIAL_WORDS})
-        self.assertEqual(Counter(row["ink_color"] for row in rows), {color: 6 for color in OFFICIAL_COLORS})
+        self.assertEqual(len(rows), 16)
+        self.assertEqual(Counter(row["condition"] for row in rows), {"congruent": 12, "incongruent": 4})
+        self.assertEqual({row["ink_color"] for row in rows}, OFFICIAL_COLORS)
+        self.assertLessEqual(max(Counter(row["word"] for row in rows).values()), 2)
+        self.assertGreaterEqual(min(Counter(row["word"] for row in rows).values()), 1)
+        self.assertLessEqual(max(Counter(row["ink_color"] for row in rows).values()), 3)
+        self.assertGreaterEqual(min(Counter(row["ink_color"] for row in rows).values()), 1)
         self.assert_condition_rules(rows)
 
-        congruent_rows = [row for row in rows if row["condition"] == "congruent"]
         incongruent_rows = [row for row in rows if row["condition"] == "incongruent"]
-        self.assertEqual(Counter(row["word"] for row in congruent_rows), {word: 4 for word in OFFICIAL_WORDS})
-        self.assertEqual(Counter(row["word"] for row in incongruent_rows), {word: 2 for word in OFFICIAL_WORDS})
-        self.assertEqual(Counter(row["ink_color"] for row in congruent_rows), {color: 4 for color in OFFICIAL_COLORS})
-        self.assertEqual(Counter(row["ink_color"] for row in incongruent_rows), {color: 2 for color in OFFICIAL_COLORS})
         self.assertEqual(
             len({(row["word"], row["ink_color"]) for row in incongruent_rows}),
             len(incongruent_rows),
         )
+        for previous, current in zip(rows, rows[1:]):
+            self.assertNotEqual(previous["word"], current["word"])
+            self.assertNotEqual(previous["ink_color"], current["ink_color"])
 
     def test_csv_unificado_preserva_ink_color_logico_sem_display(self):
         text = PSYEXP_PATH.read_text(encoding="utf-8-sig")
@@ -147,33 +144,70 @@ class Fase3CondicoesTemposTests(unittest.TestCase):
             self.assertEqual(param(item, "color"), "$ink_color_display")
             self.assertEqual(param(item, "text"), "$word")
 
-    def test_tempos_de_tentativa_pratica_e_principal(self):
-        for routine_name, response_name, fix_name, stim_name, reminder_name, hold_name in [
-            ("trial_pratica", "resp_pratica", "fix_pratica", "stim_pratica", "lembrete_pratica", "hold_pratica"),
-            ("trial_principal", "resp_principal", "fix_principal", "stim_principal", "lembrete_principal", "hold_principal"),
-        ]:
-            trial = routine(self.psyexp, routine_name)
-            response = component(trial, "KeyboardComponent", response_name)
-            fix = component(trial, "TextComponent", fix_name)
-            stim = component(trial, "TextComponent", stim_name)
-            reminder = component(trial, "TextComponent", reminder_name)
-            hold = component(trial, "TextComponent", hold_name)
+    def test_tempos_de_tentativa_pratica(self):
+        trial = routine(self.psyexp, "trial_pratica")
+        response = component(trial, "KeyboardComponent", "resp_pratica")
+        fix = component(trial, "TextComponent", "fix_pratica")
+        stim = component(trial, "TextComponent", "stim_pratica")
+        reminder = component(trial, "TextComponent", "lembrete_pratica")
+        hold = component(trial, "TextComponent", "hold_pratica")
 
-            self.assertEqual(param(fix, "startVal"), "0")
-            self.assertEqual(param(fix, "stopVal"), "0.3")
-            self.assertEqual(param(stim, "startVal"), "0.3")
-            self.assertEqual(param(stim, "stopVal"), "1.5")
-            self.assertEqual(param(reminder, "startVal"), "0.3")
-            self.assertEqual(param(reminder, "stopVal"), "1.5")
-            self.assertEqual(param(response, "startVal"), "0.3")
-            self.assertEqual(param(response, "stopVal"), "1.5")
-            self.assertEqual(param(response, "forceEndRoutine"), "False")
-            self.assertEqual(param(response, "discard previous"), "True")
-            self.assertEqual(param(hold, "startVal"), "0")
-            self.assertEqual(param(hold, "stopVal"), "2.0")
+        self.assertEqual(param(fix, "startVal"), "0")
+        self.assertEqual(param(fix, "stopVal"), "0.3")
+        self.assertEqual(param(stim, "startVal"), "0.3")
+        self.assertEqual(param(stim, "stopVal"), "2.0")
+        self.assertEqual(param(reminder, "startVal"), "0.3")
+        self.assertEqual(param(reminder, "stopVal"), "2.0")
+        self.assertEqual(param(response, "startVal"), "0.3")
+        self.assertEqual(param(response, "stopVal"), "2.0")
+        self.assertEqual(param(response, "forceEndRoutine"), "False")
+        self.assertEqual(param(response, "discard previous"), "True")
+        self.assertEqual(param(hold, "startVal"), "0")
+        self.assertEqual(param(hold, "stopVal"), "2.8")
 
-    def test_bloco_principal_dura_aproximadamente_120_segundos(self):
-        self.assertEqual(len(self.main_rows) * 2.0, 120.0)
+        feedback = component(routine(self.psyexp, "feedback_pratica"), "TextComponent", "texto_feedback")
+        self.assertEqual(param(feedback, "stopVal"), "0.5")
+
+    def test_tempos_de_tentativa_principal_e_duracao_de_60_segundos(self):
+        trial = routine(self.psyexp, "trial_principal")
+        response = component(trial, "KeyboardComponent", "resp_principal")
+        fix = component(trial, "TextComponent", "fix_principal")
+        stim = component(trial, "TextComponent", "stim_principal")
+        reminder = component(trial, "TextComponent", "lembrete_principal")
+        hold = component(trial, "TextComponent", "hold_principal")
+
+        self.assertEqual(param(fix, "startVal"), "0")
+        self.assertEqual(param(fix, "stopVal"), "0.3")
+        self.assertEqual(param(stim, "startVal"), "0.3")
+        self.assertEqual(param(stim, "stopVal"), "2.5")
+        self.assertEqual(param(reminder, "startVal"), "0.3")
+        self.assertEqual(param(reminder, "stopVal"), "2.5")
+        self.assertEqual(param(response, "startVal"), "0.3")
+        self.assertEqual(param(response, "stopVal"), "2.5")
+        self.assertEqual(param(response, "forceEndRoutine"), "False")
+        self.assertEqual(param(response, "discard previous"), "True")
+        self.assertEqual(param(hold, "startVal"), "0")
+        self.assertEqual(param(hold, "stopVal"), "3.75")
+        self.assertEqual(len(self.main_rows) * 3.75, 60.0)
+
+    def test_hud_precisao_e_cronometro(self):
+        practice = routine(self.psyexp, "trial_pratica")
+        main = routine(self.psyexp, "trial_principal")
+
+        self.assertEqual(param(component(practice, "TextComponent", "hud_pratica_precisao"), "text"), "$practice_accuracy_text")
+        self.assertEqual(param(component(practice, "TextComponent", "hud_pratica_barra"), "text"), "$practice_accuracy_bar")
+        self.assertEqual(param(component(practice, "TextComponent", "hud_pratica_tempo"), "text"), "Tempo: --:--")
+        self.assertEqual(param(component(main, "TextComponent", "hud_principal_precisao"), "text"), "$main_accuracy_text")
+        self.assertEqual(param(component(main, "TextComponent", "hud_principal_barra"), "text"), "$main_accuracy_bar")
+        self.assertEqual(param(component(main, "TextComponent", "hud_principal_tempo"), "text"), "$timer_text")
+        self.assertEqual(param(component(main, "TextComponent", "hud_principal_tempo"), "text"), "$timer_text")
+
+        practice_code = component(practice, "CodeComponent", "codigo_pratica")
+        main_code = component(main, "CodeComponent", "codigo_principal")
+        self.assertIn("practice_completed += 1", param(practice_code, "End Routine"))
+        self.assertIn("main_completed += 1", param(main_code, "End Routine"))
+        self.assertIn("if not main_timer_started:", param(main_code, "Begin Routine"))
+        self.assertIn("timer_text = format_main_time()", param(main_code, "Each Frame"))
 
 
 if __name__ == "__main__":

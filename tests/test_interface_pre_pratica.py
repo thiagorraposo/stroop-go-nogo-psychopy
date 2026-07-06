@@ -67,6 +67,14 @@ class InterfacePrePraticaTests(unittest.TestCase):
         begin_experiment = param(form, "Begin Experiment")
         self.assertIn("Dados da sessão", begin_experiment)
         self.assertIn("expInfo['assessment_id']", begin_experiment)
+        self.assertIn("TEST_VERSION = '0.2.0'", begin_experiment)
+
+    def test_csv_oficial_usa_participant_id_no_nome(self):
+        form = component(routine(self.root, "boas_vindas"), "CodeComponent", "formulario_sessao")
+        begin_experiment = param(form, "Begin Experiment")
+        self.assertIn("_official_participant_id = expInfo['participant_id']", begin_experiment)
+        self.assertIn("official_csv_path = os.path.join('data', f'{_official_participant_id}.csv')", begin_experiment)
+        self.assertNotIn("_official_assessment_id = expInfo['assessment_id']", begin_experiment)
 
     def test_telas_navegaveis_aceitam_clique_espaco_e_enter(self):
         specs = [
@@ -108,6 +116,25 @@ class InterfacePrePraticaTests(unittest.TestCase):
             "PRESSIONE ESPAÇO APENAS QUANDO A PALAVRA E A COR COMBINAREM.",
         ]:
             self.assertIn(expected, html.unescape(text))
+
+    def test_tema_escuro_e_cartao_claro_nas_tentativas(self):
+        for routine_name in [
+            "boas_vindas",
+            "tutorial_regra",
+            "pratica_inicio",
+            "regra_rapida",
+            "trial_pratica",
+            "trial_principal",
+        ]:
+            settings = component(routine(self.root, routine_name), "RoutineSettingsComponent", routine_name)
+            self.assertEqual(param(settings, "color"), "#0B1020")
+
+        for routine_name, card_name in [
+            ("trial_pratica", "stim_card_pratica"),
+            ("trial_principal", "stim_card_principal"),
+        ]:
+            card = component(routine(self.root, routine_name), "TextComponent", card_name)
+            self.assertEqual(param(card, "color"), "#F8FAFC")
 
 
 if __name__ == "__main__":

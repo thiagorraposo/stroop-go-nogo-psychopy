@@ -6,6 +6,8 @@ Esta pasta contem os CSVs de condicoes usados pelo PsychoPy Builder.
 - `bloco_principal_stroop_go_nogo_ptbr.csv`: tentativas do bloco principal.
 - `contagem_regressiva.csv`: textos usados nas telas breves de preparacao antes dos blocos.
 
+Na versao `0.2.0`, a pratica tem 4 tentativas, com 2 Go/congruentes e 2 No-Go/incongruentes. O bloco principal tem 16 tentativas, com 12 Go/congruentes e 4 No-Go/incongruentes.
+
 Colunas esperadas nos CSVs de tentativas:
 
 - `trial_number`

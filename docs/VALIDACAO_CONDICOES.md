@@ -4,7 +4,7 @@ Data da validacao: 2026-07-06.
 
 ## Escopo
 
-Esta validacao documenta a Fase 3 do experimento Stroop Go/No-Go: ampliacao para 10 cores oficiais, balanceamento das condicoes e perfil temporal de tentativa.
+Esta validacao documenta a versao `0.2.0` do experimento Stroop Go/No-Go: protocolo curto, 10 cores oficiais, tema escuro, HUD de precisao e cronometro visual do bloco principal.
 
 Arquivos validados:
 
@@ -13,6 +13,7 @@ Arquivos validados:
 - `condicoes/pratica_stroop_go_nogo_ptbr.csv`
 - `condicoes/bloco_principal_stroop_go_nogo_ptbr.csv`
 - `tests/test_fase3_condicoes_tempos.py`
+- `tests/test_interface_pre_pratica.py`
 - `tests/test_csv_unificado.py`
 
 Nenhum arquivo em `data/` foi alterado ou usado como fonte de validacao. Esta configuracao e experimental propria, para fins educacionais e de pesquisa exploratoria, sem norma clinica, diagnostico ou equivalencia com instrumentos de terceiros.
@@ -21,16 +22,16 @@ Nenhum arquivo em `data/` foi alterado ou usado como fonte de validacao. Esta co
 
 | Palavra | `ink_color` | Cor visual |
 |---|---|---|
-| `VERDE` | `green` | `#1BAE55` |
-| `AMARELO` | `yellow` | `#B8860B` |
-| `ROSA` | `pink` | `#D42E88` |
-| `PRETO` | `black` | `#1A1A1A` |
-| `VERMELHO` | `red` | `#CF2E2E` |
-| `LARANJA` | `orange` | `#E56A00` |
-| `MARROM` | `brown` | `#6D4027` |
-| `ROXO` | `purple` | `#7837B8` |
-| `AZUL` | `blue` | `#1976D2` |
-| `CINZA` | `gray` | `#626870` |
+| `VERDE` | `green` | `#16803A` |
+| `AMARELO` | `yellow` | `#A16207` |
+| `ROSA` | `pink` | `#BE185D` |
+| `PRETO` | `black` | `#111827` |
+| `VERMELHO` | `red` | `#B91C1C` |
+| `LARANJA` | `orange` | `#C2410C` |
+| `MARROM` | `brown` | `#78350F` |
+| `ROXO` | `purple` | `#6D28D9` |
+| `AZUL` | `blue` | `#1D4ED8` |
+| `CINZA` | `gray` | `#4B5563` |
 
 `ink_color` permanece como valor logico no CSV unificado oficial. O campo `ink_color_display` existe apenas nos CSVs de condicoes para renderizar o texto no PsychoPy com hexadecimal. O exportador unificado continua gravando somente `ink_color`.
 
@@ -38,8 +39,8 @@ Nenhum arquivo em `data/` foi alterado ou usado como fonte de validacao. Esta co
 
 | CSV | Codificacao | Delimitador | Linhas de dados | Colunas |
 |---|---|---|---:|---|
-| `pratica_stroop_go_nogo_ptbr.csv` | UTF-8 | virgula | 10 | `trial_number`, `word`, `ink_color`, `ink_color_display`, `condition`, `correct_response` |
-| `bloco_principal_stroop_go_nogo_ptbr.csv` | UTF-8 | virgula | 60 | `trial_number`, `word`, `ink_color`, `ink_color_display`, `condition`, `correct_response` |
+| `pratica_stroop_go_nogo_ptbr.csv` | UTF-8 | virgula | 4 | `trial_number`, `word`, `ink_color`, `ink_color_display`, `condition`, `correct_response` |
+| `bloco_principal_stroop_go_nogo_ptbr.csv` | UTF-8 | virgula | 16 | `trial_number`, `word`, `ink_color`, `ink_color_display`, `condition`, `correct_response` |
 
 Os testes validam UTF-8, separacao por virgula, largura uniforme e presenca das colunas esperadas.
 
@@ -47,16 +48,12 @@ Os testes validam UTF-8, separacao por virgula, largura uniforme e presenca das 
 
 | Propriedade | Valor |
 |---|---:|
-| Tentativas | 10 |
-| Congruentes | 5 |
-| Incongruentes | 5 |
-| Aparicoes por palavra | 1 |
-| Aparicoes por `ink_color` | 1 |
+| Tentativas | 4 |
+| Congruentes / Go | 2 |
+| Incongruentes / No-Go | 2 |
 
 Regras validadas:
 
-- cada uma das 10 palavras aparece exatamente uma vez;
-- cada uma das 10 cores aparece exatamente uma vez;
 - `correct_response` e `space` somente em tentativas `congruent`;
 - `correct_response` fica vazio em tentativas `incongruent`;
 - nenhuma tentativa `incongruent` tem palavra e cor equivalentes.
@@ -65,19 +62,12 @@ Regras validadas:
 
 | Propriedade | Valor |
 |---|---:|
-| Tentativas | 60 |
-| Congruentes / Go | 40 |
-| Incongruentes / No-Go | 20 |
-| Aparicoes por palavra | 6 |
-| Aparicoes por `ink_color` | 6 |
-| Aparicoes congruentes por palavra | 4 |
-| Aparicoes incongruentes por palavra | 2 |
-| Aparicoes congruentes por `ink_color` | 4 |
-| Aparicoes incongruentes por `ink_color` | 2 |
+| Tentativas | 16 |
+| Congruentes / Go | 12 |
+| Incongruentes / No-Go | 4 |
+| Cores oficiais presentes | 10 |
 
-As 20 tentativas incongruentes usam duas rotacoes ciclicas das 10 cores, com deslocamentos +1 e +3. Isso preserva duas ocorrencias incongruentes por palavra e por cor, impede pares incongruentes palavra + cor equivalentes e evita duplicidade de pares incongruentes.
-
-O loop `principal_loop` permanece com selecao `random`, preservando a randomizacao atual do Builder.
+O bloco principal inclui todas as 10 cores oficiais ao menos uma vez. As palavras e cores foram distribuidas da forma mais equilibrada possivel para 16 tentativas e razao 12/4, preservando pares incongruentes validos e sem duplicidade. O loop `principal_loop` permanece com selecao `random`, preservando a randomizacao atual do Builder.
 
 ## Regras do paradigma
 
@@ -90,62 +80,85 @@ Essas regras nao foram alteradas. O CSV unificado continua recebendo `word`, `in
 
 ## Perfil temporal
 
-Cada tentativa de pratica e do bloco principal usa:
+Pratica:
 
 | Segmento | Inicio | Duracao | Fim |
 |---|---:|---:|---:|
 | Cruz de fixacao | 0.0 s | 0.3 s | 0.3 s |
-| Estimulo e janela de resposta | 0.3 s | 1.5 s | 1.8 s |
-| Intervalo vazio | 1.8 s | 0.2 s | 2.0 s |
+| Estimulo e janela de resposta | 0.3 s | 2.0 s | 2.3 s |
+| Intervalo vazio | 2.3 s | 0.5 s | 2.8 s |
+| Feedback automatico | apos a tentativa | 0.5 s | - |
+
+Bloco principal:
+
+| Segmento | Inicio | Duracao | Fim |
+|---|---:|---:|---:|
+| Cruz de fixacao | 0.0 s | 0.3 s | 0.3 s |
+| Estimulo e janela de resposta | 0.3 s | 2.5 s | 2.8 s |
+| Intervalo vazio | 2.8 s | 0.95 s | 3.75 s |
 
 Configuracao validada no `.psyexp`:
 
 - `fix_pratica` e `fix_principal`: `startVal = 0`, `stopVal = 0.3`;
-- `stim_pratica`, `stim_principal`, `lembrete_pratica` e `lembrete_principal`: `startVal = 0.3`, `stopVal = 1.5`;
-- `resp_pratica` e `resp_principal`: `startVal = 0.3`, `stopVal = 1.5`, `forceEndRoutine = False`;
-- `hold_pratica` e `hold_principal`: `startVal = 0`, `stopVal = 2.0`.
+- `stim_pratica`, `lembrete_pratica` e `resp_pratica`: `startVal = 0.3`, `stopVal = 2.0`;
+- `hold_pratica`: `startVal = 0`, `stopVal = 2.8`;
+- `texto_feedback`: `stopVal = 0.5`;
+- `stim_principal`, `lembrete_principal` e `resp_principal`: `startVal = 0.3`, `stopVal = 2.5`;
+- `hold_principal`: `startVal = 0`, `stopVal = 3.75`;
+- `resp_pratica` e `resp_principal`: `forceEndRoutine = False`.
 
-Pressionar Espaco nao encerra a tentativa antes do fim da janela de 1500 ms. A resposta e registrada dentro da janela, mas o estimulo permanece ate o fim do segmento. Respostas durante a fixacao e o intervalo vazio nao sao aceitas porque o componente de teclado inicia apenas aos 300 ms e termina apos 1500 ms de janela. O tempo de reacao e medido a partir do inicio do componente de teclado, alinhado ao inicio do estimulo.
+Pressionar Espaco nao encerra a tentativa antes do fim da janela de resposta. A resposta e registrada dentro da janela, mas o estimulo permanece ate o fim do segmento. Respostas durante fixacao, intervalo vazio e feedback nao sao aceitas porque o componente de teclado inicia apenas aos 300 ms e termina antes do intervalo.
 
 O bloco principal tem duracao estimada:
 
 ```text
-60 tentativas x 2.0 s = 120 s
+16 tentativas x 3.75 s = 60 s
 ```
 
-Assim, o bloco principal dura cerca de 2 minutos. O fluxo completo e maior porque inclui formulario, instrucoes, contagens e pratica.
+Essa duracao se refere apenas ao bloco principal. O fluxo completo e maior porque inclui formulario, tutorial, contagens, pratica e feedbacks.
+
+## HUD e cronometro
+
+O HUD mostra `Precisão: —` antes da primeira tentativa concluida e `Precisão: XX%` com uma barra horizontal textual apos tentativas concluidas. A pratica calcula apenas tentativas de pratica; o bloco principal calcula apenas tentativas principais.
+
+O cronometro visual mostra `Tempo: MM:SS`, inicia apenas no comeco da primeira tentativa principal e segue continuamente ate o fim do intervalo da ultima tentativa principal. Ele e visual e nao altera CSV, metricas ou classificacao de respostas.
+
+A precisao ao vivo pode influenciar o comportamento do participante e e uma decisao de UX, nao uma configuracao metodologicamente neutra.
+
+## Tema e contraste
+
+A interface usa tema escuro original com fundo `#0B1020`, texto principal `#F8FAFC`, texto auxiliar `#CBD5E1` e destaque proprio de alto contraste. Os estimulos ficam sobre cartao claro aproximado de `#F8FAFC` para preservar contraste, especialmente em PRETO, CINZA e AMARELO. Branco nao foi adicionado como cor de estimulo.
 
 ## Validacao automatica
 
 Comandos executados:
 
 ```bash
-python3 -m unittest tests.test_fase3_condicoes_tempos -v
-python3 -m unittest tests.test_csv_unificado -v
+python3 -m unittest discover -s tests -v
 python3 -c "import xml.etree.ElementTree as ET; ET.parse('stroop_go_nogo_ptbr.psyexp'); print('psyexp XML ok')"
 ```
 
 Resultados esperados:
 
-- 6 testes da Fase 3 aprovados;
-- 10 testes do CSV unificado aprovados;
-- XML do `.psyexp` parseavel.
+- testes automatizados aprovados;
+- XML do `.psyexp` parseavel;
+- sintaxe dos Code Components valida.
 
 ## Checklist Pilot
 
-1. Preencher formulario normalmente.
-2. Confirmar as 10 cores.
-3. Confirmar 300 ms de fixacao.
-4. Confirmar 1500 ms de estimulo/resposta.
-5. Confirmar 200 ms entre tentativas.
-6. Confirmar que Espaco nao encerra a tentativa antecipadamente.
-7. Confirmar que tentativas `congruent` aceitam Espaco.
-8. Confirmar que tentativas `incongruent` exigem ausencia de resposta.
-9. Concluir o teste.
-10. Confirmar o CSV unificado em `data/`.
-11. Executar `python3 scripts/analisar_stroop.py data/ASSESSMENT_ID.csv`.
-12. Confirmar 60 tentativas principais.
-13. Confirmar duracao aproximada de 2 minutos no bloco principal.
-14. Confirmar classificacao coerente.
+1. Abrir o `.psyexp` no Builder.
+2. Executar em modo Pilot.
+3. Confirmar o tema escuro em todas as telas.
+4. Confirmar visibilidade de PRETO, CINZA, AMARELO e demais cores.
+5. Confirmar 4 tentativas de pratica.
+6. Confirmar que o cronometro fica parado durante tutorial e pratica.
+7. Confirmar 16 tentativas principais.
+8. Confirmar que o cronometro inicia na primeira tentativa principal.
+9. Confirmar precisao atualizando apos cada tentativa concluida.
+10. Confirmar duracao do bloco principal proxima de 1 minuto.
+11. Confirmar que Espaco nao encerra o estimulo antecipadamente.
+12. Confirmar geracao de apenas um CSV unificado.
+13. Executar `python3 scripts/analisar_stroop.py data/ARQUIVO_trials.csv`.
+14. Confirmar classificacao coerente das tentativas.
 
 Nao foi realizado teste grafico real nesta validacao automatica.

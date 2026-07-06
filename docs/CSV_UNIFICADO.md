@@ -60,7 +60,7 @@ error_type
 | `block` | `practice` ou `main` |
 | `trial_number` | inteiro positivo, sequencial dentro do bloco, iniciado em 1 |
 | `word` | palavra exibida na tentativa |
-| `ink_color` | cor exibida pelo PsychoPy, como `red`, `blue`, `green` ou `yellow` |
+| `ink_color` | cor exibida pelo PsychoPy, como `green`, `yellow`, `pink`, `black`, `red`, `orange`, `brown`, `purple`, `blue` ou `gray` |
 | `condition` | `congruent` ou `incongruent` |
 | `correct_response` | `space` em Go; vazio em No-Go |
 | `key_pressed` | `space` quando houver resposta; vazio sem resposta |
@@ -76,36 +76,36 @@ Campos `_raw` nao fazem parte do contrato oficial e nao devem ser usados como fo
 
 ```csv
 project,participant_id,initials,visit,evaluator,assessment_id,assessment_date,started_at,test_code,test_version,block,trial_number,word,ink_color,condition,correct_response,key_pressed,reaction_time,correct,error_type
-PILOTO_STROOP,P_EXEMPLO,,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.1.0,main,1,VERMELHO,red,congruent,space,space,0.512,1,hit
+PILOTO_STROOP,P_EXEMPLO,,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.0,main,1,VERMELHO,red,congruent,space,space,0.512,1,hit
 ```
 
 ### Omission
 
 ```csv
-PILOTO_STROOP,P_EXEMPLO,,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.1.0,main,2,AZUL,blue,congruent,space,,,0,omission
+PILOTO_STROOP,P_EXEMPLO,,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.0,main,2,AZUL,blue,congruent,space,,,0,omission
 ```
 
 ### Correct rejection
 
 ```csv
-PILOTO_STROOP,P_EXEMPLO,,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.1.0,main,3,VERDE,yellow,incongruent,,,,1,correct_rejection
+PILOTO_STROOP,P_EXEMPLO,,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.0,main,3,VERDE,yellow,incongruent,,,,1,correct_rejection
 ```
 
 ### Commission
 
 ```csv
-PILOTO_STROOP,P_EXEMPLO,,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.1.0,main,4,AMARELO,blue,incongruent,,space,0.681,0,commission
+PILOTO_STROOP,P_EXEMPLO,,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.0,main,4,AMARELO,blue,incongruent,,space,0.681,0,commission
 ```
 
 ## Nome do arquivo
 
-O arquivo oficial deve ser salvo em `data/` usando o `assessment_id` como nome-base:
+O arquivo oficial deve ser salvo em `data/` usando o `participant_id` como nome-base:
 
 ```text
-data/<assessment_id>.csv
+data/<participant_id>.csv
 ```
 
-O nome nao deve conter `participant_id`, iniciais, visita ou avaliador. O `assessment_id` tambem fica registrado no conteudo do CSV para permitir conferir a correspondencia entre nome do arquivo e dados da execucao.
+O nome nao deve conter iniciais, visita ou avaliador. O `assessment_id` permanece registrado no conteudo do CSV para rastrear a execucao especifica.
 
 ## Execucoes abortadas
 
@@ -116,7 +116,7 @@ Nesta fase, execucoes interrompidas antes do encerramento normal nao geram CSV o
 Execute a partir da raiz do projeto:
 
 ```bash
-python3 scripts/analisar_stroop.py data/ASSESSMENT_ID.csv
+python3 scripts/analisar_stroop.py data/PARTICIPANT_ID.csv
 ```
 
 O script valida o contrato do CSV e calcula metricas descritivas apenas para o bloco `main`.
