@@ -31,7 +31,7 @@ Este projeto e mantido para fins educacionais e de pesquisa exploratoria. Ele na
 
 1. Abra o experimento no Builder.
 2. Use o modo `Pilot` para testar a tarefa sem tratar a execucao como coleta definitiva.
-3. Preencha `participant` e `session` quando solicitado.
+3. Preencha o formulario local de sessao quando solicitado.
 4. Confirme se a pratica mostra feedback e se o bloco principal nao mostra feedback.
 5. Use Pilot para verificacoes antes de qualquer coleta real.
 
@@ -39,7 +39,7 @@ Este projeto e mantido para fins educacionais e de pesquisa exploratoria. Ele na
 
 1. Abra o experimento no Builder.
 2. Use o modo `Run` para coleta.
-3. Preencha `participant` e `session`.
+3. Preencha o formulario local de sessao.
 4. Os arquivos CSV serao gravados em `data/`.
 5. Nao versione arquivos gerados em `data/`.
 
@@ -63,7 +63,7 @@ Os CSVs locais ficam em `data/`. Essa pasta e ignorada pelo Git para proteger da
 
 As colunas principais registradas por tentativa sao:
 
-`participant`, `session`, `trial_number`, `word`, `ink_color`, `condition`, `correct_response`, `key_pressed`, `reaction_time`, `correct`, `error_type`, `block`.
+`project`, `participant_id`, `initials`, `visit`, `evaluator`, `assessment_id`, `assessment_date`, `started_at`, `test_code`, `test_version`, `block`, `trial_number`, `word`, `ink_color`, `condition`, `correct_response`, `key_pressed`, `reaction_time`, `correct`, `error_type`.
 
 `ink_color` usa nomes de cor simples (`red`, `blue`, `green`, `yellow`) para manter os CSVs compativeis com pandas, R e SPSS sem campos RGB com virgulas internas.
 
@@ -93,7 +93,13 @@ O script procura arquivos `.csv` em `data/`, calcula acuracia geral, por condica
 
 A arquitetura futura prevista e: PsychoPy -> CSV bruto unificado -> script de importacao -> SQLite local -> dashboard Streamlit local.
 
-Essa camada ainda nao esta implementada. O modelo de dados, regras de privacidade e plano incremental estao documentados em `docs/DADOS_E_DASHBOARD.md`, `docs/MODELO_DE_DADOS.md` e `docs/PLANO_DE_IMPLEMENTACAO_DASHBOARD.md`.
+A Fase 1 dessa camada, com formulario local de sessao, foi implementada. CSV unificado, importacao, SQLite e dashboard ainda estao pendentes. O modelo de dados, regras de privacidade e plano incremental estao documentados em `docs/DADOS_E_DASHBOARD.md`, `docs/MODELO_DE_DADOS.md` e `docs/PLANO_DE_IMPLEMENTACAO_DASHBOARD.md`.
+
+## Metadados da sessao
+
+Antes da primeira tela, o experimento exibe um formulario local com `project`, `participant_id`, `initials`, `visit` e `evaluator`. A data, hora, `assessment_id`, `test_code` e `test_version` sao gerados automaticamente.
+
+Use identificadores pseudonimizados. Nao informe nome completo, CPF, e-mail, telefone, endereco, idade ou sexo. As regras completas estao em `docs/FORMULARIO_DE_SESSAO.md`.
 
 ## Estrutura do projeto
 
@@ -124,6 +130,7 @@ Essa camada ainda nao esta implementada. O modelo de dados, regras de privacidad
 │   ├── DECISOES_DO_EXPERIMENTO.md
 │   ├── ESPECIFICACAO_VISUAL_E_FLUXO.md
 │   ├── ESTRUTURA_DO_PROJETO.md
+│   ├── FORMULARIO_DE_SESSAO.md
 │   ├── MODELO_DE_DADOS.md
 │   ├── PADRAO_DE_COMMITS.md
 │   ├── PLANO_DE_IMPLEMENTACAO_DASHBOARD.md

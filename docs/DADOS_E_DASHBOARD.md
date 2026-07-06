@@ -2,7 +2,7 @@
 
 Data: 2026-07-06.
 
-Este documento define a arquitetura futura de coleta estruturada, consolidacao e visualizacao local de dados do experimento Stroop Go/No-Go. Nenhum formulario, banco de dados, dashboard, script de importacao ou alteracao no `.psyexp` e implementado nesta etapa.
+Este documento define a arquitetura de coleta estruturada, consolidacao e visualizacao local de dados do experimento Stroop Go/No-Go. A Fase 1 foi implementada no PsychoPy com formulario local de sessao e metadados canonicos no `expInfo`; banco de dados, dashboard, script de importacao e CSV unificado ainda nao foram implementados.
 
 ## Objetivo
 
@@ -49,13 +49,15 @@ Campos previstos por execucao:
 | `project` | sim | formulario PsychoPy | nome ou codigo do projeto |
 | `participant_id` | sim | formulario PsychoPy | identificador principal, pseudonimizado |
 | `initials` | nao | formulario PsychoPy | opcional; tratar como potencialmente identificavel |
-| `assessment_date` | sim | sistema | data e hora local geradas automaticamente |
+| `assessment_date` | sim | sistema | data local gerada automaticamente no formato ISO `YYYY-MM-DD` |
 | `visit` | sim | formulario PsychoPy | visita, sessao ou momento de avaliacao |
 | `evaluator` | sim | formulario PsychoPy | preferir codigo ou iniciais profissionais |
 
 `assessment_date` nao deve depender de digitacao manual, salvo futura necessidade justificada e documentada.
 
 Nao coletar nome completo, CPF, e-mail, endereco, telefone, idade ou sexo nesta versao.
+
+Na implementacao da Fase 1, esses campos entram no `expInfo` com nomes canonicos e acompanham as linhas de tentativa exportadas pelo PsychoPy. Os campos legados `participant` e `session` deixaram de ser usados como identificadores oficiais.
 
 ## Metricas obrigatorias
 

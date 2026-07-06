@@ -23,16 +23,16 @@ Uma linha por execucao completa da tarefa.
 
 | Campo | Tipo conceitual | Obrigatorio | Valores esperados e restricoes |
 |---|---|---|---|
-| `assessment_id` | texto/UUID | sim | identificador unico da execucao; chave primaria logica |
-| `test_code` | texto curto | sim | codigo do teste, por exemplo `stroop_go_nogo` |
+| `assessment_id` | texto/UUID | sim | fonte no experimento; identificador unico da execucao; chave primaria logica |
+| `test_code` | texto curto | sim | fonte no experimento; valor inicial `stroop_go_nogo_ptbr` |
 | `test_version` | texto curto | sim | versao do experimento/teste usada na execucao |
-| `project` | texto | sim | projeto informado no formulario |
-| `participant_id` | texto | sim | identificador pseudonimizado; nao usar nome completo |
-| `initials` | texto | nao | opcional; tratar como dado potencialmente identificavel |
-| `assessment_date` | data/hora | sim | data e hora local geradas automaticamente |
-| `visit` | texto | sim | visita, sessao ou momento da avaliacao |
-| `evaluator` | texto | sim | codigo ou iniciais profissionais do avaliador |
-| `started_at` | data/hora | sim | inicio da execucao |
+| `project` | texto | sim | fonte no formulario do experimento |
+| `participant_id` | texto | sim | fonte no formulario do experimento; identificador pseudonimizado |
+| `initials` | texto | nao | fonte no formulario do experimento; opcional |
+| `assessment_date` | data/hora | sim | fonte no experimento; gerada automaticamente |
+| `visit` | texto | sim | fonte no formulario do experimento |
+| `evaluator` | texto | sim | fonte no formulario do experimento; codigo ou iniciais profissionais |
+| `started_at` | data/hora | sim | fonte no experimento; inicio da execucao |
 | `ended_at` | data/hora | sim | fim da execucao |
 | `source_file` | texto | sim | caminho ou nome do CSV bruto original |
 | `imported_at` | data/hora | sim | data e hora da importacao |
@@ -111,6 +111,7 @@ Esta tabela permite auditoria e analises futuras. O dashboard geral deve prioriz
 
 ## Regras adicionais
 
+- Campos de `assessments` como `assessment_id`, `project`, `participant_id`, `visit`, `evaluator`, `assessment_date`, `started_at`, `test_code` e `test_version` passam a existir desde o CSV bruto gerado pelo experimento.
 - Bancos SQLite reais devem ser locais e ignorados pelo Git.
 - O banco deve preservar rastreabilidade entre `assessment_id`, `source_file` e tentativas.
 - Importacoes invalidas nao devem apagar dados validos ja importados.

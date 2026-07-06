@@ -6,6 +6,8 @@ Este plano descreve fases futuras. Nenhuma fase e implementada nesta etapa.
 
 ## Fase 1 - Formulario da sessao no PsychoPy
 
+Status: implementada tecnicamente no `.psyexp`; considerar concluida somente apos aprovacao do checklist manual em modo Pilot descrito em `docs/FORMULARIO_DE_SESSAO.md`.
+
 Escopo:
 
 - adicionar campos `project`, `participant_id`, `initials`, `visit` e `evaluator`;
@@ -45,6 +47,8 @@ Commit sugerido:
 
 ## Fase 2 - CSV unificado e resumo tecnico
 
+Status: pendente.
+
 Escopo:
 
 - garantir apenas um CSV por execucao;
@@ -83,6 +87,8 @@ Commit sugerido:
 `feat: consolida exportacao unificada do experimento`
 
 ## Fase 3 - Script de validacao e importacao
+
+Status: pendente.
 
 Escopo:
 
@@ -129,6 +135,8 @@ Commit sugerido:
 `feat: cria importador local para sqlite`
 
 ## Fase 4 - Dashboard Streamlit
+
+Status: pendente.
 
 Escopo:
 
@@ -205,6 +213,8 @@ Commit sugerido:
 `feat: cria dashboard local de resultados`
 
 ## Fase 5 - Testes e validacao
+
+Status: pendente.
 
 Escopo:
 

@@ -18,6 +18,10 @@
 - `initials` serao opcionais e tratadas como dado potencialmente identificavel.
 - `assessment_date` sera gerada automaticamente pelo sistema.
 - Campos obrigatorios de sessao: `project`, `participant_id`, `visit` e `evaluator`.
+- O experimento usa formulario local de sessao antes da primeira tela.
+- `participant_id` e o identificador canonico da pessoa no CSV.
+- Nomes de arquivo de dados nao devem usar identificadores do participante, iniciais, visita ou avaliador.
+- `test_version` inicial do formulario estruturado e `0.1.0`.
 - Dados clinicos, normativos e diagnosticos permanecem proibidos.
 - `response_time` sera definido como mediana dos tempos de reacao dos hits validos.
 - O projeto nao faz alegacoes clinicas, normativas, diagnosticas ou de equivalencia psicometrica.
@@ -34,5 +38,6 @@
 ## Historico de decisoes
 
 - 2026-07-06: arquitetura futura de dados definida com CSV bruto unificado, importacao para SQLite local e dashboard Streamlit local.
+- 2026-07-06: formulario local de sessao definido como fonte canonica de metadados da execucao.
 - 2026-07-06: especificacao visual futura definida como documentacao, sem alterar o experimento atual.
 - 2026-07-05: estrutura inicial de governanca e versionamento criada sem alterar a logica experimental.
