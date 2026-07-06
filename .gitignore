@@ -7,10 +7,21 @@ data/
 *.xlsx
 *.tsv
 *.csv
+*.sqlite
+*.sqlite3
+*.db
+exports/
+storage/
+database/
+backups/
 
 # CSVs de condicoes necessarios ao experimento
 !condicoes/
 !condicoes/*.csv
+
+# Configuracoes locais do dashboard
+dashboard/.streamlit/secrets.toml
+dashboard/.streamlit/config.toml.local
 
 # Arquivos gerados pelo PsychoPy
 *_lastrun.py

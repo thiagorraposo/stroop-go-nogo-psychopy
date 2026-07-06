@@ -4,6 +4,9 @@ Formato: entradas incrementais com data, tipo de mudanca e resumo.
 
 ## 2026-07-06
 
+- `docs`: definida arquitetura futura de dados e dashboard local em `docs/DADOS_E_DASHBOARD.md`, `docs/MODELO_DE_DADOS.md` e `docs/PLANO_DE_IMPLEMENTACAO_DASHBOARD.md`.
+- `docs`: criada estrutura documental de `dashboard/` com regras persistentes e README, sem implementar Streamlit ou banco.
+- `chore`: atualizadas regras de Git e agentes para proteger SQLite, bancos locais, exports e dados reais.
 - `docs`: criada especificacao visual e funcional futura em `docs/ESPECIFICACAO_VISUAL_E_FLUXO.md`.
 - `docs`: criado copy sugerido das telas em `docs/COPY_DAS_TELAS.md`.
 - `docs`: atualizadas decisoes de UX e decisoes metodologicas sem alterar `.psyexp`, condicoes, scripts, dados ou exportacao.

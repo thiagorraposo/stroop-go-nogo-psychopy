@@ -12,6 +12,14 @@
 - A pratica podera ser repetida antes do bloco principal em implementacao futura.
 - Resultados exibidos ao participante devem ser apenas descritivos.
 - Idade e sexo nao devem ser usados para pontuacao, classificacao ou comparacao normativa.
+- A arquitetura de dados futura adotara SQLite local como armazenamento inicial.
+- O dashboard futuro sera local, em Streamlit, lendo apenas SQLite.
+- `participant_id` sera o identificador principal da pessoa.
+- `initials` serao opcionais e tratadas como dado potencialmente identificavel.
+- `assessment_date` sera gerada automaticamente pelo sistema.
+- Campos obrigatorios de sessao: `project`, `participant_id`, `visit` e `evaluator`.
+- Dados clinicos, normativos e diagnosticos permanecem proibidos.
+- `response_time` sera definido como mediana dos tempos de reacao dos hits validos.
 - O projeto nao faz alegacoes clinicas, normativas, diagnosticas ou de equivalencia psicometrica.
 - Dados locais de execucao e coleta ficam em `data/` e nao devem ser versionados.
 - A pasta `condicoes/` e mantida como pasta existente de CSVs de condicoes, equivalente funcional ao nome `conditions/` solicitado para estrutura.
@@ -25,5 +33,6 @@
 
 ## Historico de decisoes
 
+- 2026-07-06: arquitetura futura de dados definida com CSV bruto unificado, importacao para SQLite local e dashboard Streamlit local.
 - 2026-07-06: especificacao visual futura definida como documentacao, sem alterar o experimento atual.
 - 2026-07-05: estrutura inicial de governanca e versionamento criada sem alterar a logica experimental.

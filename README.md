@@ -89,6 +89,12 @@ python3 scripts/analisar_stroop.py
 
 O script procura arquivos `.csv` em `data/`, calcula acuracia geral, por condicao e por bloco, e compara a mediana do tempo de reacao das respostas corretas entre condicoes congruentes e incongruentes.
 
+## Camada de dados e dashboard
+
+A arquitetura futura prevista e: PsychoPy -> CSV bruto unificado -> script de importacao -> SQLite local -> dashboard Streamlit local.
+
+Essa camada ainda nao esta implementada. O modelo de dados, regras de privacidade e plano incremental estao documentados em `docs/DADOS_E_DASHBOARD.md`, `docs/MODELO_DE_DADOS.md` e `docs/PLANO_DE_IMPLEMENTACAO_DASHBOARD.md`.
+
 ## Estrutura do projeto
 
 ```text
@@ -108,13 +114,22 @@ O script procura arquivos `.csv` em `data/`, calcula acuracia geral, por condica
 │   └── pratica_stroop_go_nogo_ptbr.csv
 ├── data/
 │   └── README.md
+├── dashboard/
+│   ├── AGENTS.md
+│   └── README.md
 ├── docs/
 │   ├── AGENTS.md
+│   ├── COPY_DAS_TELAS.md
+│   ├── DADOS_E_DASHBOARD.md
 │   ├── DECISOES_DO_EXPERIMENTO.md
+│   ├── ESPECIFICACAO_VISUAL_E_FLUXO.md
 │   ├── ESTRUTURA_DO_PROJETO.md
+│   ├── MODELO_DE_DADOS.md
 │   ├── PADRAO_DE_COMMITS.md
+│   ├── PLANO_DE_IMPLEMENTACAO_DASHBOARD.md
 │   ├── REGISTRO_DE_ALTERACOES.md
-│   └── UX_DECISIONS.md
+│   ├── UX_DECISIONS.md
+│   └── VALIDACAO_CONDICOES.md
 ├── scripts/
 │   ├── AGENTS.md
 │   ├── README.md

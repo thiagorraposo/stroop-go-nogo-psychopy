@@ -25,6 +25,12 @@ Este projeto e um experimento original Stroop Go/No-Go desenvolvido em PsychoPy,
 - Os CSVs finais precisam ser consistentes, uma linha por tentativa, e permitir distinguir `practice` e `main` pela coluna `block`.
 - Manter somente um CSV unificado por execucao futura.
 - Campos finais esperados: `participant`, `session`, `block`, `trial_number`, `word`, `ink_color`, `condition`, `correct_response`, `key_pressed`, `reaction_time`, `correct`, `error_type`.
+- A arquitetura de dados futura e: PsychoPy -> CSV bruto unificado -> script de importacao -> SQLite local -> dashboard Streamlit local.
+- Nao versionar SQLite, bancos locais, CSVs reais, exports, backups, credenciais ou arquivos temporarios.
+- Toda metrica nova deve ter formula documentada antes da implementacao.
+- Manter rastreabilidade entre `assessment_id`, `source_file` e dados por tentativa.
+- `participant_id` e o identificador principal; `initials` sao opcionais e potencialmente identificaveis.
+- Nao coletar nome completo, CPF, e-mail, endereco, telefone, idade ou sexo nesta versao.
 
 ## Regras do paradigma
 
@@ -47,6 +53,7 @@ Este projeto e um experimento original Stroop Go/No-Go desenvolvido em PsychoPy,
 - `scripts/` concentra scripts auxiliares.
 - `docs/` concentra documentacao metodologica, historico e governanca.
 - `assets/` armazena apenas assets proprios do projeto.
+- `dashboard/` fica reservado para dashboard Streamlit local futuro.
 - `tests/` fica reservado para validacoes futuras.
 - `data/` e local; somente `data/README.md` pode ser versionado.
 
