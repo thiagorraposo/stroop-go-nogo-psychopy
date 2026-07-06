@@ -6,6 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PSYEXP_PATH = ROOT / "stroop_go_nogo_ptbr.psyexp"
+DARK_BACKGROUND_RGB = "[-0.914, -0.875, -0.749]"
 
 
 def parse_psyexp():
@@ -127,7 +128,8 @@ class InterfacePrePraticaTests(unittest.TestCase):
             "trial_principal",
         ]:
             settings = component(routine(self.root, routine_name), "RoutineSettingsComponent", routine_name)
-            self.assertEqual(param(settings, "color"), "#0B1020")
+            self.assertEqual(param(settings, "color"), DARK_BACKGROUND_RGB)
+            self.assertFalse(param(settings, "color").startswith("#"))
 
         for routine_name, card_name in [
             ("trial_pratica", "stim_card_pratica"),

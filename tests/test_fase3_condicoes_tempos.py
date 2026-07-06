@@ -26,6 +26,7 @@ WORDS_TO_COLORS = {
 OFFICIAL_WORDS = set(WORDS_TO_COLORS)
 OFFICIAL_COLORS = {color for color, _ in WORDS_TO_COLORS.values()}
 OFFICIAL_DISPLAYS = {display for _, display in WORDS_TO_COLORS.values()}
+DARK_BACKGROUND_RGB = "[-0.914, -0.875, -0.749]"
 CONDITION_COLUMNS = [
     "trial_number",
     "word",
@@ -208,6 +209,12 @@ class Fase3CondicoesTemposTests(unittest.TestCase):
         self.assertIn("main_completed += 1", param(main_code, "End Routine"))
         self.assertIn("if not main_timer_started:", param(main_code, "Begin Routine"))
         self.assertIn("timer_text = format_main_time()", param(main_code, "Each Frame"))
+
+    def test_cor_de_fundo_global_e_lista_rgb_segura_para_builder(self):
+        settings = self.psyexp.find("Settings")
+        color = param(settings, "color")
+        self.assertEqual(color, DARK_BACKGROUND_RGB)
+        self.assertFalse(color.startswith("#"))
 
 
 if __name__ == "__main__":

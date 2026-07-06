@@ -31,7 +31,7 @@
     <Param val="avg" valType="str" updates="None" name="blendMode" />
     <Param val="float" valType="str" updates="None" name="clockFormat" />
     <Param val="{'thisRow.t': 'priority.CRITICAL', 'expName': 'priority.LOW'}" valType="dict" updates="None" name="colPriority" />
-    <Param val="#0B1020" valType="list" updates="None" name="color" />
+    <Param val="[-0.914, -0.875, -0.749]" valType="list" updates="None" name="color" />
     <Param val="rgb" valType="str" updates="None" name="colorSpace" />
     <Param val="warning" valType="code" updates="None" name="consoleLoggingLevel" />
     <Param val="stroop_go_nogo_ptbr" valType="str" updates="None" name="expName" />
@@ -56,7 +56,7 @@
       <RoutineSettingsComponent name="boas_vindas" plugin="None">
         <Param val="none" valType="str" updates="None" name="backgroundFit" />
         <Param val="" valType="str" updates="None" name="backgroundImg" />
-        <Param val="#0B1020" valType="color" updates="None" name="color" />
+        <Param val="[-0.914, -0.875, -0.749]" valType="color" updates="None" name="color" />
         <Param val="rgb" valType="str" updates="None" name="colorSpace" />
         <Param val="" valType="str" updates="constant" name="desc" />
         <Param val="False" valType="bool" updates="None" name="disabled" />
@@ -295,7 +295,7 @@
       <RoutineSettingsComponent name="tutorial_regra" plugin="None">
         <Param val="none" valType="str" updates="None" name="backgroundFit" />
         <Param val="" valType="str" updates="None" name="backgroundImg" />
-        <Param val="#0B1020" valType="color" updates="None" name="color" />
+        <Param val="[-0.914, -0.875, -0.749]" valType="color" updates="None" name="color" />
         <Param val="rgb" valType="str" updates="None" name="colorSpace" />
         <Param val="" valType="str" updates="constant" name="desc" />
         <Param val="False" valType="bool" updates="None" name="disabled" />
@@ -545,7 +545,7 @@
       <RoutineSettingsComponent name="pratica_inicio" plugin="None">
         <Param val="none" valType="str" updates="None" name="backgroundFit" />
         <Param val="" valType="str" updates="None" name="backgroundImg" />
-        <Param val="#0B1020" valType="color" updates="None" name="color" />
+        <Param val="[-0.914, -0.875, -0.749]" valType="color" updates="None" name="color" />
         <Param val="rgb" valType="str" updates="None" name="colorSpace" />
         <Param val="" valType="str" updates="constant" name="desc" />
         <Param val="False" valType="bool" updates="None" name="disabled" />
@@ -711,7 +711,7 @@
       <RoutineSettingsComponent name="regra_rapida" plugin="None">
         <Param val="none" valType="str" updates="None" name="backgroundFit" />
         <Param val="" valType="str" updates="None" name="backgroundImg" />
-        <Param val="#0B1020" valType="color" updates="None" name="color" />
+        <Param val="[-0.914, -0.875, -0.749]" valType="color" updates="None" name="color" />
         <Param val="rgb" valType="str" updates="None" name="colorSpace" />
         <Param val="" valType="str" updates="constant" name="desc" />
         <Param val="False" valType="bool" updates="None" name="disabled" />
@@ -785,7 +785,7 @@
       <RoutineSettingsComponent name="contagem" plugin="None">
         <Param val="none" valType="str" updates="None" name="backgroundFit" />
         <Param val="" valType="str" updates="None" name="backgroundImg" />
-        <Param val="#0B1020" valType="color" updates="None" name="color" />
+        <Param val="[-0.914, -0.875, -0.749]" valType="color" updates="None" name="color" />
         <Param val="rgb" valType="str" updates="None" name="colorSpace" />
         <Param val="" valType="str" updates="constant" name="desc" />
         <Param val="False" valType="bool" updates="None" name="disabled" />
@@ -859,7 +859,7 @@
       <RoutineSettingsComponent name="trial_pratica" plugin="None">
         <Param val="none" valType="str" updates="None" name="backgroundFit" />
         <Param val="" valType="str" updates="None" name="backgroundImg" />
-        <Param val="#0B1020" valType="color" updates="None" name="color" />
+        <Param val="[-0.914, -0.875, -0.749]" valType="color" updates="None" name="color" />
         <Param val="rgb" valType="str" updates="None" name="colorSpace" />
         <Param val="" valType="str" updates="constant" name="desc" />
         <Param val="False" valType="bool" updates="None" name="disabled" />
@@ -1137,7 +1137,7 @@
       <RoutineSettingsComponent name="feedback_pratica" plugin="None">
         <Param val="none" valType="str" updates="None" name="backgroundFit" />
         <Param val="" valType="str" updates="None" name="backgroundImg" />
-        <Param val="#0B1020" valType="color" updates="None" name="color" />
+        <Param val="[-0.914, -0.875, -0.749]" valType="color" updates="None" name="color" />
         <Param val="rgb" valType="str" updates="None" name="colorSpace" />
         <Param val="" valType="str" updates="constant" name="desc" />
         <Param val="False" valType="bool" updates="None" name="disabled" />
@@ -1183,7 +1183,7 @@
       <RoutineSettingsComponent name="resumo_pratica" plugin="None">
         <Param val="none" valType="str" updates="None" name="backgroundFit" />
         <Param val="" valType="str" updates="None" name="backgroundImg" />
-        <Param val="#0B1020" valType="color" updates="None" name="color" />
+        <Param val="[-0.914, -0.875, -0.749]" valType="color" updates="None" name="color" />
         <Param val="rgb" valType="str" updates="None" name="colorSpace" />
         <Param val="" valType="str" updates="constant" name="desc" />
         <Param val="False" valType="bool" updates="None" name="disabled" />
@@ -1332,7 +1332,7 @@
       <RoutineSettingsComponent name="trial_principal" plugin="None">
         <Param val="none" valType="str" updates="None" name="backgroundFit" />
         <Param val="" valType="str" updates="None" name="backgroundImg" />
-        <Param val="#0B1020" valType="color" updates="None" name="color" />
+        <Param val="[-0.914, -0.875, -0.749]" valType="color" updates="None" name="color" />
         <Param val="rgb" valType="str" updates="None" name="colorSpace" />
         <Param val="" valType="str" updates="constant" name="desc" />
         <Param val="False" valType="bool" updates="None" name="disabled" />
@@ -1638,7 +1638,7 @@
       <RoutineSettingsComponent name="fim" plugin="None">
         <Param val="none" valType="str" updates="None" name="backgroundFit" />
         <Param val="" valType="str" updates="None" name="backgroundImg" />
-        <Param val="#0B1020" valType="color" updates="None" name="color" />
+        <Param val="[-0.914, -0.875, -0.749]" valType="color" updates="None" name="color" />
         <Param val="rgb" valType="str" updates="None" name="colorSpace" />
         <Param val="" valType="str" updates="constant" name="desc" />
         <Param val="False" valType="bool" updates="None" name="disabled" />
