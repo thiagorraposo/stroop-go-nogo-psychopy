@@ -1021,7 +1021,7 @@
         <Param val="0.4" valType="num" updates="constant" name="wrapWidth" />
       </TextComponent>
       <TextComponent name="stim_card_pratica" plugin="None">
-        <Param val="#F8FAFC" valType="code" updates="set every repeat" name="color" />
+        <Param val="white" valType="str" updates="constant" name="color" />
         <Param val="rgb" valType="str" updates="constant" name="colorSpace" />
         <Param val="1" valType="num" updates="constant" name="contrast" />
         <Param val="False" valType="bool" updates="None" name="disabled" />
@@ -1522,7 +1522,7 @@
         <Param val="0.4" valType="num" updates="constant" name="wrapWidth" />
       </TextComponent>
       <TextComponent name="stim_card_principal" plugin="None">
-        <Param val="#F8FAFC" valType="code" updates="set every repeat" name="color" />
+        <Param val="white" valType="str" updates="constant" name="color" />
         <Param val="rgb" valType="str" updates="constant" name="colorSpace" />
         <Param val="1" valType="num" updates="constant" name="contrast" />
         <Param val="False" valType="bool" updates="None" name="disabled" />

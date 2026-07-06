@@ -136,7 +136,17 @@ class InterfacePrePraticaTests(unittest.TestCase):
             ("trial_principal", "stim_card_principal"),
         ]:
             card = component(routine(self.root, routine_name), "TextComponent", card_name)
-            self.assertEqual(param(card, "color"), "#F8FAFC")
+            self.assertEqual(param(card, "color"), "white")
+
+    def test_hexadecimal_nao_e_usado_como_codigo_de_cor(self):
+        for text_component in self.root.findall(".//TextComponent"):
+            for item in text_component.findall("Param"):
+                if item.get("name") == "color" and (item.get("val") or "").startswith("#"):
+                    self.assertNotEqual(
+                        item.get("valType"),
+                        "code",
+                        f"{text_component.get('name')} usa hexadecimal como codigo",
+                    )
 
 
 if __name__ == "__main__":
