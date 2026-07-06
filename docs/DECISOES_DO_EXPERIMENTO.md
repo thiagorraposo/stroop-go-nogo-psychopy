@@ -14,6 +14,8 @@
 - O bloco principal tem 40 tentativas Go/congruentes e 20 tentativas No-Go/incongruentes.
 - Cada tentativa de pratica e principal dura 2,0 segundos: 300 ms de fixacao, 1500 ms de estimulo/resposta e 200 ms de intervalo vazio.
 - O bloco principal dura aproximadamente 120 segundos; o fluxo completo e maior por incluir formulario, instrucoes e pratica.
+- A primeira fase visual pre-pratica usa o fluxo `boas_vindas` -> `tutorial_regra` -> `pratica_inicio` -> `regra_rapida` antes da contagem da pratica.
+- As telas de navegacao pre-pratica aceitam clique, `Espaco` e `Enter`; cliques nao contam como respostas experimentais.
 - Resultados exibidos ao participante devem ser apenas descritivos.
 - Idade e sexo nao devem ser usados para pontuacao, classificacao ou comparacao normativa.
 - A arquitetura de dados futura adotara SQLite local como armazenamento inicial.
@@ -49,6 +51,7 @@
 ## Historico de decisoes
 
 - 2026-07-06: arquitetura futura de dados definida com CSV bruto unificado, importacao para SQLite local e dashboard Streamlit local.
+- 2026-07-06: primeira fase visual pre-pratica definida com abertura, tutorial unico, introducao a pratica e lembrete automatico.
 - 2026-07-06: Fase 3 definida com 10 cores, bloco principal de 60 tentativas e perfil temporal de 2,0 segundos por tentativa.
 - 2026-07-06: CSV oficial definido para usar `assessment_id` como nome-base do arquivo em `data/`.
 - 2026-07-06: formulario local de sessao definido como fonte canonica de metadados da execucao.

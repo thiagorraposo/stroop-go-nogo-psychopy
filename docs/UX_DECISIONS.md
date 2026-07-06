@@ -24,6 +24,17 @@ Este experimento usa uma interface original para uma tarefa Stroop Go/No-Go em p
 - Manter foco visual no estimulo central e evitar elementos decorativos durante a tarefa principal.
 - Oferecer botoes claros em telas de navegacao, sempre com alternativa por teclado quando aplicavel.
 
+## Fase visual pre-pratica
+
+Implementada em 2026-07-06 como primeira parte da nova interface visual:
+
+- `boas_vindas`: abertura com titulo, explicacao, exemplo visual simples, botao textual e alternativa por teclado.
+- `tutorial_regra`: tutorial unico com exemplos Go e No-Go lado a lado.
+- `pratica_inicio`: introducao curta a pratica e ao feedback.
+- `regra_rapida`: lembrete automatico de aproximadamente 1,5 segundo antes da contagem regressiva.
+
+As telas navegaveis aceitam clique no botao textual, `Espaco` e `Enter`. Cliques sao tratados apenas nessas telas de navegacao e nao entram como resposta experimental nas tentativas Stroop. A identidade visual usa fundo claro, tipografia sans-serif, destaque azul-esverdeado proprio e exemplos simples, sem imagens externas ou assets de terceiros.
+
 ## Limites
 
 O experimento implementa um paradigma experimental de inibicao de resposta. Ele nao fornece diagnostico, escore clinico, classificacao cognitiva ou equivalencia clinica com qualquer produto comercial.

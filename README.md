@@ -32,8 +32,9 @@ Este projeto e mantido para fins educacionais e de pesquisa exploratoria. Ele na
 1. Abra o experimento no Builder.
 2. Use o modo `Pilot` para testar a tarefa sem tratar a execucao como coleta definitiva.
 3. Preencha o formulario local de sessao quando solicitado.
-4. Confirme se a pratica mostra feedback e se o bloco principal nao mostra feedback.
-5. Use Pilot para verificacoes antes de qualquer coleta real.
+4. Confirme a sequencia pre-pratica: abertura, tutorial, inicio da pratica, lembrete rapido e contagem regressiva.
+5. Confirme se a pratica mostra feedback e se o bloco principal nao mostra feedback.
+6. Use Pilot para verificacoes antes de qualquer coleta real.
 
 ## Como executar em modo Run
 
@@ -104,6 +105,10 @@ Antes da primeira tela, o experimento exibe um formulario local com `project`, `
 
 Use identificadores pseudonimizados. Nao informe nome completo, CPF, e-mail, telefone, endereco, idade ou sexo. As regras completas estao em `docs/FORMULARIO_DE_SESSAO.md`.
 
+## Interface pre-pratica
+
+A primeira parte da interface visual conduz o participante por abertura, tutorial da regra, introducao a pratica e lembrete rapido antes da contagem regressiva. As telas navegaveis aceitam clique, `Espaco` e `Enter`. Essa etapa nao registra linhas no CSV canonico e nao altera as tentativas Stroop.
+
 ## Estrutura do projeto
 
 ```text
@@ -149,7 +154,8 @@ Use identificadores pseudonimizados. Nao informe nome completo, CPF, e-mail, tel
     ├── AGENTS.md
     ├── README.md
     ├── test_csv_unificado.py
-    └── test_fase3_condicoes_tempos.py
+    ├── test_fase3_condicoes_tempos.py
+    └── test_interface_pre_pratica.py
 ```
 
 Nota: a pasta existente `condicoes/` e preservada como diretoria de CSVs de condicoes do experimento. Ela cumpre o papel da pasta `conditions/` sem duplicar conteudo.
