@@ -48,6 +48,7 @@ Campos previstos por execucao:
 |---|---|---|---|
 | `project` | sim | formulario PsychoPy | nome ou codigo do projeto |
 | `participant_id` | sim | formulario PsychoPy | identificador principal, pseudonimizado |
+| `participant_name` | sim | formulario PsychoPy | dado pessoal local; nao usar como identificador tecnico |
 | `initials` | nao | formulario PsychoPy | opcional; tratar como potencialmente identificavel |
 | `assessment_date` | sim | sistema | data local gerada automaticamente no formato ISO `YYYY-MM-DD` |
 | `visit` | sim | formulario PsychoPy | visita, sessao ou momento de avaliacao |
@@ -57,7 +58,7 @@ Campos previstos por execucao:
 
 Nao coletar nome completo, CPF, e-mail, endereco, telefone, idade ou sexo nesta versao.
 
-Na implementacao da Fase 1, esses campos entram no `expInfo` com nomes canonicos e acompanham as linhas de tentativa exportadas pelo PsychoPy. Os campos legados `participant` e `session` deixaram de ser usados como identificadores oficiais.
+Na implementacao da Fase 1, esses campos entram no `expInfo` com nomes canonicos e acompanham as linhas de tentativa exportadas pelo PsychoPy. `participant_name` e local, nao entra em nome de arquivo e nao substitui `participant_id`. Os campos legados `participant` e `session` deixaram de ser usados como identificadores oficiais.
 
 ## Metricas obrigatorias
 
@@ -92,6 +93,7 @@ Campos tecnicos de auditoria a registrar futuramente:
 ## Privacidade e minimizacao de dados
 
 - `participant_id` e obrigatorio e deve ser pseudonimizado.
+- `participant_name` e um dado pessoal local e nao deve aparecer em nomes de arquivo, logs, screenshots ou commits.
 - `initials` sao opcionais e devem ser tratadas como dado potencialmente identificavel.
 - Nao coletar nome completo.
 - Nao coletar dados demograficos sem justificativa, consentimento e documentacao.

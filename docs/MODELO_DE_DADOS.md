@@ -28,6 +28,7 @@ Uma linha por execucao completa da tarefa.
 | `test_version` | texto curto | sim | versao do experimento/teste usada na execucao |
 | `project` | texto | sim | fonte no formulario do experimento |
 | `participant_id` | texto | sim | fonte no formulario do experimento; identificador pseudonimizado |
+| `participant_name` | texto | sim | fonte no formulario do experimento; dado pessoal local |
 | `initials` | texto | nao | fonte no formulario do experimento; opcional |
 | `assessment_date` | data/hora | sim | fonte no experimento; gerada automaticamente |
 | `visit` | texto | sim | fonte no formulario do experimento |
@@ -42,7 +43,8 @@ Restricoes recomendadas:
 
 - `assessment_id` deve ser unico.
 - A combinacao `source_file` + identificador de conteudo deve impedir duplicidade acidental.
-- `participant_id`, `project`, `visit` e `evaluator` nao podem ser vazios.
+- `participant_id`, `participant_name`, `project`, `visit` e `evaluator` nao podem ser vazios.
+- `participant_name` nao deve ser usado como identificador principal.
 - `initials` nao deve ser usado como identificador principal.
 
 ## Tabela assessment_metrics
@@ -123,6 +125,7 @@ Esta tabela permite auditoria e analises futuras. O dashboard geral deve prioriz
 |---|---|
 | `project` | `assessments.project` |
 | `participant_id` | `assessments.participant_id` |
+| `participant_name` | `assessments.participant_name` |
 | `initials` | `assessments.initials` |
 | `visit` | `assessments.visit` |
 | `evaluator` | `assessments.evaluator` |

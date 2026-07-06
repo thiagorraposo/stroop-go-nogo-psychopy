@@ -35,11 +35,11 @@ Implementada em 2026-07-06 como primeira parte da nova interface visual:
 - `pratica_inicio`: introducao curta a pratica e ao feedback.
 - `regra_rapida`: lembrete automatico de aproximadamente 1,5 segundo antes da contagem regressiva.
 
-As telas navegaveis aceitam clique no botao textual, `Espaco` e `Enter`. Cliques sao tratados apenas nessas telas de navegacao e nao entram como resposta experimental nas tentativas Stroop. A identidade visual inicial usava fundo claro, tipografia sans-serif, destaque azul-esverdeado proprio e exemplos simples, sem imagens externas ou assets de terceiros.
+As telas navegaveis aceitam clique no botao textual, `Espaco` e `Enter`. Cliques sao tratados apenas nessas telas de navegacao e nao entram como resposta experimental nas tentativas Stroop. O `participant_name` e um dado pessoal local, usado apenas no formulario e nunca em nome de arquivo, logs ou screenshots publicos. A identidade visual inicial usava fundo claro, tipografia sans-serif, destaque azul-esverdeado proprio e exemplos simples, sem imagens externas ou assets de terceiros.
 
 ## Tema escuro e HUD
 
-Implementado em 2026-07-06 na versao `0.2.0`:
+Implementado em 2026-07-06 na versao `0.2.1`:
 
 - tema escuro aplicado nas telas de instrucao, contagem, pratica, bloco principal e fim;
 - fundo principal `#0B1020`, texto principal `#F8FAFC` e texto auxiliar `#CBD5E1`;

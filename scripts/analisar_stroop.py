@@ -14,6 +14,7 @@ from statistics import median
 CANONICAL_COLUMNS = [
     "project",
     "participant_id",
+    "participant_name",
     "initials",
     "visit",
     "evaluator",
@@ -37,6 +38,7 @@ CANONICAL_COLUMNS = [
 REQUIRED_NON_EMPTY = {
     "project",
     "participant_id",
+    "participant_name",
     "visit",
     "evaluator",
     "assessment_id",
@@ -106,7 +108,7 @@ def _read_csv_stream(stream: io.TextIOBase) -> tuple[list[dict[str, str]], list[
 def read_canonical_csv(path: Path) -> tuple[list[dict[str, str]], list[str]]:
     if is_loop_csv_path(path):
         return [], [
-            "Arquivo parece ser CSV automatico de loop. Use o CSV canonico nomeado pelo assessment_id."
+            "Arquivo parece ser CSV automatico de loop. Use o CSV canonico nomeado pelo participant_id."
         ]
     if not path.exists():
         return [], [f"Arquivo nao encontrado: {path}"]
@@ -299,7 +301,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Valida e resume um CSV unificado do Stroop Go/No-Go."
     )
-    parser.add_argument("csv_path", type=Path, help="Caminho do CSV canonico nomeado pelo assessment_id")
+    parser.add_argument("csv_path", type=Path, help="Caminho do CSV canonico nomeado pelo participant_id")
     return parser.parse_args(argv)
 
 

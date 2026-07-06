@@ -12,16 +12,16 @@ PRACTICE_PATH = ROOT / "condicoes" / "pratica_stroop_go_nogo_ptbr.csv"
 MAIN_PATH = ROOT / "condicoes" / "bloco_principal_stroop_go_nogo_ptbr.csv"
 
 WORDS_TO_COLORS = {
-    "VERDE": ("green", "#16803A"),
-    "AMARELO": ("yellow", "#A16207"),
-    "ROSA": ("pink", "#BE185D"),
-    "PRETO": ("black", "#111827"),
-    "VERMELHO": ("red", "#B91C1C"),
-    "LARANJA": ("orange", "#C2410C"),
-    "MARROM": ("brown", "#78350F"),
-    "ROXO": ("purple", "#6D28D9"),
-    "AZUL": ("blue", "#1D4ED8"),
-    "CINZA": ("gray", "#4B5563"),
+    "VERDE": ("green", "#16A34A"),
+    "AMARELO": ("yellow", "#B77900"),
+    "ROSA": ("pink", "#DB2777"),
+    "PRETO": ("black", "#111111"),
+    "VERMELHO": ("red", "#DC2626"),
+    "LARANJA": ("orange", "#EA580C"),
+    "MARROM": ("brown", "#92400E"),
+    "ROXO": ("purple", "#7C3AED"),
+    "AZUL": ("blue", "#2563EB"),
+    "CINZA": ("gray", "#64748B"),
 }
 OFFICIAL_WORDS = set(WORDS_TO_COLORS)
 OFFICIAL_COLORS = {color for color, _ in WORDS_TO_COLORS.values()}
@@ -144,6 +144,30 @@ class Fase3CondicoesTemposTests(unittest.TestCase):
             item = component(routine(self.psyexp, routine_name), "TextComponent", component_name)
             self.assertEqual(param(item, "color"), "$ink_color_display")
             self.assertEqual(param(item, "text"), "$word")
+
+    def test_cartao_e_estimulo_compartilham_posicao_central(self):
+        for routine_name, card_name, stim_name in [
+            ("trial_pratica", "stim_card_pratica", "stim_pratica"),
+            ("trial_principal", "stim_card_principal", "stim_principal"),
+        ]:
+            trial = routine(self.psyexp, routine_name)
+            card = component(trial, "TextComponent", card_name)
+            stim = component(trial, "TextComponent", stim_name)
+            fix = component(trial, "TextComponent", "fix_pratica" if routine_name == "trial_pratica" else "fix_principal")
+            hold = component(trial, "TextComponent", "hold_pratica" if routine_name == "trial_pratica" else "hold_principal")
+
+            self.assertEqual(param(card, "pos"), "[0, 0]")
+            self.assertEqual(param(stim, "pos"), "[0, 0]")
+            self.assertEqual(param(fix, "pos"), "[0, 0]")
+            self.assertEqual(param(hold, "pos"), "[0, 0]")
+
+    def test_paleta_visual_tem_10_cores_distintas(self):
+        displays = [display for _, display in WORDS_TO_COLORS.values()]
+        self.assertEqual(len(displays), 10)
+        self.assertEqual(len(set(displays)), 10)
+        self.assertNotEqual(WORDS_TO_COLORS["PRETO"][1], WORDS_TO_COLORS["CINZA"][1])
+        self.assertNotEqual(WORDS_TO_COLORS["AMARELO"][1], WORDS_TO_COLORS["PRETO"][1])
+        self.assertNotEqual(WORDS_TO_COLORS["AMARELO"][1], WORDS_TO_COLORS["CINZA"][1])
 
     def test_tempos_de_tentativa_pratica(self):
         trial = routine(self.psyexp, "trial_pratica")

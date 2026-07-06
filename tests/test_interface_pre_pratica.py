@@ -68,7 +68,11 @@ class InterfacePrePraticaTests(unittest.TestCase):
         begin_experiment = param(form, "Begin Experiment")
         self.assertIn("Dados da sessão", begin_experiment)
         self.assertIn("expInfo['assessment_id']", begin_experiment)
-        self.assertIn("TEST_VERSION = '0.2.0'", begin_experiment)
+        self.assertIn("TEST_VERSION = '0.2.1'", begin_experiment)
+        self.assertIn("Nome do participante", begin_experiment)
+        self.assertIn("participant_name", begin_experiment)
+        self.assertIn("len(_session_values['participant_name']) < 2", begin_experiment)
+        self.assertIn("len(_session_values['participant_name']) > 120", begin_experiment)
 
     def test_csv_oficial_usa_participant_id_no_nome(self):
         form = component(routine(self.root, "boas_vindas"), "CodeComponent", "formulario_sessao")
@@ -76,6 +80,7 @@ class InterfacePrePraticaTests(unittest.TestCase):
         self.assertIn("_official_participant_id = expInfo['participant_id']", begin_experiment)
         self.assertIn("official_csv_path = os.path.join('data', f'{_official_participant_id}.csv')", begin_experiment)
         self.assertNotIn("_official_assessment_id = expInfo['assessment_id']", begin_experiment)
+        self.assertIn("participant_name': expInfo['participant_name']", begin_experiment)
 
     def test_telas_navegaveis_aceitam_clique_espaco_e_enter(self):
         specs = [
@@ -118,6 +123,12 @@ class InterfacePrePraticaTests(unittest.TestCase):
         ]:
             self.assertIn(expected, html.unescape(text))
 
+    def test_tela_cheia_e_sem_tamanho_fixo_no_builder(self):
+        settings = self.root.find("Settings")
+        self.assertEqual(param(settings, "Full-screen window"), "True")
+        self.assertNotEqual(param(settings, "Window size (pixels)"), "[1024, 768]")
+        self.assertNotEqual(param(settings, "Window size (pixels)"), "[1280, 720]")
+
     def test_tema_escuro_e_cartao_claro_nas_tentativas(self):
         for routine_name in [
             "boas_vindas",
@@ -137,6 +148,17 @@ class InterfacePrePraticaTests(unittest.TestCase):
         ]:
             card = component(routine(self.root, routine_name), "TextComponent", card_name)
             self.assertEqual(param(card, "color"), "white")
+
+    def test_telas_principais_nao_exibem_enter(self):
+        trial_main = routine(self.root, "trial_principal")
+        visible_texts = [
+            param(item, "text")
+            for item in trial_main.findall("TextComponent")
+            if param(item, "text")
+        ]
+        self.assertTrue(all("Enter" not in text for text in visible_texts))
+        self.assertTrue(all("ENTER" not in text for text in visible_texts))
+        self.assertTrue(all("Continue" not in text for text in visible_texts))
 
     def test_hexadecimal_nao_e_usado_como_codigo_de_cor(self):
         for text_component in self.root.findall(".//TextComponent"):

@@ -4,6 +4,11 @@ Formato: entradas incrementais com data, tipo de mudanca e resumo.
 
 ## 2026-07-06
 
+- `feat`: atualizada versao para `0.2.1`, com formulario incluindo `participant_name` local, fullscreen padrao, fundo escuro mantido e centralizacao dos componentes de estimulo.
+- `fix`: ajustado o contrato do CSV unificado para 21 colunas, inserindo `participant_name` apos `participant_id` e mantendo `participant_id` como nome-base do arquivo.
+- `test`: atualizadas validacoes automatizadas para `participant_name`, tela cheia, ausencia de tamanho fixo e alinhamento central do cartao e do estimulo.
+- `docs`: sincronizada a documentacao de formulario, CSV unificado, dados e decisoes com `participant_name` e a versao `0.2.1`.
+
 - `fix`: substituido o uso de variaveis globais diretas do HUD por `hud_state`, evitando `SyntaxError` por declaracao `global` tardia no script gerado pelo Builder.
 - `fix`: declarados contadores do HUD como globais nos Code Components de pratica e bloco principal, evitando `UnboundLocalError` ao atualizar precisao e cronometro no `run()`.
 - `fix`: corrigidas cores dos cartoes de estimulo para literal constante, evitando geracao de `setColor(#F8FAFC, ...)` invalido no `lastrun.py`.

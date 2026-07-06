@@ -24,13 +24,13 @@ Este projeto e um experimento original Stroop Go/No-Go desenvolvido em PsychoPy,
 - `data/` e local e nunca deve ser versionada.
 - Os CSVs finais precisam ser consistentes, uma linha por tentativa, e permitir distinguir `practice` e `main` pela coluna `block`.
 - Manter somente um CSV unificado por execucao futura.
-- Campos finais esperados no CSV unificado oficial: `project`, `participant_id`, `initials`, `visit`, `evaluator`, `assessment_id`, `assessment_date`, `started_at`, `test_code`, `test_version`, `block`, `trial_number`, `word`, `ink_color`, `condition`, `correct_response`, `key_pressed`, `reaction_time`, `correct`, `error_type`.
+- Campos finais esperados no CSV unificado oficial: `project`, `participant_id`, `participant_name`, `initials`, `visit`, `evaluator`, `assessment_id`, `assessment_date`, `started_at`, `test_code`, `test_version`, `block`, `trial_number`, `word`, `ink_color`, `condition`, `correct_response`, `key_pressed`, `reaction_time`, `correct`, `error_type`.
 - O CSV unificado oficial deve ser uma linha por tentativa real, com `block` em `practice` ou `main`, `condition` em `congruent` ou `incongruent` e sem colunas `_raw`.
 - A arquitetura de dados futura e: PsychoPy -> CSV bruto unificado -> script de importacao -> SQLite local -> dashboard Streamlit local.
 - Nao versionar SQLite, bancos locais, CSVs reais, exports, backups, credenciais ou arquivos temporarios.
 - Toda metrica nova deve ter formula documentada antes da implementacao.
 - Manter rastreabilidade entre `assessment_id`, `source_file` e dados por tentativa.
-- `participant_id` e o identificador principal; `initials` sao opcionais e potencialmente identificaveis.
+- `participant_id` e o identificador principal; `participant_name` e dado pessoal local que nao deve aparecer em nomes de arquivo, screenshots, exemplos publicos ou logs; `initials` sao opcionais e potencialmente identificaveis.
 - Nao coletar nome completo, CPF, e-mail, endereco, telefone, idade ou sexo nesta versao.
 
 ## Regras do paradigma

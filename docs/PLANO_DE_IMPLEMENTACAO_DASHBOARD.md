@@ -10,7 +10,7 @@ Status: implementada tecnicamente no `.psyexp`; considerar concluida somente apo
 
 Escopo:
 
-- adicionar campos `project`, `participant_id`, `initials`, `visit` e `evaluator`;
+- adicionar campos `project`, `participant_id`, `participant_name`, `initials`, `visit` e `evaluator`;
 - gerar `assessment_date` automaticamente com data e hora local;
 - garantir que metadados aparecam no CSV unificado futuro;
 - nao alterar regras do Stroop;
@@ -32,6 +32,7 @@ Criterios de aceite:
 
 - campos obrigatorios nao podem ficar vazios;
 - `assessment_date` e gerada pelo sistema;
+- `participant_name` e local, com trim e validacao de tamanho;
 - `initials` permanece opcional;
 - nenhuma regra do paradigma e alterada.
 

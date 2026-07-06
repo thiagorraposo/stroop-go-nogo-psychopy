@@ -72,16 +72,16 @@ A paleta experimental futura deve usar dez palavras em caixa alta e valores visu
 
 | Chave interna | Palavra exibida | Nome em portugues | Hexadecimal | Valor compativel com PsychoPy | Observacao de contraste |
 |---|---|---|---|---|---|
-| `green` | `VERDE` | verde | `#148A43` | `green` ou `#148A43` | bom contraste em fundo claro |
-| `yellow` | `AMARELO` | amarelo | `#B88700` | `#B88700` | amarelo escurecido para legibilidade |
-| `pink` | `ROSA` | rosa | `#C43B7A` | `#C43B7A` | saturado sem ficar claro demais |
-| `black` | `PRETO` | preto | `#111827` | `black` ou `#111827` | contraste muito alto |
-| `red` | `VERMELHO` | vermelho | `#C62828` | `red` ou `#C62828` | bom contraste e leitura clara |
-| `orange` | `LARANJA` | laranja | `#D65A00` | `#D65A00` | laranja escurecido para fundo claro |
-| `brown` | `MARROM` | marrom | `#6B3F2A` | `#6B3F2A` | contraste alto |
-| `purple` | `ROXO` | roxo | `#6A3FA0` | `#6A3FA0` | legivel e distinto do azul |
-| `blue` | `AZUL` | azul | `#1565C0` | `blue` ou `#1565C0` | bom contraste |
-| `gray` | `CINZA` | cinza | `#4B5563` | `#4B5563` | cinza escuro para nao sumir no fundo |
+| `green` | `VERDE` | verde | `#16A34A` | `green` ou `#16A34A` | bom contraste em fundo claro |
+| `yellow` | `AMARELO` | amarelo | `#B77900` | `#B77900` | amarelo escurecido para legibilidade |
+| `pink` | `ROSA` | rosa | `#DB2777` | `#DB2777` | saturado sem ficar claro demais |
+| `black` | `PRETO` | preto | `#111111` | `black` ou `#111111` | contraste muito alto |
+| `red` | `VERMELHO` | vermelho | `#DC2626` | `red` ou `#DC2626` | bom contraste e leitura clara |
+| `orange` | `LARANJA` | laranja | `#EA580C` | `#EA580C` | laranja escurecido para fundo claro |
+| `brown` | `MARROM` | marrom | `#92400E` | `#92400E` | contraste alto |
+| `purple` | `ROXO` | roxo | `#7C3AED` | `#7C3AED` | legivel e distinto do azul |
+| `blue` | `AZUL` | azul | `#2563EB` | `blue` ou `#2563EB` | bom contraste |
+| `gray` | `CINZA` | cinza | `#64748B` | `#64748B` | cinza escuro para nao sumir no fundo |
 
 Na implementacao futura, se o Builder aceitar diretamente hexadecimais no componente de texto, usar os codigos sugeridos. Se a compatibilidade local exigir nomes simples, manter nomes reconhecidos pelo PsychoPy e validar visualmente em Pilot.
 

@@ -18,11 +18,12 @@ Resultados calculados a partir desse arquivo sao descritivos. O projeto nao gera
 
 ## Colunas oficiais
 
-O CSV deve conter exatamente estas 20 colunas, nesta ordem:
+O CSV deve conter exatamente estas 21 colunas, nesta ordem:
 
 ```text
 project
 participant_id
+participant_name
 initials
 visit
 evaluator
@@ -49,6 +50,7 @@ error_type
 |---|---|
 | `project` | texto curto do projeto ou protocolo |
 | `participant_id` | identificador pseudonimizado |
+| `participant_name` | dado pessoal local; usado apenas no formulario |
 | `initials` | opcional; pode ficar vazio |
 | `visit` | codigo da visita |
 | `evaluator` | codigo ou iniciais profissionais |
@@ -76,30 +78,30 @@ Campos `_raw` nao fazem parte do contrato oficial e nao devem ser usados como fo
 
 ```csv
 project,participant_id,initials,visit,evaluator,assessment_id,assessment_date,started_at,test_code,test_version,block,trial_number,word,ink_color,condition,correct_response,key_pressed,reaction_time,correct,error_type
-PILOTO_STROOP,P_EXEMPLO,,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.0,main,1,VERMELHO,red,congruent,space,space,0.512,1,hit
+PILOTO_STROOP,P_EXEMPLO,NOME_REDIGIDO,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.1,main,1,VERMELHO,red,congruent,space,space,0.512,1,hit
 ```
 
 ### Omission
 
 ```csv
-PILOTO_STROOP,P_EXEMPLO,,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.0,main,2,AZUL,blue,congruent,space,,,0,omission
+PILOTO_STROOP,P_EXEMPLO,NOME_REDIGIDO,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.1,main,2,AZUL,blue,congruent,space,,,0,omission
 ```
 
 ### Correct rejection
 
 ```csv
-PILOTO_STROOP,P_EXEMPLO,,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.0,main,3,VERDE,yellow,incongruent,,,,1,correct_rejection
+PILOTO_STROOP,P_EXEMPLO,NOME_REDIGIDO,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.1,main,3,VERDE,yellow,incongruent,,,,1,correct_rejection
 ```
 
 ### Commission
 
 ```csv
-PILOTO_STROOP,P_EXEMPLO,,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.0,main,4,AMARELO,blue,incongruent,,space,0.681,0,commission
+PILOTO_STROOP,P_EXEMPLO,NOME_REDIGIDO,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.1,main,4,AMARELO,blue,incongruent,,space,0.681,0,commission
 ```
 
 ## Nome do arquivo
 
-O arquivo oficial deve ser salvo em `data/` usando o `participant_id` como nome-base:
+O arquivo oficial deve ser salvo em `data/` usando o `participant_id` como nome-base. O `participant_name` nao entra no nome do arquivo:
 
 ```text
 data/<participant_id>.csv

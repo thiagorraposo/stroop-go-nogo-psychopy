@@ -14,6 +14,7 @@ def make_row(**overrides):
     row = {
         "project": "PILOTO_STROOP",
         "participant_id": "P_TEST",
+        "participant_name": "NOME_REDIGIDO",
         "initials": "",
         "visit": "V1",
         "evaluator": "AV01",
@@ -21,7 +22,7 @@ def make_row(**overrides):
         "assessment_date": "2026-07-06",
         "started_at": "2026-07-06T10:00:00-03:00",
         "test_code": "stroop_go_nogo_ptbr",
-        "test_version": "0.2.0",
+        "test_version": "0.2.1",
         "block": "main",
         "trial_number": "1",
         "word": "VERMELHO",
@@ -117,7 +118,7 @@ class CsvUnificadoTests(unittest.TestCase):
         )
         self.assertFalse(analisar_stroop.is_loop_csv_path("data/P_TEST.csv"))
 
-    def test_exportador_canonico_ordem_e_20_colunas(self):
+    def test_exportador_canonico_ordem_e_21_colunas(self):
         output = io.StringIO()
         analisar_stroop.write_canonical_csv([make_row()], output)
         output.seek(0)
@@ -125,8 +126,14 @@ class CsvUnificadoTests(unittest.TestCase):
         header = next(reader)
         row = next(reader)
         self.assertEqual(header, analisar_stroop.CANONICAL_COLUMNS)
-        self.assertEqual(len(header), 20)
-        self.assertEqual(len(row), 20)
+        self.assertEqual(len(header), 21)
+        self.assertEqual(len(row), 21)
+
+    def test_participant_name_e_obrigatorio_no_validador(self):
+        row = make_row()
+        row["participant_name"] = ""
+        errors = analisar_stroop.validate_rows([row])
+        self.assertTrue(any("campo obrigatorio vazio: participant_name" in error for error in errors))
 
 
 if __name__ == "__main__":

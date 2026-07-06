@@ -51,7 +51,7 @@ As palavras usadas sao `VERDE`, `AMARELO`, `ROSA`, `PRETO`, `VERMELHO`, `LARANJA
 - `congruent`: palavra e cor correspondem; resposta correta e pressionar `Espaco`.
 - `incongruent`: palavra e cor nao correspondem; resposta correta e nao pressionar nada.
 
-Na versao `0.2.0`, cada tentativa da pratica tem:
+Na versao `0.2.1`, cada tentativa da pratica tem:
 
 - fixacao: 300 ms;
 - estimulo/resposta: 2000 ms;
@@ -74,11 +74,11 @@ A interface usa tema escuro original com fundo `#0B1020`; os estimulos aparecem 
 
 Os CSVs locais ficam em `data/`. Essa pasta e ignorada pelo Git para proteger dados de teste, execucao e participantes.
 
-Cada execucao concluida normalmente deve gerar um unico CSV oficial por tentativa, nomeado pelo `participant_id`. Pratica e bloco principal ficam no mesmo arquivo e sao diferenciados pela coluna `block`.
+Cada execucao concluida normalmente deve gerar um unico CSV oficial por tentativa, nomeado pelo `participant_id`. O `participant_name` e um dado pessoal local e nao entra no nome do arquivo. Pratica e bloco principal ficam no mesmo arquivo e sao diferenciados pela coluna `block`.
 
 As colunas principais registradas por tentativa sao:
 
-`project`, `participant_id`, `initials`, `visit`, `evaluator`, `assessment_id`, `assessment_date`, `started_at`, `test_code`, `test_version`, `block`, `trial_number`, `word`, `ink_color`, `condition`, `correct_response`, `key_pressed`, `reaction_time`, `correct`, `error_type`.
+`project`, `participant_id`, `participant_name`, `initials`, `visit`, `evaluator`, `assessment_id`, `assessment_date`, `started_at`, `test_code`, `test_version`, `block`, `trial_number`, `word`, `ink_color`, `condition`, `correct_response`, `key_pressed`, `reaction_time`, `correct`, `error_type`.
 
 `ink_color` usa nomes de cor simples (`green`, `yellow`, `pink`, `black`, `red`, `orange`, `brown`, `purple`, `blue`, `gray`) para manter o CSV unificado compativel com pandas, R e SPSS sem campos RGB com virgulas internas.
 
@@ -112,9 +112,9 @@ A Fase 1 dessa camada, com formulario local de sessao, foi implementada. A Fase 
 
 ## Metadados da sessao
 
-Antes da primeira tela, o experimento exibe um formulario local com `project`, `participant_id`, `initials`, `visit` e `evaluator`. A data, hora, `assessment_id`, `test_code` e `test_version` sao gerados automaticamente.
+Antes da primeira tela, o experimento exibe um formulario local com `project`, `participant_id`, `participant_name`, `initials`, `visit` e `evaluator`. A data, hora, `assessment_id`, `test_code` e `test_version` sao gerados automaticamente.
 
-Use identificadores pseudonimizados. Nao informe nome completo, CPF, e-mail, telefone, endereco, idade ou sexo. As regras completas estao em `docs/FORMULARIO_DE_SESSAO.md`.
+Use `participant_id` como identificador tecnico principal. `participant_name` e dado pessoal local e nao deve aparecer em nome de arquivo, screenshots, exemplos publicos, logs ou commits. Nao informe nome completo, CPF, e-mail, telefone, endereco, idade ou sexo. As regras completas estao em `docs/FORMULARIO_DE_SESSAO.md`.
 
 ## Interface pre-pratica
 

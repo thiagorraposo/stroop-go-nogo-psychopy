@@ -4,7 +4,7 @@ Data da validacao: 2026-07-06.
 
 ## Escopo
 
-Esta validacao documenta a versao `0.2.0` do experimento Stroop Go/No-Go: protocolo curto, 10 cores oficiais, tema escuro, HUD de precisao e cronometro visual do bloco principal.
+Esta validacao documenta a versao `0.2.1` do experimento Stroop Go/No-Go: protocolo curto, 10 cores oficiais, tema escuro, HUD de precisao, cronometro visual do bloco principal e formulario com `participant_name`.
 
 Arquivos validados:
 
@@ -22,16 +22,16 @@ Nenhum arquivo em `data/` foi alterado ou usado como fonte de validacao. Esta co
 
 | Palavra | `ink_color` | Cor visual |
 |---|---|---|
-| `VERDE` | `green` | `#16803A` |
-| `AMARELO` | `yellow` | `#A16207` |
-| `ROSA` | `pink` | `#BE185D` |
-| `PRETO` | `black` | `#111827` |
-| `VERMELHO` | `red` | `#B91C1C` |
-| `LARANJA` | `orange` | `#C2410C` |
-| `MARROM` | `brown` | `#78350F` |
-| `ROXO` | `purple` | `#6D28D9` |
-| `AZUL` | `blue` | `#1D4ED8` |
-| `CINZA` | `gray` | `#4B5563` |
+| `VERDE` | `green` | `#16A34A` |
+| `AMARELO` | `yellow` | `#B77900` |
+| `ROSA` | `pink` | `#DB2777` |
+| `PRETO` | `black` | `#111111` |
+| `VERMELHO` | `red` | `#DC2626` |
+| `LARANJA` | `orange` | `#EA580C` |
+| `MARROM` | `brown` | `#92400E` |
+| `ROXO` | `purple` | `#7C3AED` |
+| `AZUL` | `blue` | `#2563EB` |
+| `CINZA` | `gray` | `#64748B` |
 
 `ink_color` permanece como valor logico no CSV unificado oficial. O campo `ink_color_display` existe apenas nos CSVs de condicoes para renderizar o texto no PsychoPy com hexadecimal. O exportador unificado continua gravando somente `ink_color`.
 
@@ -76,7 +76,7 @@ O bloco principal inclui todas as 10 cores oficiais ao menos uma vez. As palavra
 - `incongruent` sem resposta = `correct_rejection`;
 - `incongruent` + Espaco = `commission`.
 
-Essas regras nao foram alteradas. O CSV unificado continua recebendo `word`, `ink_color`, `condition` e `correct_response` a partir das condicoes e exportando o contrato canonico de 20 colunas.
+Essas regras nao foram alteradas. O CSV unificado continua recebendo `word`, `ink_color`, `condition` e `correct_response` a partir das condicoes e exportando o contrato canonico de 21 colunas.
 
 ## Perfil temporal
 
