@@ -4,6 +4,7 @@ Formato: entradas incrementais com data, tipo de mudanca e resumo.
 
 ## 2026-07-06
 
+- `fix`: substituido o uso de variaveis globais diretas do HUD por `hud_state`, evitando `SyntaxError` por declaracao `global` tardia no script gerado pelo Builder.
 - `fix`: declarados contadores do HUD como globais nos Code Components de pratica e bloco principal, evitando `UnboundLocalError` ao atualizar precisao e cronometro no `run()`.
 - `fix`: corrigidas cores dos cartoes de estimulo para literal constante, evitando geracao de `setColor(#F8FAFC, ...)` invalido no `lastrun.py`.
 - `fix`: corrigida a cor de fundo do tema escuro no `.psyexp` para lista RGB numerica, evitando geracao de `color=[#0B1020]` invalido no `lastrun.py`.

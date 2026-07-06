@@ -205,14 +205,14 @@ class Fase3CondicoesTemposTests(unittest.TestCase):
 
         practice_code = component(practice, "CodeComponent", "codigo_pratica")
         main_code = component(main, "CodeComponent", "codigo_principal")
-        global_line = "global practice_completed, practice_correct_count, main_completed, main_correct_count, main_timer_started"
-        self.assertIn(global_line, param(practice_code, "Begin Routine"))
-        self.assertIn(global_line, param(practice_code, "End Routine"))
-        self.assertIn(global_line, param(main_code, "Begin Routine"))
-        self.assertIn(global_line, param(main_code, "End Routine"))
-        self.assertIn("practice_completed += 1", param(practice_code, "End Routine"))
-        self.assertIn("main_completed += 1", param(main_code, "End Routine"))
-        self.assertIn("if not main_timer_started:", param(main_code, "Begin Routine"))
+        self.assertIn("hud_state = {", param(practice_code, "Before Experiment"))
+        self.assertIn("hud_state['practice_completed'] += 1", param(practice_code, "End Routine"))
+        self.assertIn("hud_state['main_completed'] += 1", param(main_code, "End Routine"))
+        self.assertIn("if not hud_state['main_timer_started']:", param(main_code, "Begin Routine"))
+        self.assertNotIn("global practice_completed", param(practice_code, "Begin Routine"))
+        self.assertNotIn("global practice_completed", param(practice_code, "End Routine"))
+        self.assertNotIn("global practice_completed", param(main_code, "Begin Routine"))
+        self.assertNotIn("global practice_completed", param(main_code, "End Routine"))
         self.assertIn("timer_text = format_main_time()", param(main_code, "Each Frame"))
 
     def test_cor_de_fundo_global_e_lista_rgb_segura_para_builder(self):
