@@ -98,8 +98,16 @@ Nao foram adicionadas cores nesta etapa para evitar alterar quantidade de tentat
 
 | Coluna final | Origem atual | Disponivel | Depende de loop | Depende de codigo | Risco de divergencia | Ajuste futuro |
 |---|---|---|---|---|---|---|
-| `participant` | `expInfo['participant']` | sim | nao | sim | baixo | manter no CSV unificado |
-| `session` | `expInfo['session']` | sim | nao | sim | baixo | manter no CSV unificado |
+| `project` | `expInfo['project']` | sim | nao | sim | baixo | manter no CSV unificado |
+| `participant_id` | `expInfo['participant_id']` | sim | nao | sim | baixo | manter no CSV unificado |
+| `initials` | `expInfo['initials']` | sim | nao | sim | baixo | manter no CSV unificado; campo opcional |
+| `visit` | `expInfo['visit']` | sim | nao | sim | baixo | manter no CSV unificado |
+| `evaluator` | `expInfo['evaluator']` | sim | nao | sim | baixo | manter no CSV unificado |
+| `assessment_id` | `expInfo['assessment_id']` | sim | nao | sim | baixo | manter no CSV unificado |
+| `assessment_date` | `expInfo['assessment_date']` | sim | nao | sim | baixo | manter no CSV unificado |
+| `started_at` | `expInfo['started_at']` | sim | nao | sim | baixo | manter no CSV unificado |
+| `test_code` | `expInfo['test_code']` | sim | nao | sim | baixo | manter no CSV unificado |
+| `test_version` | `expInfo['test_version']` | sim | nao | sim | baixo | manter no CSV unificado |
 | `block` | codigo em `trial_pratica` e `trial_principal` | sim | nao | sim | baixo | garantir `practice` e `main` no CSV unificado |
 | `trial_number` | CSV de condicoes | sim | sim | nao | baixo | manter uma linha por tentativa |
 | `word` | CSV de condicoes | sim | sim | nao | baixo | manter valores padronizados |
@@ -111,7 +119,7 @@ Nao foram adicionadas cores nesta etapa para evitar alterar quantidade de tentat
 | `correct` | codigo de classificacao | sim | nao | sim | baixo | consolidar no CSV unificado |
 | `error_type` | codigo de classificacao | sim | nao | sim | baixo | consolidar no CSV unificado |
 
-A estrutura atual possui base suficiente para produzir um CSV unificado por execucao. A unificacao ainda deve ser tratada em etapa futura, porque a execucao atual tambem pode gerar arquivos separados por loop.
+A estrutura atual possui base suficiente para produzir um CSV unificado por execucao. A unificacao foi implementada posteriormente na Fase 2 e deve ser validada em modo Pilot antes de coleta real.
 
 ## Inconsistencias identificadas
 
@@ -119,7 +127,7 @@ Nenhuma inconsistencia bloqueante foi identificada entre `.psyexp`, loops, rotin
 
 Pendencia nao bloqueante:
 
-- a documentacao e o script ja apontam para um CSV unificado futuro, mas a exportacao atual ainda pode produzir arquivos separados por loop; isso deve ser resolvido em uma etapa propria, sem alterar o paradigma.
+- a validacao original foi feita antes da Fase 2; apos a unificacao, o contrato oficial passou a ser o documento `docs/CSV_UNIFICADO.md`.
 
 ## Correcoes realizadas
 

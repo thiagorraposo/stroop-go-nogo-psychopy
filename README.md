@@ -12,8 +12,8 @@ Este projeto e mantido para fins educacionais e de pesquisa exploratoria. Ele na
 - `condicoes/pratica_stroop_go_nogo_ptbr.csv`: tentativas do bloco de pratica.
 - `condicoes/bloco_principal_stroop_go_nogo_ptbr.csv`: tentativas do bloco principal.
 - `condicoes/contagem_regressiva.csv`: telas breves de preparacao antes dos blocos.
-- `data/`: pasta onde os CSVs por tentativa sao salvos pelo PsychoPy.
-- `scripts/analisar_stroop.py`: script simples para analisar os CSVs gerados.
+- `data/`: pasta onde o CSV unificado por execucao e salvo pelo PsychoPy.
+- `scripts/analisar_stroop.py`: script para validar e analisar um CSV unificado.
 - `docs/UX_DECISIONS.md`: notas sobre as decisoes de experiencia de usuario.
 - `AGENTS.md`: regras persistentes para agentes e contribuicoes futuras.
 - `docs/`: documentacao de governanca, decisoes e historico.
@@ -40,7 +40,7 @@ Este projeto e mantido para fins educacionais e de pesquisa exploratoria. Ele na
 1. Abra o experimento no Builder.
 2. Use o modo `Run` para coleta.
 3. Preencha o formulario local de sessao.
-4. Os arquivos CSV serao gravados em `data/`.
+4. O CSV unificado da execucao sera gravado em `data/`.
 5. Nao versione arquivos gerados em `data/`.
 
 ## Condicoes
@@ -60,6 +60,8 @@ Cada tentativa tem:
 ## Dados
 
 Os CSVs locais ficam em `data/`. Essa pasta e ignorada pelo Git para proteger dados de teste, execucao e participantes.
+
+Cada execucao concluida normalmente deve gerar um unico CSV oficial por tentativa, com sufixo `_trials.csv`. Pratica e bloco principal ficam no mesmo arquivo e sao diferenciados pela coluna `block`.
 
 As colunas principais registradas por tentativa sao:
 
@@ -84,16 +86,16 @@ As colunas principais registradas por tentativa sao:
 Depois de coletar dados, execute:
 
 ```bash
-python3 scripts/analisar_stroop.py
+python3 scripts/analisar_stroop.py data/NOME_DO_ARQUIVO_trials.csv
 ```
 
-O script procura arquivos `.csv` em `data/`, calcula acuracia geral, por condicao e por bloco, e compara a mediana do tempo de reacao das respostas corretas entre condicoes congruentes e incongruentes.
+O script valida o CSV unificado, calcula metricas descritivas do bloco principal e nao modifica o arquivo original. O contrato completo esta em `docs/CSV_UNIFICADO.md`.
 
 ## Camada de dados e dashboard
 
 A arquitetura futura prevista e: PsychoPy -> CSV bruto unificado -> script de importacao -> SQLite local -> dashboard Streamlit local.
 
-A Fase 1 dessa camada, com formulario local de sessao, foi implementada. CSV unificado, importacao, SQLite e dashboard ainda estao pendentes. O modelo de dados, regras de privacidade e plano incremental estao documentados em `docs/DADOS_E_DASHBOARD.md`, `docs/MODELO_DE_DADOS.md` e `docs/PLANO_DE_IMPLEMENTACAO_DASHBOARD.md`.
+A Fase 1 dessa camada, com formulario local de sessao, foi implementada. A Fase 2, com CSV unificado por execucao e analisador tecnico, foi implementada e depende de aprovacao manual em Pilot. Importacao, SQLite e dashboard ainda estao pendentes. O modelo de dados, regras de privacidade e plano incremental estao documentados em `docs/DADOS_E_DASHBOARD.md`, `docs/MODELO_DE_DADOS.md`, `docs/CSV_UNIFICADO.md` e `docs/PLANO_DE_IMPLEMENTACAO_DASHBOARD.md`.
 
 ## Metadados da sessao
 
@@ -126,6 +128,7 @@ Use identificadores pseudonimizados. Nao informe nome completo, CPF, e-mail, tel
 ├── docs/
 │   ├── AGENTS.md
 │   ├── COPY_DAS_TELAS.md
+│   ├── CSV_UNIFICADO.md
 │   ├── DADOS_E_DASHBOARD.md
 │   ├── DECISOES_DO_EXPERIMENTO.md
 │   ├── ESPECIFICACAO_VISUAL_E_FLUXO.md
@@ -143,7 +146,8 @@ Use identificadores pseudonimizados. Nao informe nome completo, CPF, e-mail, tel
 │   └── analisar_stroop.py
 └── tests/
     ├── AGENTS.md
-    └── README.md
+    ├── README.md
+    └── test_csv_unificado.py
 ```
 
 Nota: a pasta existente `condicoes/` e preservada como diretoria de CSVs de condicoes do experimento. Ela cumpre o papel da pasta `conditions/` sem duplicar conteudo.

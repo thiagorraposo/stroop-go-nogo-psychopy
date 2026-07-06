@@ -25,6 +25,7 @@
 ├── docs/
 │   ├── AGENTS.md
 │   ├── COPY_DAS_TELAS.md
+│   ├── CSV_UNIFICADO.md
 │   ├── DADOS_E_DASHBOARD.md
 │   ├── DECISOES_DO_EXPERIMENTO.md
 │   ├── ESPECIFICACAO_VISUAL_E_FLUXO.md
@@ -42,7 +43,8 @@
 │   └── analisar_stroop.py
 └── tests/
     ├── AGENTS.md
-    └── README.md
+    ├── README.md
+    └── test_csv_unificado.py
 ```
 
 Os nomes dos CSVs de condicoes foram preservados porque sao referenciados diretamente pelo `.psyexp`.
@@ -56,7 +58,7 @@ Os nomes dos CSVs de condicoes foram preservados porque sao referenciados direta
 - `dashboard/`: documentacao e futura aplicacao Streamlit local.
 - `docs/`: documentacao metodologica, historico e governanca.
 - `scripts/`: scripts auxiliares de analise e manutencao.
-- `tests/`: espaco reservado para validacoes estaticas futuras.
+- `tests/`: validacoes estaticas e testes automatizados sem dados reais.
 
 ## Arquivos-fonte
 

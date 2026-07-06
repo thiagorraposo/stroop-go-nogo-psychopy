@@ -2,7 +2,7 @@
 
 Data: 2026-07-06.
 
-Este documento define a arquitetura de coleta estruturada, consolidacao e visualizacao local de dados do experimento Stroop Go/No-Go. A Fase 1 foi implementada no PsychoPy com formulario local de sessao e metadados canonicos no `expInfo`; banco de dados, dashboard, script de importacao e CSV unificado ainda nao foram implementados.
+Este documento define a arquitetura de coleta estruturada, consolidacao e visualizacao local de dados do experimento Stroop Go/No-Go. A Fase 1 foi implementada no PsychoPy com formulario local de sessao e metadados canonicos no `expInfo`. A Fase 2 implementou o CSV unificado por execucao e um analisador tecnico local; banco de dados, dashboard e script de importacao para SQLite ainda nao foram implementados.
 
 ## Objetivo
 
@@ -26,7 +26,7 @@ Fluxo padrao futuro:
 2. PsychoPy coleta metadados da sessao.
 3. O experimento executa pratica e bloco principal.
 4. PsychoPy salva um CSV bruto unificado por execucao em `data/`.
-5. Um script futuro valida o CSV e calcula metricas.
+5. Um script local valida o CSV e calcula metricas descritivas.
 6. O script importa a execucao para um banco SQLite local.
 7. O dashboard Streamlit le apenas o banco SQLite.
 8. O dashboard permite filtros, visao geral, tabela de sessoes e detalhe de avaliacao.
@@ -117,6 +117,8 @@ Campos tecnicos de auditoria a registrar futuramente:
 - Permanecer local em `data/`.
 - Nao ser modificado por scripts de importacao ou dashboard.
 - Conter metadados, tentativas, respostas, tempos e classificacao por tentativa.
+- Usar o contrato documentado em `docs/CSV_UNIFICADO.md`.
+- Ser a fonte oficial do fluxo futuro `CSV -> SQLite -> dashboard`.
 
 ### Scripts de importacao
 

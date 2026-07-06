@@ -90,7 +90,7 @@ Uma linha por tentativa individual do bloco principal ou pratica.
 | `trial_number` | inteiro | sim | numero da tentativa dentro do bloco/CSV |
 | `word` | texto | sim | palavra exibida, em caixa alta |
 | `ink_color` | texto | sim | cor visual usada pelo PsychoPy |
-| `condition` | texto curto | sim | `congruente` ou `incongruente` |
+| `condition` | texto curto | sim | `congruent` ou `incongruent` no CSV unificado oficial |
 | `correct_response` | texto | nao | `space` para Go; vazio para No-Go |
 | `key_pressed` | texto | nao | `space` ou vazio |
 | `reaction_time` | numero | nao | tempo em segundos; vazio quando nao houver resposta |
@@ -116,3 +116,30 @@ Esta tabela permite auditoria e analises futuras. O dashboard geral deve prioriz
 - O banco deve preservar rastreabilidade entre `assessment_id`, `source_file` e tentativas.
 - Importacoes invalidas nao devem apagar dados validos ja importados.
 - Reimportar uma execucao deve exigir confirmacao explicita ou estrategia documentada.
+
+## Mapeamento do CSV unificado
+
+| Coluna do CSV | Destino futuro |
+|---|---|
+| `project` | `assessments.project` |
+| `participant_id` | `assessments.participant_id` |
+| `initials` | `assessments.initials` |
+| `visit` | `assessments.visit` |
+| `evaluator` | `assessments.evaluator` |
+| `assessment_id` | `assessments.assessment_id` e chave estrangeira em `trial_results` |
+| `assessment_date` | `assessments.assessment_date` |
+| `started_at` | `assessments.started_at` |
+| `test_code` | `assessments.test_code` |
+| `test_version` | `assessments.test_version` |
+| `block` | `trial_results.block` |
+| `trial_number` | `trial_results.trial_number` |
+| `word` | `trial_results.word` |
+| `ink_color` | `trial_results.ink_color` |
+| `condition` | `trial_results.condition` |
+| `correct_response` | `trial_results.correct_response` |
+| `key_pressed` | `trial_results.key_pressed` |
+| `reaction_time` | `trial_results.reaction_time` |
+| `correct` | `trial_results.correct` |
+| `error_type` | `trial_results.error_type` |
+
+Campos como `ended_at`, `source_file`, `imported_at` e `import_status` serao adicionados no processo futuro de importacao para SQLite, sem modificar o CSV bruto original.

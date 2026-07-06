@@ -22,6 +22,12 @@
 - `participant_id` e o identificador canonico da pessoa no CSV.
 - Nomes de arquivo de dados nao devem usar identificadores do participante, iniciais, visita ou avaliador.
 - `test_version` inicial do formulario estruturado e `0.1.0`.
+- Cada execucao concluida normalmente deve gerar um unico CSV oficial por tentativa, com pratica e bloco principal no mesmo arquivo.
+- O CSV oficial usa `block` com valores canonicos `practice` e `main`.
+- O CSV oficial usa `condition` com valores canonicos `congruent` e `incongruent`, mesmo que os CSVs de condicoes usem nomes em portugues.
+- O CSV oficial usa `error_type` com valores canonicos `hit`, `omission`, `correct_rejection` e `commission`.
+- Dados estruturalmente incoerentes devem bloquear a exportacao oficial em vez de gerar CSV ambiguo.
+- Execucao abortada antes do encerramento normal nao gera CSV oficial parcial nesta fase.
 - Dados clinicos, normativos e diagnosticos permanecem proibidos.
 - `response_time` sera definido como mediana dos tempos de reacao dos hits validos.
 - O projeto nao faz alegacoes clinicas, normativas, diagnosticas ou de equivalencia psicometrica.

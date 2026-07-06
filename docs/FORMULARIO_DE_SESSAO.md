@@ -98,7 +98,7 @@ Eles acompanham as colunas de tentativa existentes:
 - `correct`
 - `error_type`
 
-Nesta fase ainda nao foi implementado CSV unificado por execucao.
+Na Fase 2, esses campos passaram a compor o CSV unificado oficial por execucao.
 
 ## Exemplos ficticios
 

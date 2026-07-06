@@ -47,7 +47,7 @@ Commit sugerido:
 
 ## Fase 2 - CSV unificado e resumo tecnico
 
-Status: pendente.
+Status: implementada tecnicamente; considerar concluida somente apos aprovacao do checklist manual em modo Pilot descrito em `docs/CSV_UNIFICADO.md` e no registro da implementacao.
 
 Escopo:
 
@@ -60,7 +60,9 @@ Escopo:
 Arquivos provaveis:
 
 - `stroop_go_nogo_ptbr.psyexp`
-- `docs/VALIDACAO_CONDICOES.md`
+- `scripts/analisar_stroop.py`
+- `tests/test_csv_unificado.py`
+- `docs/CSV_UNIFICADO.md`
 - `docs/REGISTRO_DE_ALTERACOES.md`
 
 Riscos:
