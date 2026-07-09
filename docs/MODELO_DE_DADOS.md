@@ -88,7 +88,7 @@ Uma linha por tentativa individual do bloco principal ou pratica.
 |---|---|---|---|
 | `trial_result_id` | texto/UUID ou inteiro | sim | identificador unico da tentativa importada |
 | `assessment_id` | texto/UUID | sim | referencia a `assessments.assessment_id` |
-| `block` | texto curto | sim | `practice` ou `main` |
+| `block` | texto curto | sim | `main` nas execucoes oficiais atuais; `practice` apenas em dados historicos/compatibilidade |
 | `trial_number` | inteiro | sim | numero da tentativa dentro do bloco/CSV |
 | `word` | texto | sim | palavra exibida, em caixa alta |
 | `ink_color` | texto | sim | cor visual usada pelo PsychoPy |

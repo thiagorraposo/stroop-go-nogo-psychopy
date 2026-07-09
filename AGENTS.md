@@ -22,10 +22,10 @@ Este projeto e um experimento original Stroop Go/No-Go desenvolvido em PsychoPy,
 ## Regras de dados
 
 - `data/` e local e nunca deve ser versionada.
-- Os CSVs finais precisam ser consistentes, uma linha por tentativa, e permitir distinguir `practice` e `main` pela coluna `block`.
+- Os CSVs finais precisam ser consistentes, uma linha por tentativa do bloco principal, com `block` em `main`.
 - Manter somente um CSV unificado por execucao futura.
 - Campos finais esperados no CSV unificado oficial: `project`, `participant_id`, `participant_name`, `initials`, `visit`, `evaluator`, `assessment_id`, `assessment_date`, `started_at`, `test_code`, `test_version`, `block`, `trial_number`, `word`, `ink_color`, `condition`, `correct_response`, `key_pressed`, `reaction_time`, `correct`, `error_type`.
-- O CSV unificado oficial deve ser uma linha por tentativa real, com `block` em `practice` ou `main`, `condition` em `congruent` ou `incongruent` e sem colunas `_raw`.
+- O CSV unificado oficial deve ser uma linha por tentativa real do bloco principal, com `block` em `main`, `condition` em `congruent` ou `incongruent` e sem colunas `_raw`; a pratica nao deve gerar linhas no CSV oficial.
 - A arquitetura de dados futura e: PsychoPy -> CSV bruto unificado -> script de importacao -> SQLite local -> dashboard Streamlit local.
 - Nao versionar SQLite, bancos locais, CSVs reais, exports, backups, credenciais ou arquivos temporarios.
 - Toda metrica nova deve ter formula documentada antes da implementacao.

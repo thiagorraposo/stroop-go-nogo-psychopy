@@ -36,14 +36,18 @@
 - Nomes de arquivo de dados nao devem usar iniciais, visita ou avaliador.
 - O CSV oficial deve usar `participant_id` como nome-base do arquivo. `participant_name` e dado pessoal local e nao deve aparecer em nomes de arquivo, screenshots, exemplos publicos ou logs.
 - `test_version` atual e `0.2.1`.
-- Cada execucao concluida normalmente deve gerar um unico CSV oficial por tentativa, com pratica e bloco principal no mesmo arquivo.
-- O CSV oficial usa `block` com valores canonicos `practice` e `main`.
+- Cada execucao concluida normalmente deve gerar um unico CSV oficial contendo apenas tentativas do bloco principal.
+- A pratica continua sendo usada para feedback e HUD, mas nao e exportada no CSV oficial.
+- O CSV oficial usa `block` com valor canonico `main` nas execucoes atuais; `practice` permanece aceito apenas para compatibilidade historica de validacao.
 - O CSV oficial usa `condition` com valores canonicos `congruent` e `incongruent`, mesmo que os CSVs de condicoes usem nomes em portugues.
 - O CSV oficial usa `error_type` com valores canonicos `hit`, `omission`, `correct_rejection` e `commission`.
 - Dados estruturalmente incoerentes devem bloquear a exportacao oficial em vez de gerar CSV ambiguo.
 - Execucao abortada antes do encerramento normal nao gera CSV oficial parcial nesta fase.
 - Dados clinicos, normativos e diagnosticos permanecem proibidos.
 - `response_time` sera definido como mediana dos tempos de reacao dos hits validos.
+- A tela final `resultados` deve calcular metricas apenas a partir do registro canonico em memoria das tentativas `main`, sem ler CSV e sem adicionar linhas ao CSV.
+- A precisao total exibida em `resultados` e `(hits + correct_rejections) / total_main_trials * 100`, arredondada para percentual inteiro.
+- O tempo de reacao exibido em `resultados` e a mediana dos `reaction_time` dos hits do bloco principal, com 3 casas decimais e sufixo `s`; quando nao houver hits, exibe `—`.
 - O projeto nao faz alegacoes clinicas, normativas, diagnosticas ou de equivalencia psicometrica.
 - Dados locais de execucao e coleta ficam em `data/` e nao devem ser versionados.
 - A pasta `condicoes/` e mantida como pasta existente de CSVs de condicoes, equivalente funcional ao nome `conditions/` solicitado para estrutura.
@@ -57,6 +61,8 @@
 
 ## Historico de decisoes
 
+- 2026-07-09: tela final de resultados definida como resumo descritivo da execucao, calculado em memoria a partir das tentativas `main`, sem leitura de CSV e sem linguagem clinica ou normativa.
+- 2026-07-09: CSV oficial redefinido para exportar apenas tentativas do bloco principal, desconsiderando a pratica.
 - 2026-07-06: arquitetura futura de dados definida com CSV bruto unificado, importacao para SQLite local e dashboard Streamlit local.
 - 2026-07-06: versao `0.2.1` definida com protocolo curto 4 + 16, bloco principal de cerca de 1 minuto, HUD de precisao, cronometro principal, tema escuro, centralizacao do estimulo e formulario com `participant_name` local.
 - 2026-07-06: primeira fase visual pre-pratica definida com abertura, tutorial unico, introducao a pratica e lembrete automatico.

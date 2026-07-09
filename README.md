@@ -82,10 +82,7 @@ As colunas principais registradas por tentativa sao:
 
 `ink_color` usa nomes de cor simples (`green`, `yellow`, `pink`, `black`, `red`, `orange`, `brown`, `purple`, `blue`, `gray`) para manter o CSV unificado compativel com pandas, R e SPSS sem campos RGB com virgulas internas.
 
-`block` diferencia:
-
-- `practice`: bloco de pratica;
-- `main`: bloco principal.
+Nas execucoes atuais, o CSV oficial exporta apenas o bloco principal. A coluna `block` permanece no contrato e deve usar `main`; a pratica e executada no experimento, mas nao gera linhas no CSV oficial.
 
 `error_type` usa:
 

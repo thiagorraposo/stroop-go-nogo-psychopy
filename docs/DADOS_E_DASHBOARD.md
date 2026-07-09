@@ -111,7 +111,8 @@ Campos tecnicos de auditoria a registrar futuramente:
 - Registrar automaticamente data e hora local da avaliacao.
 - Executar pratica e bloco principal sem alterar o paradigma.
 - Gerar CSV bruto unificado por execucao em `data/`.
-- Preservar uma linha por tentativa com `block` distinguindo `practice` e `main`.
+- Preservar uma linha por tentativa do bloco principal, com `block` em `main`.
+- Manter a pratica apenas no fluxo de treinamento e feedback, sem exporta-la no CSV oficial.
 
 ### CSV bruto
 
@@ -164,7 +165,7 @@ Uma importacao deve falhar ou ficar marcada como invalida quando:
 
 - o CSV nao contiver as colunas exigidas;
 - houver linhas com numero de campos inconsistente;
-- `block` nao for `practice` ou `main`;
+- `block` nao for `main` nas execucoes oficiais atuais;
 - `condition` for incompativel com `word` e `ink_color`;
 - `correct_response` for incompativel com `condition`;
 - `error_type` for incompativel com resposta e condicao;

@@ -232,6 +232,8 @@ class Fase3CondicoesTemposTests(unittest.TestCase):
         self.assertIn("hud_state = {", param(practice_code, "Before Experiment"))
         self.assertIn("hud_state['practice_completed'] += 1", param(practice_code, "End Routine"))
         self.assertIn("hud_state['main_completed'] += 1", param(main_code, "End Routine"))
+        self.assertNotIn("official_trial_rows.append", param(practice_code, "End Routine"))
+        self.assertIn("official_trial_rows.append(trial_record)", param(main_code, "End Routine"))
         self.assertIn("if not hud_state['main_timer_started']:", param(main_code, "Begin Routine"))
         self.assertNotIn("global practice_completed", param(practice_code, "Begin Routine"))
         self.assertNotIn("global practice_completed", param(practice_code, "End Routine"))

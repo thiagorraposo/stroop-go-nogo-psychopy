@@ -4,11 +4,11 @@ Data: 2026-07-06.
 
 ## Objetivo
 
-O CSV unificado e a fonte oficial de dados por tentativa do experimento Stroop Go/No-Go. Cada execucao concluida normalmente deve gerar um unico arquivo em `data/`, contendo pratica e bloco principal diferenciados pela coluna `block`.
+O CSV unificado e a fonte oficial de dados por tentativa do experimento Stroop Go/No-Go. Cada execucao concluida normalmente deve gerar um unico arquivo em `data/`, contendo apenas as tentativas do bloco principal. A pratica permanece no fluxo do experimento para treinamento e feedback, mas nao e exportada no CSV oficial.
 
 O arquivo existe para:
 
-- manter uma linha por tentativa real;
+- manter uma linha por tentativa real do bloco principal;
 - preservar metadados da sessao;
 - evitar CSVs separados por loop;
 - reduzir divergencia entre estimulo exibido e dados exportados;
@@ -59,7 +59,7 @@ error_type
 | `started_at` | data e hora local ISO 8601 com fuso |
 | `test_code` | `stroop_go_nogo_ptbr` |
 | `test_version` | versao do experimento |
-| `block` | `practice` ou `main` |
+| `block` | `main` nas execucoes oficiais atuais; `practice` e aceito apenas para compatibilidade historica |
 | `trial_number` | inteiro positivo, sequencial dentro do bloco, iniciado em 1 |
 | `word` | palavra exibida na tentativa |
 | `ink_color` | cor exibida pelo PsychoPy, como `green`, `yellow`, `pink`, `black`, `red`, `orange`, `brown`, `purple`, `blue` ou `gray` |
@@ -122,3 +122,7 @@ python3 scripts/analisar_stroop.py data/PARTICIPANT_ID.csv
 ```
 
 O script valida o contrato do CSV e calcula metricas descritivas apenas para o bloco `main`.
+
+## Pratica
+
+As tentativas de pratica nao entram no CSV oficial desta versao. Elas continuam sendo classificadas em memoria para feedback imediato e HUD da pratica, mas sao descartadas da lista exportada antes da gravacao do arquivo.

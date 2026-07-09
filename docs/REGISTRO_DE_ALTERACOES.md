@@ -2,6 +2,15 @@
 
 Formato: entradas incrementais com data, tipo de mudanca e resumo.
 
+## 2026-07-09
+
+- `feat`: adicionada rotina `resultados` apos `principal_loop`, com resumo descritivo do bloco principal em painel central claro, indicador circular de precisao, mediana de RT dos hits e contagens por tipo de resposta.
+- `fix`: ajustado o fluxo para que `resultados` seja a tela final e grave o CSV oficial ao finalizar, evitando depender da rotina antiga `fim`.
+- `fix`: removida importacao local de `visual` e `event` no Code Component de `resultados`, evitando `UnboundLocalError` no script gerado pelo Builder.
+- `fix`: alterado o CSV oficial para exportar apenas tentativas do bloco principal, mantendo a pratica somente para feedback e HUD local.
+- `test`: adicionadas validacoes estaticas para Flow, formulas, textos obrigatorios, navegacao por clique/Espaco/Enter, sintaxe dos Code Components, escrita no encerramento e ausencia de linhas extras no CSV pela tela de resultados.
+- `docs`: documentadas formulas, limites de interpretacao e decisao de UX da tela final de resultados.
+
 ## 2026-07-06
 
 - `feat`: atualizada versao para `0.2.1`, com formulario incluindo `participant_name` local, fullscreen padrao, fundo escuro mantido e centralizacao dos componentes de estimulo.

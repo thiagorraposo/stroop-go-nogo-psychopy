@@ -54,10 +54,21 @@ Implementado em 2026-07-06 na versao `0.2.1`:
 
 A precisao ao vivo pode influenciar o comportamento do participante. Essa exibicao e uma decisao de UX e nao uma configuracao metodologicamente neutra. O HUD nao deve ser interpretado como diagnostico, norma, classificacao clinica ou comparacao populacional.
 
+## Tela final de resultados
+
+Implementada em 2026-07-09:
+
+- rotina `resultados` exibida apos o bloco principal como tela final de encerramento;
+- mantem o tema escuro atual com painel central claro e alinhado em unidades `height`;
+- mostra apenas dados descritivos desta execucao: precisao total do bloco principal, mediana dos tempos de reacao dos hits e contagens de Hits, Omissoes, Rejeicoes corretas e Comissoes;
+- usa indicador circular original, sem logotipo, marca, paleta proprietaria, classificacao, ranking, normas ou recomendacoes;
+- inclui aviso explicito de que o resumo nao representa diagnostico ou avaliacao clinica;
+- aceita clique no botao `Finalizar`, `Espaco` ou `Enter`.
+
 ## Limites
 
 O experimento implementa um paradigma experimental de inibicao de resposta. Ele nao fornece diagnostico, escore clinico, classificacao cognitiva ou equivalencia clinica com qualquer produto comercial.
 
 ## Registro de dados
 
-A coluna `block` foi adicionada para separar pratica (`practice`) e bloco principal (`main`) nos CSVs de saida. Os tipos de resposta sao registrados como `hit`, `omission`, `correct_rejection` e `commission`.
+A coluna `block` permanece no CSV oficial, mas as execucoes atuais exportam apenas o bloco principal (`main`). A pratica e usada para treinamento, feedback e HUD local, sem gerar linhas no CSV oficial. Os tipos de resposta do bloco principal sao registrados como `hit`, `omission`, `correct_rejection` e `commission`.

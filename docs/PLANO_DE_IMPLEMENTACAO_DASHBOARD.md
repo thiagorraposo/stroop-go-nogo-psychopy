@@ -69,14 +69,14 @@ Arquivos provaveis:
 Riscos:
 
 - duplicar linhas por tentativa;
-- perder dados de pratica ou principal;
+- perder dados do bloco principal;
 - alterar tempos ou classificacao sem intencao.
 
 Criterios de aceite:
 
 - um CSV bruto unificado por execucao;
 - colunas finais presentes;
-- `block` diferencia `practice` e `main`;
+- `block` usa `main` nas execucoes oficiais atuais;
 - metricas sao descritivas e reproduziveis.
 
 Testes necessarios:
