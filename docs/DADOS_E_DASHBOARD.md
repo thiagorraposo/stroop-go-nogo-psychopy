@@ -1,8 +1,8 @@
 # Dados e dashboard
 
-Data: 2026-07-06.
+Data: 2026-07-09.
 
-Este documento define a arquitetura de coleta estruturada, consolidacao e visualizacao local de dados do experimento Stroop Go/No-Go. A Fase 1 foi implementada no PsychoPy com formulario local de sessao e metadados canonicos no `expInfo`. A Fase 2 implementou o CSV unificado por execucao e um analisador tecnico local; banco de dados, dashboard e script de importacao para SQLite ainda nao foram implementados.
+Este documento define a arquitetura de coleta estruturada, consolidacao e visualizacao local de dados do experimento Stroop Go/No-Go. A Fase 1 foi implementada no PsychoPy com formulario local de sessao e metadados canonicos no `expInfo`. A Fase 2 implementou o CSV unificado por execucao e um analisador tecnico local. A Fase 7 implementou a importacao para SQLite local; o dashboard ainda nao foi implementado.
 
 ## Objetivo
 
@@ -20,7 +20,7 @@ Os resultados devem permanecer descritivos. O projeto nao deve gerar diagnostico
 
 ## Arquitetura definida
 
-Fluxo padrao futuro:
+Fluxo padrao:
 
 1. Participante ou avaliador inicia o experimento.
 2. PsychoPy coleta metadados da sessao.
@@ -28,7 +28,7 @@ Fluxo padrao futuro:
 4. PsychoPy salva um CSV bruto unificado por execucao em `data/`.
 5. Um script local valida o CSV e calcula metricas descritivas.
 6. O script importa a execucao para um banco SQLite local.
-7. O dashboard Streamlit le apenas o banco SQLite.
+7. O dashboard Streamlit futuro le apenas o banco SQLite.
 8. O dashboard permite filtros, visao geral, tabela de sessoes e detalhe de avaliacao.
 9. Dados brutos permanecem em `data/` e nao sao modificados pelo dashboard.
 
@@ -129,7 +129,8 @@ Campos tecnicos de auditoria a registrar futuramente:
 - Calcular metricas documentadas.
 - Impedir importacao duplicada sem confirmacao explicita.
 - Registrar erros sem alterar o CSV original.
-- Criar ou atualizar SQLite local, conforme regra documentada.
+- Criar SQLite local automaticamente quando nao existir.
+- Reimportar `assessment_id` existente somente com `--force`.
 - Nao produzir interpretacoes clinicas.
 
 ### SQLite
@@ -138,6 +139,7 @@ Campos tecnicos de auditoria a registrar futuramente:
 - Manter relacao entre `assessment_id`, `source_file` e dados por tentativa.
 - Permanecer local e ignorado pelo Git.
 - Ser a unica fonte lida pelo dashboard.
+- Usar por padrao `database/stroop_results.sqlite3`.
 
 ### Dashboard
 

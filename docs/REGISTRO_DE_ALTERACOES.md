@@ -10,6 +10,9 @@ Formato: entradas incrementais com data, tipo de mudanca e resumo.
 - `fix`: alterado o CSV oficial para exportar apenas tentativas do bloco principal, mantendo a pratica somente para feedback e HUD local.
 - `test`: adicionadas validacoes estaticas para Flow, formulas, textos obrigatorios, navegacao por clique/Espaco/Enter, sintaxe dos Code Components, escrita no encerramento e ausencia de linhas extras no CSV pela tela de resultados.
 - `docs`: documentadas formulas, limites de interpretacao e decisao de UX da tela final de resultados.
+- `feat`: implementada Fase 7 com importacao do CSV unificado para SQLite local em `scripts/importar_csv_sqlite.py` e schema em `scripts/db_schema.sql`.
+- `test`: adicionados testes com CSVs temporarios para importacao valida, cabecalho invalido, duplicidade, `--force`, metricas, rollback, validacao de RT e coerencia de resposta.
+- `docs`: criada documentacao `docs/IMPORTACAO_SQLITE.md` e atualizados README, modelo de dados e arquitetura para marcar SQLite local como implementado e pendente de validacao manual com CSV real em Pilot.
 
 ## 2026-07-06
 

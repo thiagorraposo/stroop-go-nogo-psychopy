@@ -14,6 +14,8 @@ Este projeto e mantido para fins educacionais e de pesquisa exploratoria. Ele na
 - `condicoes/contagem_regressiva.csv`: telas breves de preparacao antes dos blocos.
 - `data/`: pasta onde o CSV unificado por execucao e salvo pelo PsychoPy.
 - `scripts/analisar_stroop.py`: script para validar e analisar um CSV unificado.
+- `scripts/importar_csv_sqlite.py`: script para validar e importar CSV unificado para SQLite local.
+- `scripts/db_schema.sql`: schema SQLite local da camada de importacao.
 - `docs/UX_DECISIONS.md`: notas sobre as decisoes de experiencia de usuario.
 - `AGENTS.md`: regras persistentes para agentes e contribuicoes futuras.
 - `docs/`: documentacao de governanca, decisoes e historico.
@@ -101,11 +103,27 @@ python3 scripts/analisar_stroop.py data/PARTICIPANT_ID.csv
 
 O script valida o CSV unificado, calcula metricas descritivas do bloco principal e nao modifica o arquivo original. O contrato completo esta em `docs/CSV_UNIFICADO.md`.
 
+## Importacao SQLite
+
+Para importar um CSV validado para SQLite local:
+
+```bash
+python3 scripts/importar_csv_sqlite.py data/PARTICIPANT_ID.csv
+```
+
+Banco padrao:
+
+```text
+database/stroop_results.sqlite3
+```
+
+Use `--db` para escolher outro caminho e `--force` para reimportar um `assessment_id` ja existente. A pasta `database/` e local e ignorada pelo Git. A documentacao completa esta em `docs/IMPORTACAO_SQLITE.md`.
+
 ## Camada de dados e dashboard
 
 A arquitetura futura prevista e: PsychoPy -> CSV bruto unificado -> script de importacao -> SQLite local -> dashboard Streamlit local.
 
-A Fase 1 dessa camada, com formulario local de sessao, foi implementada. A Fase 2, com CSV unificado por execucao e analisador tecnico, foi implementada e depende de aprovacao manual em Pilot. Importacao, SQLite e dashboard ainda estao pendentes. O modelo de dados, regras de privacidade e plano incremental estao documentados em `docs/DADOS_E_DASHBOARD.md`, `docs/MODELO_DE_DADOS.md`, `docs/CSV_UNIFICADO.md` e `docs/PLANO_DE_IMPLEMENTACAO_DASHBOARD.md`.
+A Fase 1 dessa camada, com formulario local de sessao, foi implementada. A Fase 2, com CSV unificado por execucao e analisador tecnico, foi implementada. A Fase 7, com importacao para SQLite local, foi implementada e segue pendente de validacao manual com CSV real em Pilot. O dashboard ainda esta pendente. O modelo de dados, regras de privacidade e plano incremental estao documentados em `docs/DADOS_E_DASHBOARD.md`, `docs/MODELO_DE_DADOS.md`, `docs/CSV_UNIFICADO.md`, `docs/IMPORTACAO_SQLITE.md` e `docs/PLANO_DE_IMPLEMENTACAO_DASHBOARD.md`.
 
 ## Metadados da sessao
 

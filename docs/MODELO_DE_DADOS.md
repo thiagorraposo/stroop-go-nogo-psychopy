@@ -1,8 +1,8 @@
 # Modelo de dados
 
-Data: 2026-07-06.
+Data: 2026-07-09.
 
-Este documento define o modelo logico futuro para SQLite local. Ele nao cria banco real, migracoes, scripts ou tabelas nesta etapa.
+Este documento define o modelo logico para SQLite local. A Fase 7 implementou o schema em `scripts/db_schema.sql` e a importacao em `scripts/importar_csv_sqlite.py`.
 
 ## Visao geral
 
@@ -34,10 +34,9 @@ Uma linha por execucao completa da tarefa.
 | `visit` | texto | sim | fonte no formulario do experimento |
 | `evaluator` | texto | sim | fonte no formulario do experimento; codigo ou iniciais profissionais |
 | `started_at` | data/hora | sim | fonte no experimento; inicio da execucao |
-| `ended_at` | data/hora | sim | fim da execucao |
 | `source_file` | texto | sim | caminho ou nome do CSV bruto original |
 | `imported_at` | data/hora | sim | data e hora da importacao |
-| `import_status` | texto | sim | `valid`, `invalid`, `duplicate`, `pending_review` ou estado equivalente documentado |
+| `import_status` | texto | sim | `valid` na importacao concluida |
 
 Restricoes recomendadas:
 
@@ -53,7 +52,7 @@ Uma linha por metrica calculada por avaliacao.
 
 | Campo | Tipo conceitual | Obrigatorio | Valores esperados e restricoes |
 |---|---|---|---|
-| `metric_id` | texto/UUID ou inteiro | sim | identificador unico da metrica |
+| `metric_id` | inteiro autoincremental | sim | identificador unico da metrica |
 | `assessment_id` | texto/UUID | sim | referencia a `assessments.assessment_id` |
 | `metric_code` | texto curto | sim | codigo padronizado da metrica |
 | `metric_label` | texto | sim | rotulo legivel para dashboard |
@@ -86,7 +85,7 @@ Uma linha por tentativa individual do bloco principal ou pratica.
 
 | Campo | Tipo conceitual | Obrigatorio | Valores esperados e restricoes |
 |---|---|---|---|
-| `trial_result_id` | texto/UUID ou inteiro | sim | identificador unico da tentativa importada |
+| `trial_result_id` | inteiro autoincremental | sim | identificador unico da tentativa importada |
 | `assessment_id` | texto/UUID | sim | referencia a `assessments.assessment_id` |
 | `block` | texto curto | sim | `main` nas execucoes oficiais atuais; `practice` apenas em dados historicos/compatibilidade |
 | `trial_number` | inteiro | sim | numero da tentativa dentro do bloco/CSV |
@@ -117,7 +116,7 @@ Esta tabela permite auditoria e analises futuras. O dashboard geral deve prioriz
 - Bancos SQLite reais devem ser locais e ignorados pelo Git.
 - O banco deve preservar rastreabilidade entre `assessment_id`, `source_file` e tentativas.
 - Importacoes invalidas nao devem apagar dados validos ja importados.
-- Reimportar uma execucao deve exigir confirmacao explicita ou estrategia documentada.
+- Reimportar uma execucao exige `--force`.
 
 ## Mapeamento do CSV unificado
 
@@ -145,4 +144,4 @@ Esta tabela permite auditoria e analises futuras. O dashboard geral deve prioriz
 | `correct` | `trial_results.correct` |
 | `error_type` | `trial_results.error_type` |
 
-Campos como `ended_at`, `source_file`, `imported_at` e `import_status` serao adicionados no processo futuro de importacao para SQLite, sem modificar o CSV bruto original.
+Campos como `source_file`, `imported_at` e `import_status` sao adicionados no processo de importacao para SQLite, sem modificar o CSV bruto original.
