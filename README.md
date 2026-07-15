@@ -16,6 +16,8 @@ Este projeto e mantido para fins educacionais e de pesquisa exploratoria. Ele na
 - `scripts/analisar_stroop.py`: script para validar e analisar um CSV unificado.
 - `scripts/importar_csv_sqlite.py`: script para validar e importar CSV unificado para SQLite local.
 - `scripts/db_schema.sql`: schema SQLite local da camada de importacao.
+- `dashboard/app.py`: dashboard Streamlit local para consulta descritiva do SQLite.
+- `dashboard/requirements.txt`: dependencias do dashboard local.
 - `docs/UX_DECISIONS.md`: notas sobre as decisoes de experiencia de usuario.
 - `AGENTS.md`: regras persistentes para agentes e contribuicoes futuras.
 - `docs/`: documentacao de governanca, decisoes e historico.
@@ -121,9 +123,24 @@ Use `--db` para escolher outro caminho e `--force` para reimportar um `assessmen
 
 ## Camada de dados e dashboard
 
-A arquitetura futura prevista e: PsychoPy -> CSV bruto unificado -> script de importacao -> SQLite local -> dashboard Streamlit local.
+A arquitetura prevista e: PsychoPy -> CSV bruto unificado -> script de importacao -> SQLite local -> dashboard Streamlit local.
 
-A Fase 1 dessa camada, com formulario local de sessao, foi implementada. A Fase 2, com CSV unificado por execucao e analisador tecnico, foi implementada. A Fase 7, com importacao para SQLite local, foi implementada e segue pendente de validacao manual com CSV real em Pilot. O dashboard ainda esta pendente. O modelo de dados, regras de privacidade e plano incremental estao documentados em `docs/DADOS_E_DASHBOARD.md`, `docs/MODELO_DE_DADOS.md`, `docs/CSV_UNIFICADO.md`, `docs/IMPORTACAO_SQLITE.md` e `docs/PLANO_DE_IMPLEMENTACAO_DASHBOARD.md`.
+A Fase 1 dessa camada, com formulario local de sessao, foi implementada. A Fase 2, com CSV unificado por execucao e analisador tecnico, foi implementada. A Fase 7, com importacao para SQLite local, foi implementada e segue pendente de validacao manual com CSV real em Pilot. A Fase 8, com dashboard Streamlit local, foi implementada tecnicamente e segue pendente de validacao manual com banco real importado. O modelo de dados, regras de privacidade e plano incremental estao documentados em `docs/DADOS_E_DASHBOARD.md`, `docs/MODELO_DE_DADOS.md`, `docs/CSV_UNIFICADO.md`, `docs/IMPORTACAO_SQLITE.md` e `docs/PLANO_DE_IMPLEMENTACAO_DASHBOARD.md`.
+
+Para rodar o dashboard:
+
+```bash
+python3 -m pip install -r dashboard/requirements.txt
+streamlit run dashboard/app.py
+```
+
+Banco padrao esperado:
+
+```text
+database/stroop_results.sqlite3
+```
+
+O dashboard le apenas SQLite, abre o banco em modo somente leitura e exibe resultados descritivos sem diagnostico ou interpretacao clinica.
 
 ## Metadados da sessao
 
@@ -156,7 +173,9 @@ A primeira parte da interface visual conduz o participante por abertura, tutoria
 │   └── README.md
 ├── dashboard/
 │   ├── AGENTS.md
-│   └── README.md
+│   ├── README.md
+│   ├── app.py
+│   └── requirements.txt
 ├── docs/
 │   ├── AGENTS.md
 │   ├── COPY_DAS_TELAS.md
@@ -180,6 +199,7 @@ A primeira parte da interface visual conduz o participante por abertura, tutoria
     ├── AGENTS.md
     ├── README.md
     ├── test_csv_unificado.py
+    ├── test_dashboard.py
     ├── test_fase3_condicoes_tempos.py
     └── test_interface_pre_pratica.py
 ```

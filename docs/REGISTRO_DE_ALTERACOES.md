@@ -2,6 +2,13 @@
 
 Formato: entradas incrementais com data, tipo de mudanca e resumo.
 
+## 2026-07-15
+
+- `feat`: implementada Fase 8 com dashboard Streamlit local em `dashboard/app.py`, lendo apenas o SQLite padrao `database/stroop_results.sqlite3` em modo somente leitura.
+- `feat`: adicionados filtros por periodo, projeto, `participant_id`, `participant_name`, visita, avaliador, teste e versao, com cards, graficos, tabela agregada, detalhe por avaliacao e download manual da visao filtrada.
+- `test`: adicionados testes do dashboard com SQLite temporario para conexao, banco ausente, schema, leitura das tres tabelas, tabela agregada, filtros, cards, detalhe, linguagem proibida e ausencia de escrita no banco.
+- `docs`: atualizada documentacao do dashboard, plano e camada de dados para marcar a Fase 8 como implementada tecnicamente e pendente de validacao manual com banco real.
+
 ## 2026-07-09
 
 - `feat`: adicionada rotina `resultados` apos `principal_loop`, com resumo descritivo do bloco principal em painel central claro, indicador circular de precisao, mediana de RT dos hits e contagens por tipo de resposta.

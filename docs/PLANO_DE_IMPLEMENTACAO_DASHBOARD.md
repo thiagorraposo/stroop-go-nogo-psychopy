@@ -139,7 +139,7 @@ Commit sugerido:
 
 ## Fase 4 - Dashboard Streamlit
 
-Status: pendente.
+Status: implementada tecnicamente na Fase 8; pendente de validacao manual com banco real.
 
 Escopo:
 
@@ -155,7 +155,7 @@ Filtros previstos:
 - periodo;
 - projeto;
 - `participant_id`;
-- iniciais;
+- `participant_name`;
 - visita;
 - avaliador;
 - teste;
@@ -214,6 +214,47 @@ Testes necessarios:
 Commit sugerido:
 
 `feat: cria dashboard local de resultados`
+
+## Fase 8 - Dashboard interativo local
+
+Status: implementada tecnicamente em 2026-07-15; pendente de validacao manual com banco SQLite real importado.
+
+Escopo implementado:
+
+- aplicacao Streamlit local em `dashboard/app.py`;
+- leitura do banco padrao `database/stroop_results.sqlite3` em modo somente leitura;
+- tratamento de banco ausente, banco vazio e schema invalido;
+- filtros por periodo, projeto, `participant_id`, `participant_name`, visita, avaliador, teste e versao;
+- cards de total de avaliacoes, participantes unicos, precisao media, precisao mediana, tempo de reacao mediano, total de omissoes e total de comissoes;
+- graficos de avaliacoes por data, precisao por visita, distribuicao do tempo de reacao, omissoes e comissoes por projeto e evolucao de participante por visita;
+- tabela agregada filtravel de avaliacoes;
+- detalhe da avaliacao com metadados, metricas completas, tentativas e contagem dos quatro tipos de resposta;
+- download manual em CSV apenas da visao agregada filtrada e visivel;
+- testes automatizados com SQLite temporario, sem dados reais.
+
+Arquivos:
+
+- `dashboard/app.py`;
+- `dashboard/README.md`;
+- `dashboard/requirements.txt`;
+- `tests/test_dashboard.py`;
+- `docs/DADOS_E_DASHBOARD.md`;
+- `docs/PLANO_DE_IMPLEMENTACAO_DASHBOARD.md`;
+- `docs/REGISTRO_DE_ALTERACOES.md`;
+- `README.md`.
+
+Checklist manual pendente:
+
+1. Importar pelo menos um CSV real para SQLite.
+2. Rodar `streamlit run dashboard/app.py`.
+3. Confirmar abertura do dashboard.
+4. Testar filtros.
+5. Conferir cards principais.
+6. Conferir graficos.
+7. Conferir tabela de avaliacoes.
+8. Conferir detalhe de uma avaliacao.
+9. Conferir aviso nao clinico.
+10. Conferir exportacao da visao filtrada.
 
 ## Fase 5 - Testes e validacao
 

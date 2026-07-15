@@ -1,8 +1,8 @@
 # Dados e dashboard
 
-Data: 2026-07-09.
+Data: 2026-07-15.
 
-Este documento define a arquitetura de coleta estruturada, consolidacao e visualizacao local de dados do experimento Stroop Go/No-Go. A Fase 1 foi implementada no PsychoPy com formulario local de sessao e metadados canonicos no `expInfo`. A Fase 2 implementou o CSV unificado por execucao e um analisador tecnico local. A Fase 7 implementou a importacao para SQLite local; o dashboard ainda nao foi implementado.
+Este documento define a arquitetura de coleta estruturada, consolidacao e visualizacao local de dados do experimento Stroop Go/No-Go. A Fase 1 foi implementada no PsychoPy com formulario local de sessao e metadados canonicos no `expInfo`. A Fase 2 implementou o CSV unificado por execucao e um analisador tecnico local. A Fase 7 implementou a importacao para SQLite local. A Fase 8 implementou tecnicamente o dashboard Streamlit local, pendente de validacao manual com banco real.
 
 ## Objetivo
 
@@ -28,7 +28,7 @@ Fluxo padrao:
 4. PsychoPy salva um CSV bruto unificado por execucao em `data/`.
 5. Um script local valida o CSV e calcula metricas descritivas.
 6. O script importa a execucao para um banco SQLite local.
-7. O dashboard Streamlit futuro le apenas o banco SQLite.
+7. O dashboard Streamlit local le apenas o banco SQLite.
 8. O dashboard permite filtros, visao geral, tabela de sessoes e detalhe de avaliacao.
 9. Dados brutos permanecem em `data/` e nao sao modificados pelo dashboard.
 
@@ -146,8 +146,13 @@ Campos tecnicos de auditoria a registrar futuramente:
 - Ler apenas o SQLite local.
 - Permitir filtros e visualizacoes descritivas.
 - Nao modificar CSV bruto.
-- Nao alterar banco sem funcionalidade documentada e confirmacao explicita.
+- Nao alterar banco.
 - Exibir aviso de uso descritivo e nao clinico.
+- Abrir o banco padrao `database/stroop_results.sqlite3` em modo somente leitura.
+- Tratar banco ausente, vazio ou com schema invalido com mensagem clara.
+- Permitir download manual apenas da tabela agregada filtrada e visivel.
+
+Na Fase 8, o dashboard implementado em `dashboard/app.py` inclui filtros por periodo, projeto, `participant_id`, `participant_name`, visita, avaliador, teste e versao. A visao geral mostra total de avaliacoes, participantes unicos, precisao media, precisao mediana, tempo de reacao mediano, total de omissoes e total de comissoes. A interface tambem inclui graficos descritivos, tabela de avaliacoes e detalhe por avaliacao com metadados, metricas completas, tabela de tentativas e contagem de `hit`, `omission`, `correct_rejection` e `commission`.
 
 ### Documentacao
 

@@ -1,41 +1,118 @@
-# Dashboard
+# Dashboard local
 
-Esta pasta esta reservada para um dashboard Streamlit local futuro.
+Dashboard Streamlit local para visualizar resultados descritivos do experimento Stroop Go/No-Go importados para SQLite.
+
+Aviso fixo exibido na interface:
+
+> Resultados descritivos. Este dashboard não representa avaliação clínica ou diagnóstico.
 
 ## Objetivo
 
-O dashboard devera permitir consulta descritiva de avaliacoes do experimento Stroop Go/No-Go, com filtros, visao geral, tabela de sessoes e detalhe de avaliacao.
+- consultar avaliações já importadas para SQLite;
+- aplicar filtros por metadados da sessão;
+- visualizar métricas agregadas, gráficos, tabela de avaliações e detalhe por avaliação;
+- exportar manualmente apenas a visão agregada filtrada que está visível.
 
-## Fonte de dados prevista
+O dashboard não modifica CSV bruto, não altera o SQLite e não envia dados para servidor externo.
 
-A fonte padrao sera um banco SQLite local gerado por script futuro de validacao e importacao. O dashboard deve ler apenas esse banco e nunca modificar CSVs brutos em `data/`.
+## Instalação
 
-## Filtros previstos
+Em um ambiente Python local:
 
-- periodo;
-- projeto;
+```bash
+python3 -m pip install -r dashboard/requirements.txt
+```
+
+## Execução
+
+```bash
+streamlit run dashboard/app.py
+```
+
+## Banco esperado
+
+Banco padrão:
+
+```text
+database/stroop_results.sqlite3
+```
+
+O banco deve ser criado previamente pelo importador local. O dashboard lê apenas SQLite e abre o arquivo em modo somente leitura.
+
+Tabelas esperadas:
+
+- `assessments`;
+- `assessment_metrics`;
+- `trial_results`.
+
+Se o banco não existir, estiver vazio ou tiver schema incompatível, a interface mostra uma mensagem clara.
+
+## Filtros
+
+- período por `assessment_date`;
+- `project`;
 - `participant_id`;
-- iniciais;
-- visita;
-- avaliador;
-- teste;
-- versao do teste.
+- `participant_name`;
+- `visit`;
+- `evaluator`;
+- `test_code`;
+- `test_version`.
 
-## Metricas previstas
+## Métricas e visualizações
 
+Cards principais:
+
+- total de avaliações;
+- participantes únicos;
+- precisão média;
+- precisão mediana;
+- tempo de reação mediano;
+- total de omissões;
+- total de comissões.
+
+Gráficos:
+
+- avaliações por data;
+- precisão por visita;
+- distribuição do tempo de reação;
+- omissões e comissões por projeto;
+- evolução de um participante ao longo das visitas.
+
+Tabela de avaliações:
+
+- `assessment_date`;
+- `project`;
+- `participant_id`;
+- `participant_name`;
+- `visit`;
+- `evaluator`;
+- `test_version`;
 - `accuracy`;
 - `accuracy_go_trials`;
 - `accuracy_no_go_trials`;
 - `omission_errors`;
-- `omission_errors_percentage`;
 - `commission_errors`;
-- `response_time`;
-- totais tecnicos de tentativas, hits e rejeicoes corretas.
+- `response_time`.
 
-## Limites metodologicos
+Detalhe da avaliação:
 
-Os resultados sao descritivos e exploratorios. O dashboard nao deve apresentar diagnostico, comparacao normativa, escore clinico, percentil clinico, recomendacao de avaliacao clinica ou alegacao individual sobre capacidades cognitivas.
+- metadados da sessão;
+- métricas completas;
+- contagem de `hit`, `omission`, `correct_rejection` e `commission`;
+- tabela de tentativas.
 
-## Estado atual
+## Exportação
 
-Nenhuma aplicacao funcional e criada nesta etapa. Esta pasta contem apenas documentacao e regras persistentes para implementacao futura.
+O botão de download gera CSV apenas da visão agregada filtrada e visível. A exportação é manual e não modifica o SQLite nem CSVs brutos.
+
+## Limites metodológicos
+
+Os resultados são descritivos e exploratórios. A interface não apresenta interpretação de saúde, classificação individual, comparação normativa, percentil ou recomendação clínica.
+
+## Privacidade
+
+- Use `participant_id` pseudonimizado como identificador principal.
+- `participant_name` é dado pessoal local e deve ser tratado com cuidado.
+- Não use screenshots públicas com dados reais.
+- Não versione banco SQLite, exports ou arquivos de coleta.
+- O dashboard é local e não deve expor dados fora do ambiente da máquina.
