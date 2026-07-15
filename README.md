@@ -53,7 +53,7 @@ As palavras usadas sao `VERDE`, `AMARELO`, `ROSA`, `PRETO`, `VERMELHO`, `LARANJA
 - `congruent`: palavra e cor correspondem; resposta correta e pressionar `Espaco`.
 - `incongruent`: palavra e cor nao correspondem; resposta correta e nao pressionar nada.
 
-Na versao `0.2.1`, cada tentativa da pratica tem:
+Na versao `0.2.2`, cada tentativa da pratica tem:
 
 - fixacao: 300 ms;
 - estimulo/resposta: 2000 ms;
@@ -66,9 +66,9 @@ Cada tentativa do bloco principal tem:
 - estimulo/resposta: 2500 ms;
 - intervalo vazio entre tentativas: 950 ms.
 
-A pratica tem 4 tentativas, com 2 Go/congruentes e 2 No-Go/incongruentes. O bloco principal tem 16 tentativas, com 12 Go/congruentes e 4 No-Go/incongruentes, totalizando cerca de 60 segundos exclusivamente no bloco principal. O fluxo completo e maior por incluir formulario, instrucoes, contagens, pratica e feedbacks.
+A pratica tem 4 tentativas, com 2 Go/congruentes e 2 No-Go/incongruentes. O bloco principal tem 16 tentativas, com 8 Go/congruentes e 8 No-Go/incongruentes, totalizando cerca de 60 segundos exclusivamente no bloco principal. O fluxo completo e maior por incluir formulario, instrucoes, contagens, pratica e feedbacks.
 
-Durante a pratica e o bloco principal ha um HUD discreto com precisao acumulada. O cronometro visual inicia apenas no comeco da primeira tentativa principal e segue ate o fim do intervalo da ultima tentativa principal. A precisao ao vivo pode influenciar o comportamento do participante e e uma decisao de UX, nao uma configuracao metodologicamente neutra.
+Durante a pratica e o bloco principal ha um HUD discreto com precisao acumulada. O cronometro visual inicia apenas no comeco da primeira tentativa principal e segue ate o fim do intervalo da ultima tentativa principal. O bloco principal nao exibe texto instrucional durante as tentativas. A precisao ao vivo pode influenciar o comportamento do participante e e uma decisao de UX, nao uma configuracao metodologicamente neutra.
 
 A interface usa tema escuro original com fundo `#0B1020`; os estimulos aparecem sobre um cartao claro para preservar contraste, sem adicionar branco como cor de estimulo.
 
@@ -76,7 +76,7 @@ A interface usa tema escuro original com fundo `#0B1020`; os estimulos aparecem 
 
 Os CSVs locais ficam em `data/`. Essa pasta e ignorada pelo Git para proteger dados de teste, execucao e participantes.
 
-Cada execucao concluida normalmente deve gerar um unico CSV oficial por tentativa, nomeado pelo `participant_id`. O `participant_name` e um dado pessoal local e nao entra no nome do arquivo. Pratica e bloco principal ficam no mesmo arquivo e sao diferenciados pela coluna `block`.
+Cada execucao concluida normalmente deve gerar um unico CSV oficial por tentativa, nomeado pelo `participant_id`. O `participant_name` e um dado pessoal local e nao entra no nome do arquivo. Nas execucoes atuais, apenas tentativas do bloco principal sao exportadas no CSV oficial, com `block = main`.
 
 As colunas principais registradas por tentativa sao:
 

@@ -41,9 +41,9 @@ Tambem ha opcao de cancelamento seguro. Se o formulario for cancelado, o experim
 | `assessment_date` | sistema | data local em formato ISO `YYYY-MM-DD` |
 | `started_at` | sistema | data e hora local em ISO 8601 com fuso, ate segundos |
 | `test_code` | constante | `stroop_go_nogo_ptbr` |
-| `test_version` | constante | `0.2.1` |
+| `test_version` | constante | `0.2.2` |
 
-`test_version` atual `0.2.1` identifica a versao com protocolo curto, HUD, tema escuro, centralizacao do estimulo e formulario com `participant_name`. Os campos centrais do formulario permanecem pseudonimizados, com `participant_id` como identificador tecnico principal.
+`test_version` atual `0.2.2` identifica a versao com protocolo curto, bloco principal balanceado 8/8, HUD, tema escuro, centralizacao do estimulo e formulario com `participant_name`. Os campos centrais do formulario permanecem pseudonimizados, com `participant_id` como identificador tecnico principal.
 
 ## Regras de validacao
 

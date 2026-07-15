@@ -107,10 +107,10 @@ class Fase3CondicoesTemposTests(unittest.TestCase):
         self.assertEqual(Counter(row["condition"] for row in rows), {"congruent": 2, "incongruent": 2})
         self.assert_condition_rules(rows)
 
-    def test_principal_tem_16_linhas_balanceamento_12_4_e_10_cores(self):
+    def test_principal_tem_16_linhas_balanceamento_8_8_e_10_cores(self):
         rows = self.main_rows
         self.assertEqual(len(rows), 16)
-        self.assertEqual(Counter(row["condition"] for row in rows), {"congruent": 12, "incongruent": 4})
+        self.assertEqual(Counter(row["condition"] for row in rows), {"congruent": 8, "incongruent": 8})
         self.assertEqual({row["ink_color"] for row in rows}, OFFICIAL_COLORS)
         self.assertLessEqual(max(Counter(row["word"] for row in rows).values()), 2)
         self.assertGreaterEqual(min(Counter(row["word"] for row in rows).values()), 1)
@@ -198,15 +198,12 @@ class Fase3CondicoesTemposTests(unittest.TestCase):
         response = component(trial, "KeyboardComponent", "resp_principal")
         fix = component(trial, "TextComponent", "fix_principal")
         stim = component(trial, "TextComponent", "stim_principal")
-        reminder = component(trial, "TextComponent", "lembrete_principal")
         hold = component(trial, "TextComponent", "hold_principal")
 
         self.assertEqual(param(fix, "startVal"), "0")
         self.assertEqual(param(fix, "stopVal"), "0.3")
         self.assertEqual(param(stim, "startVal"), "0.3")
         self.assertEqual(param(stim, "stopVal"), "2.5")
-        self.assertEqual(param(reminder, "startVal"), "0.3")
-        self.assertEqual(param(reminder, "stopVal"), "2.5")
         self.assertEqual(param(response, "startVal"), "0.3")
         self.assertEqual(param(response, "stopVal"), "2.5")
         self.assertEqual(param(response, "forceEndRoutine"), "False")
@@ -214,6 +211,36 @@ class Fase3CondicoesTemposTests(unittest.TestCase):
         self.assertEqual(param(hold, "startVal"), "0")
         self.assertEqual(param(hold, "stopVal"), "3.75")
         self.assertEqual(len(self.main_rows) * 3.75, 60.0)
+
+    def test_trial_principal_nao_tem_texto_instrucional_visivel(self):
+        trial = routine(self.psyexp, "trial_principal")
+        forbidden = [
+            "pressione",
+            "espaço",
+            "espaco",
+            "enter",
+            "continue",
+            "combinar",
+        ]
+        allowed_dynamic_texts = {
+            "$word",
+            "$main_accuracy_text",
+            "$main_accuracy_bar",
+            "$timer_text",
+            "$progress_text",
+        }
+        for item in trial.findall("TextComponent"):
+            text = param(item, "text") or ""
+            disabled = param(item, "disabled")
+            if disabled == "True":
+                continue
+            if text in allowed_dynamic_texts or text in ["+", "."]:
+                continue
+            lowered = text.lower()
+            self.assertTrue(
+                all(pattern not in lowered for pattern in forbidden),
+                f"{item.get('name')} contem texto instrucional: {text!r}",
+            )
 
     def test_hud_precisao_e_cronometro(self):
         practice = routine(self.psyexp, "trial_pratica")

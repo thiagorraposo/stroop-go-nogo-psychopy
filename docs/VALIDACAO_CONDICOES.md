@@ -1,10 +1,10 @@
 # Validacao estatica de condicoes e tempos
 
-Data da validacao: 2026-07-06.
+Data da validacao: 2026-07-09.
 
 ## Escopo
 
-Esta validacao documenta a versao `0.2.1` do experimento Stroop Go/No-Go: protocolo curto, 10 cores oficiais, tema escuro, HUD de precisao, cronometro visual do bloco principal e formulario com `participant_name`.
+Esta validacao documenta a versao `0.2.2` do experimento Stroop Go/No-Go: protocolo curto, 10 cores oficiais, tema escuro, HUD de precisao, cronometro visual do bloco principal e formulario com `participant_name`.
 
 Arquivos validados:
 
@@ -63,11 +63,11 @@ Regras validadas:
 | Propriedade | Valor |
 |---|---:|
 | Tentativas | 16 |
-| Congruentes / Go | 12 |
-| Incongruentes / No-Go | 4 |
+| Congruentes / Go | 8 |
+| Incongruentes / No-Go | 8 |
 | Cores oficiais presentes | 10 |
 
-O bloco principal inclui todas as 10 cores oficiais ao menos uma vez. As palavras e cores foram distribuidas da forma mais equilibrada possivel para 16 tentativas e razao 12/4, preservando pares incongruentes validos e sem duplicidade. O loop `principal_loop` permanece com selecao `random`, preservando a randomizacao atual do Builder.
+O bloco principal inclui todas as 10 cores oficiais ao menos uma vez. As palavras e cores foram distribuidas da forma mais equilibrada possivel para 16 tentativas e razao 8/8, preservando pares incongruentes validos e sem duplicidade. O loop `principal_loop` permanece com selecao `random`, preservando a randomizacao atual do Builder.
 
 ## Regras do paradigma
 
@@ -103,11 +103,13 @@ Configuracao validada no `.psyexp`:
 - `stim_pratica`, `lembrete_pratica` e `resp_pratica`: `startVal = 0.3`, `stopVal = 2.0`;
 - `hold_pratica`: `startVal = 0`, `stopVal = 2.8`;
 - `texto_feedback`: `stopVal = 0.5`;
-- `stim_principal`, `lembrete_principal` e `resp_principal`: `startVal = 0.3`, `stopVal = 2.5`;
+- `stim_principal` e `resp_principal`: `startVal = 0.3`, `stopVal = 2.5`;
 - `hold_principal`: `startVal = 0`, `stopVal = 3.75`;
 - `resp_pratica` e `resp_principal`: `forceEndRoutine = False`.
 
 Pressionar Espaco nao encerra a tentativa antes do fim da janela de resposta. A resposta e registrada dentro da janela, mas o estimulo permanece ate o fim do segmento. Respostas durante fixacao, intervalo vazio e feedback nao sao aceitas porque o componente de teclado inicia apenas aos 300 ms e termina antes do intervalo.
+
+Durante as tentativas do bloco principal nao ha texto instrucional visivel, como lembrete de pressionar Espaco ou instrucao de navegacao. A tela principal mantem estimulo central, cronometro, precisao e progresso.
 
 O bloco principal tem duracao estimada:
 

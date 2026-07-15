@@ -23,7 +23,7 @@ def make_row(**overrides):
         "assessment_date": "2026-07-09",
         "started_at": "2026-07-09T10:00:00-03:00",
         "test_code": "stroop_go_nogo_ptbr",
-        "test_version": "0.2.1",
+        "test_version": "0.2.2",
         "block": "main",
         "trial_number": "1",
         "word": "VERMELHO",

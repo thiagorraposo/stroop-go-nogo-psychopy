@@ -68,7 +68,7 @@ class InterfacePrePraticaTests(unittest.TestCase):
         begin_experiment = param(form, "Begin Experiment")
         self.assertIn("Dados da sessão", begin_experiment)
         self.assertIn("expInfo['assessment_id']", begin_experiment)
-        self.assertIn("TEST_VERSION = '0.2.1'", begin_experiment)
+        self.assertIn("TEST_VERSION = '0.2.2'", begin_experiment)
         self.assertIn("Nome do participante", begin_experiment)
         self.assertIn("participant_name", begin_experiment)
         self.assertIn("len(_session_values['participant_name']) < 2", begin_experiment)

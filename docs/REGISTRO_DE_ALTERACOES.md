@@ -13,6 +13,10 @@ Formato: entradas incrementais com data, tipo de mudanca e resumo.
 - `feat`: implementada Fase 7 com importacao do CSV unificado para SQLite local em `scripts/importar_csv_sqlite.py` e schema em `scripts/db_schema.sql`.
 - `test`: adicionados testes com CSVs temporarios para importacao valida, cabecalho invalido, duplicidade, `--force`, metricas, rollback, validacao de RT e coerencia de resposta.
 - `docs`: criada documentacao `docs/IMPORTACAO_SQLITE.md` e atualizados README, modelo de dados e arquitetura para marcar SQLite local como implementado e pendente de validacao manual com CSV real em Pilot.
+- `feat`: atualizada versao para `0.2.2`, com bloco principal balanceado em 8 tentativas congruentes e 8 incongruentes, preservando pratica 2/2 e protocolo curto 4 + 16.
+- `fix`: removido texto instrucional visivel do `trial_principal`, mantendo apenas estimulo central, cronometro, precisao e progresso durante o bloco principal.
+- `test`: atualizadas validacoes de condicoes, versao, cores oficiais, pares incongruentes e ausencia de texto instrucional no bloco principal.
+- `docs`: sincronizadas decisoes e validacao de condicoes com a distribuicao 8/8 e a limpeza da tela principal.
 
 ## 2026-07-06
 
