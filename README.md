@@ -10,6 +10,8 @@ Este projeto e mantido para fins educacionais e de pesquisa exploratoria. Ele na
 
 O PsychoPy precisa ser instalado separadamente para executar ou editar o experimento. O fluxo abaixo configura apenas o dashboard local, baseado em Python, Streamlit e SQLite.
 
+Para usar sem Git, abra o repositorio no GitHub e escolha `Code` -> `Download ZIP`, descompacte o arquivo e abra um terminal dentro da pasta. Em repositorios privados, e necessario estar conectado a uma conta autorizada. Consulte o passo a passo em [`docs/USO_POR_ZIP_GITHUB.md`](docs/USO_POR_ZIP_GITHUB.md) e o fluxo cotidiano em [`docs/GUIA_DO_USUARIO.md`](docs/GUIA_DO_USUARIO.md).
+
 No Windows:
 
 1. Instale o Python 3.9 ou mais recente.
@@ -44,6 +46,8 @@ O launcher importa o arquivo mais recente em `data/*_trials.csv` e abre o dashbo
 - `dashboard/app.py`: dashboard Streamlit local para consulta descritiva do SQLite.
 - `dashboard/requirements.txt`: dependencias do dashboard local.
 - `docs/UX_DECISIONS.md`: notas sobre as decisoes de experiencia de usuario.
+- `docs/USO_POR_ZIP_GITHUB.md`: instalacao e uso a partir do Download ZIP do GitHub.
+- `docs/GUIA_DO_USUARIO.md`: fluxo cotidiano do experimento ao dashboard.
 - `AGENTS.md`: regras persistentes para agentes e contribuicoes futuras.
 - `docs/`: documentacao de governanca, decisoes e historico.
 - `assets/`: assets proprios do projeto.
