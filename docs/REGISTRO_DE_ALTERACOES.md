@@ -4,6 +4,10 @@ Formato: entradas incrementais com data, tipo de mudanca e resumo.
 
 ## 2026-07-15
 
+- `feat`: criado fluxo multiplataforma para configurar `.venv`, instalar dependencias, importar o CSV oficial mais recente e iniciar o dashboard local em Windows, Linux e macOS.
+- `feat`: adicionados atalhos `setup.bat`, `setup.sh`, `abrir_dashboard.bat` e `abrir_dashboard.sh`, sem dependencia de `.desktop` ou shell especifico na logica Python.
+- `test`: adicionadas validacoes estaticas para deteccao do sistema, Python da venv, selecao do CSV mais recente, ausencias de CSV e venv, comando Streamlit e preservacao de `data/`.
+- `docs`: documentada instalacao multiplataforma, uso manual, armazenamento local e limite descritivo nao clinico dos resultados.
 - `feat`: implementada Fase 8 com dashboard Streamlit local em `dashboard/app.py`, lendo apenas o SQLite padrao `database/stroop_results.sqlite3` em modo somente leitura.
 - `feat`: adicionados filtros por periodo, projeto, `participant_id`, `participant_name`, visita, avaliador, teste e versao, com cards, graficos, tabela agregada, detalhe por avaliacao e download manual da visao filtrada.
 - `test`: adicionados testes do dashboard com SQLite temporario para conexao, banco ausente, schema, leitura das tres tabelas, tabela agregada, filtros, cards, detalhe, linguagem proibida e ausencia de escrita no banco.

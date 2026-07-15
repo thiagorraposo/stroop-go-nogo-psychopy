@@ -11,3 +11,5 @@ python3 scripts/analisar_stroop.py data/PARTICIPANT_ID.csv
 `analisar_stroop.py` consome apenas um CSV unificado local em `data/`, distinguindo `practice` e `main` pela coluna `block`. O script valida o contrato oficial, calcula metricas descritivas do bloco principal e nao modifica o CSV bruto.
 
 Os resultados sao descritivos e exploratorios. Eles nao sao interpretacao clinica, diagnostico ou comparacao normativa.
+
+`setup_env.py` cria a `.venv` multiplataforma e instala as dependencias do dashboard. `run_dashboard.py` seleciona ou recebe um CSV oficial, chama o importador SQLite sem modificar o CSV e inicia o Streamlit. Consulte `docs/INSTALACAO_MULTIPLATAFORMA.md`.

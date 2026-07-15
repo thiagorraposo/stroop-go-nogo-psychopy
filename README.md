@@ -6,6 +6,31 @@ Regra da tarefa: pressionar `Espaco` apenas quando a palavra e a cor da tinta fo
 
 Este projeto e mantido para fins educacionais e de pesquisa exploratoria. Ele nao e instrumento clinico validado, nao produz diagnostico e nao deve ser usado para classificacao clinica ou normativa.
 
+## Uso em qualquer sistema
+
+O PsychoPy precisa ser instalado separadamente para executar ou editar o experimento. O fluxo abaixo configura apenas o dashboard local, baseado em Python, Streamlit e SQLite.
+
+No Windows:
+
+1. Instale o Python 3.9 ou mais recente.
+2. Execute `setup.bat`.
+3. Execute `abrir_dashboard.bat`.
+
+No Linux ou macOS:
+
+1. Instale o Python 3.9 ou mais recente.
+2. Execute `bash setup.sh`.
+3. Execute `bash abrir_dashboard.sh`.
+
+Uso manual, a partir da raiz do projeto:
+
+```text
+python scripts/setup_env.py
+python scripts/run_dashboard.py
+```
+
+O launcher importa o arquivo mais recente em `data/*_trials.csv` e abre o dashboard. Use `--csv CAMINHO` para selecionar outro CSV e `--force` para reimportar uma avaliacao. Os CSVs e o banco permanecem locais em `data/` e `database/`; `database/` nao deve ser enviada ao Git. Os resultados apresentados sao descritivos, nao clinicos.
+
 ## Arquivos
 
 - `stroop_go_nogo_ptbr.psyexp`: experimento para abrir no PsychoPy Builder.
