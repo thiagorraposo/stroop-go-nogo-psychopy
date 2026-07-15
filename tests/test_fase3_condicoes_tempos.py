@@ -23,6 +23,18 @@ WORDS_TO_COLORS = {
     "AZUL": ("blue", "#2563EB"),
     "CINZA": ("gray", "#64748B"),
 }
+DISPLAY_PALETTE = {
+    "green": "#40FF00",
+    "yellow": "#FFF200",
+    "pink": "#FF5CCB",
+    "black": "#000000",
+    "red": "#FF0000",
+    "orange": "#FF9000",
+    "brown": "#965000",
+    "purple": "#9A24FF",
+    "blue": "#0062FF",
+    "gray": "#808080",
+}
 OFFICIAL_WORDS = set(WORDS_TO_COLORS)
 OFFICIAL_COLORS = {color for color, _ in WORDS_TO_COLORS.values()}
 OFFICIAL_DISPLAYS = {display for _, display in WORDS_TO_COLORS.values()}
@@ -135,15 +147,39 @@ class Fase3CondicoesTemposTests(unittest.TestCase):
         self.assertIn("'correct_response'", text)
         self.assertIn("'ink_color': trial_context['ink_color']", text)
         self.assertNotIn("'ink_color_display'", text.split("OFFICIAL_CSV_COLUMNS = [", 1)[1].split("]", 1)[0])
+        self.assertNotIn("'_raw'", text.split("OFFICIAL_CSV_COLUMNS = [", 1)[1].split("]", 1)[0])
 
-    def test_psyexp_usa_hexadecimal_para_renderizar_estimulos(self):
+    def test_psyexp_usa_paleta_visual_por_chave_logica(self):
+        practice = routine(self.psyexp, "trial_pratica")
+        palette_code = param(
+            component(practice, "CodeComponent", "renderizacao_cores_pratica"),
+            "Before Experiment",
+        )
+        for logical_color, display_color in DISPLAY_PALETTE.items():
+            self.assertIn(f"'{logical_color}': '{display_color}'", palette_code)
+
+        self.assertEqual(set(DISPLAY_PALETTE), OFFICIAL_COLORS)
+        self.assertEqual(len(set(DISPLAY_PALETTE.values())), 10)
         for routine_name, component_name in [
             ("trial_pratica", "stim_pratica"),
             ("trial_principal", "stim_principal"),
         ]:
             item = component(routine(self.psyexp, routine_name), "TextComponent", component_name)
-            self.assertEqual(param(item, "color"), "$ink_color_display")
+            self.assertEqual(param(item, "color"), "$INK_COLOR_DISPLAY_MAP[ink_color]")
             self.assertEqual(param(item, "text"), "$word")
+
+    def test_estimulos_tem_centralizacao_explicita_em_pratica_e_principal(self):
+        for routine_name, code_name, stim_name in [
+            ("trial_pratica", "renderizacao_cores_pratica", "stim_pratica"),
+            ("trial_principal", "renderizacao_cores_principal", "stim_principal"),
+        ]:
+            code = param(
+                component(routine(self.psyexp, routine_name), "CodeComponent", code_name),
+                "Begin Routine",
+            )
+            self.assertIn(f"{stim_name}.alignText = 'center'", code)
+            self.assertIn(f"{stim_name}.anchorHoriz = 'center'", code)
+            self.assertIn(f"{stim_name}.anchorVert = 'center'", code)
 
     def test_cartao_e_estimulo_compartilham_posicao_central(self):
         for routine_name, card_name, stim_name in [
@@ -162,12 +198,18 @@ class Fase3CondicoesTemposTests(unittest.TestCase):
             self.assertEqual(param(hold, "pos"), "[0, 0]")
 
     def test_paleta_visual_tem_10_cores_distintas(self):
-        displays = [display for _, display in WORDS_TO_COLORS.values()]
+        displays = list(DISPLAY_PALETTE.values())
         self.assertEqual(len(displays), 10)
         self.assertEqual(len(set(displays)), 10)
-        self.assertNotEqual(WORDS_TO_COLORS["PRETO"][1], WORDS_TO_COLORS["CINZA"][1])
-        self.assertNotEqual(WORDS_TO_COLORS["AMARELO"][1], WORDS_TO_COLORS["PRETO"][1])
-        self.assertNotEqual(WORDS_TO_COLORS["AMARELO"][1], WORDS_TO_COLORS["CINZA"][1])
+        for first, second in [
+            ("black", "gray"),
+            ("red", "pink"),
+            ("orange", "brown"),
+            ("blue", "purple"),
+            ("yellow", "black"),
+            ("yellow", "gray"),
+        ]:
+            self.assertNotEqual(DISPLAY_PALETTE[first], DISPLAY_PALETTE[second])
 
     def test_tempos_de_tentativa_pratica(self):
         trial = routine(self.psyexp, "trial_pratica")

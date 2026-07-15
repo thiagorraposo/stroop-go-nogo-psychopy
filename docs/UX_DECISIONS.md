@@ -44,7 +44,7 @@ Implementado em 2026-07-06 na versao `0.2.1`:
 - tema escuro aplicado nas telas de instrucao, contagem, pratica, bloco principal e fim;
 - fundo principal `#0B1020`, texto principal `#F8FAFC` e texto auxiliar `#CBD5E1`;
 - estimulos exibidos sobre cartao claro aproximado de `#F8FAFC` para preservar contraste;
-- PRETO, CINZA e AMARELO devem ser conferidos em Pilot antes de coleta real;
+- palavras centralizadas explicitamente no cartao claro, com alinhamento e ancoras horizontal e vertical no centro;
 - branco permanece apenas como cor de interface, nao como estimulo;
 - HUD mostra `Precisão: —` antes da primeira tentativa concluida e `Precisão: XX%` depois disso;
 - barra horizontal textual acompanha a precisao acumulada;
@@ -53,6 +53,32 @@ Implementado em 2026-07-06 na versao `0.2.1`:
 - cronometro visual mostra `Tempo: MM:SS`, inicia apenas na primeira tentativa principal e segue ate o fim da ultima tentativa principal.
 
 A precisao ao vivo pode influenciar o comportamento do participante. Essa exibicao e uma decisao de UX e nao uma configuracao metodologicamente neutra. O HUD nao deve ser interpretado como diagnostico, norma, classificacao clinica ou comparacao populacional.
+
+## Paleta visual dos estimulos
+
+Atualizada em 2026-07-15 exclusivamente para renderizacao. As chaves logicas de `ink_color`, condicoes e exportacao permanecem inalteradas:
+
+- `green`: `#40FF00`;
+- `yellow`: `#FFF200`;
+- `pink`: `#FF5CCB`;
+- `black`: `#000000`;
+- `red`: `#FF0000`;
+- `orange`: `#FF9000`;
+- `brown`: `#965000`;
+- `purple`: `#9A24FF`;
+- `blue`: `#0062FF`;
+- `gray`: `#808080`.
+
+A mesma paleta e usada na pratica e no bloco principal por meio de um mapa visual no `.psyexp`, sem exportar hexadecimal, RGB ou campos auxiliares. A verificacao Pilot deve priorizar a legibilidade de amarelo sobre o cartao claro e a distincao entre preto/cinza, vermelho/rosa, laranja/marrom e azul/roxo.
+
+Checklist Pilot visual:
+
+1. Abrir o experimento em Run.
+2. Conferir o cartao branco centralizado.
+3. Conferir que as dez cores estao mais vivas.
+4. Conferir distincao clara entre preto/cinza, vermelho/rosa, laranja/marrom e azul/roxo.
+5. Conferir a legibilidade do amarelo.
+6. Confirmar que o teste e o CSV continuam normais.
 
 ## Tela final de resultados
 

@@ -4,6 +4,9 @@ Formato: entradas incrementais com data, tipo de mudanca e resumo.
 
 ## 2026-07-15
 
+- `ux`: atualizada somente a renderizacao das dez cores dos estimulos para uma paleta mais viva sobre o cartao claro, preservando as chaves logicas, condicoes e CSV oficial.
+- `fix`: explicitadas ancoras e alinhamento central das palavras na pratica e no bloco principal.
+- `test`: adicionadas validacoes da nova paleta visual, das dez chaves logicas, da centralizacao e da ausencia de cores de exibicao ou campos `_raw` no contrato exportado.
 - `docs`: implementada a Etapa 10 com guias para Download ZIP do GitHub, primeira instalacao, uso cotidiano, privacidade, solucao de problemas e checklist do usuario.
 - `docs`: atualizados README e estrutura do projeto para orientar usuarios sem Git aos atalhos multiplataforma e ao fluxo PsychoPy -> CSV -> SQLite -> dashboard.
 - `feat`: criado fluxo multiplataforma para configurar `.venv`, instalar dependencias, importar o CSV oficial mais recente e iniciar o dashboard local em Windows, Linux e macOS.

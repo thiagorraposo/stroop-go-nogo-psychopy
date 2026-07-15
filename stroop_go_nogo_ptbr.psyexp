@@ -889,6 +889,23 @@
         <Param val="False" valType="bool" updates="None" name="disabled"/>
         <Param val="codigo_pratica" valType="code" updates="None" name="name"/>
       </CodeComponent>
+      <CodeComponent name="renderizacao_cores_pratica" plugin="None">
+        <Param val="INK_COLOR_DISPLAY_MAP = {&amp;#10;    'green': '#40FF00',&amp;#10;    'yellow': '#FFF200',&amp;#10;    'pink': '#FF5CCB',&amp;#10;    'black': '#000000',&amp;#10;    'red': '#FF0000',&amp;#10;    'orange': '#FF9000',&amp;#10;    'brown': '#965000',&amp;#10;    'purple': '#9A24FF',&amp;#10;    'blue': '#0062FF',&amp;#10;    'gray': '#808080',&amp;#10;}" valType="extendedCode" updates="constant" name="Before Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Before JS Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Begin Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Begin JS Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Begin JS Routine"/>
+        <Param val="stim_pratica.alignText = 'center'&amp;#10;stim_pratica.anchorHoriz = 'center'&amp;#10;stim_pratica.anchorVert = 'center'" valType="extendedCode" updates="constant" name="Begin Routine"/>
+        <Param val="Py" valType="str" updates="None" name="Code Type"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Each Frame"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Each JS Frame"/>
+        <Param val="" valType="extendedCode" updates="constant" name="End Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="End JS Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="End JS Routine"/>
+        <Param val="" valType="extendedCode" updates="constant" name="End Routine"/>
+        <Param val="False" valType="bool" updates="None" name="disabled"/>
+        <Param val="renderizacao_cores_pratica" valType="code" updates="None" name="name"/>
+      </CodeComponent>
       <TextComponent name="hud_pratica_precisao" plugin="None">
         <Param val="#CBD5E1" valType="str" updates="constant" name="color"/>
         <Param val="rgb" valType="str" updates="constant" name="colorSpace"/>
@@ -1049,7 +1066,7 @@
         <Param val="0.82" valType="num" updates="constant" name="wrapWidth"/>
       </TextComponent>
       <TextComponent name="stim_pratica" plugin="None">
-        <Param val="$ink_color_display" valType="code" updates="set every repeat" name="color"/>
+        <Param val="$INK_COLOR_DISPLAY_MAP[ink_color]" valType="code" updates="set every repeat" name="color"/>
         <Param val="rgb" valType="str" updates="constant" name="colorSpace"/>
         <Param val="1" valType="num" updates="constant" name="contrast"/>
         <Param val="False" valType="bool" updates="None" name="disabled"/>
@@ -1362,6 +1379,23 @@
         <Param val="False" valType="bool" updates="None" name="disabled"/>
         <Param val="codigo_principal" valType="code" updates="None" name="name"/>
       </CodeComponent>
+      <CodeComponent name="renderizacao_cores_principal" plugin="None">
+        <Param val="" valType="extendedCode" updates="constant" name="Before Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Before JS Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Begin Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Begin JS Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Begin JS Routine"/>
+        <Param val="stim_principal.alignText = 'center'&amp;#10;stim_principal.anchorHoriz = 'center'&amp;#10;stim_principal.anchorVert = 'center'" valType="extendedCode" updates="constant" name="Begin Routine"/>
+        <Param val="Py" valType="str" updates="None" name="Code Type"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Each Frame"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Each JS Frame"/>
+        <Param val="" valType="extendedCode" updates="constant" name="End Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="End JS Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="End JS Routine"/>
+        <Param val="" valType="extendedCode" updates="constant" name="End Routine"/>
+        <Param val="False" valType="bool" updates="None" name="disabled"/>
+        <Param val="renderizacao_cores_principal" valType="code" updates="None" name="name"/>
+      </CodeComponent>
       <TextComponent name="hud_principal_precisao" plugin="None">
         <Param val="#CBD5E1" valType="str" updates="constant" name="color"/>
         <Param val="rgb" valType="str" updates="constant" name="colorSpace"/>
@@ -1550,7 +1584,7 @@
         <Param val="0.82" valType="num" updates="constant" name="wrapWidth"/>
       </TextComponent>
       <TextComponent name="stim_principal" plugin="None">
-        <Param val="$ink_color_display" valType="code" updates="set every repeat" name="color"/>
+        <Param val="$INK_COLOR_DISPLAY_MAP[ink_color]" valType="code" updates="set every repeat" name="color"/>
         <Param val="rgb" valType="str" updates="constant" name="colorSpace"/>
         <Param val="1" valType="num" updates="constant" name="contrast"/>
         <Param val="False" valType="bool" updates="None" name="disabled"/>
