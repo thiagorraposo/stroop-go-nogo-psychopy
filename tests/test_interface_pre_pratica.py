@@ -97,7 +97,12 @@ class InterfacePrePraticaTests(unittest.TestCase):
             self.assertEqual(param(keyboard, "storeCorrect"), "False")
 
             code = component(current, "CodeComponent", code_name)
-            self.assertIn("event.Mouse", param(code, "Begin Routine"))
+            begin_routine = param(code, "Begin Routine")
+            self.assertIn("win.units = 'height'", begin_routine)
+            self.assertLess(
+                begin_routine.index("win.units = 'height'"),
+                begin_routine.index("event.Mouse"),
+            )
             self.assertIn(f"{button_name}.contains(nav_mouse)", param(code, "Each Frame"))
             self.assertIn("continueRoutine = False", param(code, "Each Frame"))
 

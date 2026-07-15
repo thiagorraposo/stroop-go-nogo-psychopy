@@ -262,7 +262,7 @@
         <Param val="" valType="extendedCode" updates="constant" name="Begin Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Routine"/>
-        <Param val="nav_mouse = event.Mouse(win=win)&amp;#10;nav_mouse.clickReset()" valType="extendedCode" updates="constant" name="Begin Routine"/>
+        <Param val="win.units = 'height'&amp;#10;nav_mouse = event.Mouse(win=win)&amp;#10;nav_mouse.clickReset()" valType="extendedCode" updates="constant" name="Begin Routine"/>
         <Param val="Auto-&gt;JS" valType="str" updates="None" name="Code Type"/>
         <Param val="if nav_mouse.getPressed()[0] and abertura_botao.contains(nav_mouse):&amp;#10;    continueRoutine = False" valType="extendedCode" updates="constant" name="Each Frame"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each JS Frame"/>
@@ -529,7 +529,7 @@
         <Param val="" valType="extendedCode" updates="constant" name="Begin Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Routine"/>
-        <Param val="nav_mouse = event.Mouse(win=win)&amp;#10;nav_mouse.clickReset()" valType="extendedCode" updates="constant" name="Begin Routine"/>
+        <Param val="win.units = 'height'&amp;#10;nav_mouse = event.Mouse(win=win)&amp;#10;nav_mouse.clickReset()" valType="extendedCode" updates="constant" name="Begin Routine"/>
         <Param val="Auto-&gt;JS" valType="str" updates="None" name="Code Type"/>
         <Param val="if nav_mouse.getPressed()[0] and tutorial_botao.contains(nav_mouse):&amp;#10;    continueRoutine = False" valType="extendedCode" updates="constant" name="Each Frame"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each JS Frame"/>
@@ -695,7 +695,7 @@
         <Param val="" valType="extendedCode" updates="constant" name="Begin Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Experiment"/>
         <Param val="" valType="extendedCode" updates="constant" name="Begin JS Routine"/>
-        <Param val="nav_mouse = event.Mouse(win=win)&amp;#10;nav_mouse.clickReset()" valType="extendedCode" updates="constant" name="Begin Routine"/>
+        <Param val="win.units = 'height'&amp;#10;nav_mouse = event.Mouse(win=win)&amp;#10;nav_mouse.clickReset()" valType="extendedCode" updates="constant" name="Begin Routine"/>
         <Param val="Auto-&gt;JS" valType="str" updates="None" name="Code Type"/>
         <Param val="if nav_mouse.getPressed()[0] and pratica_inicio_botao.contains(nav_mouse):&amp;#10;    continueRoutine = False" valType="extendedCode" updates="constant" name="Each Frame"/>
         <Param val="" valType="extendedCode" updates="constant" name="Each JS Frame"/>

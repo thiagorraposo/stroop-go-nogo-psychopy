@@ -4,6 +4,8 @@ Formato: entradas incrementais com data, tipo de mudanca e resumo.
 
 ## 2026-07-15
 
+- `fix`: fixadas unidades `height` antes da criacao do mouse nas telas de navegacao, evitando falha de `contains()` em monitores sem distancia calibrada quando o PsychoPy interpreta coordenadas como `degFlatPos`.
+- `test`: adicionada regressao estatica para garantir que as unidades relativas sejam definidas antes de `event.Mouse` nas telas clicaveis.
 - `ux`: atualizada somente a renderizacao das dez cores dos estimulos para uma paleta mais viva sobre o cartao claro, preservando as chaves logicas, condicoes e CSV oficial.
 - `fix`: explicitadas ancoras e alinhamento central das palavras na pratica e no bloco principal.
 - `test`: adicionadas validacoes da nova paleta visual, das dez chaves logicas, da centralizacao e da ausencia de cores de exibicao ou campos `_raw` no contrato exportado.
