@@ -101,13 +101,13 @@ PILOTO_STROOP,P_EXEMPLO,NOME_REDIGIDO,V1,AV01,00000000-0000-0000-0000-0000000000
 
 ## Nome do arquivo
 
-O arquivo oficial deve ser salvo em `data/` usando o `participant_id` como nome-base. O `participant_name` nao entra no nome do arquivo:
+O arquivo oficial deve ser salvo em `data/` com codigo do teste e data/hora local da execucao:
 
 ```text
-data/<participant_id>.csv
+data/stroop_go_nogo_ptbr_YYYY-MM-DD_HHhMMmSSs_trials.csv
 ```
 
-O nome nao deve conter iniciais, visita ou avaliador. O `assessment_id` permanece registrado no conteudo do CSV para rastrear a execucao especifica.
+O nome nao deve conter `participant_id`, `participant_name`, iniciais, visita ou avaliador. Esses metadados e o `assessment_id` permanecem registrados somente no conteudo do CSV para rastrear a execucao especifica. O sufixo `_trials.csv` permite que o launcher local encontre o arquivo oficial mais recente.
 
 ## Execucoes abortadas
 

@@ -107,7 +107,7 @@ A interface usa tema escuro original com fundo `#0B1020`; os estimulos aparecem 
 
 Os CSVs locais ficam em `data/`. Essa pasta e ignorada pelo Git para proteger dados de teste, execucao e participantes.
 
-Cada execucao concluida normalmente deve gerar um unico CSV oficial por tentativa, nomeado pelo `participant_id`. O `participant_name` e um dado pessoal local e nao entra no nome do arquivo. Nas execucoes atuais, apenas tentativas do bloco principal sao exportadas no CSV oficial, com `block = main`.
+Cada execucao concluida normalmente gera um unico CSV oficial por tentativa no formato `data/stroop_go_nogo_ptbr_YYYY-MM-DD_HHhMMmSSs_trials.csv`. Nenhum metadado do participante entra no nome do arquivo. Nas execucoes atuais, apenas tentativas do bloco principal sao exportadas no CSV oficial, com `block = main`.
 
 As colunas principais registradas por tentativa sao:
 

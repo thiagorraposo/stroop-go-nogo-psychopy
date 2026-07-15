@@ -34,8 +34,8 @@
 - Campos obrigatorios de sessao: `project`, `participant_id`, `visit` e `evaluator`.
 - O experimento usa formulario local de sessao antes da primeira tela.
 - `participant_id` e o identificador canonico da pessoa no CSV.
-- Nomes de arquivo de dados nao devem usar iniciais, visita ou avaliador.
-- O CSV oficial deve usar `participant_id` como nome-base do arquivo. `participant_name` e dado pessoal local e nao deve aparecer em nomes de arquivo, screenshots, exemplos publicos ou logs.
+- Nomes de arquivo de dados nao devem usar `participant_id`, `participant_name`, iniciais, visita ou avaliador.
+- O CSV oficial deve seguir `stroop_go_nogo_ptbr_YYYY-MM-DD_HHhMMmSSs_trials.csv`, permitindo descoberta por `data/*_trials.csv`; metadados pessoais ficam somente no conteudo local.
 - `test_version` atual e `0.2.2`.
 - Cada execucao concluida normalmente deve gerar um unico CSV oficial contendo apenas tentativas do bloco principal.
 - A pratica continua sendo usada para feedback e HUD, mas nao e exportada no CSV oficial.
@@ -67,6 +67,7 @@
 - 2026-07-09: versao `0.2.2` definida com bloco principal balanceado em 8 tentativas congruentes e 8 incongruentes, mantendo pratica 2/2 e protocolo curto 4 + 16.
 - 2026-07-09: tela de tentativa principal limpa de texto instrucional, mantendo somente estimulo central, cronometro, precisao e progresso.
 - 2026-07-06: arquitetura futura de dados definida com CSV bruto unificado, importacao para SQLite local e dashboard Streamlit local.
+- 2026-07-15: nome do CSV oficial alterado para codigo do teste e timestamp, com sufixo `_trials.csv` e sem identificadores do participante.
 - 2026-07-06: versao `0.2.1` definida com protocolo curto 4 + 16, bloco principal de cerca de 1 minuto, HUD de precisao, cronometro principal, tema escuro, centralizacao do estimulo e formulario com `participant_name` local.
 - 2026-07-06: primeira fase visual pre-pratica definida com abertura, tutorial unico, introducao a pratica e lembrete automatico.
 - 2026-07-06: Fase 3 definida com 10 cores, bloco principal de 60 tentativas e perfil temporal de 2,0 segundos por tentativa.

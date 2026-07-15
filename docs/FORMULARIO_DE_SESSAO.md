@@ -70,7 +70,7 @@ Tambem ha opcao de cancelamento seguro. Se o formulario for cancelado, o experim
 - Nao coletar nome completo.
 - Nao coletar CPF, e-mail, telefone, endereco, idade ou sexo nesta versao.
 - Avaliador(a) deve usar codigo ou iniciais profissionais, nao nome completo.
-- O CSV oficial usa `participant_id` como nome-base do arquivo; `participant_name` nao entra no nome do arquivo e os demais metadados ficam no conteudo do CSV local.
+- O CSV oficial usa codigo do teste e data/hora no nome, terminando em `_trials.csv`; nenhum campo do formulario entra no nome e todos os metadados permanecem no conteudo local.
 - Dados reais permanecem em `data/`, pasta ignorada pelo Git.
 - Nenhum dado clinico, diagnostico ou normativo e coletado pelo formulario.
 

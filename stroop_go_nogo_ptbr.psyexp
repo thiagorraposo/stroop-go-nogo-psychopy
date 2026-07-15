@@ -290,6 +290,23 @@
         <Param val="False" valType="bool" updates="None" name="disabled"/>
         <Param val="formulario_sessao" valType="code" updates="None" name="name"/>
       </CodeComponent>
+      <CodeComponent name="nome_csv_oficial" plugin="None">
+        <Param val="" valType="extendedCode" updates="constant" name="Before Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Before JS Experiment"/>
+        <Param val="official_timestamp = _started_at.strftime('%Y-%m-%d_%Hh%Mm%Ss')&amp;#10;official_csv_path = os.path.join('data', f'{TEST_CODE}_{official_timestamp}_trials.csv')" valType="extendedCode" updates="constant" name="Begin Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Begin JS Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Begin JS Routine"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Begin Routine"/>
+        <Param val="Py" valType="str" updates="None" name="Code Type"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Each Frame"/>
+        <Param val="" valType="extendedCode" updates="constant" name="Each JS Frame"/>
+        <Param val="" valType="extendedCode" updates="constant" name="End Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="End JS Experiment"/>
+        <Param val="" valType="extendedCode" updates="constant" name="End JS Routine"/>
+        <Param val="" valType="extendedCode" updates="constant" name="End Routine"/>
+        <Param val="False" valType="bool" updates="None" name="disabled"/>
+        <Param val="nome_csv_oficial" valType="code" updates="None" name="name"/>
+      </CodeComponent>
     </Routine>
     <Routine name="tutorial_regra">
       <RoutineSettingsComponent name="tutorial_regra" plugin="None">

@@ -74,12 +74,30 @@ class InterfacePrePraticaTests(unittest.TestCase):
         self.assertIn("len(_session_values['participant_name']) < 2", begin_experiment)
         self.assertIn("len(_session_values['participant_name']) > 120", begin_experiment)
 
-    def test_csv_oficial_usa_participant_id_no_nome(self):
-        form = component(routine(self.root, "boas_vindas"), "CodeComponent", "formulario_sessao")
+    def test_csv_oficial_usa_timestamp_sem_identificadores_no_nome(self):
+        first = routine(self.root, "boas_vindas")
+        filename_code = param(
+            component(first, "CodeComponent", "nome_csv_oficial"),
+            "Begin Experiment",
+        )
+        self.assertIn(
+            "_started_at.strftime('%Y-%m-%d_%Hh%Mm%Ss')", filename_code
+        )
+        self.assertIn(
+            "f'{TEST_CODE}_{official_timestamp}_trials.csv'", filename_code
+        )
+        for participant_field in [
+            "participant_id",
+            "participant_name",
+            "initials",
+            "visit",
+            "evaluator",
+            "assessment_id",
+        ]:
+            self.assertNotIn(participant_field, filename_code)
+
+        form = component(first, "CodeComponent", "formulario_sessao")
         begin_experiment = param(form, "Begin Experiment")
-        self.assertIn("_official_participant_id = expInfo['participant_id']", begin_experiment)
-        self.assertIn("official_csv_path = os.path.join('data', f'{_official_participant_id}.csv')", begin_experiment)
-        self.assertNotIn("_official_assessment_id = expInfo['assessment_id']", begin_experiment)
         self.assertIn("participant_name': expInfo['participant_name']", begin_experiment)
 
     def test_telas_navegaveis_aceitam_clique_espaco_e_enter(self):

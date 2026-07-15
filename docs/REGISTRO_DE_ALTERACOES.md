@@ -4,6 +4,8 @@ Formato: entradas incrementais com data, tipo de mudanca e resumo.
 
 ## 2026-07-15
 
+- `fix`: corrigido o nome do CSV oficial para `stroop_go_nogo_ptbr_YYYY-MM-DD_HHhMMmSSs_trials.csv`, sem campos identificadores e compativel com a busca `data/*_trials.csv` do launcher.
+- `test`: adicionada validacao do timestamp, sufixo `_trials.csv`, ausencia de metadados pessoais no filename e compatibilidade com o fluxo do dashboard.
 - `fix`: fixadas unidades `height` antes da criacao do mouse nas telas de navegacao, evitando falha de `contains()` em monitores sem distancia calibrada quando o PsychoPy interpreta coordenadas como `degFlatPos`.
 - `test`: adicionada regressao estatica para garantir que as unidades relativas sejam definidas antes de `event.Mouse` nas telas clicaveis.
 - `ux`: atualizada somente a renderizacao das dez cores dos estimulos para uma paleta mais viva sobre o cartao claro, preservando as chaves logicas, condicoes e CSV oficial.
