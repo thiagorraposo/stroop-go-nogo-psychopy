@@ -13,3 +13,8 @@ python3 scripts/analisar_stroop.py data/PARTICIPANT_ID.csv
 Os resultados sao descritivos e exploratorios. Eles nao sao interpretacao clinica, diagnostico ou comparacao normativa.
 
 `setup_env.py` cria a `.venv` multiplataforma e instala as dependencias do dashboard. `run_dashboard.py` seleciona ou recebe um CSV oficial, chama o importador SQLite sem modificar o CSV e inicia o Streamlit. Consulte `docs/INSTALACAO_MULTIPLATAFORMA.md`.
+
+`doctor.py` faz somente verificacoes de leitura no ambiente. Na raiz do projeto,
+use `py scripts\doctor.py` no Windows ou `python3 scripts/doctor.py` no Linux e
+macOS. Ele nao instala pacotes, nao modifica CSVs, nao cria o SQLite e nao abre o
+dashboard.

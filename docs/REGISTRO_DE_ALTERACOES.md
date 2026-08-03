@@ -2,6 +2,11 @@
 
 Formato: entradas incrementais com data, tipo de mudanca e resumo.
 
+## 2026-08-03
+
+- `feat`: adicionado `scripts/doctor.py` para diagnostico somente leitura do ambiente no Windows, Linux e macOS, com resultados `OK`, `ERRO` e `AVISO` e orientacoes de correcao por plataforma.
+- `docs`: documentados no README os comandos para executar o diagnostico multiplataforma.
+
 ## 2026-07-15
 
 - `fix`: corrigido o nome do CSV oficial para `stroop_go_nogo_ptbr_YYYY-MM-DD_HHhMMmSSs_trials.csv`, sem campos identificadores e compativel com a busca `data/*_trials.csv` do launcher.

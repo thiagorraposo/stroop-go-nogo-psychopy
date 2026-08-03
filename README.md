@@ -24,6 +24,17 @@ No Linux ou macOS:
 2. Execute `bash setup.sh`.
 3. Execute `bash abrir_dashboard.sh`.
 
+Para verificar o ambiente sem instalar dependencias, modificar dados, criar banco ou
+abrir o dashboard, execute a partir da raiz do projeto:
+
+```text
+Windows:     py scripts\doctor.py
+Linux/macOS: python3 scripts/doctor.py
+```
+
+O diagnostico informa `OK`, `ERRO` ou `AVISO` para os componentes necessarios e
+mostra instrucoes de correcao especificas para cada plataforma.
+
 Uso manual, a partir da raiz do projeto:
 
 ```text
