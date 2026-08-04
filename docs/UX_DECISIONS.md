@@ -95,6 +95,18 @@ Implementada em 2026-07-09:
 
 O experimento implementa um paradigma experimental de inibicao de resposta. Ele nao fornece diagnostico, escore clinico, classificacao cognitiva ou equivalencia clinica com qualquer produto comercial.
 
+## Formulario visual responsivo
+
+Atualizado em 2026-08-04:
+
+- o cadastro e uma rotina visual interna do PsychoPy, sem `gui.Dlg`, `tkinter` ou janela nativa;
+- campos editaveis, labels, mensagem de erro e botao permanecem dentro de um cartao central em unidades `height`;
+- fullscreen continua como padrao, mas o layout nao define posicoes ou tamanhos em pixels;
+- o cursor fica visivel no formulario e nas telas com botao, sendo ocultado somente durante as tentativas Stroop;
+- entradas invalidas mantem a rotina ativa e exibem a orientacao no proprio formulario.
+
+Essa decisao reduz variacoes de layout causadas por DPI scaling, decoracoes de janelas nativas e resolucoes diferentes entre Windows, Linux e macOS, sem mudar o protocolo ou o contrato de dados.
+
 ## Registro de dados
 
 A coluna `block` permanece no CSV oficial, mas as execucoes atuais exportam apenas o bloco principal (`main`). A pratica e usada para treinamento, feedback e HUD local, sem gerar linhas no CSV oficial. Os tipos de resposta do bloco principal sao registrados como `hit`, `omission`, `correct_rejection` e `commission`.

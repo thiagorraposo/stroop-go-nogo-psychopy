@@ -1,10 +1,10 @@
 # Formulario de sessao
 
-Data: 2026-07-06.
+Data: 2026-08-04.
 
 ## Objetivo
 
-O formulario de sessao coleta metadados minimos antes do inicio da tarefa Stroop Go/No-Go. Ele substitui o dialogo padrao `participant/session` do Builder por um formulario local, estruturado e validado.
+O formulario de sessao coleta metadados minimos antes do inicio da tarefa Stroop Go/No-Go. Ele e a primeira rotina do Flow e usa somente estimulos da janela do PsychoPy, sem dialogo nativo ou janela externa.
 
 O objetivo e identificar a execucao de forma pseudonimizada, preservar privacidade e permitir rastreabilidade futura entre CSV bruto, avaliacao e metricas agregadas.
 
@@ -15,7 +15,7 @@ O objetivo e identificar a execucao de forma pseudonimizada, preservar privacida
 | Projeto | `project` | sim | texto curto identificando projeto ou protocolo |
 | ID do participante | `participant_id` | sim | 2 a 64 caracteres; letras, numeros, hifen e sublinhado |
 | Nome do participante | `participant_name` | sim | 2 a 120 caracteres; dado pessoal local, trim dos espacos |
-| Iniciais (opcional) | `initials` | nao | opcional; nao usar nome completo |
+| Iniciais | `initials` | nao | opcional; nao usar nome completo |
 | Visita | `visit` | sim | codigo ou numero da visita |
 | Avaliador(a) | `evaluator` | sim | codigo ou iniciais profissionais |
 
@@ -31,7 +31,19 @@ Botao de confirmacao:
 Iniciar tarefa
 ```
 
-Tambem ha opcao de cancelamento seguro. Se o formulario for cancelado, o experimento e encerrado antes do inicio da tarefa.
+O formulario respeita a tecla global `Escape` para encerramento seguro antes do inicio da tarefa.
+
+## Layout responsivo
+
+- a rotina `formulario_sessao` e executada antes de `boas_vindas`;
+- o cartao, os textos, os seis campos editaveis e o botao usam unidades `height`;
+- o cartao e centralizado e limitado a 1,18 de largura por 0,94 de altura, sem coordenadas em pixels;
+- os campos usam `visual.TextBox2` editavel dentro da propria janela fullscreen;
+- um componente visual transparente e sem duracao final mantem a rotina ativa no ciclo de frames do Builder ate a validacao concluir;
+- o layout foi dimensionado para proporcoes semelhantes a 16:9, incluindo 1366x768 e 1920x1080;
+- escala de DPI e resolucao nao alteram as coordenadas relativas do formulario;
+- erros aparecem no proprio cartao e os valores digitados permanecem disponiveis para correcao;
+- o cursor fica visivel durante o formulario e nas telas com botao.
 
 ## Campos automaticos
 
@@ -60,7 +72,7 @@ Tambem ha opcao de cancelamento seguro. Se o formulario for cancelado, o experim
 
 - Se houver erro, o formulario mostra mensagem clara e preserva os valores digitados para correcao.
 - O experimento nao inicia enquanto houver erro de validacao.
-- O cancelamento encerra o experimento antes de qualquer tentativa.
+- A tecla `Escape`, quando usada, encerra o experimento antes de qualquer tentativa.
 
 ## Privacidade e minimizacao
 
@@ -122,18 +134,21 @@ Na Fase 2, esses campos passaram a compor o CSV unificado oficial por execucao.
 
 1. Abrir `stroop_go_nogo_ptbr.psyexp` no PsychoPy Builder.
 2. Rodar em modo Pilot.
-3. Confirmar que o formulario aparece antes da abertura.
+3. Confirmar que o formulario aparece antes da abertura, centralizado e com cursor visivel.
 4. Tentar avancar com `participant_id` vazio.
 5. Tentar `participant_id` invalido, como `P 001`.
 6. Preencher:
    - Projeto: `PILOTO_STROOP`
    - ID do participante: `P001`
+   - Nome do participante: `NOME_REDIGIDO`
    - Iniciais: `TR`
    - Visita: `V1`
    - Avaliador(a): `AV01`
 7. Iniciar e executar uma tentativa curta.
 8. Encerrar normalmente.
-9. Conferir se o CSV local tem o nome do `participant_id` e inclui todos os metadados.
+9. Conferir se o CSV local termina em `_trials.csv`, nao inclui identificadores no nome e contem todos os metadados.
 10. Confirmar que nenhum dado foi versionado.
+
+Antes da coleta, repetir o teste em 1366x768 e 1920x1080 e, no Windows, com escala de 100%, 125% e 150%.
 
 O checklist deve ser aprovado antes de considerar a Fase 1 completamente validada para coleta.

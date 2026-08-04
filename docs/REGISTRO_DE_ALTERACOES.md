@@ -5,6 +5,10 @@ Formato: entradas incrementais com data, tipo de mudanca e resumo.
 ## 2026-08-04
 
 - `fix`: atualizado `setup.bat` para tentar o launcher `py -3` antes de `python` e orientar a instalacao oficial quando nenhum deles funcionar; `abrir_dashboard.bat` passa a usar diretamente o Python da `.venv`.
+- `fix`: substituido o dialogo nativo de metadados por uma rotina visual responsiva em fullscreen, com campos editaveis, validacao e erro dentro da janela do PsychoPy.
+- `ux`: padronizado o cursor visivel no formulario e nas telas com botao, ocultando-o somente durante tentativas Stroop.
+- `test`: adicionadas regressoes para Flow, ausencia de dialogos externos, unidades `height`, validacoes, fullscreen, cursor e preservacao do CSV canonico.
+- `fix`: impedido o encerramento automatico da rotina visual de formulario no primeiro frame, garantindo o preenchimento de `expInfo` antes da pratica e preservando o caminho global do CSV oficial.
 
 ## 2026-08-03
 

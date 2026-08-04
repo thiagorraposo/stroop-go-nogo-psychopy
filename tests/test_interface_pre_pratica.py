@@ -42,8 +42,9 @@ class InterfacePrePraticaTests(unittest.TestCase):
     def test_flow_pre_pratica_na_ordem_esperada(self):
         flow_names = [item.get("name") for item in self.root.find("Flow")]
         self.assertEqual(
-            flow_names[:8],
+            flow_names[:9],
             [
+                "formulario_sessao",
                 "boas_vindas",
                 "tutorial_regra",
                 "pratica_inicio",
@@ -54,31 +55,90 @@ class InterfacePrePraticaTests(unittest.TestCase):
                 "pratica_loop",
             ],
         )
-        self.assertEqual(flow_names[8], "trial_pratica")
+        self.assertEqual(flow_names[9], "trial_pratica")
 
     def test_telas_antigas_de_instrucao_nao_estao_no_flow(self):
         flow_names = [item.get("name") for item in self.root.find("Flow")]
         for old_name in ["instr_regra", "instr_congruente", "instr_incongruente"]:
             self.assertNotIn(old_name, flow_names)
 
-    def test_formulario_permanece_na_primeira_rotina(self):
+    def test_formulario_visual_e_a_primeira_rotina(self):
         first_routine = self.root.find("Flow")[0].get("name")
-        self.assertEqual(first_routine, "boas_vindas")
-        form = component(routine(self.root, "boas_vindas"), "CodeComponent", "formulario_sessao")
-        begin_experiment = param(form, "Begin Experiment")
-        self.assertIn("Dados da sessão", begin_experiment)
-        self.assertIn("expInfo['assessment_id']", begin_experiment)
-        self.assertIn("TEST_VERSION = '0.2.2'", begin_experiment)
-        self.assertIn("Nome do participante", begin_experiment)
-        self.assertIn("participant_name", begin_experiment)
-        self.assertIn("len(_session_values['participant_name']) < 2", begin_experiment)
-        self.assertIn("len(_session_values['participant_name']) > 120", begin_experiment)
+        self.assertEqual(first_routine, "formulario_sessao")
+        form_routine = routine(self.root, "formulario_sessao")
+        keeper = component(form_routine, "TextComponent", "formulario_manter_ativo")
+        self.assertEqual(param(keeper, "units"), "height")
+        self.assertEqual(param(keeper, "opacity"), "0")
+        self.assertEqual(param(keeper, "stopVal"), "")
+        form = component(form_routine, "CodeComponent", "controle_formulario_sessao")
+        begin_routine = html.unescape(param(form, "Begin Routine"))
+        each_frame = html.unescape(param(form, "Each Frame"))
+        self.assertIn("visual.TextBox2", begin_routine)
+        self.assertIn("editable=True", begin_routine)
+        self.assertIn("win.mouseVisible = True", begin_routine)
+        self.assertIn("global official_csv_path", begin_routine)
+        self.assertIn("Iniciar tarefa", begin_routine)
+        for label in [
+            "Projeto",
+            "ID do participante",
+            "Nome do participante",
+            "Iniciais",
+            "Visita",
+            "Avaliador(a)",
+        ]:
+            self.assertIn(label, begin_routine)
+        self.assertIn("expInfo['assessment_id']", each_frame)
+        self.assertIn("expInfo['assessment_date']", each_frame)
+        self.assertIn("expInfo['started_at']", each_frame)
+        self.assertIn("expInfo['test_code']", each_frame)
+        self.assertIn("expInfo['test_version']", each_frame)
+
+    def test_formulario_nao_usa_dialogo_ou_janela_externa(self):
+        source = PSYEXP_PATH.read_text(encoding="utf-8-sig")
+        for forbidden in ["gui.Dlg", "tkinter", "session_dlg", "addField("]:
+            self.assertNotIn(forbidden, source)
+
+    def test_formulario_usa_layout_responsivo_em_height(self):
+        form = component(
+            routine(self.root, "formulario_sessao"),
+            "CodeComponent",
+            "controle_formulario_sessao",
+        )
+        begin_routine = html.unescape(param(form, "Begin Routine"))
+        self.assertIn("win.units = 'height'", begin_routine)
+        self.assertIn("units='height'", begin_routine)
+        self.assertIn("size=(1.18, 0.94)", begin_routine)
+        self.assertIn("pos=(0, 0)", begin_routine)
+        self.assertNotIn("pix", begin_routine.lower())
+        self.assertNotIn("win.size", begin_routine)
+
+    def test_validacoes_do_formulario_e_trim(self):
+        form = component(
+            routine(self.root, "formulario_sessao"),
+            "CodeComponent",
+            "controle_formulario_sessao",
+        )
+        each_frame = html.unescape(param(form, "Each Frame"))
+        self.assertIn("str(field.text or '').strip()", each_frame)
+        for required in ["project", "participant_id", "participant_name", "visit", "evaluator"]:
+            self.assertIn(f"not session_values['{required}']", each_frame)
+        self.assertNotIn("not session_values['initials']", each_frame)
+        self.assertIn("PARTICIPANT_ID_PATTERN.fullmatch", each_frame)
+        self.assertIn("len(session_values['participant_name']) < 2", each_frame)
+        self.assertIn("len(session_values['participant_name']) > 120", each_frame)
+        self.assertIn("if validation_errors:", each_frame)
+        self.assertIn("continueRoutine = False", each_frame)
 
     def test_csv_oficial_usa_timestamp_sem_identificadores_no_nome(self):
-        first = routine(self.root, "boas_vindas")
-        filename_code = param(
-            component(first, "CodeComponent", "nome_csv_oficial"),
-            "Begin Experiment",
+        form = component(
+            routine(self.root, "formulario_sessao"),
+            "CodeComponent",
+            "controle_formulario_sessao",
+        )
+        each_frame = html.unescape(param(form, "Each Frame"))
+        filename_code = "\n".join(
+            line for line in each_frame.splitlines()
+            if "official_timestamp" in line or "official_csv_path" in line
         )
         self.assertIn(
             "_started_at.strftime('%Y-%m-%d_%Hh%Mm%Ss')", filename_code
@@ -96,8 +156,12 @@ class InterfacePrePraticaTests(unittest.TestCase):
         ]:
             self.assertNotIn(participant_field, filename_code)
 
-        form = component(first, "CodeComponent", "formulario_sessao")
-        begin_experiment = param(form, "Begin Experiment")
+        initializer = component(
+            routine(self.root, "boas_vindas"),
+            "CodeComponent",
+            "inicializacao_sessao",
+        )
+        begin_experiment = html.unescape(param(initializer, "Begin Experiment"))
         self.assertIn("participant_name': expInfo['participant_name']", begin_experiment)
 
     def test_telas_navegaveis_aceitam_clique_espaco_e_enter(self):
@@ -149,8 +213,32 @@ class InterfacePrePraticaTests(unittest.TestCase):
     def test_tela_cheia_e_sem_tamanho_fixo_no_builder(self):
         settings = self.root.find("Settings")
         self.assertEqual(param(settings, "Full-screen window"), "True")
-        self.assertNotEqual(param(settings, "Window size (pixels)"), "[1024, 768]")
-        self.assertNotEqual(param(settings, "Window size (pixels)"), "[1280, 720]")
+        form = component(
+            routine(self.root, "formulario_sessao"),
+            "CodeComponent",
+            "controle_formulario_sessao",
+        )
+        form_code = html.unescape(param(form, "Begin Routine"))
+        self.assertNotIn("Window size", form_code)
+        self.assertNotIn("win.size", form_code)
+
+    def test_cursor_oculto_somente_nas_tentativas_stroop(self):
+        for routine_name, code_name in [
+            ("trial_pratica", "codigo_pratica"),
+            ("trial_principal", "codigo_principal"),
+        ]:
+            code = component(routine(self.root, routine_name), "CodeComponent", code_name)
+            self.assertIn("win.mouseVisible = False", html.unescape(param(code, "Begin Routine")))
+            self.assertIn("win.mouseVisible = True", html.unescape(param(code, "End Routine")))
+
+        for routine_name, code_name in [
+            ("boas_vindas", "clique_abertura"),
+            ("tutorial_regra", "clique_tutorial_regra"),
+            ("pratica_inicio", "clique_pratica_inicio"),
+            ("resultados", "codigo_resultados"),
+        ]:
+            code = component(routine(self.root, routine_name), "CodeComponent", code_name)
+            self.assertIn("win.mouseVisible = True", html.unescape(param(code, "Begin Routine")))
 
     def test_tema_escuro_e_cartao_claro_nas_tentativas(self):
         for routine_name in [
