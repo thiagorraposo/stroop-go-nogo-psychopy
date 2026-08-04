@@ -2,6 +2,10 @@
 
 Formato: entradas incrementais com data, tipo de mudanca e resumo.
 
+## 2026-08-04
+
+- `fix`: atualizado `setup.bat` para tentar o launcher `py -3` antes de `python` e orientar a instalacao oficial quando nenhum deles funcionar; `abrir_dashboard.bat` passa a usar diretamente o Python da `.venv`.
+
 ## 2026-08-03
 
 - `feat`: adicionado `scripts/doctor.py` para diagnostico somente leitura do ambiente no Windows, Linux e macOS, com resultados `OK`, `ERRO` e `AVISO` e orientacoes de correcao por plataforma.
