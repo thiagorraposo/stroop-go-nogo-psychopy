@@ -45,6 +45,7 @@ Implementado em 2026-07-06 na versao `0.2.1`:
 - fundo principal `#0B1020`, texto principal `#F8FAFC` e texto auxiliar `#CBD5E1`;
 - estimulos exibidos sobre cartao claro aproximado de `#F8FAFC` para preservar contraste;
 - palavras centralizadas explicitamente no cartao claro, com alinhamento e ancoras horizontal e vertical no centro;
+- cartoes de pratica e bloco principal usam retangulo Builder de `0,82 x 0,24` em unidades `height`, com palavras em altura `0,090`, evitando overflow das palavras mais longas sem prejudicar leitura rapida;
 - branco permanece apenas como cor de interface, nao como estimulo;
 - HUD mostra `Precisão: —` antes da primeira tentativa concluida e `Precisão: XX%` depois disso;
 - barra horizontal textual acompanha a precisao acumulada;

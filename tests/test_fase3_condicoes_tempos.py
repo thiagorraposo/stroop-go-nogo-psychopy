@@ -187,7 +187,7 @@ class Fase3CondicoesTemposTests(unittest.TestCase):
             ("trial_principal", "stim_card_principal", "stim_principal"),
         ]:
             trial = routine(self.psyexp, routine_name)
-            card = component(trial, "TextComponent", card_name)
+            card = component(trial, "PolygonComponent", card_name)
             stim = component(trial, "TextComponent", stim_name)
             fix = component(trial, "TextComponent", "fix_pratica" if routine_name == "trial_pratica" else "fix_principal")
             hold = component(trial, "TextComponent", "hold_pratica" if routine_name == "trial_pratica" else "hold_principal")
@@ -196,6 +196,32 @@ class Fase3CondicoesTemposTests(unittest.TestCase):
             self.assertEqual(param(stim, "pos"), "[0, 0]")
             self.assertEqual(param(fix, "pos"), "[0, 0]")
             self.assertEqual(param(hold, "pos"), "[0, 0]")
+
+    def test_cartoes_e_palavras_usam_geometria_ampla_e_identica(self):
+        geometries = []
+        for routine_name, card_name, stim_name in [
+            ("trial_pratica", "stim_card_pratica", "stim_pratica"),
+            ("trial_principal", "stim_card_principal", "stim_principal"),
+        ]:
+            trial = routine(self.psyexp, routine_name)
+            card = component(trial, "PolygonComponent", card_name)
+            stim = component(trial, "TextComponent", stim_name)
+            card_size = tuple(float(value.strip()) for value in param(card, "size").strip("[]").split(","))
+            font_height = float(param(stim, "height"))
+
+            self.assertEqual(param(card, "shape"), "rectangle")
+            self.assertEqual(param(card, "units"), "height")
+            self.assertEqual(param(stim, "units"), "height")
+            self.assertGreaterEqual(card_size[0], 0.70)
+            self.assertLessEqual(card_size[0], 0.85)
+            self.assertGreaterEqual(card_size[1], 0.20)
+            self.assertLessEqual(card_size[1], 0.26)
+            self.assertGreaterEqual(font_height, 0.075)
+            self.assertLessEqual(font_height, 0.095)
+            self.assertLess(float(param(stim, "wrapWidth")), card_size[0])
+            geometries.append((card_size, font_height, param(stim, "wrapWidth")))
+
+        self.assertEqual(geometries[0], geometries[1])
 
     def test_paleta_visual_tem_10_cores_distintas(self):
         displays = list(DISPLAY_PALETTE.values())

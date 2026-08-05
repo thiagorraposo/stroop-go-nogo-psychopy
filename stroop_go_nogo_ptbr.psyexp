@@ -1117,34 +1117,35 @@
         <Param val="" valType="code" updates="None" name="validator"/>
         <Param val="0.4" valType="num" updates="constant" name="wrapWidth"/>
       </TextComponent>
-      <TextComponent name="stim_card_pratica" plugin="None">
-        <Param val="white" valType="str" updates="constant" name="color"/>
+      <PolygonComponent name="stim_card_pratica" plugin="None">
+        <Param val="center" valType="str" updates="constant" name="anchor"/>
         <Param val="rgb" valType="str" updates="constant" name="colorSpace"/>
         <Param val="1" valType="num" updates="constant" name="contrast"/>
         <Param val="False" valType="bool" updates="None" name="disabled"/>
         <Param val="False" valType="code" updates="constant" name="draggable"/>
         <Param val="" valType="code" updates="None" name="durationEstim"/>
-        <Param val="None" valType="str" updates="constant" name="flip"/>
-        <Param val="Arial" valType="str" updates="constant" name="font"/>
-        <Param val="0.060" valType="num" updates="constant" name="height"/>
-        <Param val="LTR" valType="str" updates="None" name="languageStyle"/>
-        <Param val="0.060" valType="num" updates="constant" name="letterHeight"/>
+        <Param val="#F8FAFC" valType="color" updates="constant" name="fillColor"/>
+        <Param val="linear" valType="str" updates="constant" name="interpolate"/>
+        <Param val="#F8FAFC" valType="color" updates="constant" name="lineColor"/>
+        <Param val="1" valType="num" updates="constant" name="lineWidth"/>
         <Param val="stim_card_pratica" valType="code" updates="None" name="name"/>
+        <Param val="4" valType="int" updates="constant" name="nVertices"/>
         <Param val="" valType="num" updates="constant" name="opacity"/>
         <Param val="0" valType="num" updates="constant" name="ori"/>
         <Param val="[0, 0]" valType="list" updates="constant" name="pos"/>
         <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
+        <Param val="rectangle" valType="str" updates="None" name="shape"/>
+        <Param val="[0.82, 0.24]" valType="list" updates="constant" name="size"/>
         <Param val="" valType="code" updates="None" name="startEstim"/>
         <Param val="time (s)" valType="str" updates="constant" name="startType"/>
-        <Param val="0.3" valType="num" updates="constant" name="startVal"/>
+        <Param val="0.3" valType="code" updates="constant" name="startVal"/>
         <Param val="duration (s)" valType="str" updates="constant" name="stopType"/>
-        <Param val="2.0" valType="num" updates="constant" name="stopVal"/>
+        <Param val="2.0" valType="code" updates="constant" name="stopVal"/>
         <Param val="True" valType="bool" updates="None" name="syncScreenRefresh"/>
-        <Param val="████████████████&amp;#10;████████████████&amp;#10;████████████████" valType="str" updates="constant" name="text"/>
-        <Param val="from exp settings" valType="str" updates="None" name="units"/>
+        <Param val="height" valType="str" updates="None" name="units"/>
         <Param val="" valType="code" updates="None" name="validator"/>
-        <Param val="0.82" valType="num" updates="constant" name="wrapWidth"/>
-      </TextComponent>
+        <Param val="" valType="list" updates="constant" name="vertices"/>
+      </PolygonComponent>
       <TextComponent name="stim_pratica" plugin="None">
         <Param val="$INK_COLOR_DISPLAY_MAP[ink_color]" valType="code" updates="set every repeat" name="color"/>
         <Param val="rgb" valType="str" updates="constant" name="colorSpace"/>
@@ -1154,9 +1155,9 @@
         <Param val="" valType="code" updates="None" name="durationEstim"/>
         <Param val="None" valType="str" updates="constant" name="flip"/>
         <Param val="Arial" valType="str" updates="constant" name="font"/>
-        <Param val="0.13" valType="num" updates="constant" name="height"/>
+        <Param val="0.090" valType="num" updates="constant" name="height"/>
         <Param val="LTR" valType="str" updates="None" name="languageStyle"/>
-        <Param val="0.13" valType="num" updates="constant" name="letterHeight"/>
+        <Param val="0.090" valType="num" updates="constant" name="letterHeight"/>
         <Param val="stim_pratica" valType="code" updates="None" name="name"/>
         <Param val="" valType="num" updates="constant" name="opacity"/>
         <Param val="0" valType="num" updates="constant" name="ori"/>
@@ -1169,9 +1170,9 @@
         <Param val="2.0" valType="num" updates="constant" name="stopVal"/>
         <Param val="True" valType="bool" updates="None" name="syncScreenRefresh"/>
         <Param val="$word" valType="code" updates="set every repeat" name="text"/>
-        <Param val="from exp settings" valType="str" updates="None" name="units"/>
+        <Param val="height" valType="str" updates="None" name="units"/>
         <Param val="" valType="code" updates="None" name="validator"/>
-        <Param val="0.55" valType="num" updates="constant" name="wrapWidth"/>
+        <Param val="0.74" valType="num" updates="constant" name="wrapWidth"/>
       </TextComponent>
       <TextComponent name="lembrete_pratica" plugin="None">
         <Param val="#CBD5E1" valType="str" updates="constant" name="color"/>
@@ -1635,34 +1636,35 @@
         <Param val="" valType="code" updates="None" name="validator"/>
         <Param val="0.4" valType="num" updates="constant" name="wrapWidth"/>
       </TextComponent>
-      <TextComponent name="stim_card_principal" plugin="None">
-        <Param val="white" valType="str" updates="constant" name="color"/>
+      <PolygonComponent name="stim_card_principal" plugin="None">
+        <Param val="center" valType="str" updates="constant" name="anchor"/>
         <Param val="rgb" valType="str" updates="constant" name="colorSpace"/>
         <Param val="1" valType="num" updates="constant" name="contrast"/>
         <Param val="False" valType="bool" updates="None" name="disabled"/>
         <Param val="False" valType="code" updates="constant" name="draggable"/>
         <Param val="" valType="code" updates="None" name="durationEstim"/>
-        <Param val="None" valType="str" updates="constant" name="flip"/>
-        <Param val="Arial" valType="str" updates="constant" name="font"/>
-        <Param val="0.060" valType="num" updates="constant" name="height"/>
-        <Param val="LTR" valType="str" updates="None" name="languageStyle"/>
-        <Param val="0.060" valType="num" updates="constant" name="letterHeight"/>
+        <Param val="#F8FAFC" valType="color" updates="constant" name="fillColor"/>
+        <Param val="linear" valType="str" updates="constant" name="interpolate"/>
+        <Param val="#F8FAFC" valType="color" updates="constant" name="lineColor"/>
+        <Param val="1" valType="num" updates="constant" name="lineWidth"/>
         <Param val="stim_card_principal" valType="code" updates="None" name="name"/>
+        <Param val="4" valType="int" updates="constant" name="nVertices"/>
         <Param val="" valType="num" updates="constant" name="opacity"/>
         <Param val="0" valType="num" updates="constant" name="ori"/>
         <Param val="[0, 0]" valType="list" updates="constant" name="pos"/>
         <Param val="True" valType="bool" updates="None" name="saveStartStop"/>
+        <Param val="rectangle" valType="str" updates="None" name="shape"/>
+        <Param val="[0.82, 0.24]" valType="list" updates="constant" name="size"/>
         <Param val="" valType="code" updates="None" name="startEstim"/>
         <Param val="time (s)" valType="str" updates="constant" name="startType"/>
-        <Param val="0.3" valType="num" updates="constant" name="startVal"/>
+        <Param val="0.3" valType="code" updates="constant" name="startVal"/>
         <Param val="duration (s)" valType="str" updates="constant" name="stopType"/>
-        <Param val="2.5" valType="num" updates="constant" name="stopVal"/>
+        <Param val="2.5" valType="code" updates="constant" name="stopVal"/>
         <Param val="True" valType="bool" updates="None" name="syncScreenRefresh"/>
-        <Param val="████████████████&amp;#10;████████████████&amp;#10;████████████████" valType="str" updates="constant" name="text"/>
-        <Param val="from exp settings" valType="str" updates="None" name="units"/>
+        <Param val="height" valType="str" updates="None" name="units"/>
         <Param val="" valType="code" updates="None" name="validator"/>
-        <Param val="0.82" valType="num" updates="constant" name="wrapWidth"/>
-      </TextComponent>
+        <Param val="" valType="list" updates="constant" name="vertices"/>
+      </PolygonComponent>
       <TextComponent name="stim_principal" plugin="None">
         <Param val="$INK_COLOR_DISPLAY_MAP[ink_color]" valType="code" updates="set every repeat" name="color"/>
         <Param val="rgb" valType="str" updates="constant" name="colorSpace"/>
@@ -1672,9 +1674,9 @@
         <Param val="" valType="code" updates="None" name="durationEstim"/>
         <Param val="None" valType="str" updates="constant" name="flip"/>
         <Param val="Arial" valType="str" updates="constant" name="font"/>
-        <Param val="0.13" valType="num" updates="constant" name="height"/>
+        <Param val="0.090" valType="num" updates="constant" name="height"/>
         <Param val="LTR" valType="str" updates="None" name="languageStyle"/>
-        <Param val="0.13" valType="num" updates="constant" name="letterHeight"/>
+        <Param val="0.090" valType="num" updates="constant" name="letterHeight"/>
         <Param val="stim_principal" valType="code" updates="None" name="name"/>
         <Param val="" valType="num" updates="constant" name="opacity"/>
         <Param val="0" valType="num" updates="constant" name="ori"/>
@@ -1687,9 +1689,9 @@
         <Param val="2.5" valType="num" updates="constant" name="stopVal"/>
         <Param val="True" valType="bool" updates="None" name="syncScreenRefresh"/>
         <Param val="$word" valType="code" updates="set every repeat" name="text"/>
-        <Param val="from exp settings" valType="str" updates="None" name="units"/>
+        <Param val="height" valType="str" updates="None" name="units"/>
         <Param val="" valType="code" updates="None" name="validator"/>
-        <Param val="0.55" valType="num" updates="constant" name="wrapWidth"/>
+        <Param val="0.74" valType="num" updates="constant" name="wrapWidth"/>
       </TextComponent>
       <TextComponent name="lembrete_principal" plugin="None">
         <Param val="#CBD5E1" valType="str" updates="constant" name="color"/>

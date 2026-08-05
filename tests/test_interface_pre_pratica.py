@@ -257,8 +257,8 @@ class InterfacePrePraticaTests(unittest.TestCase):
             ("trial_pratica", "stim_card_pratica"),
             ("trial_principal", "stim_card_principal"),
         ]:
-            card = component(routine(self.root, routine_name), "TextComponent", card_name)
-            self.assertEqual(param(card, "color"), "white")
+            card = component(routine(self.root, routine_name), "PolygonComponent", card_name)
+            self.assertEqual(param(card, "fillColor"), "#F8FAFC")
 
     def test_telas_principais_nao_exibem_enter(self):
         trial_main = routine(self.root, "trial_principal")

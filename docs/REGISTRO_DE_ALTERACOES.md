@@ -9,6 +9,8 @@ Formato: entradas incrementais com data, tipo de mudanca e resumo.
 - `ux`: padronizado o cursor visivel no formulario e nas telas com botao, ocultando-o somente durante tentativas Stroop.
 - `test`: adicionadas regressoes para Flow, ausencia de dialogos externos, unidades `height`, validacoes, fullscreen, cursor e preservacao do CSV canonico.
 - `fix`: impedido o encerramento automatico da rotina visual de formulario no primeiro frame, garantindo o preenchimento de `expInfo` antes da pratica e preservando o caminho global do CSV oficial.
+- `fix`: ampliados os cartoes claros dos estimulos e ajustada a fonte das palavras na pratica e no bloco principal para evitar overflow de `AMARELO` e `VERMELHO`.
+- `test`: adicionadas regressoes para geometria identica, centralizada e responsiva dos cartoes e palavras nas duas rotinas.
 
 ## 2026-08-03
 
