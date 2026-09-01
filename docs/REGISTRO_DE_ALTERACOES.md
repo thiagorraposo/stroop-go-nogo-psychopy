@@ -2,6 +2,12 @@
 
 Formato: entradas incrementais com data, tipo de mudanca e resumo.
 
+## 2026-09-01
+
+- `docs`: registrada a baseline reproduzivel da Etapa 1 para o fluxo PsychoPy -> CSV -> SQLite -> Streamlit, incluindo componentes, esquema, limitacoes, integridade, contagens agregadas e procedimento validado de backup.
+- `test`: confirmada a suite atual com 73 testes aprovados e adicionadas fixtures CSV inteiramente sinteticas para caso valido, coluna ausente, tipo invalido e valor fora do dominio.
+- `chore`: reforcadas exclusoes de credenciais, secrets e chaves no `.gitignore`, mantendo uma excecao estreita para fixtures CSV sinteticas em `tests/fixtures/`.
+
 ## 2026-08-04
 
 - `fix`: atualizado `setup.bat` para tentar o launcher `py -3` antes de `python` e orientar a instalacao oficial quando nenhum deles funcionar; `abrir_dashboard.bat` passa a usar diretamente o Python da `.venv`.

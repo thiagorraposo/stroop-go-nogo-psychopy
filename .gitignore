@@ -15,6 +15,10 @@ storage/
 database/
 backups/
 
+# Fixtures CSV sinteticas e versionaveis
+!tests/fixtures/
+!tests/fixtures/**/*.csv
+
 # CSVs de condicoes necessarios ao experimento
 !condicoes/
 !condicoes/*.csv
@@ -22,6 +26,11 @@ backups/
 # Configuracoes locais do dashboard
 dashboard/.streamlit/secrets.toml
 dashboard/.streamlit/config.toml.local
+**/.streamlit/secrets.toml
+credentials*.json
+secrets.*
+*.pem
+*.key
 
 # Arquivos gerados pelo PsychoPy
 *_lastrun.py
