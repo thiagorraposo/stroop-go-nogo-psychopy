@@ -1,13 +1,12 @@
-# AGENTS.md
+# Condicoes do experimento
 
-## Regras para condicoes
+Escopo: CSVs-fonte em `condicoes/`. Herda todas as regras da raiz.
 
-- CSVs desta pasta sao arquivos-fonte do experimento, nao dados coletados.
-- Nao adicionar colunas sem verificar compatibilidade com o `.psyexp`.
-- Nao alterar nomes de colunas usadas em rotinas e loops sem atualizar as referencias.
-- Toda mudanca nas condicoes deve preservar o paradigma:
-  - congruente + Espaco = `hit`;
-  - congruente sem resposta = `omission`;
-  - incongruente sem resposta = `correct_rejection`;
-  - incongruente + Espaco = `commission`.
-- Registrar mudancas relevantes em `docs/REGISTRO_DE_ALTERACOES.md`.
+- Estes CSVs sao fontes versionadas, nao dados coletados; a excecao de
+  `.gitignore` e intencional.
+- Antes de mudar cabecalhos, valores ou linhas, localize todas as referencias no
+  `.psyexp` e valide a compatibilidade de nomes e tipos.
+- Preserve as quatro classificacoes do paradigma e o balanceamento documentado
+  em `docs/VALIDACAO_CONDICOES.md`, salvo decisao metodologica explicita.
+- Execute os testes estaticos de condicoes e registre qualquer mudanca autorizada
+  no protocolo em `docs/DECISOES_DO_EXPERIMENTO.md`.

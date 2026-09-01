@@ -4,6 +4,8 @@ Formato: entradas incrementais com data, tipo de mudanca e resumo.
 
 ## 2026-09-01
 
+- `docs`: otimizada a hierarquia de `AGENTS.md`, com regras duraveis na raiz e especializacoes concisas para condicoes, dashboard, documentacao, scripts e testes.
+- `docs`: criado o workflow canonico de 12 etapas, sua auditoria de instrucoes, o template de prompts e o prompt da Etapa 2, sem executar a modularizacao.
 - `docs`: registrada a baseline reproduzivel da Etapa 1 para o fluxo PsychoPy -> CSV -> SQLite -> Streamlit, incluindo componentes, esquema, limitacoes, integridade, contagens agregadas e procedimento validado de backup.
 - `test`: confirmada a suite atual com 73 testes aprovados e adicionadas fixtures CSV inteiramente sinteticas para caso valido, coluna ausente, tipo invalido e valor fora do dominio.
 - `chore`: reforcadas exclusoes de credenciais, secrets e chaves no `.gitignore`, mantendo uma excecao estreita para fixtures CSV sinteticas em `tests/fixtures/`.

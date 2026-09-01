@@ -1,14 +1,15 @@
-# AGENTS.md
+# Scripts e camada de dados
 
-## Regras para scripts
+Escopo: `scripts/`. Herda todas as regras da raiz.
 
-- Scripts devem analisar apenas arquivos locais em `data/`.
-- Scripts nao devem modificar arquivos brutos de coleta.
-- Scripts devem suportar o CSV unificado futuro.
-- Scripts devem distinguir `practice` e `main` por meio da coluna `block`.
-- Nao incluir interpretacao clinica, diagnosticos ou normas populacionais.
-- Scripts futuros devem validar CSVs antes de importar.
-- Scripts nao devem sobrescrever banco local sem backup ou confirmacao explicita.
-- Scripts devem impedir importacao duplicada sem confirmacao explicita.
-- Scripts devem separar erros de validacao de dados validos.
-- Scripts de importacao devem manter rastreabilidade entre `assessment_id`, `source_file` e tentativas.
+- Nunca modifique CSV bruto. Valide completamente antes de persistir e mantenha
+  erros de validacao separados de dados aceitos.
+- Preserve rastreabilidade por `assessment_id` e `source_file`, transacoes,
+  bloqueio de duplicidade e exigencia explicita de `--force` para reimportacao.
+- Nao sobrescreva banco preenchido fora do fluxo documentado e sem backup ou
+  confirmacao. Migre schema apenas na etapa que autorizar migracoes.
+- Calcule somente metricas com formula e unidade documentadas; nao produza
+  interpretacao clinica ou normativa.
+- Teste scripts de dados apenas com CSVs e bancos temporarios sinteticos. Nao use
+  `data/` ou `database/` como fixtures.
+- Preserve as CLIs publicas documentadas, salvo requisito explicito.

@@ -1,66 +1,79 @@
-# AGENTS.md
+# Instrucoes do repositorio
 
-## Objetivo do projeto
+## Projeto e fontes canonicas
 
-Este projeto e um experimento original Stroop Go/No-Go desenvolvido em PsychoPy, para fins educacionais e de pesquisa exploratoria.
+Experimento original Stroop Go/No-Go para uso educacional e pesquisa
+exploratoria. Nao e instrumento clinico, diagnostico ou normativo.
 
-## Limites eticos e de propriedade
+Antes de alterar codigo, leia `docs/BASELINE_ETAPA_1.md`,
+`docs/WORKFLOW_EVOLUCAO.md`, a documentacao citada pela etapa e todos os
+`AGENTS.md` aplicaveis. Contratos detalhados ficam na documentacao, nao devem ser
+duplicados aqui.
 
-- Nao copiar identidade visual, logotipos, textos proprietarios, pontuacao normativa, diagnosticos ou alegacoes clinicas de plataformas como CogniFit.
-- O experimento pode se inspirar em paradigmas publicos, mas deve manter interface e textos proprios.
-- Nao alegar validacao clinica, equivalencia psicometrica ou diagnostico sem estudo apropriado.
+Arquitetura vigente: PsychoPy local -> CSV oficial local -> importador -> SQLite
+local -> dashboard Streamlit local. Pontos de entrada:
 
-## Regras para alteracoes
+- experimento: `stroop_go_nogo_ptbr.psyexp` no PsychoPy Builder;
+- dashboard publico: `abrir_dashboard.bat` ou `bash abrir_dashboard.sh`;
+- launcher: `python scripts/run_dashboard.py`;
+- importador: `python scripts/importar_csv_sqlite.py CAMINHO.csv`;
+- diagnostico somente leitura: `python scripts/doctor.py`;
+- testes: `.venv/bin/python -m unittest discover -s tests -v` (Linux/macOS).
 
-- Antes de mudancas relevantes, inspecionar os arquivos atuais e explicar o plano.
-- Fazer alteracoes incrementais.
-- Nao reescrever o experimento inteiro quando uma correcao localizada for suficiente.
-- Nao alterar arquivos de dados ja coletados.
-- Nao editar `*_lastrun.py`; corrigir o `.psyexp`, CSVs de condicoes ou scripts-fonte.
-- Nao remover funcionalidades existentes sem explicar e confirmar.
+Diretorios: `condicoes/` contem fontes do experimento; `dashboard/`, a interface
+Streamlit; `scripts/`, importacao e utilitarios; `tests/`, testes e fixtures
+sinteticas; `docs/`, contratos e governanca; `data/` e `database/`, dados locais
+ignorados. `assets/` aceita somente material proprio.
 
-## Regras de dados
+## Workflow por etapas
 
-- `data/` e local e nunca deve ser versionada.
-- Os CSVs finais precisam ser consistentes, uma linha por tentativa do bloco principal, com `block` em `main`.
-- Manter somente um CSV unificado por execucao futura.
-- Campos finais esperados no CSV unificado oficial: `project`, `participant_id`, `participant_name`, `initials`, `visit`, `evaluator`, `assessment_id`, `assessment_date`, `started_at`, `test_code`, `test_version`, `block`, `trial_number`, `word`, `ink_color`, `condition`, `correct_response`, `key_pressed`, `reaction_time`, `correct`, `error_type`.
-- O CSV unificado oficial deve ser uma linha por tentativa real do bloco principal, com `block` em `main`, `condition` em `congruent` ou `incongruent` e sem colunas `_raw`; a pratica nao deve gerar linhas no CSV oficial.
-- A arquitetura de dados futura e: PsychoPy -> CSV bruto unificado -> script de importacao -> SQLite local -> dashboard Streamlit local.
-- Nao versionar SQLite, bancos locais, CSVs reais, exports, backups, credenciais ou arquivos temporarios.
-- Toda metrica nova deve ter formula documentada antes da implementacao.
-- Manter rastreabilidade entre `assessment_id`, `source_file` e dados por tentativa.
-- `participant_id` e o identificador principal; `participant_name` e dado pessoal local que nao deve aparecer em nomes de arquivo, screenshots, exemplos publicos ou logs; `initials` sao opcionais e potencialmente identificaveis.
-- Nao coletar nome completo, CPF, e-mail, endereco, telefone, idade ou sexo nesta versao.
+- Execute somente a etapa explicitamente solicitada e pare antes da seguinte.
+- Consulte o estado e os criterios em `docs/WORKFLOW_EVOLUCAO.md`; nao antecipe
+  infraestrutura, migracoes ou funcionalidades de etapas posteriores.
+- Antes de editar, inspecione o estado atual e apresente um plano curto.
+- Preserve todo comportamento fora do escopo. Prefira mudancas pequenas,
+  incrementais e verificaveis; nao remova funcionalidade sem confirmacao.
+- Atualize o estado/progresso do workflow somente quando todos os criterios da
+  etapa estiverem comprovados. Registre mudancas relevantes em
+  `docs/REGISTRO_DE_ALTERACOES.md`.
+- Interrompa e solicite decisao diante de ambiguidade clinica, semantica,
+  arquitetural, metodologica, de privacidade ou seguranca que altere o resultado.
 
-## Regras do paradigma
+## Limites de dominio e seguranca
 
-- Congruente + Espaco = `hit`.
-- Congruente sem resposta = `omission`.
-- Incongruente sem resposta = `correct_rejection`.
-- Incongruente + Espaco = `commission`.
-- Nao mudar essas regras sem registrar a decisao em documentacao.
+- PsychoPy permanece local e fora do Docker. Nao edite `*_lastrun.py`; altere o
+  `.psyexp`, condicoes ou scripts-fonte apenas quando a etapa autorizar.
+- Preserve o comando publico de inicializacao do dashboard, salvo requisito
+  explicito. Streamlit nao modifica CSV bruto; no estado vigente, abre SQLite
+  somente leitura.
+- Nao mude paradigma, tempos, estimulos, contrato CSV, schema ou formulas de
+  metricas sem decisao explicita e documentada. Regras do paradigma e formulas:
+  `docs/DECISOES_DO_EXPERIMENTO.md` e `docs/MODELO_DE_DADOS.md`.
+- Nao copiar identidade, textos, pontuacao ou alegacoes proprietarias; nao criar
+  diagnostico, norma, percentil clinico ou equivalencia psicometrica.
+- Use somente dados inequivocamente sinteticos em testes e documentacao. Nao
+  abra, copie, imprima, registre em log ou versione dados identificaveis.
+- `participant_name` e `initials` sao dados locais potencialmente identificaveis.
+  Nunca os use em nomes de arquivo, screenshots, exemplos publicos ou logs.
+- Nao modificar coletas existentes. Nao versionar `data/`, SQLite, backups,
+  exports, logs, temporarios, credenciais ou secrets; respeite `.gitignore`.
+- Nao instalar ou atualizar dependencias sem necessidade comprovada pela etapa.
 
-## Regras de documentacao
+## Validacao e conclusao
 
-- Toda mudanca relevante deve atualizar `docs/REGISTRO_DE_ALTERACOES.md`.
-- Decisoes metodologicas ou de UX devem ser registradas em `docs/DECISOES_DO_EXPERIMENTO.md`.
-- Commits devem seguir o padrao definido em `docs/PADRAO_DE_COMMITS.md`.
+- Execute os testes aplicaveis e sempre `git diff --check`. Alteracoes no
+  experimento exigem tambem validacao de loops/variaveis, compatibilidade das
+  condicoes e checklist Pilot autorizado, sem coleta real.
+- Considere a etapa concluida somente com escopo implementado, testes aprovados,
+  documentacao e workflow atualizados, comportamento fora do escopo preservado e
+  riscos/pendencias declarados.
+- Na entrega, liste arquivos alterados, comandos e resultados, riscos, decisoes
+  pendentes e confirme que a proxima etapa nao foi iniciada.
 
-## Estrutura canonica
+## Git
 
-- `.psyexp` principal permanece na raiz do projeto.
-- `condicoes/` e o nome canonico para CSVs de condicoes; nao criar pasta duplicada `conditions/`.
-- `scripts/` concentra scripts auxiliares.
-- `docs/` concentra documentacao metodologica, historico e governanca.
-- `assets/` armazena apenas assets proprios do projeto.
-- `dashboard/` fica reservado para dashboard Streamlit local futuro.
-- `tests/` fica reservado para validacoes futuras.
-- `data/` e local; somente `data/README.md` pode ser versionado.
-
-## Regras de validacao
-
-- Apos alterar o experimento, validar variaveis usadas em rotinas e loops.
-- Confirmar que CSVs de condicoes tem colunas compativeis.
-- Testar em modo Pilot antes de coletar dados reais.
-- Nao alegar validacao clinica, equivalencia psicometrica ou diagnostico sem estudo apropriado.
+- O versionamento e manual. Nao execute `git add`, `git commit`, `git tag` ou
+  `git push` sem solicitacao explicita.
+- Preserve alteracoes preexistentes do usuario e nao use comandos destrutivos.
+- Ao final de cada etapa, sugira exatamente uma mensagem Conventional Commits em
+  portugues conforme `docs/PADRAO_DE_COMMITS.md`; nao execute o commit.

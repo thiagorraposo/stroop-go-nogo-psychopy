@@ -1,8 +1,14 @@
-# AGENTS.md
+# Testes
 
-## Regras para testes
+Escopo: `tests/`. Herda todas as regras da raiz.
 
-- Testes futuros devem priorizar validacao estatica de condicoes, variaveis, campos de exportacao e consistencia de CSV.
-- Nao executar coleta real.
-- Nao usar dados pessoais ou arquivos reais de participantes como fixtures versionados.
-- Testes devem verificar compatibilidade entre CSVs de condicoes e variaveis usadas no `.psyexp`.
+- Use `unittest` conforme a suite existente e mantenha descoberta por
+  `.venv/bin/python -m unittest discover -s tests -v`.
+- Fixtures devem ser inequivocamente sinteticas. Nao leia CSVs de `data/`, o
+  SQLite local, backups ou qualquer coleta real.
+- Use diretorios temporarios e bancos descartaveis; testes nao podem iniciar
+  coleta, Streamlit interativo, Docker ou servicos externos.
+- Para mudancas no `.psyexp` ou em condicoes, valide estaticamente Flow, nomes de
+  variaveis, colunas, tempos e compatibilidade entre arquivos.
+- Cubra comportamento e regressao do escopo; nao enfraqueca assercoes nem altere
+  funcionalidade apenas para fazer a suite passar.
