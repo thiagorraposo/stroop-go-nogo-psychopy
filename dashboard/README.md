@@ -15,6 +15,10 @@ Aviso fixo exibido na interface:
 
 O dashboard não modifica CSV bruto, não altera o SQLite e não envia dados para servidor externo.
 
+A infraestrutura Docker da Etapa 3 empacota este ponto de entrada e fornece
+`DATABASE_URL`, mas a camada de acesso continua SQLite nesta etapa. A troca do
+backend do dashboard pertence a uma etapa posterior do workflow.
+
 ## Instalação
 
 Em um ambiente Python local:

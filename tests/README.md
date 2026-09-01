@@ -12,5 +12,7 @@ Validacoes implementadas ou esperadas:
 - rejeicao de CSVs automaticos de loops como fonte oficial.
 - balanceamento de 10 cores e tempos da Fase 3.
 - Flow e navegacao das telas visuais pre-pratica.
+- configuracao estatica da infraestrutura Docker local, isolamento de dados,
+  healthcheck, volume e ponto de entrada do dashboard.
 
 Nao usar dados pessoais ou arquivos reais de participantes como fixtures versionados.

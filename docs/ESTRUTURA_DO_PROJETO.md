@@ -7,6 +7,10 @@
 ├── AGENTS.md
 ├── README.md
 ├── .gitignore
+├── .dockerignore
+├── .env.example
+├── compose.yaml
+├── Dockerfile.dashboard
 ├── requirements.txt
 ├── setup.bat
 ├── setup.sh
@@ -55,6 +59,8 @@ Os nomes dos CSVs de condicoes sao preservados porque eles sao referenciados dir
 ## Finalidade das pastas
 
 - `assets/`: assets proprios do projeto.
+- `compose.yaml` e `Dockerfile.dashboard`: infraestrutura local de
+  desenvolvimento para Streamlit e PostgreSQL, sem PsychoPy.
 - `assets/ui/`: elementos visuais proprios da interface.
 - `condicoes/`: CSVs-fonte usados pelos loops do PsychoPy.
 - `data/`: saidas locais de execucao e coleta, ignoradas pelo Git.

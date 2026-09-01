@@ -4,6 +4,9 @@ Formato: entradas incrementais com data, tipo de mudanca e resumo.
 
 ## 2026-09-01
 
+- `chore`: concluida a Etapa 3 vigente com containers separados para Streamlit e PostgreSQL 17.6, volume persistente, healthchecks, dependencia por saude, configuracao ficticia por ambiente e contexto de imagem sem coletas ou secrets.
+- `test`: adicionadas seis regressoes da infraestrutura; build, smoke do Streamlit, saude dos servicos e persistencia de marcador sintetico apos reinicializacao foram comprovados, totalizando 83 testes aprovados.
+- `docs`: documentada a operacao Docker local e preservado explicitamente o fluxo funcional SQLite ate as etapas futuras de schema, importacao e integracao PostgreSQL.
 - `refactor`: concluida a Etapa 2 com separacao do dashboard em composicao Streamlit, acesso SQLite somente leitura, transformacoes puras e componentes visuais, preservando o ponto de entrada e o comportamento publico.
 - `test`: adicionadas quatro verificacoes de fronteira para API compativel, direcao de dependencias sem ciclos, importacao sem iniciar Streamlit e preservacao do launcher; suite total com 77 testes aprovados.
 - `docs`: otimizada a hierarquia de `AGENTS.md`, com regras duraveis na raiz e especializacoes concisas para condicoes, dashboard, documentacao, scripts e testes.

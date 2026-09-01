@@ -44,6 +44,19 @@ python scripts/run_dashboard.py
 
 O launcher importa o arquivo mais recente em `data/*_trials.csv` e abre o dashboard. Use `--csv CAMINHO` para selecionar outro CSV e `--force` para reimportar uma avaliacao. Os CSVs e o banco permanecem locais em `data/` e `database/`; `database/` nao deve ser enviada ao Git. Os resultados apresentados sao descritivos, nao clinicos.
 
+## Infraestrutura Docker de desenvolvimento
+
+A Etapa 3 adicionou containers separados para Streamlit e PostgreSQL, sem
+instalar o PsychoPy na imagem e sem substituir ainda o fluxo funcional SQLite.
+Copie `.env.example` para `.env`, ajuste a senha ficticia e execute:
+
+```bash
+docker compose up --build -d --wait
+```
+
+Consulte [`docs/INFRAESTRUTURA_DOCKER.md`](docs/INFRAESTRUTURA_DOCKER.md) para
+limites, validacao e encerramento seguro sem excluir o volume.
+
 ## Arquivos
 
 - `stroop_go_nogo_ptbr.psyexp`: experimento para abrir no PsychoPy Builder.
@@ -56,6 +69,8 @@ O launcher importa o arquivo mais recente em `data/*_trials.csv` e abre o dashbo
 - `scripts/db_schema.sql`: schema SQLite local da camada de importacao.
 - `dashboard/app.py`: dashboard Streamlit local para consulta descritiva do SQLite.
 - `dashboard/requirements.txt`: dependencias do dashboard local.
+- `compose.yaml`: servicos locais separados do dashboard e PostgreSQL.
+- `Dockerfile.dashboard`: imagem de desenvolvimento do Streamlit.
 - `docs/UX_DECISIONS.md`: notas sobre as decisoes de experiencia de usuario.
 - `docs/USO_POR_ZIP_GITHUB.md`: instalacao e uso a partir do Download ZIP do GitHub.
 - `docs/GUIA_DO_USUARIO.md`: fluxo cotidiano do experimento ao dashboard.
