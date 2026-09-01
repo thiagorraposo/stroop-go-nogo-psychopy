@@ -4,6 +4,8 @@ Formato: entradas incrementais com data, tipo de mudanca e resumo.
 
 ## 2026-09-01
 
+- `refactor`: concluida a Etapa 2 com separacao do dashboard em composicao Streamlit, acesso SQLite somente leitura, transformacoes puras e componentes visuais, preservando o ponto de entrada e o comportamento publico.
+- `test`: adicionadas quatro verificacoes de fronteira para API compativel, direcao de dependencias sem ciclos, importacao sem iniciar Streamlit e preservacao do launcher; suite total com 77 testes aprovados.
 - `docs`: otimizada a hierarquia de `AGENTS.md`, com regras duraveis na raiz e especializacoes concisas para condicoes, dashboard, documentacao, scripts e testes.
 - `docs`: criado o workflow canonico de 12 etapas, sua auditoria de instrucoes, o template de prompts e o prompt da Etapa 2, sem executar a modularizacao.
 - `docs`: registrada a baseline reproduzivel da Etapa 1 para o fluxo PsychoPy -> CSV -> SQLite -> Streamlit, incluindo componentes, esquema, limitacoes, integridade, contagens agregadas e procedimento validado de backup.

@@ -29,6 +29,21 @@ python3 -m pip install -r dashboard/requirements.txt
 streamlit run dashboard/app.py
 ```
 
+`dashboard/app.py` permanece como ponto de entrada publico e e usado tambem por
+`scripts/run_dashboard.py` e pelos atalhos da raiz.
+
+## Estrutura interna
+
+- `app.py`: composicao da interface Streamlit e ponto de entrada;
+- `data_access.py`: conexao SQLite somente leitura, validacao do schema e carga;
+- `transformations.py`: filtros, agregacoes, calculos puros e exportacao em memoria;
+- `components.py`: cards, graficos, tabela e detalhe visual reutilizaveis.
+
+As dependencias seguem em direcao ao ponto de entrada: acesso a dados e
+transformacoes nao importam Streamlit; componentes dependem apenas das
+transformacoes; `app.py` compoe todas as camadas. A API historicamente importada
+de `dashboard.app` permanece reexportada para compatibilidade.
+
 ## Banco esperado
 
 Banco padrão:

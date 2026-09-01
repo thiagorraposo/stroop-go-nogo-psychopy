@@ -154,6 +154,12 @@ Campos tecnicos de auditoria a registrar futuramente:
 
 Na Fase 8, o dashboard implementado em `dashboard/app.py` inclui filtros por periodo, projeto, `participant_id`, `participant_name`, visita, avaliador, teste e versao. A visao geral mostra total de avaliacoes, participantes unicos, precisao media, precisao mediana, tempo de reacao mediano, total de omissoes e total de comissoes. A interface tambem inclui graficos descritivos, tabela de avaliacoes e detalhe por avaliacao com metadados, metricas completas, tabela de tentativas e contagem de `hit`, `omission`, `correct_rejection` e `commission`.
 
+Na Etapa 2 do workflow vigente, o comportamento foi preservado e a implementacao
+foi separada em `dashboard/app.py` (composicao), `dashboard/data_access.py`
+(SQLite somente leitura), `dashboard/transformations.py` (operacoes puras) e
+`dashboard/components.py` (componentes visuais). O launcher e o ponto de entrada
+publico permanecem inalterados.
+
 ### Documentacao
 
 - Definir campos, formulas, restricoes e fluxo de trabalho.

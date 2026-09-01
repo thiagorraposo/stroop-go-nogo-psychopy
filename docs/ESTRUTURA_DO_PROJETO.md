@@ -26,6 +26,9 @@
 │   ├── AGENTS.md
 │   ├── README.md
 │   ├── app.py
+│   ├── components.py
+│   ├── data_access.py
+│   ├── transformations.py
 │   └── requirements.txt
 ├── docs/
 │   ├── AGENTS.md
@@ -55,7 +58,8 @@ Os nomes dos CSVs de condicoes sao preservados porque eles sao referenciados dir
 - `assets/ui/`: elementos visuais proprios da interface.
 - `condicoes/`: CSVs-fonte usados pelos loops do PsychoPy.
 - `data/`: saidas locais de execucao e coleta, ignoradas pelo Git.
-- `dashboard/`: aplicacao Streamlit local e suas dependencias.
+- `dashboard/`: aplicacao Streamlit local, com interface, componentes, acesso
+  SQLite somente leitura e transformacoes separados.
 - `docs/`: documentacao metodologica, historico, guias e governanca.
 - `scripts/`: analise, importacao, configuracao e inicializacao local.
 - `tests/`: validacoes estaticas e testes automatizados sem dados reais.
@@ -67,7 +71,7 @@ Os atalhos `setup.bat`, `setup.sh`, `abrir_dashboard.bat` e `abrir_dashboard.sh`
 - `stroop_go_nogo_ptbr.psyexp`
 - `condicoes/*.csv`
 - `scripts/*.py` e `scripts/db_schema.sql`
-- `dashboard/app.py` e `dashboard/requirements.txt`
+- `dashboard/*.py` e `dashboard/requirements.txt`
 - atalhos e requisitos multiplataforma da raiz
 - `README.md`, `AGENTS.md`, `docs/*.md` e documentos locais
 

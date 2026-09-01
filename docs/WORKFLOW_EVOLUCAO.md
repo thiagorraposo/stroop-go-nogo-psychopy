@@ -35,7 +35,7 @@ etapa que autorizar sua substituicao no fluxo correspondente.
 | Etapa | Peso | Objetivo e aceite resumido | Estado |
 |---|---:|---|---|
 | 1. Baseline reproduzivel | 5% | Fluxo, schema, backup, fixtures e testes registrados; integridade comprovada. | Concluida |
-| 2. Modularizar dashboard | 7% | Separar interface, SQLite, transformacoes e componentes; preservar UI, leitura somente leitura, launcher e testes. | Nao iniciada |
+| 2. Modularizar dashboard | 7% | Separar interface, SQLite, transformacoes e componentes; preservar UI, leitura somente leitura, launcher e testes. | Concluida |
 | 3. Infraestrutura local | 11% | Introduzir Docker para componentes de servidor e PostgreSQL local, sem incluir PsychoPy; configuracao reproduzivel e dados sinteticos. | Nao iniciada |
 | 4. Schema e migracoes PostgreSQL | 8% | Modelar e migrar avaliacoes, metricas e tentativas com restricoes, indices, rollback e rastreabilidade testados. | Nao iniciada |
 | 5. Importacao para PostgreSQL | 13% | Validar e importar CSV de forma transacional, idempotente e auditavel, preservando formulas e arquivo bruto. | Nao iniciada |
@@ -55,9 +55,11 @@ baseado em [prompts/TEMPLATE_ETAPA.md](prompts/TEMPLATE_ETAPA.md).
 ## Estado atual
 
 - Etapa 1: concluida.
-- Etapa 2: nao iniciada.
-- Progresso global: **5%**.
-- Baseline: **73 testes aprovados**.
+- Etapa 2: concluida.
+- Etapa 3: nao iniciada.
+- Progresso global: **12%**.
+- Baseline da Etapa 1: **73 testes aprovados**.
+- Suite atual apos a Etapa 2: **77 testes aprovados**.
 
 ## Atualizacao do progresso
 
