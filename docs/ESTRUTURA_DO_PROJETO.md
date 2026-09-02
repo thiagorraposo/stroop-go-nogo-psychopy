@@ -46,6 +46,9 @@
 │   ├── analisar_stroop.py
 │   ├── db_schema.sql
 │   ├── importar_csv_sqlite.py
+│   ├── migrations.py
+│   ├── migrar_sqlite_postgres.py
+│   ├── migrations/
 │   ├── run_dashboard.py
 │   └── setup_env.py
 └── tests/
@@ -67,7 +70,8 @@ Os nomes dos CSVs de condicoes sao preservados porque eles sao referenciados dir
 - `dashboard/`: aplicacao Streamlit local, com interface, componentes, acesso
   SQLite somente leitura e transformacoes separados.
 - `docs/`: documentacao metodologica, historico, guias e governanca.
-- `scripts/`: analise, importacao, configuracao e inicializacao local.
+- `scripts/`: analise, importacao, migrations, migracao legada, configuracao e
+  inicializacao local.
 - `tests/`: validacoes estaticas e testes automatizados sem dados reais.
 
 Os atalhos `setup.bat`, `setup.sh`, `abrir_dashboard.bat` e `abrir_dashboard.sh` ficam na raiz para facilitar o uso por outra pessoa, inclusive depois de `Code` -> `Download ZIP` no GitHub. A logica multiplataforma correspondente fica nos scripts Python em `scripts/`.

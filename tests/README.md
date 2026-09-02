@@ -14,5 +14,7 @@ Validacoes implementadas ou esperadas:
 - Flow e navegacao das telas visuais pre-pratica.
 - configuracao estatica da infraestrutura Docker local, isolamento de dados,
   healthcheck, volume e ponto de entrada do dashboard.
+- schema e migrations PostgreSQL, rollback e migracao SQLite sintetica com
+  paridade de relacionamentos, valores e identities.
 
 Nao usar dados pessoais ou arquivos reais de participantes como fixtures versionados.

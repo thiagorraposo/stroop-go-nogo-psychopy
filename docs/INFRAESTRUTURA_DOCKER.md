@@ -18,6 +18,10 @@ integracao do dashboard com PostgreSQL pertencem a etapas posteriores do
 - `DATABASE_URL` entregue ao container do dashboard como contrato de
   configuracao, ainda nao consumido pela camada SQLite vigente.
 
+O PostgreSQL tambem publica a porta configuravel `POSTGRES_PORT` somente em
+`127.0.0.1`, usando 55432 por padrao. Isso permite executar no host as
+[migrations PostgreSQL](MIGRACOES_POSTGRESQL.md) sem expor o banco na rede.
+
 O contexto da imagem exclui coletas, bancos, backups, exports, logs,
 credenciais, chaves, secrets, PsychoPy e arquivos do experimento. A telemetria
 de uso do Streamlit fica desativada no container.

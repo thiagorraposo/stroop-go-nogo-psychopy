@@ -4,6 +4,9 @@ Formato: entradas incrementais com data, tipo de mudanca e resumo.
 
 ## 2026-09-01
 
+- `feat`: concluida a Etapa 4 vigente com schema PostgreSQL versionado para avaliacoes, metricas e tentativas, executor transacional com controle de versao e migracao legada SQLite -> PostgreSQL explicita e segura.
+- `test`: adicionados nove testes de schema, indices, FKs, idempotencia, rollback, validacao de origem, recusa de destino preenchido, paridade sintetica e ajuste de identities; suite total com 92 testes aprovados.
+- `docs`: documentados schema, operacao das migrations e distribuicao canonica das pendencias, mantendo importacao PostgreSQL na Etapa 5 e integracao Streamlit na Etapa 10.
 - `chore`: concluida a Etapa 3 vigente com containers separados para Streamlit e PostgreSQL 17.6, volume persistente, healthchecks, dependencia por saude, configuracao ficticia por ambiente e contexto de imagem sem coletas ou secrets.
 - `test`: adicionadas seis regressoes da infraestrutura; build, smoke do Streamlit, saude dos servicos e persistencia de marcador sintetico apos reinicializacao foram comprovados, totalizando 83 testes aprovados.
 - `docs`: documentada a operacao Docker local e preservado explicitamente o fluxo funcional SQLite ate as etapas futuras de schema, importacao e integracao PostgreSQL.

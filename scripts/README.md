@@ -18,3 +18,8 @@ Os resultados sao descritivos e exploratorios. Eles nao sao interpretacao clinic
 use `py scripts\doctor.py` no Windows ou `python3 scripts/doctor.py` no Linux e
 macOS. Ele nao instala pacotes, nao modifica CSVs, nao cria o SQLite e nao abre o
 dashboard.
+
+`migrations.py` aplica o schema PostgreSQL versionado por `DATABASE_URL`.
+`migrar_sqlite_postgres.py` faz uma migracao legada explicita e transacional
+de um SQLite validado para um PostgreSQL vazio. Nenhum dos dois e chamado pelos
+launchers publicos nesta etapa. Consulte `docs/MIGRACOES_POSTGRESQL.md`.

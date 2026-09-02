@@ -57,6 +57,11 @@ docker compose up --build -d --wait
 Consulte [`docs/INFRAESTRUTURA_DOCKER.md`](docs/INFRAESTRUTURA_DOCKER.md) para
 limites, validacao e encerramento seguro sem excluir o volume.
 
+O schema PostgreSQL versionado e a migracao legada SQLite -> PostgreSQL sao
+operacoes explicitas documentadas em
+[`docs/MIGRACOES_POSTGRESQL.md`](docs/MIGRACOES_POSTGRESQL.md). O importador e o
+dashboard publicos permanecem no SQLite ate suas etapas proprias.
+
 ## Arquivos
 
 - `stroop_go_nogo_ptbr.psyexp`: experimento para abrir no PsychoPy Builder.
@@ -67,6 +72,8 @@ limites, validacao e encerramento seguro sem excluir o volume.
 - `scripts/analisar_stroop.py`: script para validar e analisar um CSV unificado.
 - `scripts/importar_csv_sqlite.py`: script para validar e importar CSV unificado para SQLite local.
 - `scripts/db_schema.sql`: schema SQLite local da camada de importacao.
+- `scripts/migrations.py`: executor transacional das migrations PostgreSQL.
+- `scripts/migrar_sqlite_postgres.py`: migracao legada explicita e segura.
 - `dashboard/app.py`: dashboard Streamlit local para consulta descritiva do SQLite.
 - `dashboard/requirements.txt`: dependencias do dashboard local.
 - `compose.yaml`: servicos locais separados do dashboard e PostgreSQL.

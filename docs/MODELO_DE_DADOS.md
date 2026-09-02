@@ -2,7 +2,10 @@
 
 Data: 2026-07-09.
 
-Este documento define o modelo logico para SQLite local. A Fase 7 implementou o schema em `scripts/db_schema.sql` e a importacao em `scripts/importar_csv_sqlite.py`.
+Este documento define o modelo logico originalmente implementado no SQLite
+local por `scripts/db_schema.sql`. A Etapa 4 reproduziu as mesmas tres tabelas no
+PostgreSQL por migrations versionadas, mantendo textos e timestamps sem
+conversao semantica. Consulte [MIGRACOES_POSTGRESQL.md](MIGRACOES_POSTGRESQL.md).
 
 ## Visao geral
 

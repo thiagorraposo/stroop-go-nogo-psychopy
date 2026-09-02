@@ -25,6 +25,7 @@ class InfraestruturaDockerTests(unittest.TestCase):
 
     def test_postgres_tem_volume_e_healthcheck(self) -> None:
         self.assertIn("postgres_data:/var/lib/postgresql/data", self.compose)
+        self.assertIn('127.0.0.1:${POSTGRES_PORT:-55432}:5432', self.compose)
         self.assertIn("pg_isready", self.compose)
         self.assertRegex(self.compose, r"(?m)^volumes:\n  postgres_data:$")
 
@@ -53,6 +54,7 @@ class InfraestruturaDockerTests(unittest.TestCase):
         self.assertIn("POSTGRES_DB=stroop_dev", self.env_example)
         self.assertIn("POSTGRES_USER=stroop_dev", self.env_example)
         self.assertIn("POSTGRES_PASSWORD=troque-esta-senha-local", self.env_example)
+        self.assertIn("POSTGRES_PORT=55432", self.env_example)
         self.assertNotRegex(self.env_example, re.compile(r"participant", re.IGNORECASE))
 
 
