@@ -78,7 +78,10 @@ class PostgresMigrationsTests(unittest.TestCase):
         return path
 
     def test_migration_em_banco_vazio_cria_schema_indices_e_fks(self) -> None:
-        self.assertEqual(apply_migrations(TEST_DATABASE_URL), ["0001_initial.sql"])
+        self.assertEqual(
+            apply_migrations(TEST_DATABASE_URL),
+            ["0001_initial.sql", "0002_authentication.sql"],
+        )
         with psycopg.connect(TEST_DATABASE_URL) as connection:
             tables = {
                 row[0]
@@ -87,7 +90,14 @@ class PostgresMigrationsTests(unittest.TestCase):
                 )
             }
             self.assertTrue(
-                {"schema_migrations", "assessments", "assessment_metrics", "trial_results"}
+                {
+                    "schema_migrations",
+                    "assessments",
+                    "assessment_metrics",
+                    "trial_results",
+                    "app_users",
+                    "auth_audit_events",
+                }
                 .issubset(tables)
             )
             indices = {
@@ -187,7 +197,7 @@ class PostgresMigrationStaticTests(unittest.TestCase):
     def test_migration_versionada_existe(self) -> None:
         self.assertEqual(
             [path.name for path in MIGRATIONS_DIR.glob("*.sql")],
-            ["0001_initial.sql"],
+            ["0001_initial.sql", "0002_authentication.sql"],
         )
 
     def test_fluxo_publico_permanece_sqlite(self) -> None:

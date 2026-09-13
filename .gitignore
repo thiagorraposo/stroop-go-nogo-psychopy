@@ -29,6 +29,7 @@ dashboard/.streamlit/config.toml.local
 **/.streamlit/secrets.toml
 credentials*.json
 secrets.*
+!.streamlit/secrets.toml.example
 *.pem
 *.key
 

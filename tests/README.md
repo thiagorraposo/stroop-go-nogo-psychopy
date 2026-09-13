@@ -28,6 +28,11 @@ Veja [comandos e isolamento](../docs/IMPORTACAO_POSTGRESQL.md) para executar a
 integracao em PostgreSQL descartavel com `TEST_DATABASE_URL`; skips nao aprovam
 a suite integral.
 
-`test_upload_local.py` cobre envelope HTTP, isolamento, retencao, validacao,
-mensagens seguras e integracao sintetica de uploads concorrentes. Consulte
+`test_upload_local.py` cobre isolamento, retencao, validacao, launcher
+autenticado e integracao sintetica de uploads concorrentes. Consulte
 [UPLOAD_LOCAL.md](../docs/UPLOAD_LOCAL.md) para comandos e limites.
+
+`test_authentication.py` cobre claims Google, expiracao, cadastro previo,
+bloqueio, perfis, autorizacao negativa, limitacao de recusas, auditoria minima,
+bootstrap e recuperacao, sempre com identidades sinteticas. Consulte
+[AUTENTICACAO_E_PERMISSOES.md](../docs/AUTENTICACAO_E_PERMISSOES.md).

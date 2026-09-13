@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any
 
 from dashboard.transformations import (
@@ -10,7 +11,6 @@ from dashboard.transformations import (
     count_by_date,
     error_type_counts,
     errors_by_project,
-    filtered_csv_bytes,
     metrics_for_assessment,
     numeric_values,
     option_values,
@@ -131,7 +131,11 @@ def render_charts(
 
 
 def render_assessment_table(
-    streamlit_module: Any, rows: list[dict[str, Any]], view: InstrumentView | None = None
+    streamlit_module: Any,
+    rows: list[dict[str, Any]],
+    view: InstrumentView | None = None,
+    *,
+    export_factory: Callable[[], bytes] | None = None,
 ) -> None:
     view = view or instrument_view("stroop_go_nogo_ptbr")
     streamlit_module.subheader("Avaliacoes filtradas")
@@ -139,12 +143,13 @@ def render_assessment_table(
     streamlit_module.dataframe(
         to_dataframe(visible_rows), use_container_width=True, hide_index=True
     )
-    streamlit_module.download_button(
-        "Baixar visao filtrada em CSV",
-        data=filtered_csv_bytes(rows, None if view.code == "stroop_go_nogo_ptbr" else view.metric_codes),
-        file_name=f"{view.code}_dashboard_visao_filtrada.csv",
-        mime="text/csv",
-    )
+    if export_factory is not None:
+        streamlit_module.download_button(
+            "Baixar visao filtrada em CSV",
+            data=export_factory,
+            file_name=f"{view.code}_dashboard_visao_filtrada.csv",
+            mime="text/csv",
+        )
 
 
 def render_assessment_detail(

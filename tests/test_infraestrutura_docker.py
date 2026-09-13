@@ -32,11 +32,14 @@ class InfraestruturaDockerTests(unittest.TestCase):
     def test_dashboard_aguarda_saude_do_postgres(self) -> None:
         self.assertIn("condition: service_healthy", self.compose)
         self.assertIn("DATABASE_URL: postgresql://", self.compose)
+        self.assertIn("AUTH_DATABASE_URL:", self.compose)
+        self.assertIn("/app/.streamlit/secrets.toml:ro", self.compose)
 
     def test_imagem_preserva_ponto_de_entrada_e_nao_instala_psychopy(self) -> None:
         self.assertIn('"dashboard/app.py"', self.dockerfile)
         self.assertNotIn("psychopy", self.dockerfile.lower())
         self.assertIn("COPY dashboard /app/dashboard", self.dockerfile)
+        self.assertIn("COPY scripts /app/scripts", self.dockerfile)
 
     def test_contexto_exclui_dados_e_segredos(self) -> None:
         exclusions = {
@@ -55,6 +58,8 @@ class InfraestruturaDockerTests(unittest.TestCase):
         self.assertIn("POSTGRES_USER=stroop_dev", self.env_example)
         self.assertIn("POSTGRES_PASSWORD=troque-esta-senha-local", self.env_example)
         self.assertIn("POSTGRES_PORT=55432", self.env_example)
+        self.assertIn("AUTH_DATABASE_URL=postgresql://stroop_dev:", self.env_example)
+        self.assertIn("STREAMLIT_SECRETS_FILE=", self.env_example)
         self.assertNotRegex(self.env_example, re.compile(r"participant", re.IGNORECASE))
 
 

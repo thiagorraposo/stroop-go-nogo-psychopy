@@ -28,3 +28,4 @@ Estes riscos descrevem o contexto tecnico; nao constituem backlog independente.
   explicitas antes da implementacao.
 - O dashboard pode exibir dados pessoais locais; exports e screenshots continuam
   sendo risco operacional.
+

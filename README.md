@@ -58,7 +58,14 @@ python scripts/setup_env.py
 python scripts/run_dashboard.py
 ```
 
-O launcher importa o arquivo mais recente em `data/*_trials.csv` e abre o dashboard. Use `--csv CAMINHO` para selecionar outro CSV e `--force` para reimportar uma avaliacao. Os CSVs e o banco permanecem locais em `data/` e `database/`; `database/` nao deve ser enviada ao Git. Os resultados apresentados sao descritivos, nao clinicos.
+O launcher importa o arquivo mais recente em `data/*_trials.csv` e abre o
+dashboard. O acesso ao dashboard exige Google OIDC, usuario previamente
+cadastrado e `AUTH_DATABASE_URL`; veja
+[`docs/AUTENTICACAO_E_PERMISSOES.md`](docs/AUTENTICACAO_E_PERMISSOES.md). Use
+`--csv CAMINHO` para selecionar outro CSV e `--force` para reimportar uma
+avaliacao. Os CSVs e o banco permanecem locais em `data/` e `database/`;
+`database/` nao deve ser enviada ao Git. Os resultados apresentados sao
+descritivos, nao clinicos.
 
 ## Infraestrutura Docker de desenvolvimento
 
@@ -80,13 +87,14 @@ dashboard publicos permanecem no SQLite. A CLI separada de
 [importacao CSV PostgreSQL](docs/IMPORTACAO_POSTGRESQL.md) usa `DATABASE_URL` e
 oferece `--validate-only` para conferir uma entrada sem persistir.
 
-## Upload local de CSV
+## Upload autenticado de CSV
 
-A [area de upload local](docs/UPLOAD_LOCAL.md) recebe um CSV sintetico por envio
+A [area de upload autenticado](docs/UPLOAD_LOCAL.md) recebe um CSV por operacao
 para o PostgreSQL, com limite de 5 MiB, validacao e descarte do temporario.
-Com `DATABASE_URL` configurada e migrations aplicadas, execute
-`.venv/bin/python scripts/upload_local.py --local` e abra `http://127.0.0.1:8765`.
-O dashboard e seus atalhos continuam usando SQLite.
+Com OIDC, `DATABASE_URL`, `AUTH_DATABASE_URL` e migrations configurados, execute
+`.venv/bin/python scripts/upload_local.py --local` e abra
+`http://127.0.0.1:8501`. Somente os perfis `importacao` e `administracao` veem
+essa area. O dashboard de resultados continua usando SQLite nesta etapa.
 
 ## Arquivos
 
@@ -100,6 +108,7 @@ O dashboard e seus atalhos continuam usando SQLite.
 - `scripts/db_schema.sql`: schema SQLite local da camada de importacao.
 - `scripts/migrations.py`: executor transacional das migrations PostgreSQL.
 - `scripts/migrar_sqlite_postgres.py`: migracao legada explicita e segura.
+- `scripts/gerenciar_usuarios.py`: bootstrap e recuperacao administrativa OIDC.
 - `dashboard/app.py`: dashboard Streamlit local para consulta descritiva do SQLite.
 - `dashboard/requirements.txt`: dependencias do dashboard local.
 - `compose.yaml`: servicos locais separados do dashboard e PostgreSQL.

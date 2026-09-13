@@ -23,6 +23,9 @@ services:
       dockerfile: Dockerfile.dashboard
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:?Defina POSTGRES_USER no arquivo .env}:${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no arquivo .env}@postgres:5432/${POSTGRES_DB:?Defina POSTGRES_DB no arquivo .env}
+      AUTH_DATABASE_URL: ${AUTH_DATABASE_URL:?Defina AUTH_DATABASE_URL no arquivo .env}
+    volumes:
+      - ${STREAMLIT_SECRETS_FILE:?Defina STREAMLIT_SECRETS_FILE no arquivo .env}:/app/.streamlit/secrets.toml:ro
     depends_on:
       postgres:
         condition: service_healthy

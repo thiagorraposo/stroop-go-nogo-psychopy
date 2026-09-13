@@ -16,8 +16,12 @@ aceite das entregas sao definidos somente no
 - `dashboard`: Python 3.12 e Streamlit em imagem propria, preservando
   `dashboard/app.py` como ponto de entrada;
 - inicializacao do dashboard condicionada ao estado saudavel do PostgreSQL;
-- `DATABASE_URL` entregue ao container do dashboard como contrato de
-  configuracao, ainda nao consumido pela camada SQLite vigente.
+- `DATABASE_URL` entregue ao container para importacao PostgreSQL;
+- `AUTH_DATABASE_URL` separado para autorizacao e auditoria;
+- arquivo local de secrets OIDC montado como somente leitura, nunca incorporado
+  a imagem;
+- camada de resultados ainda consulta SQLite ate a etapa prevista para troca do
+  backend.
 
 O PostgreSQL tambem publica a porta configuravel `POSTGRES_PORT` somente em
 `127.0.0.1`, usando 55432 por padrao. Isso permite executar no host as
@@ -29,7 +33,8 @@ de uso do Streamlit fica desativada no container.
 
 ## Configuracao e execucao
 
-Crie uma configuracao local a partir do exemplo e substitua a senha ficticia:
+Crie uma configuracao local a partir do exemplo, substitua a senha ficticia e
+aponte `STREAMLIT_SECRETS_FILE` para um arquivo OIDC real ignorado pelo Git:
 
 ```bash
 cp .env.example .env
@@ -38,10 +43,11 @@ docker compose up --build -d --wait
 docker compose ps
 ```
 
-O dashboard fica em `http://localhost:8501`. Nesta etapa ele pode exibir a
-mensagem esperada de SQLite ausente dentro da imagem; a saude do servico apenas
-confirma que o ponto de entrada Streamlit responde. Os launchers publicos do
-host continuam sendo o caminho funcional para consultar o SQLite local.
+O dashboard fica em `http://localhost:8501` e exige Google OIDC e cadastro
+previo. Ele pode exibir a mensagem esperada de SQLite ausente dentro da imagem
+de desenvolvimento; a saude do servico apenas confirma que o ponto de entrada
+Streamlit responde. Consulte
+[AUTENTICACAO_E_PERMISSOES.md](AUTENTICACAO_E_PERMISSOES.md).
 
 Para encerrar sem apagar o volume PostgreSQL:
 

@@ -119,3 +119,10 @@ local de um CSV sintetico por vez. A pagina apresenta limite e descarte antes
 do envio, botao desabilitado durante processamento e resultado textual recebido,
 validado, importado ou rejeitado. Nao renderiza conteudo do CSV ou mensagens
 internas; a selecao e limpa ao finalizar. Operacao em [UPLOAD_LOCAL.md](UPLOAD_LOCAL.md).
+
+Atualizado na Etapa 8: a rota HTTP propria foi removida e o comando existente
+passou a abrir a area **Importacao** dentro do dashboard autenticado. Perfis sem
+permissao nao veem essa area; conta nao cadastrada ve apenas os identificadores
+`iss` e `sub` da propria sessao para solicitar cadastro manual. O e-mail e
+exibido somente como informacao auxiliar da conta autenticada. Detalhes em
+[AUTENTICACAO_E_PERMISSOES.md](AUTENTICACAO_E_PERMISSOES.md).

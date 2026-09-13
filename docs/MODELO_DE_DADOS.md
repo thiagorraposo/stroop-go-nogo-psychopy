@@ -20,6 +20,15 @@ Relacionamentos:
 - `assessments` 1:N `assessment_metrics`
 - `assessments` 1:N `trial_results`
 
+As tabelas de autenticacao da Etapa 8 ficam separadas desse dominio:
+
+- `app_users`: autorizacao por `iss` + `sub`, e-mail auxiliar, perfil e bloqueio;
+- `auth_audit_events`: horario, identidade OIDC, acao fixa, resultado e
+  identificador aleatorio, sem conteudo clinico.
+
+O contrato detalhado de acesso esta em
+[AUTENTICACAO_E_PERMISSOES.md](AUTENTICACAO_E_PERMISSOES.md).
+
 ## Tabela assessments
 
 Uma linha por execucao completa da tarefa.

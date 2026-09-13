@@ -2,11 +2,15 @@
 
 Data: 2026-09-01.
 
-Esta etapa versiona o schema PostgreSQL das tres tabelas de dominio e oferece
+Esta etapa versionou o schema PostgreSQL das tres tabelas de dominio e oferece
 uma migracao explicita do SQLite legado. O importador SQLite e o dashboard
 continuam no fluxo local legado. A CLI de [importacao CSV PostgreSQL](IMPORTACAO_POSTGRESQL.md)
 usa este schema ja aplicado; o sequenciamento das transicoes e definido no
 [backlog canonico](Projeto%20Stroop%20Test.md).
+
+A Etapa 8 acrescentou `0002_authentication.sql`, com `app_users` e
+`auth_audit_events`, sem alterar as tabelas de dominio. Operacao e modelo de
+acesso: [AUTENTICACAO_E_PERMISSOES.md](AUTENTICACAO_E_PERMISSOES.md).
 
 ## Schema versionado
 

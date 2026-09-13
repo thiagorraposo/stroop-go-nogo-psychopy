@@ -32,6 +32,10 @@ launchers publicos nesta etapa. Consulte `docs/MIGRACOES_POSTGRESQL.md`.
 recusa de duplicidade, `--force` e `--validate-only`. O comando e separado do
 launcher SQLite. Consulte [importacao PostgreSQL](../docs/IMPORTACAO_POSTGRESQL.md).
 
-`upload_local.py --local` abre a area de upload somente em `127.0.0.1`, com
-limites, validacao, importacao PostgreSQL e descarte do temporario. Consulte
-[UPLOAD_LOCAL.md](../docs/UPLOAD_LOCAL.md).
+`upload_local.py --local` preserva o comando publico, mas agora abre a area de
+importacao do dashboard somente em `127.0.0.1`, protegida por Google OIDC,
+cadastro previo e perfil. `gerenciar_usuarios.py` faz somente o bootstrap inicial
+e a recuperacao administrativa de emergencia; cadastros comuns ocorrem na area
+administrativa autenticada. Consulte
+[autenticacao](../docs/AUTENTICACAO_E_PERMISSOES.md) e
+[upload](../docs/UPLOAD_LOCAL.md).

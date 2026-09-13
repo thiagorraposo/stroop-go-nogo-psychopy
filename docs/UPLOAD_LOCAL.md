@@ -1,56 +1,55 @@
-# Upload local de CSV
+# Upload autenticado de CSV
 
-A area de upload recebe arquivos de outro computador depois que forem copiados
-para a maquina local, ou CSVs exportados por planilhas em um contrato de
-instrumento registrado. O contrato do Stroop e o adaptador demonstrativo estão
-em [MULTIPLOS_INSTRUMENTOS.md](MULTIPLOS_INSTRUMENTOS.md).
-Ela importa no PostgreSQL e preserva o dashboard SQLite e seus atalhos.
+A area recebe CSVs de um instrumento registrado e importa no PostgreSQL. Desde
+a Etapa 8, ela faz parte do dashboard protegido por Google OIDC e exige usuario
+previamente cadastrado com perfil `importacao` ou `administracao`. O contrato do
+Stroop e o adaptador demonstrativo estao em
+[MULTIPLOS_INSTRUMENTOS.md](MULTIPLOS_INSTRUMENTOS.md); identidade, perfis e
+bootstrap estao em [AUTENTICACAO_E_PERMISSOES.md](AUTENTICACAO_E_PERMISSOES.md).
+O dashboard ainda consulta o SQLite ate a etapa prevista para troca do backend.
 Estado e aceite ficam no [backlog canonico](Projeto%20Stroop%20Test.md).
 
 ## Abrir a area de upload
 
-Usar a `.venv` existente, PostgreSQL local e
+Usar a `.venv` existente, PostgreSQL local, OIDC configurado e
 [migrations aplicadas](MIGRACOES_POSTGRESQL.md). Configurar `DATABASE_URL` no
-ambiente sem imprimir ou versionar credenciais. Na raiz do repositorio:
+ambiente, `AUTH_DATABASE_URL` separadamente e o arquivo local de secrets sem
+imprimir ou versionar credenciais. Na raiz do repositorio:
 
 ```bash
 .venv/bin/python scripts/upload_local.py --local
 ```
 
 No Windows, substituir o executavel por `.venv\Scripts\python.exe`.
-Abrir `http://127.0.0.1:8765` no navegador da mesma maquina. `--port` permite
-escolher outra porta local. O endereco de escuta e fixo em `127.0.0.1`.
+Abrir `http://127.0.0.1:8501` no navegador da mesma maquina. `--port` permite
+escolher outra porta local, que tambem deve constar no `redirect_uri` do cliente
+Google. O endereco de escuta desse comando permanece fixo em `127.0.0.1`.
 
 1. Selecionar um CSV sintetico UTF-8, com ou sem BOM, de ate 5 MiB.
-2. Clicar em **Enviar e importar**.
-3. Conferir o resultado: recebido, validado e importado; ou rejeitado.
+2. Entrar com uma conta Google previamente cadastrada e abrir **Importacao**.
+3. Clicar em **Validar e importar**.
+4. Conferir o resultado importado ou rejeitado.
 
-O botao fica desabilitado durante o envio e a selecao e limpa ao terminar.
+O botao fica desabilitado sem arquivo.
 Duplicatas por `assessment_id` sao recusadas; esta interface nao oferece
 sobrescrita. A importacao usa o [importador PostgreSQL](IMPORTACAO_POSTGRESQL.md)
 sem alterar suas formulas ou regras.
 
-O servico exige `--local`, `DATABASE_URL` e ambiente `APP_ENV` igual a `local`,
-`development` ou `test` (padrao: `local`). Outros valores, incluindo `production`,
-impedem a inicializacao. Encerrar com Ctrl+C. Nao configurar proxy, tunel,
-publicacao Docker ou acesso pela rede para este servico.
+O comando exige `--local`, `DATABASE_URL`, `AUTH_DATABASE_URL` e ambiente
+`APP_ENV` igual a `local`, `development` ou `test` (padrao: `local`). Outros
+valores, incluindo `production`, impedem a inicializacao. Encerrar com Ctrl+C.
+Publicacao, proxy e HTTPS pertencem a etapas posteriores.
 
 ## Limites de recepcao
 
-Aceita um unico corpo CSV por requisicao, limitado a 5 MiB tanto no navegador
-quanto no servidor. Multipart, transferencia chunked, tamanho ausente/invalido,
-encoding invalido, byte NUL, extensao diferente de `.csv` e estrutura CSV invalida
-sao recusados. A extensao sozinha nao aprova um arquivo.
+Aceita um unico CSV por operacao. Tamanho vazio ou superior a 5 MiB, encoding
+invalido, byte NUL, extensao diferente de `.csv` e estrutura CSV invalida sao
+recusados. A extensao sozinha nao aprova um arquivo. O importador preserva a
+serializacao transacional e a recusa de duplicidade.
 
-O servidor admite ate quatro conexoes simultaneas e limita a leitura do socket
-a 15 segundos por operacao. Excesso de conexoes e encerrado sem criar threads
-adicionais; o navegador orienta conferir o servico antes de repetir o envio.
-A serializacao transacional do importador continua protegendo duplicidade.
-
-O upload exige Host e Origin correspondentes ao endereco local e token aleatorio
-da pagina. Nao habilita CORS nem serve arquivos de diretorios. Essa protecao
-contra envios de outras origens nao substitui autenticacao: processos locais
-podem acessar o servico. Nao ha exposicao publica autorizada.
+A antiga rota HTTP propria foi removida para eliminar um caminho de importacao
+sem OIDC. O Streamlit revalida expiracao, cadastro, bloqueio e perfil antes de
+encaminhar bytes ao processador.
 
 ## Retencao e rastreabilidade
 
@@ -70,11 +69,9 @@ limpeza: antes de retomar, o operador deve remover apenas os diretorios temporar
 `stroop-upload-*` daquela execucao, sem abrir seu conteudo e sem apagar diretorios
 de um processo ainda ativo. Nao usar esta versao com dados reais.
 
-Os eventos sao JSON no terminal com somente `id` aleatorio, `origin` fixo
-`upload local`, `at` UTC e `status`. O servico nao cria arquivo de log nem guarda
-historico de eventos em memoria. O terminal pode reter sua propria saida; nao
-redirecionar para arquivo versionado. Requisicoes recusadas antes da recepcao do
-corpo recebem erro generico sem log de headers ou caminhos.
+O fluxo autenticado registra no PostgreSQL somente identidade OIDC, acao fixa,
+resultado, horario e `request_id` aleatorio. Nao registra nome do arquivo,
+conteudo, metadados clinicos, caminhos, e-mail ou credenciais.
 
 A origem no PostgreSQL e o caminho temporario com esse ID, para correlacionar
 com os eventos; o arquivo nao permanece disponivel. O banco conserva a avaliacao,
@@ -99,7 +96,7 @@ docker compose --env-file .env.example config --quiet
 git diff --check
 ```
 
-Os testes nao iniciam servidor: exercitam o processamento e handlers em memoria,
-e a integracao usa o banco sintetico disponibilizado externamente. O smoke HTTP
-local verifica separadamente abertura da pagina, envio sintetico, duplicidade,
-rejeicao e limpeza. Nao ha nova dependencia, migration ou mudanca no experimento.
+Os testes nao iniciam login real nem usam secrets: exercitam o processamento,
+o launcher autenticado e a integracao em banco sintetico. Autenticacao,
+autorizacao negativa e auditoria sao cobertas por `test_authentication.py`.
+Nenhuma mudanca foi feita no experimento ou nas formulas.

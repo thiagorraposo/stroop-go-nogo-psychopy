@@ -7,10 +7,10 @@ validar e registrar o trabalho; documentos auxiliares nao mantem outro backlog.
 
 ## Estado consolidado
 
-- Etapas 1–7: concluidas.
-- Progresso global: **62%**, soma de 5% + 7% + 11% + 8% + 13% + 8% + 10%, sem credito parcial.
-- Suite registrada: **124 testes aprovados**; ver evidencias datadas abaixo.
-- Etapa 8: **nao iniciada**, primeira etapa nao concluida e proxima etapa.
+- Etapas 1–8: concluidas.
+- Progresso global: **72%**, soma de 5% + 7% + 11% + 8% + 13% + 8% + 10% + 10%, sem credito parcial.
+- Suite registrada: **138 testes aprovados**; ver evidencias datadas abaixo.
+- Etapa 9: **nao iniciada**, primeira etapa nao concluida e proxima etapa.
 - Destino futuro de hospedagem: **OCI Always Free**, somente na Etapa 11.
 - Bloqueios atuais: nenhum para a etapa concluida; decisoes dos instrumentos
   futuros e de producao permanecem listadas neste backlog.
@@ -63,8 +63,8 @@ alternativas de etapas ou progresso.
 | 4     | Schema e migrations PostgreSQL   |   8% |       31% | Concluída |
 | 5     | Importação CSV → PostgreSQL      |  13% |       44% | Concluída |
 | 6     | Envio remoto de CSV              |   8% |       52% | Concluída |
-| 7     | Suporte a múltiplos instrumentos |  10% |       62% | Pendente  |
-| 8     | Autenticação e permissões        |  10% |       72% | Pendente  |
+| 7     | Suporte a múltiplos instrumentos |  10% |       62% | Concluída |
+| 8     | Autenticação e permissões        |  10% |       72% | Concluída |
 | 9     | Hardening de produção            |   8% |       80% | Pendente  |
 | 10    | Dashboard usando PostgreSQL      |   7% |       87% | Pendente  |
 | 11    | Deploy no OCI Always Free        |   6% |       93% | Pendente  |
@@ -477,6 +477,29 @@ Para cada instrumento, a equipe deverá confirmar:
 ## Etapa 8 — Autenticação e permissões
 
 **Objetivo:** controlar acesso aos dados e às operações.
+
+**Estado:** concluida — 72% acumulados.
+
+Decisao autorizada pelo usuario em 2026-09-13: Google Identity por OIDC nativo
+do Streamlit; acesso somente a identidades previamente cadastradas por `iss` +
+`sub`; e-mail apenas auxiliar; perfis `consulta`, `importacao` e
+`administracao` no PostgreSQL; sem autocadastro ou secrets versionados;
+revalidacao de expiracao e bloqueio em toda operacao protegida.
+
+Evidencias de 2026-09-13: `scripts/migrations/0002_authentication.sql`,
+`dashboard/auth.py`, area protegida em `dashboard/app.py`, bootstrap e
+recuperacao em `scripts/gerenciar_usuarios.py` e operacao documentada em
+[AUTENTICACAO_E_PERMISSOES.md](AUTENTICACAO_E_PERMISSOES.md). A antiga rota
+HTTP de upload sem OIDC foi removida; o comando publico abre a area autenticada
+do Streamlit em `127.0.0.1`.
+
+Testes especificos: 17 aprovados. Suite integral: 138 aprovados, zero falhas,
+erros ou skips, com PostgreSQL 17.6 descartavel em tmpfs e identidades/dados
+sinteticos. Configuracao Docker, dependencias, compilacao Python, 61 links,
+secrets ignorados e `git diff --check` aprovados. Build da imagem e smoke final
+com Authlib empacotada, healthcheck `ok` e pagina HTTP 200 aprovados. Nenhuma
+credencial Google real foi criada, lida ou versionada; login real depende da
+configuracao operacional do cliente OIDC. Etapa 9 nao iniciada.
 
 ### Backlog
 

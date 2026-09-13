@@ -1,10 +1,9 @@
 """Upload local com entradas sinteticas, sem iniciar servidor nos testes."""
 from concurrent.futures import ThreadPoolExecutor
-from email.message import Message
-import io
 import json
 import os
 from pathlib import Path
+import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
@@ -64,75 +63,33 @@ class UploadTests(unittest.TestCase):
             self.assertFalse(target.exists())
 
     def test_producao_e_habilitacao_recusadas(self):
-        with patch.dict(os.environ, {'APP_ENV': 'production', 'DATABASE_URL': 'unused'}), patch.object(upload, 'UploadServer') as server:
+        with patch.dict(os.environ, {'APP_ENV': 'production', 'DATABASE_URL': 'unused'}), patch.object(upload.subprocess, 'run') as run:
             self.assertEqual(upload.main(['--local']), 1)
-            server.assert_not_called()
-        with patch.dict(os.environ, {'APP_ENV': 'local', 'DATABASE_URL': 'unused'}), patch.object(upload, 'UploadServer') as server:
+            run.assert_not_called()
+        with patch.dict(os.environ, {'APP_ENV': 'local', 'DATABASE_URL': 'unused'}), patch.object(upload.subprocess, 'run') as run:
             self.assertEqual(upload.main([]), 1)
-            server.assert_not_called()
+            run.assert_not_called()
 
-    def handler(self, **headers):
-        handler = object.__new__(upload.UploadHandler)
-        handler.server = SimpleNamespace(server_port=8765, origin='http://127.0.0.1:8765', token='synthetic', database_url='', temp_root=None, audit=None)
-        handler.path = '/upload'
-        handler.headers = Message()
-        defaults = {'Host': '127.0.0.1:8765', 'Origin': 'http://127.0.0.1:8765',
-                    'X-Upload-Token': 'synthetic', 'Content-Type': 'text/csv',
-                    'Content-Length': str(len(DATA)), 'X-Upload-Name': 'synthetic.csv'}
-        defaults.update(headers)
-        for key, value in defaults.items():
-            if value is not None:
-                handler.headers[key] = value
-        handler.rfile = io.BytesIO(DATA)
-        handler.reply = lambda code, payload, **kwargs: setattr(handler, 'result', (code, payload))
-        return handler
+    def test_comando_publico_abre_dashboard_autenticado(self):
+        environment = {
+            'APP_ENV': 'local',
+            'DATABASE_URL': 'postgresql://synthetic',
+            'AUTH_DATABASE_URL': 'postgresql://synthetic-auth',
+        }
+        completed = SimpleNamespace(returncode=0)
+        with patch.dict(os.environ, environment, clear=True), patch.object(
+            upload.subprocess, 'run', return_value=completed
+        ) as run:
+            self.assertEqual(upload.main(['--local', '--port', '8765']), 0)
+        command = run.call_args.args[0]
+        self.assertEqual(command[:3], [sys.executable, '-m', 'streamlit'])
+        self.assertIn('--server.address=127.0.0.1', command)
+        self.assertIn('--server.port=8765', command)
+        self.assertEqual(run.call_args.kwargs['env']['STROOP_INITIAL_SECTION'], 'Importacao')
 
-    def test_http_recusa_origem_host_token(self):
-        with patch.object(upload, 'process_upload') as process:
-            for key in ('Host', 'Origin', 'X-Upload-Token'):
-                h = self.handler(**{key: 'https://invalid.example'})
-                h.do_POST()
-                self.assertEqual(h.result[0], 403)
-                self.assertEqual(h.rfile.tell(), 0)
-        process.assert_not_called()
-
-    def test_http_limite_tipo_multipart_e_chunked(self):
-        with patch.object(upload, 'process_upload') as process:
-            for headers in ({'Content-Length': str(upload.MAX_BYTES+1)}, {'Content-Length': '-1'},
-                            {'Content-Length': None}, {'Content-Type': 'multipart/form-data'},
-                            {'Transfer-Encoding': 'chunked'}):
-                h = self.handler(**headers)
-                h.do_POST()
-                self.assertEqual(h.result[0], 400)
-                self.assertEqual(h.rfile.tell(), 0)
-        process.assert_not_called()
-
-    def test_http_corpo_truncado_e_cabecalho_duplicado(self):
-        h = self.handler()
-        h.rfile = io.BytesIO(DATA[:5])
-        h.do_POST()
-        self.assertEqual(h.result[0], 400)
-        h = self.handler()
-        h.headers['Content-Length'] = '1'
-        h.do_POST()
-        self.assertEqual(h.result[0], 400)
-
-    def test_http_encaminha_um_arquivo(self):
-        h = self.handler()
-        with patch.object(upload, 'process_upload', return_value={'statuses': ['importado']}) as process:
-            h.do_POST()
-        self.assertEqual(h.result[0], 200)
-        self.assertEqual(process.call_args.args[:2], (DATA, 'synthetic.csv'))
-
-    def test_get_nao_serve_arquivos_e_usa_token(self):
-        h = self.handler()
-        h.path = '/'
-        h.do_GET()
-        self.assertEqual(h.result[0], 200)
-        self.assertIn("'X-Upload-Token':'synthetic'", h.result[1])
-        h.path = '/../../anything'
-        h.do_GET()
-        self.assertEqual(h.result[0], 403)
+    def test_servidor_http_sem_autenticacao_nao_existe(self):
+        self.assertFalse(hasattr(upload, 'UploadServer'))
+        self.assertFalse(hasattr(upload, 'UploadHandler'))
 
     def test_utf8_bom_aceito(self):
         with patch.object(upload, 'import_csv'):

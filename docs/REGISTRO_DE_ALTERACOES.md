@@ -3,6 +3,46 @@
 Este arquivo preserva fatos datados; nao define estado ou aceite vigente.
 Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 
+## 2026-09-13 — Autenticacao e permissoes
+
+- `feat`: implementado Google OIDC nativo do Streamlit com acesso somente para
+  `iss` + `sub` previamente cadastrados; e-mail permanece auxiliar e nao existe
+  autocadastro ou armazenamento local de senhas.
+- `feat`: adicionada migration de usuarios e auditoria minima, com perfis
+  `consulta`, `importacao` e `administracao`, bloqueio, revalidacao explicita de
+  `exp`, cinco recusas locais por 15 minutos e preservacao da ultima conta
+  administrativa ativa.
+- `feat`: visualizacao, detalhe, exportacao sob demanda, importacao e gestao de
+  usuarios revalidam autorizacao; areas sem permissao nao aparecem. O comando de
+  upload foi preservado, mas a antiga rota HTTP sem OIDC foi removida e agora
+  abre a area autenticada em `127.0.0.1`.
+- `feat`: criado bootstrap unico do primeiro administrador e recuperacao
+  break-glass somente para identidade existente, ambos auditados e sem imprimir
+  credenciais. Secrets reais permanecem fora do Git e montados somente leitura
+  no container.
+- `test`: 17 testes especificos e suite integral com 138 aprovados, zero falhas,
+  erros ou skips, em PostgreSQL 17.6 descartavel em tmpfs. Configuracao Docker,
+  `pip check`, compilacao, 61 links relativos/externos e `git diff --check`
+  aprovados. Build final e smoke confirmaram Authlib, healthcheck `ok` e HTTP
+  200; nenhum login ou segredo Google real foi usado.
+- `docs`: documentadas configuracao, perfis, bootstrap, bloqueio, recuperacao,
+  auditoria e limites. Etapa 8 concluida em 72%; Etapa 9 nao iniciada.
+
+## 2026-09-13 — Preparacao da Etapa 8
+
+- `docs`: corrigida a divergencia da tabela consolidada que ainda marcava a
+  Etapa 7 como pendente, apesar do estado e das evidencias canonicas de
+  conclusao; Etapa 8 registrada como bloqueada por decisao, sem credito parcial.
+- `test`: baseline reexecutada com PostgreSQL 17.6 descartavel em tmpfs e dados
+  sinteticos: 124 aprovados, zero falhas, erros ou skips; configuracao Docker e
+  `git diff --check` aprovados. Uma primeira execucao sem acesso de rede local
+  teve 17 erros de conexao e foi descartada; a reexecucao autorizada passou.
+- `docs`: proposta autenticacao OIDC nativa do Streamlit, autorizacao local por
+  `iss` + `sub`, tres perfis no PostgreSQL, auditoria minima e upload remoto
+  autenticado. Escolha do provedor/tenant, ciclo de contas, MFA e limitacao de
+  login aguardam autorizacao explicita do usuario. Nenhuma migration,
+  dependencia ou funcionalidade da Etapa 8 foi iniciada.
+
 ## 2026-09-13 — Múltiplos instrumentos
 
 - `feat`: criado contrato normalizado e registro de adaptadores por
