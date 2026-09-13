@@ -7,12 +7,13 @@ validar e registrar o trabalho; documentos auxiliares nao mantem outro backlog.
 
 ## Estado consolidado
 
-- Etapas 1–4: concluidas.
-- Progresso global: **31%**, soma de 5% + 7% + 11% + 8%, sem credito parcial.
-- Suite registrada: **92 testes aprovados**; ver evidencias datadas abaixo.
-- Etapa 5: **nao iniciada**, primeira etapa nao concluida e proxima etapa.
+- Etapas 1–5: concluidas.
+- Progresso global: **44%**, soma de 5% + 7% + 11% + 8% + 13%, sem credito parcial.
+- Suite registrada: **104 testes aprovados**; ver evidencias datadas abaixo.
+- Etapa 6: **nao iniciada**, primeira etapa nao concluida e proxima etapa.
 - Destino futuro de hospedagem: **OCI Always Free**, somente na Etapa 11.
-- Bloqueios materiais atuais para esta reorganizacao: nenhum apos validacao integral.
+- Bloqueios materiais atuais: nenhum para a etapa concluida; decisoes externas
+  futuras permanecem listadas ao final.
 
 ## Dependencias e documentos de referencia
 
@@ -60,7 +61,7 @@ alternativas de etapas ou progresso.
 | 2     | Modularização do dashboard       |   7% |       12% | Concluída |
 | 3     | Docker local                     |  11% |       23% | Concluída |
 | 4     | Schema e migrations PostgreSQL   |   8% |       31% | Concluída |
-| 5     | Importação CSV → PostgreSQL      |  13% |       44% | Não iniciada |
+| 5     | Importação CSV → PostgreSQL      |  13% |       44% | Concluída |
 | 6     | Envio remoto de CSV              |   8% |       52% | Pendente  |
 | 7     | Suporte a múltiplos instrumentos |  10% |       62% | Pendente  |
 | 8     | Autenticação e permissões        |  10% |       72% | Pendente  |
@@ -217,7 +218,7 @@ alternativas de etapas ou progresso.
 
 ---
 
-# Backlog pendente
+# Importacao e evolucao seguinte
 
 ## Etapa 5 — Importação CSV → PostgreSQL
 
@@ -282,7 +283,18 @@ alternativas de etapas ou progresso.
 - Suíte completa aprovada.
 
 
-**Progresso após conclusão:** 44%.
+**Estado:** concluida — 44% acumulados.
+
+Evidencias de 2026-09-13: `scripts/importar_csv_postgres.py` e
+`tests/test_importar_csv_postgres.py`; 12 novos testes e suite integral com
+104 aprovados, sem skips, em PostgreSQL 17.6 descartavel. Paridade com SQLite,
+duplicidade concorrente, rollback e preservacao do CSV comprovados. Configuracao
+Docker, CLI sem persistencia, links e `git diff --check` aprovados.
+
+Decisao operacional da sessao: incluir `--validate-only` sem conexao; duplicatas
+sao recusadas sem `--force`, preservando o contrato legado. Origem e resultado
+usam as colunas existentes, sem nova migration. Comandos, codigos e limites em
+[IMPORTACAO_POSTGRESQL.md](IMPORTACAO_POSTGRESQL.md). Etapa 6 nao iniciada.
 
 ---
 

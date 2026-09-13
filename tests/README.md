@@ -22,3 +22,8 @@ Validacoes implementadas ou esperadas:
   paridade de relacionamentos, valores e identities.
 
 Nao usar dados pessoais ou arquivos reais de participantes como fixtures versionados.
+
+A importacao CSV PostgreSQL e coberta por `test_importar_csv_postgres.py`.
+Veja [comandos e isolamento](../docs/IMPORTACAO_POSTGRESQL.md) para executar a
+integracao em PostgreSQL descartavel com `TEST_DATABASE_URL`; skips nao aprovam
+a suite integral.

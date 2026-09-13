@@ -27,3 +27,7 @@ dashboard.
 `migrar_sqlite_postgres.py` faz uma migracao legada explicita e transacional
 de um SQLite validado para um PostgreSQL vazio. Nenhum dos dois e chamado pelos
 launchers publicos nesta etapa. Consulte `docs/MIGRACOES_POSTGRESQL.md`.
+
+`importar_csv_postgres.py` importa CSV via `DATABASE_URL`, com transacao,
+recusa de duplicidade, `--force` e `--validate-only`. O comando e separado do
+launcher SQLite. Consulte [importacao PostgreSQL](../docs/IMPORTACAO_POSTGRESQL.md).

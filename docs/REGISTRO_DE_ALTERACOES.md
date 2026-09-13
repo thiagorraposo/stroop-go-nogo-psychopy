@@ -3,6 +3,30 @@
 Este arquivo preserva fatos datados; nao define estado ou aceite vigente.
 Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 
+## 2026-09-13 — Importacao CSV PostgreSQL
+
+- `feat`: adicionada CLI separada para CSV -> PostgreSQL por `DATABASE_URL`,
+  reutilizando integralmente validacao, conversoes e metricas do SQLite.
+  Transacao unica, duplicidade por `assessment_id`, substituicao explicita por
+  `--force`, origem/status/timestamps no schema existente e saidas sanitizadas.
+- `docs`: conforme decisao anunciada no plano antes da implementacao, incluido
+  `--validate-only` para conferir CSV sem conectar ou persistir. Documentados
+  codigos de saida, idempotencia de efeito, bloqueio entre escritores, limites
+  da validacao e possivel incerteza de confirmacao em perda de conexao no commit.
+- `test`: 12 novos testes cobrem entradas validas/invalidas, paridade integral com
+  SQLite, imutabilidade do CSV, duplicidade concorrente, rollback de importacao e
+  de substituicao, indisponibilidade e ausencia de conteudo sensivel nas saidas.
+  Suite completa: 104 aprovados, zero falhas, erros ou skips, usando PostgreSQL
+  17.6 descartavel em tmpfs e dados exclusivamente sinteticos.
+- `test`: comando isolado da Etapa 5 com 12 aprovados; 34 links relativos e
+  `git diff --check` aprovados, com whitespace dos arquivos novos verificado.
+  Configuracao Docker com `.env.example` e smoke da CLI `--validate-only`
+  aprovados. Build/smoke do dashboard e persistencia de volume
+  nao repetidos: infraestrutura e dashboard nao foram alterados.
+- `docs`: Etapa 5 concluida; progresso de 44%. Etapa 6 nao iniciada.
+  Sem alteracao no legado, schema, formulas, experimento ou dependencias; sem
+  dados reais, OCI ou versionamento automatico.
+
 ## 2026-09-13 — Centralizacao documental no Codex CLI
 
 - `docs`: identificada concorrencia entre o antigo WORKFLOW_EVOLUCAO e o backlog

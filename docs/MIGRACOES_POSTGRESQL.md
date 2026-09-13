@@ -3,9 +3,10 @@
 Data: 2026-09-01.
 
 Esta etapa versiona o schema PostgreSQL das tres tabelas de dominio e oferece
-uma migracao explicita do SQLite legado. O importador de CSV continua gravando
-somente no SQLite e o dashboard continua consultando somente o SQLite; o sequenciamento dessas
-transicoes e definido no [backlog canonico](Projeto%20Stroop%20Test.md).
+uma migracao explicita do SQLite legado. O importador SQLite e o dashboard
+continuam no fluxo local legado. A CLI de [importacao CSV PostgreSQL](IMPORTACAO_POSTGRESQL.md)
+usa este schema ja aplicado; o sequenciamento das transicoes e definido no
+[backlog canonico](Projeto%20Stroop%20Test.md).
 
 ## Schema versionado
 

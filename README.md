@@ -75,8 +75,10 @@ limites, validacao e encerramento seguro sem excluir o volume.
 
 O schema PostgreSQL versionado e a migracao legada SQLite -> PostgreSQL sao
 operacoes explicitas documentadas em
-[`docs/MIGRACOES_POSTGRESQL.md`](docs/MIGRACOES_POSTGRESQL.md). O importador e o
-dashboard publicos permanecem no SQLite ate suas etapas proprias.
+[`docs/MIGRACOES_POSTGRESQL.md`](docs/MIGRACOES_POSTGRESQL.md). O launcher e o
+dashboard publicos permanecem no SQLite. A CLI separada de
+[importacao CSV PostgreSQL](docs/IMPORTACAO_POSTGRESQL.md) usa `DATABASE_URL` e
+oferece `--validate-only` para conferir uma entrada sem persistir.
 
 ## Arquivos
 
