@@ -3,6 +3,25 @@
 Este arquivo preserva fatos datados; nao define estado ou aceite vigente.
 Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 
+## 2026-09-13 — Dashboard PostgreSQL
+
+- `feat`: concluída a Etapa 10 com leitura operacional PostgreSQL em
+  `dashboard/data_access.py`, cursor paginado, validação de schema, mensagens
+  sanitizadas e transações forçadas como somente leitura.
+- `feat`: adicionada `DASHBOARD_DATABASE_URL` para a credencial `dashboard_ro`,
+  separada da `DATABASE_URL` de importação e da `AUTH_DATABASE_URL` de OIDC;
+  SQLite permanece apenas como fallback local.
+- `docs`: documentados criação da role sem escrita, grants mínimos, tamanho de
+  página, migração controlada e ausência de arquivo SQLite no container.
+- `test`: cinco testes de integração PostgreSQL, prova manual da role sintética
+  com `GRANT SELECT`, fluxo CSV sintético → PostgreSQL → dashboard, rebuild e
+  smoke Docker saudável. Suíte integral: 164 testes aprovados, zero falhas,
+  erros ou skips; reinicialização preservou uma avaliação sintética; nenhuma
+  coleta ou credencial real foi usada.
+- `docs`: Etapa 10 marcada como concluída (87%); Etapa 11 permanece não
+  iniciada. OCI, domínio, HTTPS real, destino externo e custos continuam fora
+  do escopo.
+
 ## 2026-09-13 — Hardening de produção
 
 - `feat`: concluída a Etapa 9 com perfil Compose de produção separado, imagens

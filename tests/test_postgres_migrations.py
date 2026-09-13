@@ -209,10 +209,12 @@ class PostgresMigrationStaticTests(unittest.TestCase):
             ],
         )
 
-    def test_fluxo_publico_permanece_sqlite(self) -> None:
+    def test_dashboard_operacional_usa_postgres_com_fallback_sqlite(self) -> None:
         launcher = (ROOT / "scripts" / "run_dashboard.py").read_text(encoding="utf-8")
         dashboard = (ROOT / "dashboard" / "data_access.py").read_text(encoding="utf-8")
         self.assertIn("importar_csv_sqlite.py", launcher)
+        self.assertIn("load_postgres_data", dashboard)
+        self.assertIn("DASHBOARD_DATABASE_URL", dashboard)
         self.assertIn("load_sqlite_data", dashboard)
         self.assertNotIn("migrar_sqlite_postgres", launcher)
 

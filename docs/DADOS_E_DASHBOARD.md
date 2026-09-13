@@ -27,18 +27,21 @@ Fluxo padrao:
 3. O experimento executa pratica e bloco principal.
 4. PsychoPy salva um CSV bruto unificado por execucao em `data/`.
 5. Um script local valida o CSV e calcula metricas descritivas.
-6. O script importa a execucao para um banco SQLite local.
-7. O dashboard Streamlit local le apenas o banco SQLite.
+6. O script importa a execucao para PostgreSQL.
+7. O dashboard Streamlit autenticado le PostgreSQL por credencial somente leitura.
 8. O dashboard permite filtros, visao geral, tabela de sessoes e detalhe de avaliacao.
 9. Dados brutos permanecem em `data/` e nao sao modificados pelo dashboard.
 
-A solucao inicial deve funcionar sem servidor e sem internet:
+A solução local legada continua funcionando sem servidor e sem internet:
 
 ```text
 PsychoPy -> CSV bruto unificado -> script de importacao -> SQLite local -> dashboard Streamlit local
 ```
 
-A evolucao para PostgreSQL segue exclusivamente o [backlog canonico](Projeto%20Stroop%20Test.md). O fluxo local descrito aqui permanece como contrato operacional enquanto sua substituicao nao for autorizada.
+A operação atual do dashboard usa PostgreSQL por `DASHBOARD_DATABASE_URL`; o
+fluxo SQLite permanece somente como fallback local e compatibilidade legada. A
+credencial de leitura não recebe permissão de escrita e o importador continua
+usando `DATABASE_URL` separado.
 
 ## Formulario da sessao
 
@@ -121,7 +124,8 @@ Campos tecnicos de auditoria a registrar futuramente:
 - Nao ser modificado por scripts de importacao ou dashboard.
 - Conter metadados, tentativas, respostas, tempos e classificacao por tentativa.
 - Usar o contrato documentado em `docs/CSV_UNIFICADO.md`.
-- Ser a fonte oficial do fluxo futuro `CSV -> SQLite -> dashboard`.
+- Ser a fonte primária da auditoria da execução; o importador PostgreSQL é a
+  fonte operacional do dashboard.
 
 ### Scripts de importacao
 
@@ -129,34 +133,37 @@ Campos tecnicos de auditoria a registrar futuramente:
 - Calcular metricas documentadas.
 - Impedir importacao duplicada sem confirmacao explicita.
 - Registrar erros sem alterar o CSV original.
-- Criar SQLite local automaticamente quando nao existir.
+- Criar o destino PostgreSQL configurado; o importador SQLite permanece como
+  fallback local.
 - Reimportar `assessment_id` existente somente com `--force`.
 - Nao produzir interpretacoes clinicas.
 
-### SQLite
+### SQLite legado
 
 - Armazenar avaliacoes, metricas calculadas e tentativas.
 - Manter relacao entre `assessment_id`, `source_file` e dados por tentativa.
 - Permanecer local e ignorado pelo Git.
-- Ser a unica fonte lida pelo dashboard.
+- Ser lido pelo dashboard somente quando `DASHBOARD_DATABASE_URL` não estiver
+  configurada.
 - Usar por padrao `database/stroop_results.sqlite3`.
 
 ### Dashboard
 
-- Ler apenas o SQLite local.
+- Ler PostgreSQL por `DASHBOARD_DATABASE_URL` com credencial somente leitura;
+  manter fallback SQLite em modo somente leitura.
 - Permitir filtros e visualizacoes descritivas.
 - Nao modificar CSV bruto.
 - Nao alterar banco.
 - Exibir aviso de uso descritivo e nao clinico.
-- Abrir o banco padrao `database/stroop_results.sqlite3` em modo somente leitura.
+- Consultar em lotes configuráveis e nunca abrir transações de escrita.
 - Tratar banco ausente, vazio ou com schema invalido com mensagem clara.
 - Permitir download manual apenas da tabela agregada filtrada e visivel.
 
 Na Fase 8, o dashboard implementado em `dashboard/app.py` inclui filtros por periodo, projeto, `participant_id`, `participant_name`, visita, avaliador, teste e versao. A visao geral mostra total de avaliacoes, participantes unicos, precisao media, precisao mediana, tempo de reacao mediano, total de omissoes e total de comissoes. A interface tambem inclui graficos descritivos, tabela de avaliacoes e detalhe por avaliacao com metadados, metricas completas, tabela de tentativas e contagem de `hit`, `omission`, `correct_rejection` e `commission`.
 
-Na Etapa 2 do workflow vigente, o comportamento foi preservado e a implementacao
+Na Etapa 2 do workflow vigente, o comportamento visual foi preservado e a implementacao
 foi separada em `dashboard/app.py` (composicao), `dashboard/data_access.py`
-(SQLite somente leitura), `dashboard/transformations.py` (operacoes puras) e
+(PostgreSQL/SQLite somente leitura), `dashboard/transformations.py` (operacoes puras) e
 `dashboard/components.py` (componentes visuais). O launcher e o ponto de entrada
 publico permanecem inalterados.
 

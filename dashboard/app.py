@@ -42,6 +42,7 @@ from dashboard.data_access import (
     DashboardDataError,
     connect_readonly,
     fetch_all_rows,
+    load_dashboard_data,
     load_sqlite_data,
     table_columns,
     validate_schema,
@@ -338,13 +339,13 @@ def _render_results(
     st.header("Resultados")
 
     try:
-        data = load_sqlite_data(db_path)
+        data = load_dashboard_data(db_path)
         assessment_rows = build_assessment_table(data)
     except DashboardDataError as exc:
         st.error(str(exc))
         return
     except sqlite3.Error as exc:
-        st.error(f"Erro ao ler SQLite: {exc}")
+        st.error(f"Erro ao ler banco de dados: {exc}")
         return
 
     dates = [parse_iso_date(row["assessment_date"]) for row in assessment_rows]

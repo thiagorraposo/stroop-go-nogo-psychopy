@@ -43,7 +43,7 @@ Para escolher outro CSV ou reimportar uma avaliacao, consulte `INSTALACAO_MULTIP
 
 ## Encerrar
 
-Feche a aba do navegador e encerre o processo do dashboard no terminal com `Ctrl+C`. Os dados importados permanecem no SQLite local para a proxima abertura.
+Feche a aba do navegador e encerre o processo do dashboard no terminal com `Ctrl+C`. Em operação PostgreSQL, os dados importados permanecem no banco; no fallback local, permanecem no SQLite.
 
 ## Cuidado com dados pessoais
 

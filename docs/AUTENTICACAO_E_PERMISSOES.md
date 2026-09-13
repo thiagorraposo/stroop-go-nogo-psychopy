@@ -39,6 +39,9 @@ Configure separadamente:
 
 - `AUTH_DATABASE_URL`: conexao usada para usuarios, permissoes e auditoria;
 - `DATABASE_URL`: conexao de escrita usada apenas pela importacao PostgreSQL.
+- `DASHBOARD_DATABASE_URL`: conexao da conta `dashboard_ro`, somente leitura
+  das tabelas de dominio; detalhes da concessao ficam em
+  [`DASHBOARD_POSTGRESQL.md`](DASHBOARD_POSTGRESQL.md).
 
 Em Docker, `STREAMLIT_SECRETS_FILE` aponta para o arquivo real no host, montado
 como somente leitura em `/app/.streamlit/secrets.toml`. O exemplo versionado

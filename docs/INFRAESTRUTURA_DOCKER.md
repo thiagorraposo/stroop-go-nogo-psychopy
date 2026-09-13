@@ -2,9 +2,10 @@
 
 Data: 2026-09-01.
 
-Esta etapa introduz somente a infraestrutura local de desenvolvimento. O
-PsychoPy continua instalado e executado no host. O fluxo funcional vigente
-permanece CSV -> SQLite -> dashboard. O schema ja possui
+Esta etapa introduz a infraestrutura local de desenvolvimento. O PsychoPy
+continua instalado e executado no host. O fluxo aceita CSV -> PostgreSQL ->
+dashboard autenticado; sem URL de leitura, o fallback CSV -> SQLite -> dashboard
+permanece disponível. O schema ja possui
 [migrations documentadas](MIGRACOES_POSTGRESQL.md); sequenciamento, escopo e
 aceite das entregas sao definidos somente no
 [backlog canonico](Projeto%20Stroop%20Test.md).
@@ -21,11 +22,11 @@ desenvolvimento descrito neste documento.
   `dashboard/app.py` como ponto de entrada;
 - inicializacao do dashboard condicionada ao estado saudavel do PostgreSQL;
 - `DATABASE_URL` entregue ao container para importacao PostgreSQL;
+- `DASHBOARD_DATABASE_URL` entregue ao container para leitura PostgreSQL;
 - `AUTH_DATABASE_URL` separado para autorizacao e auditoria;
 - arquivo local de secrets OIDC montado como somente leitura, nunca incorporado
   a imagem;
-- camada de resultados ainda consulta SQLite ate a etapa prevista para troca do
-  backend.
+- camada de resultados consulta PostgreSQL quando a URL de leitura está configurada.
 
 O dashboard e o PostgreSQL publicam suas portas configuraveis somente em
 `127.0.0.1` no desenvolvimento; o PostgreSQL usa 55432 por padrao. Isso permite executar no host as

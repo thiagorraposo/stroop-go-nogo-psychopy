@@ -59,6 +59,18 @@ class ProductionConfigurationTests(unittest.TestCase):
         ]
         self.assertEqual(certificate_sources, [])
 
+    def test_dashboard_usa_url_de_leitura_separada(self) -> None:
+        self.assertIn(
+            "DASHBOARD_DATABASE_URL: ${DASHBOARD_DATABASE_URL:?",
+            self.compose,
+        )
+        example = (ROOT / ".env.production.example").read_text(encoding="utf-8")
+        self.assertIn("DASHBOARD_DATABASE_URL=postgresql://stroop_dashboard_ro:", example)
+        dashboard_docs = (ROOT / "docs" / "DASHBOARD_POSTGRESQL.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("GRANT SELECT ON TABLE", dashboard_docs)
+
     def test_imagens_fixadas_e_manifestos_arm64_documentados(self) -> None:
         self.assertIn("nginx:1.28.0-alpine3.21@sha256:30f1c0d", self.proxy_dockerfile)
         self.assertIn("postgres:17.6-bookworm@sha256:f3bd19c", self.compose)

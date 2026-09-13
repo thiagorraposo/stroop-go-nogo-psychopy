@@ -5,7 +5,7 @@ Operacao do desenvolvimento: [protocolo Codex CLI](../docs/WORKFLOW_CODEX_CLI.md
 
 
 Dashboard Streamlit autenticado para visualizar resultados descritivos do
-experimento Stroop Go/No-Go importados para SQLite.
+experimento Stroop Go/No-Go importados para PostgreSQL.
 
 O acesso usa Google OIDC e exige cadastro previo por `iss` + `sub` no
 PostgreSQL. Perfis, bootstrap e configuracao sem secrets versionados estao em
@@ -22,18 +22,18 @@ Aviso fixo exibido na interface:
 
 ## Objetivo
 
-- consultar avaliações já importadas para SQLite;
+- consultar avaliações já importadas para PostgreSQL;
 - aplicar filtros por metadados da sessão;
 - visualizar métricas agregadas, gráficos, tabela de avaliações e detalhe por avaliação;
 - exportar manualmente apenas a visão agregada filtrada que está visível.
 
-O dashboard não modifica CSV bruto nem altera o SQLite. O login redireciona ao
+O dashboard não modifica CSV bruto nem altera o PostgreSQL. O login redireciona ao
 Google Identity; a area de importacao autorizada envia o CSV selecionado somente
 ao processador local da aplicacao e ao PostgreSQL configurado.
 
-A infraestrutura Docker da Etapa 3 empacota este ponto de entrada e fornece
-`DATABASE_URL`, mas a camada de acesso continua SQLite nesta etapa. A troca do
-backend do dashboard pertence a uma etapa posterior do workflow.
+A infraestrutura Docker empacota este ponto de entrada e fornece
+`DASHBOARD_DATABASE_URL` com uma credencial PostgreSQL somente leitura. A
+`DATABASE_URL` de escrita permanece exclusiva do importador autenticado.
 
 ## Instalação
 
@@ -52,15 +52,14 @@ streamlit run dashboard/app.py
 `dashboard/app.py` permanece como ponto de entrada e e usado tambem por
 `scripts/run_dashboard.py` e pelos atalhos da raiz.
 
-Antes de iniciar, configure `.streamlit/secrets.toml`, `AUTH_DATABASE_URL` e as
-migrations PostgreSQL. Sem login, nenhuma leitura do SQLite ou area protegida e
-executada.
+Antes de iniciar, configure `.streamlit/secrets.toml`, as URLs PostgreSQL e as
+migrations. Sem login, nenhuma leitura do banco ou area protegida e executada.
 
 ## Estrutura interna
 
 - `app.py`: composicao da interface Streamlit e ponto de entrada;
 - `auth.py`: validacao de claims, perfis, bloqueio e auditoria PostgreSQL;
-- `data_access.py`: conexao SQLite somente leitura, validacao do schema e carga;
+- `data_access.py`: conexoes PostgreSQL/SQLite, validacao do schema e leitura paginada;
 - `transformations.py`: filtros, agregacoes, calculos puros e exportacao em memoria;
 - `components.py`: cards, graficos, tabela e detalhe visual reutilizaveis.
 
@@ -71,13 +70,19 @@ de `dashboard.app` permanece reexportada para compatibilidade.
 
 ## Banco esperado
 
-Banco padrão:
+Banco operacional:
 
 ```text
-database/stroop_results.sqlite3
+DASHBOARD_DATABASE_URL=postgresql://dashboard_ro:***@postgres:5432/stroop_production
 ```
 
-O banco deve ser criado previamente pelo importador local. O dashboard lê apenas SQLite e abre o arquivo em modo somente leitura.
+O usuário `dashboard_ro` deve existir fora do Git e receber somente `CONNECT`,
+`USAGE` no schema `public` e `SELECT` nas três tabelas de domínio. O dashboard
+também força transações somente leitura e busca cada tabela em lotes definidos
+por `DASHBOARD_PAGE_SIZE` (padrão 1000, máximo 10000).
+
+Para desenvolvimento local sem `DASHBOARD_DATABASE_URL`, o fallback SQLite
+continua disponível e abre o arquivo em modo somente leitura.
 
 Tabelas esperadas:
 

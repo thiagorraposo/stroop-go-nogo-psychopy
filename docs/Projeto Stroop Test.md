@@ -7,10 +7,10 @@ validar e registrar o trabalho; documentos auxiliares nao mantem outro backlog.
 
 ## Estado consolidado
 
-- Etapas 1–9: concluidas.
-- Progresso global: **80%**, soma de 5% + 7% + 11% + 8% + 13% + 8% + 10% + 10% + 8%, sem credito parcial.
-- Suite registrada: **158 testes aprovados**; ver evidencias datadas abaixo.
-- Etapa 10: **nao iniciada**, primeira etapa nao concluida e proxima etapa.
+- Etapas 1–10: concluidas.
+- Progresso global: **87%**, soma de 5% + 7% + 11% + 8% + 13% + 8% + 10% + 10% + 8% + 7%, sem credito parcial.
+- Suite registrada: **164 testes aprovados**; ver evidencias datadas abaixo.
+- Etapa 11: **nao iniciada**, primeira etapa nao concluida e proxima etapa.
 - Destino futuro de hospedagem: **OCI Always Free**, somente na Etapa 11.
 - Bloqueios atuais: nenhum para a etapa concluida; decisoes dos instrumentos
   futuros e de producao permanecem listadas neste backlog.
@@ -675,7 +675,26 @@ usado.
 - Fluxo ponta a ponta aprovado.
 
 
-**Progresso após conclusão:** 87%.
+**Estado:** concluida — 87% acumulados.
+
+Implementado nesta sessão: `dashboard/data_access.py` agora consulta as três
+tabelas PostgreSQL com cursor paginado, schema validado e transações somente
+leitura. `DASHBOARD_DATABASE_URL` usa a conta `dashboard_ro` separada da
+credencial de importação `DATABASE_URL`; o fallback SQLite local permanece
+somente para compatibilidade. Filtros, métricas, gráficos, detalhe e
+exportação foram preservados porque continuam consumindo o mesmo formato de
+linhas.
+
+Evidências: cinco testes de integração PostgreSQL cobrem paginação, equivalência
+de formato, banco vazio, schema inválido e rejeição de escrita; uma role
+PostgreSQL sintética com `GRANT SELECT` leu o dashboard e teve `CREATE TABLE`
+recusado. O fluxo CSV sintético → importador PostgreSQL → dashboard retornou
+uma avaliação e `accuracy=50.0`. O container reconstruído iniciou saudável,
+leu PostgreSQL sem arquivo SQLite e manteve o root filesystem somente leitura.
+Após reinicialização do ambiente Docker, a avaliação sintética permaneceu
+presente (`assessments_after_restart=1`).
+Suíte integral: 164 testes aprovados, zero falhas, erros ou skips. Nenhum dado
+real foi usado.
 
 ---
 

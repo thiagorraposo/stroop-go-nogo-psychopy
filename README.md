@@ -69,8 +69,10 @@ descritivos, nao clinicos.
 
 ## Infraestrutura Docker de desenvolvimento
 
-A Etapa 3 adicionou containers separados para Streamlit e PostgreSQL, sem
-instalar o PsychoPy na imagem e sem substituir ainda o fluxo funcional SQLite.
+A infraestrutura Docker mantém containers separados para Streamlit e
+PostgreSQL, sem instalar o PsychoPy na imagem. O dashboard usa PostgreSQL
+quando a URL de leitura está configurada e preserva o fluxo SQLite local como
+fallback.
 Copie `.env.example` para `.env`, ajuste a senha ficticia e execute:
 
 ```bash
@@ -90,7 +92,8 @@ configura nem autoriza deploy. Consulte
 O schema PostgreSQL versionado e a migracao legada SQLite -> PostgreSQL sao
 operacoes explicitas documentadas em
 [`docs/MIGRACOES_POSTGRESQL.md`](docs/MIGRACOES_POSTGRESQL.md). O launcher e o
-dashboard publicos permanecem no SQLite. A CLI separada de
+dashboard autenticado usam `DASHBOARD_DATABASE_URL` com leitura somente; o
+fallback SQLite permanece apenas para uso local sem essa variável. A CLI separada de
 [importacao CSV PostgreSQL](docs/IMPORTACAO_POSTGRESQL.md) usa `DATABASE_URL` e
 oferece `--validate-only` para conferir uma entrada sem persistir.
 
@@ -98,10 +101,11 @@ oferece `--validate-only` para conferir uma entrada sem persistir.
 
 A [area de upload autenticado](docs/UPLOAD_LOCAL.md) recebe um CSV por operacao
 para o PostgreSQL, com limite de 5 MiB, validacao e descarte do temporario.
-Com OIDC, `DATABASE_URL`, `AUTH_DATABASE_URL` e migrations configurados, execute
+Com OIDC, `DATABASE_URL`, `DASHBOARD_DATABASE_URL`, `AUTH_DATABASE_URL` e migrations configurados, execute
 `.venv/bin/python scripts/upload_local.py --local` e abra
 `http://127.0.0.1:8501`. Somente os perfis `importacao` e `administracao` veem
-essa area. O dashboard de resultados continua usando SQLite nesta etapa.
+essa area. Em operação PostgreSQL, o dashboard de resultados usa a credencial
+somente leitura descrita em [`docs/DASHBOARD_POSTGRESQL.md`](docs/DASHBOARD_POSTGRESQL.md).
 
 ## Arquivos
 
@@ -118,13 +122,14 @@ essa area. O dashboard de resultados continua usando SQLite nesta etapa.
 - `scripts/gerenciar_usuarios.py`: bootstrap e recuperacao administrativa OIDC.
 - `scripts/backup_postgres.py`: backup criptografado e restauracao isolada.
 - `scripts/aplicar_retencao.py`: expurgo seletivo de auditorias vencidas.
-- `dashboard/app.py`: dashboard Streamlit local para consulta descritiva do SQLite.
+- `dashboard/app.py`: dashboard Streamlit autenticado para consulta descritiva do PostgreSQL.
 - `dashboard/requirements.txt`: dependencias do dashboard local.
 - `compose.yaml`: servicos locais separados do dashboard e PostgreSQL.
 - `compose.production.yaml`: perfil endurecido sem deploy ou secrets reais.
 - `compose.restore-test.yaml`: restauracao descartavel sem portas.
 - `Dockerfile.dashboard`: imagem de desenvolvimento do Streamlit.
 - `Dockerfile.proxy`: Nginx fixado e executado sem privilegio.
+- `docs/DASHBOARD_POSTGRESQL.md`: credencial somente leitura e consultas paginadas.
 - `docs/UX_DECISIONS.md`: notas sobre as decisoes de experiencia de usuario.
 - `docs/USO_POR_ZIP_GITHUB.md`: instalacao e uso a partir do Download ZIP do GitHub.
 - `docs/GUIA_DO_USUARIO.md`: fluxo cotidiano do experimento ao dashboard.
@@ -232,7 +237,7 @@ Use `--db` para escolher outro caminho e `--force` para reimportar um `assessmen
 
 ## Camada de dados e dashboard
 
-A arquitetura prevista e: PsychoPy -> CSV bruto unificado -> script de importacao -> SQLite local -> dashboard Streamlit local.
+A arquitetura operacional é: PsychoPy -> CSV bruto unificado -> importador PostgreSQL -> dashboard Streamlit autenticado. O fluxo SQLite continua como fallback local.
 
 Os contratos tecnicos estao em `docs/DADOS_E_DASHBOARD.md`,
 `docs/MODELO_DE_DADOS.md`, `docs/CSV_UNIFICADO.md` e `docs/IMPORTACAO_SQLITE.md`.
@@ -246,13 +251,15 @@ python3 -m pip install -r dashboard/requirements.txt
 streamlit run dashboard/app.py
 ```
 
-Banco padrao esperado:
+Banco operacional esperado:
 
 ```text
-database/stroop_results.sqlite3
+DASHBOARD_DATABASE_URL=postgresql://dashboard_ro:***@postgres:5432/stroop_production
 ```
 
-O dashboard le apenas SQLite, abre o banco em modo somente leitura e exibe resultados descritivos sem diagnostico ou interpretacao clinica.
+O dashboard usa a conexão PostgreSQL somente leitura e exibe resultados
+descritivos sem diagnóstico ou interpretação clínica. Sem a URL, usa o SQLite
+local em modo somente leitura.
 
 ## Metadados da sessao
 

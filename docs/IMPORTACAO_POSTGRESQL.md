@@ -83,8 +83,9 @@ usar substituicao automatica como tentativa de recuperacao.
 
 ## Compatibilidade e limites
 
-O importador SQLite, launchers e dashboard permanecem inalterados. O dashboard
-continua lendo SQLite somente leitura. Nao houve mudanca no CSV, schema,
+O importador SQLite e os launchers locais permanecem disponíveis como fallback.
+O dashboard operacional lê PostgreSQL com `DASHBOARD_DATABASE_URL` somente
+leitura; sem essa URL, continua lendo SQLite somente leitura. Nao houve mudanca no CSV, schema,
 paradigma ou formulas; `practice` segue aceito por compatibilidade historica e
 as metricas usam somente `main`, inclusive RT sem hits igual a `0.0` no banco.
 
