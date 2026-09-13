@@ -9,6 +9,10 @@ permanece CSV -> SQLite -> dashboard. O schema ja possui
 aceite das entregas sao definidos somente no
 [backlog canonico](Projeto%20Stroop%20Test.md).
 
+A configuracao endurecida, separada desta base local, esta em
+[Hardening de producao](HARDENING_PRODUCAO.md). Ela nao altera o comando de
+desenvolvimento descrito neste documento.
+
 ## Componentes
 
 - `postgres`: PostgreSQL 17.6, com volume nomeado persistente e healthcheck por
@@ -23,8 +27,8 @@ aceite das entregas sao definidos somente no
 - camada de resultados ainda consulta SQLite ate a etapa prevista para troca do
   backend.
 
-O PostgreSQL tambem publica a porta configuravel `POSTGRES_PORT` somente em
-`127.0.0.1`, usando 55432 por padrao. Isso permite executar no host as
+O dashboard e o PostgreSQL publicam suas portas configuraveis somente em
+`127.0.0.1` no desenvolvimento; o PostgreSQL usa 55432 por padrao. Isso permite executar no host as
 [migrations PostgreSQL](MIGRACOES_POSTGRESQL.md) sem expor o banco na rede.
 
 O contexto da imagem exclui coletas, bancos, backups, exports, logs,

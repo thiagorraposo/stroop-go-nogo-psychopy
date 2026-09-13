@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
+import re
 from typing import Any, Mapping
 from uuid import uuid4
 
@@ -22,6 +23,15 @@ PERMISSIONS = {
 }
 DENIAL_LIMIT = 5
 DENIAL_WINDOW_MINUTES = 15
+IMPORT_STATUSES = frozenset({"importado", "rejeitado"})
+IMPORT_ERROR_CODES = frozenset(
+    {
+        "invalid_envelope",
+        "duplicate_assessment",
+        "validation_or_service_failure",
+    }
+)
+SHA256_HEX = re.compile(r"^[0-9a-f]{64}$")
 
 
 class AuthError(Exception):
@@ -220,6 +230,35 @@ def record_operation(
             _audit(connection, action, outcome, user)
     except psycopg.Error as exc:
         raise AuthDatabaseError("Falha ao registrar auditoria.") from exc
+
+
+def record_import_result(
+    database_url: str,
+    request_id: str,
+    content_sha256: str,
+    status: str,
+    error_code: str | None,
+) -> None:
+    """Persiste apenas hash, resultado e erro de vocabulario controlado."""
+    if (
+        status not in IMPORT_STATUSES
+        or SHA256_HEX.fullmatch(content_sha256) is None
+        or (status == "importado" and error_code is not None)
+        or (status == "rejeitado" and error_code not in IMPORT_ERROR_CODES)
+    ):
+        raise AuthDatabaseError("Resultado de importacao invalido.")
+    try:
+        with psycopg.connect(database_url) as connection:
+            connection.execute(
+                """
+                INSERT INTO import_audit_events
+                    (request_id, content_sha256, status, error_code)
+                VALUES (%s, %s, %s, %s)
+                """,
+                (request_id, content_sha256, status, error_code),
+            )
+    except psycopg.Error as exc:
+        raise AuthDatabaseError("Falha ao registrar resultado de importacao.") from exc
 
 
 def list_users(database_url: str) -> list[AppUser]:

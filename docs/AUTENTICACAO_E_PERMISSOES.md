@@ -138,12 +138,20 @@ conta Google continua sendo responsabilidade do provedor.
 `request_id` aleatorio. Nao possui e-mail, nome, CSV, metrica, identificador de
 participante, caminho, credencial, token ou texto livre.
 
+O prazo provisorio da auditoria OIDC e 180 dias. Resultados de importacao ficam
+em tabela separada, sem e-mail, nome de arquivo ou identidade: somente hash
+SHA-256 do conteudo, status, codigo fechado de erro, horario e identificador
+aleatorio por 30 dias. Prazos, expurgo e logging de producao estao em
+[hardening](HARDENING_PRODUCAO.md) e
+[tratamento de dados](TRATAMENTO_DE_DADOS.md).
+
 O logout remove a sessao atual do Streamlit. Uma aba ja aberta pode continuar
 mostrando o que foi renderizado ate sua proxima interacao; nessa interacao, toda
 operacao protegida consulta novamente bloqueio e expiracao. Secrets reais e um
 login Google real nao fazem parte dos testes automatizados nem devem ser
-versionados. Exposicao publica, proxy, HTTPS e hardening pertencem as etapas
-posteriores do backlog.
+versionados. Exposicao publica ainda nao foi realizada. O proxy e HTTPS foram
+preparados com TLS fail-closed; dominio, certificado real e ativacao pertencem
+a Etapa 11.
 
 ## Validacao sintetica
 

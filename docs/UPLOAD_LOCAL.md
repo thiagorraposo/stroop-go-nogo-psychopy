@@ -73,10 +73,15 @@ O fluxo autenticado registra no PostgreSQL somente identidade OIDC, acao fixa,
 resultado, horario e `request_id` aleatorio. Nao registra nome do arquivo,
 conteudo, metadados clinicos, caminhos, e-mail ou credenciais.
 
-A origem no PostgreSQL e o caminho temporario com esse ID, para correlacionar
-com os eventos; o arquivo nao permanece disponivel. O banco conserva a avaliacao,
+Em tabela operacional separada, o resultado final guarda somente SHA-256 do
+conteudo, status, codigo fechado de erro, horario e UUID aleatorio. Assim, uma
+rejeicao nao persiste arquivo, nome, identidade ou texto livre. O prazo
+provisorio desse registro e 30 dias.
+
+A origem da avaliacao importada e o caminho temporario aleatorio com esse ID;
+o arquivo nao permanece disponivel. O banco conserva a avaliacao,
 metricas e tentativas importadas, conforme seu contrato existente. A retencao de
-dados operacionais reais permanece uma decisao externa futura no backlog.
+dados e provisoria e esta em [tratamento de dados](TRATAMENTO_DE_DADOS.md).
 
 ## Falhas e verificacao
 

@@ -36,3 +36,9 @@ autenticado e integracao sintetica de uploads concorrentes. Consulte
 bloqueio, perfis, autorizacao negativa, limitacao de recusas, auditoria minima,
 bootstrap e recuperacao, sempre com identidades sinteticas. Consulte
 [AUTENTICACAO_E_PERMISSOES.md](../docs/AUTENTICACAO_E_PERMISSOES.md).
+
+`test_hardening_producao.py` cobre isolamento de portas/redes, TLS fail-closed,
+versoes fixadas, menor privilegio, limites Ampere A1, headers, rate limit,
+logging minimo, criptografia/rotacao de backups, restauracao isolada, auditoria
+de importacao e expurgo seletivo. Testes de banco exigem o mesmo PostgreSQL
+descartavel da suite integral.

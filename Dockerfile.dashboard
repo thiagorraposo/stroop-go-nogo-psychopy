@@ -1,4 +1,4 @@
-FROM python:3.12-slim-bookworm
+FROM python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -7,11 +7,20 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 COPY dashboard/requirements.txt /app/dashboard/requirements.txt
-RUN python -m pip install --requirement /app/dashboard/requirements.txt
+COPY dashboard/requirements.lock /app/dashboard/requirements.lock
+RUN python -m pip install --requirement /app/dashboard/requirements.lock
 
-COPY dashboard /app/dashboard
-COPY scripts /app/scripts
+RUN groupadd --gid 10001 stroop \
+    && useradd --uid 10001 --gid 10001 --no-create-home --shell /usr/sbin/nologin stroop \
+    && mkdir -p /app/.streamlit \
+    && chown -R 10001:10001 /app
+
+COPY --chown=10001:10001 dashboard /app/dashboard
+COPY --chown=10001:10001 scripts /app/scripts
+COPY --chown=10001:10001 .streamlit/config.toml /app/.streamlit/config.toml
 
 EXPOSE 8501
+
+USER 10001:10001
 
 CMD ["python", "-m", "streamlit", "run", "dashboard/app.py", "--server.address=0.0.0.0", "--server.port=8501", "--server.headless=true", "--browser.gatherUsageStats=false"]

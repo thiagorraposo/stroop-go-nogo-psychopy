@@ -14,7 +14,10 @@ Operacao do desenvolvimento: [protocolo Codex CLI](../docs/WORKFLOW_CODEX_CLI.md
 ├── .dockerignore
 ├── .env.example
 ├── compose.yaml
+├── compose.production.yaml
+├── compose.restore-test.yaml
 ├── Dockerfile.dashboard
+├── Dockerfile.proxy
 ├── requirements.txt
 ├── setup.bat
 ├── setup.sh
@@ -37,7 +40,11 @@ Operacao do desenvolvimento: [protocolo Codex CLI](../docs/WORKFLOW_CODEX_CLI.md
 │   ├── components.py
 │   ├── data_access.py
 │   ├── transformations.py
-│   └── requirements.txt
+│   ├── requirements.txt
+│   └── requirements.lock
+├── nginx/
+│   ├── nginx.conf
+│   └── proxy-entrypoint.sh
 ├── docs/
 │   ├── AGENTS.md
 │   ├── GUIA_DO_USUARIO.md
@@ -48,6 +55,8 @@ Operacao do desenvolvimento: [protocolo Codex CLI](../docs/WORKFLOW_CODEX_CLI.md
 │   ├── AGENTS.md
 │   ├── README.md
 │   ├── analisar_stroop.py
+│   ├── aplicar_retencao.py
+│   ├── backup_postgres.py
 │   ├── db_schema.sql
 │   ├── importar_csv_sqlite.py
 │   ├── migrations.py
@@ -68,6 +77,8 @@ Os nomes dos CSVs de condicoes sao preservados porque eles sao referenciados dir
 - `assets/`: assets proprios do projeto.
 - `compose.yaml` e `Dockerfile.dashboard`: infraestrutura local de
   desenvolvimento para Streamlit e PostgreSQL, sem PsychoPy.
+- `compose.production.yaml`, `compose.restore-test.yaml`, `Dockerfile.proxy` e
+  `nginx/`: preparacao endurecida, TLS fail-closed e restauracao isolada.
 - `assets/ui/`: elementos visuais proprios da interface.
 - `condicoes/`: CSVs-fonte usados pelos loops do PsychoPy.
 - `data/`: saidas locais de execucao e coleta, ignoradas pelo Git.

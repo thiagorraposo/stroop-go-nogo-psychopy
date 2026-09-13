@@ -7,10 +7,10 @@ validar e registrar o trabalho; documentos auxiliares nao mantem outro backlog.
 
 ## Estado consolidado
 
-- Etapas 1–8: concluidas.
-- Progresso global: **72%**, soma de 5% + 7% + 11% + 8% + 13% + 8% + 10% + 10%, sem credito parcial.
-- Suite registrada: **138 testes aprovados**; ver evidencias datadas abaixo.
-- Etapa 9: **nao iniciada**, primeira etapa nao concluida e proxima etapa.
+- Etapas 1–9: concluidas.
+- Progresso global: **80%**, soma de 5% + 7% + 11% + 8% + 13% + 8% + 10% + 10% + 8%, sem credito parcial.
+- Suite registrada: **158 testes aprovados**; ver evidencias datadas abaixo.
+- Etapa 10: **nao iniciada**, primeira etapa nao concluida e proxima etapa.
 - Destino futuro de hospedagem: **OCI Always Free**, somente na Etapa 11.
 - Bloqueios atuais: nenhum para a etapa concluida; decisoes dos instrumentos
   futuros e de producao permanecem listadas neste backlog.
@@ -499,7 +499,8 @@ sinteticos. Configuracao Docker, dependencias, compilacao Python, 61 links,
 secrets ignorados e `git diff --check` aprovados. Build da imagem e smoke final
 com Authlib empacotada, healthcheck `ok` e pagina HTTP 200 aprovados. Nenhuma
 credencial Google real foi criada, lida ou versionada; login real depende da
-configuracao operacional do cliente OIDC. Etapa 9 nao iniciada.
+configuracao operacional do cliente OIDC. Etapa 9 concluida; Etapa 10 nao
+iniciada.
 
 ### Backlog
 
@@ -603,7 +604,29 @@ configuracao operacional do cliente OIDC. Etapa 9 nao iniciada.
 - Nenhum dado real usado na validação.
 
 
-**Progresso após conclusão:** 80%.
+**Estado:** concluida — 80% acumulados.
+
+Implementado nesta sessão: perfil de produção separado com Nginx fixado e
+compatível com ARM64, somente HTTP/HTTPS públicos, redes internas para
+dashboard/PostgreSQL, execução sem privilégios, limites configuráveis com
+reserva para o sistema operacional, TLS externo obrigatório e recusa explícita
+de certificado sintético fora de teste. Uploads temporários são eliminados e
+rejeições preservam somente hash/status/erro fechado; logs e auditorias têm
+retenção configurável; dados da pesquisa têm retenção mínima provisória de
+cinco anos com pseudonimização e acesso restrito; incidentes são retidos por
+cinco anos com fluxo de comunicação ANPD/titulares em três dias úteis quando
+aplicável; backup diário criptografado, rotação de 30 gerações e restauração
+mensal isolada foram documentados e comprovados com dados sintéticos. O
+destino externo, domínio, certificado real e dimensionamento final permanecem
+exclusivos da Etapa 11.
+
+Evidências: `compose.production.yaml`, `Dockerfile.proxy`,
+`scripts/backup_postgres.py`, `scripts/aplicar_retencao.py`, migrations 0003,
+documentos de hardening, threat model, resposta a incidentes e tratamento de
+dados, além dos testes específicos. Smoke descartável comprovou healthchecks,
+migrações, isolamento de portas, proxy TLS sintético somente em `APP_ENV=test`
+e recusa em produção. Nenhum dado real, segredo, domínio ou destino externo foi
+usado.
 
 ---
 

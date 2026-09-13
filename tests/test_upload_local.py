@@ -1,6 +1,7 @@
 """Upload local com entradas sinteticas, sem iniciar servidor nos testes."""
 from concurrent.futures import ThreadPoolExecutor
 import json
+import hashlib
 import os
 from pathlib import Path
 import sys
@@ -28,6 +29,8 @@ class UploadTests(unittest.TestCase):
             result = upload.process_upload(DATA, '../../SYNTHETIC_PRIVATE.csv', 'unused', temp_root=root, audit=events.append)
             self.assertEqual(list(Path(root).iterdir()), [])
         self.assertEqual(result['statuses'], ['recebido', 'validado', 'importado'])
+        self.assertEqual(result['content_sha256'], hashlib.sha256(DATA).hexdigest())
+        self.assertIsNone(result['error_code'])
         self.assertTrue(all(not p.exists() for p in paths))
         for event in events:
             self.assertEqual(set(event), {'id', 'origin', 'at', 'status'})
@@ -44,14 +47,16 @@ class UploadTests(unittest.TestCase):
     def test_csv_invalido_nao_persiste_e_limpa(self):
         with tempfile.TemporaryDirectory() as root:
             result = upload.process_upload(b'bad,header\n1,2', 'x.csv', '', temp_root=root)
-            self.assertEqual(result['statuses'], ['recebido', 'rejeitado'])
             self.assertEqual(list(Path(root).iterdir()), [])
+        self.assertEqual(result['statuses'], ['recebido', 'rejeitado'])
+        self.assertEqual(result['error_code'], 'validation_or_service_failure')
 
     def test_falha_banco_nao_expoe_detalhes_e_limpa(self):
         with tempfile.TemporaryDirectory() as root, patch.object(upload, 'import_csv', side_effect=[{}, upload.PostgresImportError('SYNTHETIC_SECRET')]):
             result = upload.process_upload(DATA, 'x.csv', '', temp_root=root)
             self.assertEqual(list(Path(root).iterdir()), [])
         self.assertEqual(result['statuses'], ['recebido', 'validado', 'rejeitado'])
+        self.assertEqual(result['error_code'], 'validation_or_service_failure')
         self.assertNotIn('SYNTHETIC_SECRET', json.dumps(result))
 
     def test_conteudo_nao_executado(self):

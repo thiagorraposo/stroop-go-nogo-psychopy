@@ -80,6 +80,13 @@ docker compose up --build -d --wait
 Consulte [`docs/INFRAESTRUTURA_DOCKER.md`](docs/INFRAESTRUTURA_DOCKER.md) para
 limites, validacao e encerramento seguro sem excluir o volume.
 
+A preparacao de producao fica separada em `compose.production.yaml`, com Nginx,
+TLS obrigatorio, servicos internos, limites e backup criptografado. Ela nao
+configura nem autoriza deploy. Consulte
+[`docs/HARDENING_PRODUCAO.md`](docs/HARDENING_PRODUCAO.md), o
+[`threat model`](docs/THREAT_MODEL.md) e a
+[`resposta a incidentes`](docs/RESPOSTA_A_INCIDENTES.md).
+
 O schema PostgreSQL versionado e a migracao legada SQLite -> PostgreSQL sao
 operacoes explicitas documentadas em
 [`docs/MIGRACOES_POSTGRESQL.md`](docs/MIGRACOES_POSTGRESQL.md). O launcher e o
@@ -109,10 +116,15 @@ essa area. O dashboard de resultados continua usando SQLite nesta etapa.
 - `scripts/migrations.py`: executor transacional das migrations PostgreSQL.
 - `scripts/migrar_sqlite_postgres.py`: migracao legada explicita e segura.
 - `scripts/gerenciar_usuarios.py`: bootstrap e recuperacao administrativa OIDC.
+- `scripts/backup_postgres.py`: backup criptografado e restauracao isolada.
+- `scripts/aplicar_retencao.py`: expurgo seletivo de auditorias vencidas.
 - `dashboard/app.py`: dashboard Streamlit local para consulta descritiva do SQLite.
 - `dashboard/requirements.txt`: dependencias do dashboard local.
 - `compose.yaml`: servicos locais separados do dashboard e PostgreSQL.
+- `compose.production.yaml`: perfil endurecido sem deploy ou secrets reais.
+- `compose.restore-test.yaml`: restauracao descartavel sem portas.
 - `Dockerfile.dashboard`: imagem de desenvolvimento do Streamlit.
+- `Dockerfile.proxy`: Nginx fixado e executado sem privilegio.
 - `docs/UX_DECISIONS.md`: notas sobre as decisoes de experiencia de usuario.
 - `docs/USO_POR_ZIP_GITHUB.md`: instalacao e uso a partir do Download ZIP do GitHub.
 - `docs/GUIA_DO_USUARIO.md`: fluxo cotidiano do experimento ao dashboard.

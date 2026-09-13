@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+import hashlib
 import os
 from pathlib import Path
 import subprocess
@@ -31,6 +32,10 @@ def process_upload(
     """Valida o envelope, isola os bytes e importa sem sobrescrever duplicatas."""
     upload_id = uuid.uuid4().hex
     statuses = []
+    content_sha256 = hashlib.sha256(
+        content if isinstance(content, bytes) else b""
+    ).hexdigest()
+    error_code = None
 
     def event(status):
         statuses.append(status)
@@ -41,12 +46,18 @@ def process_upload(
 
     event("recebido")
     try:
+        if not isinstance(content, bytes):
+            error_code = "invalid_envelope"
+            raise ValueError
         if not isinstance(filename, str) or not filename.lower().endswith('.csv'):
+            error_code = "invalid_envelope"
             raise ValueError
         if not 0 < len(content) <= MAX_BYTES:
+            error_code = "invalid_envelope"
             raise ValueError
         text = content.decode('utf-8-sig', errors='strict')
         if '\x00' in text:
+            error_code = "invalid_envelope"
             raise ValueError
         # Nunca usa o nome fornecido como caminho e nunca executa o conteudo.
         with tempfile.TemporaryDirectory(prefix='stroop-upload-', dir=temp_root) as directory:
@@ -59,12 +70,21 @@ def process_upload(
         event('importado')
         message = 'Importacao concluida.'
     except DuplicateAssessmentError:
+        error_code = "duplicate_assessment"
         event('rejeitado')
         message = 'Avaliacao ja importada; nenhuma substituicao realizada.'
     except (ValueError, UnicodeError, OSError, PostgresImportError):
+        error_code = error_code or "validation_or_service_failure"
         event('rejeitado')
         message = 'Arquivo rejeitado ou importacao nao confirmada. Verifique o CSV e o servico.'
-    return {"id": upload_id, "statuses": statuses, "message": message}
+    return {
+        "id": upload_id,
+        "statuses": statuses,
+        "status": statuses[-1],
+        "content_sha256": content_sha256,
+        "error_code": error_code,
+        "message": message,
+    }
 
 
 def main(argv=None):

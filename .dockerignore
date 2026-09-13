@@ -22,6 +22,7 @@ storage
 *.key
 credentials*.json
 secrets.*
+production-secrets
 stroop_go_nogo_ptbr.psyexp
 *_lastrun.py
 condicoes

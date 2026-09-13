@@ -38,8 +38,9 @@ class InfraestruturaDockerTests(unittest.TestCase):
     def test_imagem_preserva_ponto_de_entrada_e_nao_instala_psychopy(self) -> None:
         self.assertIn('"dashboard/app.py"', self.dockerfile)
         self.assertNotIn("psychopy", self.dockerfile.lower())
-        self.assertIn("COPY dashboard /app/dashboard", self.dockerfile)
-        self.assertIn("COPY scripts /app/scripts", self.dockerfile)
+        self.assertIn("dashboard /app/dashboard", self.dockerfile)
+        self.assertIn("scripts /app/scripts", self.dockerfile)
+        self.assertIn("USER 10001:10001", self.dockerfile)
 
     def test_contexto_exclui_dados_e_segredos(self) -> None:
         exclusions = {

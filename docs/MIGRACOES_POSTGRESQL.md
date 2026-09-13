@@ -12,6 +12,11 @@ A Etapa 8 acrescentou `0002_authentication.sql`, com `app_users` e
 `auth_audit_events`, sem alterar as tabelas de dominio. Operacao e modelo de
 acesso: [AUTENTICACAO_E_PERMISSOES.md](AUTENTICACAO_E_PERMISSOES.md).
 
+A Etapa 9 acrescentou `0003_import_audit.sql`. A tabela registra somente hash
+SHA-256, status, codigo de erro controlado, horario e UUID da operacao; nao
+armazena arquivo, nome, path, conteudo ou identificador de participante.
+Retencao e backup: [HARDENING_PRODUCAO.md](HARDENING_PRODUCAO.md).
+
 ## Schema versionado
 
 A migration inicial fica em `scripts/migrations/0001_initial.sql`. Ela cria:

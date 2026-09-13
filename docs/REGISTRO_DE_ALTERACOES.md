@@ -3,6 +3,37 @@
 Este arquivo preserva fatos datados; nao define estado ou aceite vigente.
 Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 
+## 2026-09-13 — Hardening de produção
+
+- `feat`: concluída a Etapa 9 com perfil Compose de produção separado, imagens
+  fixadas (PostgreSQL/Nginx/Python com manifestos ARM64 verificados), Nginx
+  TLS-only na borda, dashboard/PostgreSQL internos, menor privilégio, limites
+  configuráveis e reserva de CPU para o host Ampere A1.
+- `feat`: adicionados TLS externo obrigatório sem certificado sintético em
+  produção, limites de requisição/upload, headers, logs operacionais
+  sanitizados, healthchecks e dependências Python travadas.
+- `feat`: temporários CSV são removidos sempre; rejeições registram somente
+  hash, status e código fechado. Retenção configurável remove apenas auditorias
+  vencidas; dados de pesquisa não são eliminados automaticamente.
+- `feat`: backup diário automatizável com AES-256-GCM, chave separada,
+  checksum, rotação de 30 gerações e restauração transacional isolada para
+  teste mensal.
+- `docs`: registradas políticas provisórias de 30 dias para logs, 180 para
+  auditoria OIDC, cinco anos para incidentes e mínimo de cinco anos após a
+  pesquisa para dados pseudonimizados, condicionadas ao protocolo, pesquisador
+  responsável, CEP e confirmação institucional. Documentado prazo de três
+  dias úteis para comunicação de incidente relevante à ANPD e titulares,
+  quando aplicável.
+- `test`: 158 testes passaram anteriormente com PostgreSQL descartável e dados
+  sintéticos, sem falhas, erros ou skips; nesta conclusão, 16 testes estáticos
+  de hardening/criptografia e a suíte sem banco passaram (29 testes de banco
+  foram corretamente pulados por ausência de conexão no sandbox). Smoke Docker
+  comprovou migrações, isolamento, headers, healthcheck e recusa de certificado
+  sintético em produção. Nenhum dado real ou OCI foi acessado.
+- `docs`: Etapa 9 marcada como concluída (80%); Etapa 10 permanece não
+  iniciada. Destino externo, domínio, certificado real e dimensionamento final
+  continuam pendentes da Etapa 11.
+
 ## 2026-09-13 — Autenticacao e permissoes
 
 - `feat`: implementado Google OIDC nativo do Streamlit com acesso somente para

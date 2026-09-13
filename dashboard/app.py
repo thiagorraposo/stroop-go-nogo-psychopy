@@ -21,6 +21,7 @@ from dashboard.auth import (
     create_user,
     list_users,
     parse_identity,
+    record_import_result,
     record_operation,
     update_user,
 )
@@ -192,6 +193,21 @@ def _render_upload(streamlit_module: Any, claims: Mapping[str, Any]) -> None:
             origin="upload autenticado",
         )
         outcome = "success" if result["statuses"][-1] == "importado" else "rejected"
+        try:
+            record_import_result(
+                os.environ.get("AUTH_DATABASE_URL", ""),
+                result["id"],
+                result["content_sha256"],
+                result["status"],
+                result["error_code"],
+            )
+        except AuthError:
+            # A importacao ja foi processada; nao a reapresente como rejeitada.
+            streamlit_module.error(
+                "Importacao processada, mas o registro de auditoria nao foi confirmado. "
+                "Nao repita o arquivo sem verificar o estado."
+            )
+            return
         record_operation(
             os.environ.get("AUTH_DATABASE_URL", ""), user, "import_csv", outcome
         )

@@ -50,6 +50,8 @@ venv/
 .env
 .env.*
 !.env.example
+!.env.production.example
+production-secrets/
 
 # Sistema, editor e temporarios
 .DS_Store

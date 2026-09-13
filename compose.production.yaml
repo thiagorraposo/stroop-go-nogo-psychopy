@@ -1,0 +1,158 @@
+name: stroop-production
+
+x-logging: &restricted-logging
+  driver: local
+  options:
+    max-size: ${LOG_MAX_SIZE:-10m}
+    max-file: ${LOG_MAX_FILES:-5}
+
+services:
+  postgres:
+    image: postgres:17.6-bookworm@sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3
+    user: "999:999"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Defina POSTGRES_DB fora do Git}
+      POSTGRES_USER: ${POSTGRES_USER:?Defina POSTGRES_USER fora do Git}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD fora do Git}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    command:
+      - postgres
+      - -c
+      - log_statement=none
+      - -c
+      - log_min_error_statement=panic
+      - -c
+      - log_error_verbosity=terse
+      - -c
+      - log_connections=off
+      - -c
+      - log_disconnections=off
+      - -c
+      - log_parameter_max_length=0
+      - -c
+      - log_parameter_max_length_on_error=0
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    networks:
+      - backend
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=32m,mode=1777
+      - /var/run/postgresql:rw,noexec,nosuid,nodev,size=8m,mode=0775,uid=999,gid=999
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 200
+    cpus: ${POSTGRES_CPUS:-0.75}
+    mem_limit: ${POSTGRES_MEMORY:-1536m}
+    shm_size: 128m
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+    logging: *restricted-logging
+    restart: unless-stopped
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    user: "${APPLICATION_UID:-1000}:${APPLICATION_GID:-1000}"
+    environment:
+      APP_ENV: production
+      DATABASE_URL: ${DATABASE_URL:?Defina DATABASE_URL fora do Git}
+      AUTH_DATABASE_URL: ${AUTH_DATABASE_URL:?Defina AUTH_DATABASE_URL fora do Git}
+    secrets:
+      - source: oidc_secrets
+        target: /app/.streamlit/secrets.toml
+        mode: 0444
+    depends_on:
+      postgres:
+        condition: service_healthy
+    expose:
+      - "8501"
+    networks:
+      - frontend
+      - backend
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=128m,mode=1777,uid=${APPLICATION_UID:-1000},gid=${APPLICATION_GID:-1000}
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 128
+    cpus: ${DASHBOARD_CPUS:-0.65}
+    mem_limit: ${DASHBOARD_MEMORY:-768m}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health', timeout=2)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    logging: *restricted-logging
+    restart: unless-stopped
+
+  proxy:
+    image: stroop-proxy:1.28.0-stage9
+    build:
+      context: .
+      dockerfile: Dockerfile.proxy
+    user: "${PROXY_UID:-1000}:${PROXY_GID:-1000}"
+    environment:
+      APP_ENV: production
+    secrets:
+      - source: tls_certificate
+        target: tls_certificate
+        mode: 0444
+      - source: tls_private_key
+        target: tls_private_key
+        mode: 0400
+    depends_on:
+      dashboard:
+        condition: service_healthy
+    ports:
+      - "80:8080"
+      - "443:8443"
+    networks:
+      - frontend
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777,uid=${PROXY_UID:-1000},gid=${PROXY_GID:-1000}
+      - /var/cache/nginx:rw,noexec,nosuid,nodev,size=32m,mode=0700,uid=${PROXY_UID:-1000},gid=${PROXY_GID:-1000}
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    cpus: ${PROXY_CPUS:-0.15}
+    mem_limit: ${PROXY_MEMORY:-128m}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "http://127.0.0.1:8081/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 5s
+    logging: *restricted-logging
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  frontend:
+  backend:
+    internal: true
+
+secrets:
+  oidc_secrets:
+    file: ${STREAMLIT_SECRETS_FILE:?Defina STREAMLIT_SECRETS_FILE fora do Git}
+  tls_certificate:
+    file: ${TLS_CERTIFICATE_FILE:?Defina TLS_CERTIFICATE_FILE fora do Git}
+  tls_private_key:
+    file: ${TLS_PRIVATE_KEY_FILE:?Defina TLS_PRIVATE_KEY_FILE fora do Git}

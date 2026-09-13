@@ -1,0 +1,18 @@
+[client]
+showErrorDetails = "none"
+toolbarMode = "minimal"
+
+[logger]
+level = "warning"
+messageFormat = "%(asctime)s level=%(levelname)s component=%(name)s"
+
+[server]
+enableCORS = true
+enableXsrfProtection = true
+enableStaticServing = false
+maxUploadSize = 5
+maxMessageSize = 6
+fileWatcherType = "none"
+
+[browser]
+gatherUsageStats = false

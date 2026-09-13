@@ -39,3 +39,10 @@ e a recuperacao administrativa de emergencia; cadastros comuns ocorrem na area
 administrativa autenticada. Consulte
 [autenticacao](../docs/AUTENTICACAO_E_PERMISSOES.md) e
 [upload](../docs/UPLOAD_LOCAL.md).
+
+`aplicar_retencao.py` conta auditorias vencidas por padrao e, somente com
+`--apply`, remove eventos operacionais com mais de 30 dias e OIDC com mais de
+180 dias. Nunca remove tabelas da pesquisa. `backup_postgres.py` gera chave,
+transmite `pg_dump` diretamente para AES-256-GCM, mantem 30 geracoes e restaura
+em PostgreSQL isolado e descartavel. Operacao e limites:
+[hardening de producao](../docs/HARDENING_PRODUCAO.md).

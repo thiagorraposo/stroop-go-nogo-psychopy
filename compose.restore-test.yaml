@@ -1,0 +1,33 @@
+name: stroop-restore-test
+
+services:
+  restore-postgres:
+    image: postgres:17.6-bookworm@sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3
+    environment:
+      POSTGRES_DB: stroop_restore_test
+      POSTGRES_USER: stroop_restore
+      POSTGRES_PASSWORD: synthetic-restore-only
+      PGDATA: /var/lib/postgresql/data/pgdata
+    user: "999:999"
+    tmpfs:
+      - /var/lib/postgresql/data:rw,nosuid,nodev,size=512m,mode=0700,uid=999,gid=999
+      - /tmp:rw,noexec,nosuid,nodev,size=32m,mode=1777
+    networks:
+      - restore_isolated
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 128
+    cpus: 0.50
+    mem_limit: 768m
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stroop_restore -d stroop_restore_test"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+      start_period: 5s
+
+networks:
+  restore_isolated:
+    internal: true
