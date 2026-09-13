@@ -6,6 +6,11 @@ Operacao do desenvolvimento: [protocolo Codex CLI](../docs/WORKFLOW_CODEX_CLI.md
 
 Dashboard Streamlit local para visualizar resultados descritivos do experimento Stroop Go/No-Go importados para SQLite.
 
+O registro de visões em `dashboard/instrumentos.py` também permite validar
+instrumentos adicionais sem misturar métricas. A tela sempre seleciona um
+instrumento por vez; o contrato e o adaptador demonstrativo estão em
+[`docs/MULTIPLOS_INSTRUMENTOS.md`](../docs/MULTIPLOS_INSTRUMENTOS.md).
+
 Aviso fixo exibido na interface:
 
 > Resultados descritivos. Este dashboard não representa avaliação clínica ou diagnóstico.

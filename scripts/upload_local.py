@@ -25,9 +25,9 @@ MAX_CONCURRENT = 4
 
 PAGE = r'''<!doctype html><html lang="pt-BR"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Importar CSV Stroop</title>
+<title>Importar CSV de instrumento</title>
 <style>body{font:18px system-ui;max-width:680px;margin:60px auto;padding:24px;background:#f5f7fa;color:#172636}button,input{font:inherit;margin:12px 0}button{padding:12px}pre{white-space:pre-wrap}</style>
-<h1>Importar CSV Stroop</h1>
+<h1>Importar CSV de instrumento</h1>
 <p>Uso local com dados sintéticos. Selecione um CSV UTF-8 de até 5 MiB.
 Avaliações já importadas serão rejeitadas. O arquivo enviado será descartado após o processamento.</p>
 <form id="form"><label for="file">Arquivo CSV</label><br>

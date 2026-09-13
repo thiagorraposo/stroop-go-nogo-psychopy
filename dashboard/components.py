@@ -19,6 +19,7 @@ from dashboard.transformations import (
     trials_for_assessment,
     visible_assessment_rows,
 )
+from dashboard.instrumentos import InstrumentView, instrument_view
 
 
 def render_metric_card(streamlit_module: Any, label: str, value: str) -> None:
@@ -33,8 +34,21 @@ def format_seconds(value: float | int) -> str:
     return f"{float(value):.3f} s"
 
 
-def render_summary_cards(streamlit_module: Any, rows: list[dict[str, Any]]) -> None:
+def render_summary_cards(
+    streamlit_module: Any, rows: list[dict[str, Any]], view: InstrumentView | None = None
+) -> None:
+    view = view or instrument_view("stroop_go_nogo_ptbr")
     cards = calculate_cards(rows)
+    if view.code != "stroop_go_nogo_ptbr":
+        card_columns = streamlit_module.columns(1 + len(view.metric_codes))
+        with card_columns[0]:
+            render_metric_card(streamlit_module, "Avaliacoes", str(cards["total_assessments"]))
+        for index, metric_code in enumerate(view.metric_codes, start=1):
+            with card_columns[index]:
+                values = numeric_values(rows, metric_code)
+                label = metric_code.replace("_", " ").title()
+                render_metric_card(streamlit_module, label, str(values[0]) if values else "0")
+        return
     card_columns = streamlit_module.columns(7)
     with card_columns[0]:
         render_metric_card(streamlit_module, "Avaliacoes", str(cards["total_assessments"]))
@@ -62,7 +76,18 @@ def render_summary_cards(streamlit_module: Any, rows: list[dict[str, Any]]) -> N
         render_metric_card(streamlit_module, "Comissoes", str(cards["total_commissions"]))
 
 
-def render_charts(streamlit_module: Any, rows: list[dict[str, Any]]) -> None:
+def render_charts(
+    streamlit_module: Any, rows: list[dict[str, Any]], view: InstrumentView | None = None
+) -> None:
+    view = view or instrument_view("stroop_go_nogo_ptbr")
+    if view.code != "stroop_go_nogo_ptbr":
+        streamlit_module.subheader("Graficos")
+        chart_rows = [
+            {"visit": row.get("visit"), **{code: row.get(code, 0.0) for code in view.chart_metric_codes}}
+            for row in rows
+        ]
+        streamlit_module.bar_chart(to_dataframe(chart_rows), x="visit", y=list(view.chart_metric_codes))
+        return
     streamlit_module.subheader("Graficos")
     chart_left, chart_right = streamlit_module.columns(2)
     with chart_left:
@@ -106,17 +131,18 @@ def render_charts(streamlit_module: Any, rows: list[dict[str, Any]]) -> None:
 
 
 def render_assessment_table(
-    streamlit_module: Any, rows: list[dict[str, Any]]
+    streamlit_module: Any, rows: list[dict[str, Any]], view: InstrumentView | None = None
 ) -> None:
+    view = view or instrument_view("stroop_go_nogo_ptbr")
     streamlit_module.subheader("Avaliacoes filtradas")
-    visible_rows = visible_assessment_rows(rows)
+    visible_rows = visible_assessment_rows(rows, None if view.code == "stroop_go_nogo_ptbr" else view.metric_codes)
     streamlit_module.dataframe(
         to_dataframe(visible_rows), use_container_width=True, hide_index=True
     )
     streamlit_module.download_button(
         "Baixar visao filtrada em CSV",
-        data=filtered_csv_bytes(rows),
-        file_name="stroop_dashboard_visao_filtrada.csv",
+        data=filtered_csv_bytes(rows, None if view.code == "stroop_go_nogo_ptbr" else view.metric_codes),
+        file_name=f"{view.code}_dashboard_visao_filtrada.csv",
         mime="text/csv",
     )
 
@@ -125,7 +151,9 @@ def render_assessment_detail(
     streamlit_module: Any,
     data: dict[str, list[dict[str, Any]]],
     rows: list[dict[str, Any]],
+    view: InstrumentView | None = None,
 ) -> None:
+    view = view or instrument_view("stroop_go_nogo_ptbr")
     streamlit_module.subheader("Detalhe da avaliacao")
     assessment_labels = [
         f"{row['assessment_date']} | {row['participant_id']} | {row['visit']} | {row['assessment_id']}"
@@ -171,19 +199,19 @@ def render_assessment_detail(
     )
 
     detail_trials = trials_for_assessment(data, selected_assessment_id)
-    streamlit_module.write("Contagem por tipo de resposta")
-    streamlit_module.dataframe(
-        to_dataframe(
-            [
-                {"error_type": error_type, "count": count}
-                for error_type, count in error_type_counts(detail_trials).items()
-            ]
-        ),
-        use_container_width=True,
-        hide_index=True,
-    )
-
-    streamlit_module.write("Tentativas")
-    streamlit_module.dataframe(
-        to_dataframe(detail_trials), use_container_width=True, hide_index=True
-    )
+    if view.trial_detail:
+        streamlit_module.write("Contagem por tipo de resposta")
+        streamlit_module.dataframe(
+            to_dataframe(
+                [
+                    {"error_type": error_type, "count": count}
+                    for error_type, count in error_type_counts(detail_trials).items()
+                ]
+            ),
+            use_container_width=True,
+            hide_index=True,
+        )
+        streamlit_module.write("Tentativas")
+        streamlit_module.dataframe(
+            to_dataframe(detail_trials), use_container_width=True, hide_index=True
+        )

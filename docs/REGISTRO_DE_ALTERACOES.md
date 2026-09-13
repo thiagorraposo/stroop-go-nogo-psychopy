@@ -3,6 +3,25 @@
 Este arquivo preserva fatos datados; nao define estado ou aceite vigente.
 Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 
+## 2026-09-13 — Múltiplos instrumentos
+
+- `feat`: criado contrato normalizado e registro de adaptadores por
+  `test_code`/`test_version`, preservando integralmente o Stroop e permitindo
+  métricas sem tentativas para formatos heterogêneos.
+- `feat`: adicionada a fixture e o adaptador `instrumento_sintetico_demo`,
+  estritamente demonstrativo, com coexistência em SQLite e PostgreSQL sem
+  mistura de métricas ou criação de `trial_results` incompatíveis.
+- `feat`: dashboard passou a selecionar um instrumento por vez e adaptar cards,
+  gráficos, tabela, detalhe e exportação conforme o registro visual.
+- `test`: suíte integral com 124 testes aprovados, zero falhas, erros ou skips,
+  usando PostgreSQL 17.6 descartável e dados sintéticos; configuração Docker,
+  compilação Python e `git diff --check` aprovados.
+- `docs`: documentado o contrato em `docs/MULTIPLOS_INSTRUMENTOS.md` e
+  registrada a Etapa 7 como concluída, com a Etapa 8 ainda não iniciada.
+- `docs`: decisão operacional desta sessão: instrumentos reais permanecem
+  pendentes até confirmação de campos, unidades, fórmulas, interpretação e
+  dados permitidos; nenhuma regra clínica foi inventada.
+
 ## 2026-09-13 — Upload local autorizado
 
 - `feat`: implementada decisao autorizada pelo usuario: upload separado em

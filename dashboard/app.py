@@ -27,6 +27,7 @@ from dashboard.data_access import (
     table_columns,
     validate_schema,
 )
+from dashboard.instrumentos import instrument_view, supported_codes
 from dashboard.transformations import (
     AGGREGATED_COLUMNS,
     METRIC_CODES,
@@ -116,8 +117,11 @@ def render_dashboard(db_path: Path = DEFAULT_DB_PATH) -> None:
                 "Avaliador", option_values(assessment_rows, "evaluator")
             )
         ),
-        test_code=tuple(
-            st.sidebar.multiselect("Teste", option_values(assessment_rows, "test_code"))
+        test_code=(
+            st.sidebar.selectbox(
+                "Instrumento",
+                [code for code in supported_codes() if code in option_values(assessment_rows, "test_code")],
+            ),
         ),
         test_version=tuple(
             st.sidebar.multiselect(
@@ -131,10 +135,11 @@ def render_dashboard(db_path: Path = DEFAULT_DB_PATH) -> None:
         st.info("Nenhuma avaliacao encontrada para os filtros selecionados.")
         return
 
-    render_summary_cards(st, filtered_rows)
-    render_charts(st, filtered_rows)
-    render_assessment_table(st, filtered_rows)
-    render_assessment_detail(st, data, filtered_rows)
+    view = instrument_view(filters.test_code[0])
+    render_summary_cards(st, filtered_rows, view)
+    render_charts(st, filtered_rows, view)
+    render_assessment_table(st, filtered_rows, view)
+    render_assessment_detail(st, data, filtered_rows, view)
 
 
 def main() -> None:

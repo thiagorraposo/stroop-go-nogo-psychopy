@@ -153,3 +153,14 @@ class PostgresCsvIntegrationTests(unittest.TestCase):
         with self.assertRaises(pg.PostgresImportError):
             pg.import_csv(self.source, "postgresql://synthetic:synthetic@127.0.0.1:1/stroop_etapa4_test")
         self.assertEqual(self.counts(), (0, 0, 0))
+
+    def test_instrumento_sintetico_coexiste_sem_tentativas_stroop(self):
+        source = FIXTURES / "instrumento_sintetico_demo.csv"
+        result = pg.import_csv(source, URL)
+        self.assertEqual(result, {"status": "imported", "trials": 0, "metrics": 2})
+        self.assertEqual(self.counts(), (1, 0, 2))
+        with psycopg.connect(URL) as connection:
+            self.assertEqual(
+                connection.execute("SELECT test_code FROM assessments").fetchone()[0],
+                "instrumento_sintetico_demo",
+            )

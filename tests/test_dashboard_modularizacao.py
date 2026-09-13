@@ -51,7 +51,7 @@ class DashboardModularizacaoTests(unittest.TestCase):
         self.assertFalse(any(name.startswith("dashboard") for name in transformation_imports))
         self.assertEqual(
             {name for name in component_imports if name.startswith("dashboard")},
-            {"dashboard.transformations"},
+            {"dashboard.transformations", "dashboard.instrumentos"},
         )
         self.assertTrue(
             {

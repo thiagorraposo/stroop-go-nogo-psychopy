@@ -1,7 +1,9 @@
 # Upload local de CSV
 
 A area de upload recebe arquivos de outro computador depois que forem copiados
-para a maquina local, ou CSVs exportados por planilhas no contrato Stroop.
+para a maquina local, ou CSVs exportados por planilhas em um contrato de
+instrumento registrado. O contrato do Stroop e o adaptador demonstrativo estão
+em [MULTIPLOS_INSTRUMENTOS.md](MULTIPLOS_INSTRUMENTOS.md).
 Ela importa no PostgreSQL e preserva o dashboard SQLite e seus atalhos.
 Estado e aceite ficam no [backlog canonico](Projeto%20Stroop%20Test.md).
 

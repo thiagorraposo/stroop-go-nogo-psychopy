@@ -7,10 +7,10 @@ validar e registrar o trabalho; documentos auxiliares nao mantem outro backlog.
 
 ## Estado consolidado
 
-- Etapas 1–6: concluidas.
-- Progresso global: **52%**, soma de 5% + 7% + 11% + 8% + 13% + 8%, sem credito parcial.
-- Suite registrada: **118 testes aprovados**; ver evidencias datadas abaixo.
-- Etapa 7: **nao iniciada**, primeira etapa nao concluida e proxima etapa.
+- Etapas 1–7: concluidas.
+- Progresso global: **62%**, soma de 5% + 7% + 11% + 8% + 13% + 8% + 10%, sem credito parcial.
+- Suite registrada: **124 testes aprovados**; ver evidencias datadas abaixo.
+- Etapa 8: **nao iniciada**, primeira etapa nao concluida e proxima etapa.
 - Destino futuro de hospedagem: **OCI Always Free**, somente na Etapa 11.
 - Bloqueios atuais: nenhum para a etapa concluida; decisoes dos instrumentos
   futuros e de producao permanecem listadas neste backlog.
@@ -372,7 +372,7 @@ Smoke HTTP com PostgreSQL descartavel comprovou pagina, upload sintetico,
 duplicidade, rejeicao e ausencia de residuos apos processamento normal.
 JavaScript validado por `node --check`; configuracao Docker e `git diff --check`
 aprovados. Dashboard, schema, formulas, dependencias e PsychoPy preservados.
-Etapa 7 nao iniciada. Limite operacional: queda de energia/encerramento forcado
+Limite operacional: queda de energia/encerramento forcado
 exige limpeza dos temporarios daquela execucao antes de retomar, conforme o guia.
 
 ---
@@ -380,6 +380,21 @@ exige limpeza dos temporarios daquela execucao antes de retomar, conforme o guia
 ## Etapa 7 — Múltiplos instrumentos
 
 **Objetivo:** permitir diferentes testes e fichas no mesmo sistema.
+
+**Estado:** concluída — 62% acumulados.
+
+Evidencias de 2026-09-13: criado contrato normalizado e registro de adaptadores
+em `scripts/instrumentos.py`, com o Stroop preservado e um instrumento
+demonstrativo sintético validando métricas separadas, coexistência em SQLite e
+PostgreSQL e ausência de tentativas incompatíveis. O dashboard passou a
+selecionar um instrumento por vez e adaptar cards, gráficos, tabelas, detalhe e
+exportação conforme `dashboard/instrumentos.py`. A documentação de extensão
+está em [MULTIPLOS_INSTRUMENTOS.md](MULTIPLOS_INSTRUMENTOS.md).
+
+Suíte integral: 124 testes aprovados, zero falhas, erros ou skips, com
+PostgreSQL 17.6 descartável e fixtures sintéticas. Configuração Docker,
+compilação Python e `git diff --check` aprovados. Nenhuma regra clínica foi
+inventada e a Etapa 8 não foi iniciada.
 
 ### Backlog
 

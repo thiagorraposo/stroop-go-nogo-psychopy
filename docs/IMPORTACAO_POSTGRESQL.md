@@ -1,7 +1,10 @@
 # Importacao CSV para PostgreSQL
 
 O comando `scripts/importar_csv_postgres.py` importa uma avaliacao por CSV,
-reutilizando o leitor, as validacoes, conversoes e formulas do importador SQLite.
+selecionando o adaptador registrado pelo cabeçalho e reutilizando o contrato
+normalizado descrito em [MULTIPLOS_INSTRUMENTOS.md](MULTIPLOS_INSTRUMENTOS.md).
+O adaptador Stroop mantém o leitor, as validações, conversões e fórmulas do
+importador SQLite.
 O CSV permanece imutavel. O [backlog canonico](Projeto%20Stroop%20Test.md) define
 estado e aceite; o [protocolo Codex CLI](WORKFLOW_CODEX_CLI.md) governa a execucao.
 

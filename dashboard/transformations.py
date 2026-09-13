@@ -62,9 +62,14 @@ def metric_map(metrics: list[dict[str, Any]]) -> dict[str, dict[str, float]]:
     return mapped
 
 
-def build_assessment_table(data: dict[str, list[dict[str, Any]]]) -> list[dict[str, Any]]:
+def build_assessment_table(
+    data: dict[str, list[dict[str, Any]]], metric_codes: list[str] | tuple[str, ...] | None = None
+) -> list[dict[str, Any]]:
     """Monta tabela agregada de uma linha por avaliacao."""
     metrics_by_assessment = metric_map(data["assessment_metrics"])
+    if metric_codes is None:
+        discovered = [str(row["metric_code"]) for row in data["assessment_metrics"]]
+        metric_codes = tuple(dict.fromkeys([*METRIC_CODES, *discovered]))
     rows: list[dict[str, Any]] = []
 
     for assessment in data["assessments"]:
@@ -84,7 +89,7 @@ def build_assessment_table(data: dict[str, list[dict[str, Any]]]) -> list[dict[s
             "imported_at": assessment["imported_at"],
             "import_status": assessment["import_status"],
         }
-        for metric_code in METRIC_CODES:
+        for metric_code in (metric_codes or METRIC_CODES):
             row[metric_code] = metrics_by_assessment.get(assessment_id, {}).get(
                 metric_code, 0.0
             )
@@ -234,8 +239,16 @@ def participant_evolution(
     ]
 
 
-def visible_assessment_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    return [{column: row.get(column) for column in AGGREGATED_COLUMNS} for row in rows]
+def visible_assessment_rows(
+    rows: list[dict[str, Any]], metric_codes: list[str] | tuple[str, ...] | None = None
+) -> list[dict[str, Any]]:
+    columns = AGGREGATED_COLUMNS
+    if metric_codes is not None:
+        columns = [
+            "assessment_date", "test_code", "project", "participant_id",
+            "participant_name", "visit", "evaluator", *metric_codes,
+        ]
+    return [{column: row.get(column) for column in columns} for row in rows]
 
 
 def metrics_for_assessment(
@@ -277,6 +290,8 @@ def to_dataframe(rows: list[dict[str, Any]]):
     return pd.DataFrame(rows)
 
 
-def filtered_csv_bytes(rows: list[dict[str, Any]]) -> bytes:
-    dataframe = to_dataframe(visible_assessment_rows(rows))
+def filtered_csv_bytes(
+    rows: list[dict[str, Any]], metric_codes: list[str] | tuple[str, ...] | None = None
+) -> bytes:
+    dataframe = to_dataframe(visible_assessment_rows(rows, metric_codes))
     return dataframe.to_csv(index=False).encode("utf-8")

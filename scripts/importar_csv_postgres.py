@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import csv
 import os
 from pathlib import Path
 import sys
@@ -12,8 +11,10 @@ import psycopg
 
 if __package__:
     from . import importar_csv_sqlite as legacy
+    from .instrumentos import InstrumentValidationError, load_instrument_csv
 else:
     import importar_csv_sqlite as legacy
+    from instrumentos import InstrumentValidationError, load_instrument_csv
 
 
 class PostgresImportError(Exception):
@@ -27,10 +28,10 @@ class DuplicateAssessmentError(PostgresImportError):
 def import_csv(csv_path: Path, database_url: str = "", *, force: bool = False,
                validate_only: bool = False) -> dict[str, int | str]:
     try:
-        rows = legacy.load_and_validate_csv(csv_path)
-        metrics = legacy.calculate_metrics(rows)
-        trials = [legacy.row_to_trial_values(row) for row in rows]
-    except (legacy.ImportValidationError, OSError, UnicodeError, csv.Error, ValueError, OverflowError):
+        normalized = load_instrument_csv(csv_path)
+        metrics = normalized.metrics
+        trials = normalized.trial_values
+    except (InstrumentValidationError, legacy.ImportValidationError, OSError, UnicodeError, ValueError, OverflowError):
         raise PostgresImportError("CSV invalido ou indisponivel; nenhuma importacao realizada.") from None
 
     summary = {"status": "validated", "trials": len(trials), "metrics": len(metrics)}
@@ -39,8 +40,8 @@ def import_csv(csv_path: Path, database_url: str = "", *, force: bool = False,
     if not database_url:
         raise PostgresImportError("DATABASE_URL nao configurada.")
 
-    first = rows[0]
-    assessment_id = first["assessment_id"]
+    metadata = normalized.metadata
+    assessment_id = metadata["assessment_id"]
     timestamp = legacy.utc_now_iso()
     try:
         with psycopg.connect(database_url, connect_timeout=5) as connection:
@@ -60,18 +61,19 @@ def import_csv(csv_path: Path, database_url: str = "", *, force: bool = False,
                     participant_name, initials, visit, evaluator, assessment_date,
                     started_at, source_file, imported_at, import_status
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-                (assessment_id, first["test_code"], first["test_version"], first["project"],
-                 first["participant_id"], first["participant_name"], first["initials"] or None,
-                 first["visit"], first["evaluator"], first["assessment_date"], first["started_at"],
+                (assessment_id, metadata["test_code"], metadata["test_version"], metadata["project"],
+                 metadata["participant_id"], metadata["participant_name"], metadata["initials"] or None,
+                 metadata["visit"], metadata["evaluator"], metadata["assessment_date"], metadata["started_at"],
                  str(csv_path), timestamp, "valid"),
             )
             with connection.cursor() as cursor:
-                cursor.executemany(
-                    """INSERT INTO trial_results (
-                        assessment_id, block, trial_number, word, ink_color, condition,
-                        correct_response, key_pressed, reaction_time, correct, error_type
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""", trials,
-                )
+                if trials:
+                    cursor.executemany(
+                        """INSERT INTO trial_results (
+                            assessment_id, block, trial_number, word, ink_color, condition,
+                            correct_response, key_pressed, reaction_time, correct, error_type
+                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""", trials,
+                    )
                 cursor.executemany(
                     """INSERT INTO assessment_metrics (
                         assessment_id, metric_code, metric_label, metric_value, unit, calculated_at
