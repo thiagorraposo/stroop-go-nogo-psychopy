@@ -80,6 +80,14 @@ dashboard publicos permanecem no SQLite. A CLI separada de
 [importacao CSV PostgreSQL](docs/IMPORTACAO_POSTGRESQL.md) usa `DATABASE_URL` e
 oferece `--validate-only` para conferir uma entrada sem persistir.
 
+## Upload local de CSV
+
+A [area de upload local](docs/UPLOAD_LOCAL.md) recebe um CSV sintetico por envio
+para o PostgreSQL, com limite de 5 MiB, validacao e descarte do temporario.
+Com `DATABASE_URL` configurada e migrations aplicadas, execute
+`.venv/bin/python scripts/upload_local.py --local` e abra `http://127.0.0.1:8765`.
+O dashboard e seus atalhos continuam usando SQLite.
+
 ## Arquivos
 
 - `stroop_go_nogo_ptbr.psyexp`: experimento para abrir no PsychoPy Builder.

@@ -3,6 +3,36 @@
 Este arquivo preserva fatos datados; nao define estado ou aceite vigente.
 Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 
+## 2026-09-13 — Upload local autorizado
+
+- `feat`: implementada decisao autorizada pelo usuario: upload separado em
+  `127.0.0.1`, um CSV UTF-8 de ate 5 MiB por envio, sem sobrescrever duplicatas,
+  temporarios isolados e removidos apos processamento e eventos minimos no terminal.
+- `feat`: adicionados controles de Host/Origin/token, formato e tamanho antes da
+  leitura, limite de conexoes e recusa de producao. Conteudo nunca e executado
+  ou servido; arquivos e erros nao revelam caminhos ou metadados nas respostas.
+- `test`: 14 novos testes de upload; suite integral com 118 aprovados, zero
+  falhas, erros ou skips, usando PostgreSQL 17.6 descartavel em tmpfs. Smoke HTTP
+  comprovou upload, duplicidade, rejeicao e limpeza; JavaScript e Docker validados.
+  Testes isolados: 14 aprovados; 35 links e `git diff --check` aprovados.
+  Build e smoke do dashboard nao repetidos: imagem e dashboard preservados.
+- `docs`: documentados operacao, retencao, limite de limpeza em encerramento
+  forcado e UX. Etapa 6 concluida, progresso de 52%; Etapa 7 nao iniciada.
+  Nenhuma mudanca em SQLite, dashboard, migrations, formulas ou dependencias;
+  nenhum dado real ou OCI acessado, nenhum versionamento executado.
+
+## 2026-09-13 — Preparacao da Etapa 6
+
+- `docs`: inspecionados protocolo, backlog, instrucoes locais, fluxo SQLite e
+  importador PostgreSQL; Git inicialmente limpo, Etapa 5 no commit `0d34ce9`.
+- `test`: suite completa reexecutada com `TEST_DATABASE_URL` no PostgreSQL 17.6
+  descartavel: 104 aprovados, zero falhas, erros ou skips; configuracao Docker
+  com `.env.example` aprovada. Nenhum dado real acessado.
+- `docs`: registrada no backlog a proposta de arquitetura local e retencao do
+  upload, perguntada ao usuario na sessao e ainda sem resposta. Implementacao
+  bloqueada ate aprovacao ou ajuste, conforme as regras do AGENTS.md.
+  Progresso mantido em 44%; Etapas 6 e 7 sem implementacao nesta execucao.
+
 ## 2026-09-13 — Importacao CSV PostgreSQL
 
 - `feat`: adicionada CLI separada para CSV -> PostgreSQL por `DATABASE_URL`,

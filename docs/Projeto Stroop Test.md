@@ -7,13 +7,13 @@ validar e registrar o trabalho; documentos auxiliares nao mantem outro backlog.
 
 ## Estado consolidado
 
-- Etapas 1–5: concluidas.
-- Progresso global: **44%**, soma de 5% + 7% + 11% + 8% + 13%, sem credito parcial.
-- Suite registrada: **104 testes aprovados**; ver evidencias datadas abaixo.
-- Etapa 6: **nao iniciada**, primeira etapa nao concluida e proxima etapa.
+- Etapas 1–6: concluidas.
+- Progresso global: **52%**, soma de 5% + 7% + 11% + 8% + 13% + 8%, sem credito parcial.
+- Suite registrada: **118 testes aprovados**; ver evidencias datadas abaixo.
+- Etapa 7: **nao iniciada**, primeira etapa nao concluida e proxima etapa.
 - Destino futuro de hospedagem: **OCI Always Free**, somente na Etapa 11.
-- Bloqueios materiais atuais: nenhum para a etapa concluida; decisoes externas
-  futuras permanecem listadas ao final.
+- Bloqueios atuais: nenhum para a etapa concluida; decisoes dos instrumentos
+  futuros e de producao permanecem listadas neste backlog.
 
 ## Dependencias e documentos de referencia
 
@@ -62,7 +62,7 @@ alternativas de etapas ou progresso.
 | 3     | Docker local                     |  11% |       23% | Concluída |
 | 4     | Schema e migrations PostgreSQL   |   8% |       31% | Concluída |
 | 5     | Importação CSV → PostgreSQL      |  13% |       44% | Concluída |
-| 6     | Envio remoto de CSV              |   8% |       52% | Pendente  |
+| 6     | Envio remoto de CSV              |   8% |       52% | Concluída |
 | 7     | Suporte a múltiplos instrumentos |  10% |       62% | Pendente  |
 | 8     | Autenticação e permissões        |  10% |       72% | Pendente  |
 | 9     | Hardening de produção            |   8% |       80% | Pendente  |
@@ -302,6 +302,25 @@ usam as colunas existentes, sem nova migration. Comandos, codigos e limites em
 
 **Objetivo:** receber arquivos produzidos em outros computadores ou planilhas.
 
+**Estado:** concluida — 52% acumulados.
+
+Inspecao de 2026-09-13: Git limpo no inicio; importador da Etapa 5 presente no
+commit `0d34ce9`; suite integral reexecutada em PostgreSQL descartavel com
+104 aprovados, zero falhas, erros ou skips. Configuracao Docker aprovada.
+
+Decisao autorizada pelo usuario na sessao de 2026-09-13: implementar
+uma area local separada do dashboard, limitada a `127.0.0.1`, um CSV UTF-8 de ate
+5 MiB por envio, duplicatas recusadas sem sobrescrita, arquivo temporario isolado
+excluido ao finalizar (sucesso ou erro) e registro apenas de identificador
+aleatorio, origem "upload local", horario e status. A proposta nao autoriza
+publicacao ou dados reais. Implementacao validada com dados sinteticos.
+
+Autorizacao recebida; bloqueio de arquitetura e retencao resolvido.
+O AGENTS.md exige decisao explicita sobre ambiguidades arquiteturais e de
+privacidade que alterem o resultado. Retencao de dados operacionais reais
+continua sendo uma decisao futura distinta.
+
+
 ### Backlog
 
 - Criar uma área de upload controlada.
@@ -346,7 +365,15 @@ Como a autenticação só será implementada na Etapa 8, o upload desta etapa de
 - Integração com o importador PostgreSQL validada.
 
 
-**Progresso após conclusão:** 52%.
+Evidencias de 2026-09-13: `scripts/upload_local.py`,
+`tests/test_upload_local.py` e [operacao documentada](UPLOAD_LOCAL.md).
+Suite integral: 118 aprovados, sem skips, falhas ou erros; 14 testes especificos.
+Smoke HTTP com PostgreSQL descartavel comprovou pagina, upload sintetico,
+duplicidade, rejeicao e ausencia de residuos apos processamento normal.
+JavaScript validado por `node --check`; configuracao Docker e `git diff --check`
+aprovados. Dashboard, schema, formulas, dependencias e PsychoPy preservados.
+Etapa 7 nao iniciada. Limite operacional: queda de energia/encerramento forcado
+exige limpeza dos temporarios daquela execucao antes de retomar, conforme o guia.
 
 ---
 

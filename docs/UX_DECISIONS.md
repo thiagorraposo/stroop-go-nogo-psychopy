@@ -111,3 +111,11 @@ Essa decisao reduz variacoes de layout causadas por DPI scaling, decoracoes de j
 ## Registro de dados
 
 A coluna `block` permanece no CSV oficial, mas as execucoes atuais exportam apenas o bloco principal (`main`). A pratica e usada para treinamento, feedback e HUD local, sem gerar linhas no CSV oficial. Os tipos de resposta do bloco principal sao registrados como `hit`, `omission`, `correct_rejection` e `commission`.
+
+## Area de upload local
+
+Em 2026-09-13, autorizada interface separada do dashboard SQLite para envio
+local de um CSV sintetico por vez. A pagina apresenta limite e descarte antes
+do envio, botao desabilitado durante processamento e resultado textual recebido,
+validado, importado ou rejeitado. Nao renderiza conteudo do CSV ou mensagens
+internas; a selecao e limpa ao finalizar. Operacao em [UPLOAD_LOCAL.md](UPLOAD_LOCAL.md).

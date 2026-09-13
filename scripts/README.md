@@ -31,3 +31,7 @@ launchers publicos nesta etapa. Consulte `docs/MIGRACOES_POSTGRESQL.md`.
 `importar_csv_postgres.py` importa CSV via `DATABASE_URL`, com transacao,
 recusa de duplicidade, `--force` e `--validate-only`. O comando e separado do
 launcher SQLite. Consulte [importacao PostgreSQL](../docs/IMPORTACAO_POSTGRESQL.md).
+
+`upload_local.py --local` abre a area de upload somente em `127.0.0.1`, com
+limites, validacao, importacao PostgreSQL e descarte do temporario. Consulte
+[UPLOAD_LOCAL.md](../docs/UPLOAD_LOCAL.md).

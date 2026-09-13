@@ -27,3 +27,7 @@ A importacao CSV PostgreSQL e coberta por `test_importar_csv_postgres.py`.
 Veja [comandos e isolamento](../docs/IMPORTACAO_POSTGRESQL.md) para executar a
 integracao em PostgreSQL descartavel com `TEST_DATABASE_URL`; skips nao aprovam
 a suite integral.
+
+`test_upload_local.py` cobre envelope HTTP, isolamento, retencao, validacao,
+mensagens seguras e integracao sintetica de uploads concorrentes. Consulte
+[UPLOAD_LOCAL.md](../docs/UPLOAD_LOCAL.md) para comandos e limites.
