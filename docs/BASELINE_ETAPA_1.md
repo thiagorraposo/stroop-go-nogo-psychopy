@@ -1,5 +1,11 @@
 # Baseline reproduzivel — Etapa 1
 
+> Evidencia historica da data indicada, sem revalidacao de dados operacionais.
+> Estado, progresso e aceite vigente: [backlog canonico](Projeto%20Stroop%20Test.md).
+> Os comandos de backup abaixo sao registro historico, nao autorizacao para
+> acessar dados reais durante o workflow do Codex CLI.
+
+
 Data da verificacao: 2026-09-01.
 
 Este documento registra o estado encontrado sem alterar o comportamento do

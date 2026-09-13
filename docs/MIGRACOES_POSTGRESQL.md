@@ -4,9 +4,8 @@ Data: 2026-09-01.
 
 Esta etapa versiona o schema PostgreSQL das tres tabelas de dominio e oferece
 uma migracao explicita do SQLite legado. O importador de CSV continua gravando
-somente no SQLite e o dashboard continua consultando somente o SQLite; essas
-transicoes pertencem, respectivamente, as Etapas 5 e 10 do
-[workflow](WORKFLOW_EVOLUCAO.md).
+somente no SQLite e o dashboard continua consultando somente o SQLite; o sequenciamento dessas
+transicoes e definido no [backlog canonico](Projeto%20Stroop%20Test.md).
 
 ## Schema versionado
 
@@ -63,9 +62,7 @@ Antes de migrar qualquer banco operacional, deve existir autorizacao explicita
 e procedimento de backup. Na Etapa 4, a validacao usou somente um SQLite
 temporario inteiramente sintetico e um banco PostgreSQL descartavel.
 
-## Distribuicao das proximas entregas
+## Evolucao
 
-- Etapa 5: importacao do CSV validado diretamente no PostgreSQL;
-- Etapa 10: consultas do dashboard pela arquitetura PostgreSQL;
-- migracao SQLite -> PostgreSQL: concluida nesta Etapa 4 como transicao legada
-  explicita, sem uso pelo fluxo publico.
+Consulte exclusivamente o [backlog canonico](Projeto%20Stroop%20Test.md) e o
+[protocolo Codex CLI](WORKFLOW_CODEX_CLI.md) para proximas entregas e validacao.

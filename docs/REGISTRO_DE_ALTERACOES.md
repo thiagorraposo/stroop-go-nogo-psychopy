@@ -1,6 +1,36 @@
 # Registro de alteracoes
 
+Este arquivo preserva fatos datados; nao define estado ou aceite vigente.
+Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
+
+## 2026-09-13 — Centralizacao documental no Codex CLI
+
+- `docs`: identificada concorrencia entre o antigo WORKFLOW_EVOLUCAO e o backlog
+  fornecido, ainda nao rastreado no Git. Os pesos e as conclusoes das etapas 1–4
+  coincidiam; as entregas 6, 8, 9, 11 e 12 divergiam (API/upload/autenticacao,
+  hardening e hospedagem). Por instrucao explicita do usuario, prevalece
+  `Projeto Stroop Test.md`, incluindo OCI Always Free na Etapa 11.
+- `docs`: identificadas exigencias antigas de prompt por etapa, VPS somente apos
+  a Etapa 11 e validacao com dados reais nas fases historicas. Foram substituidas
+  ou marcadas como historicas, sem autorizar dados reais ou infraestrutura futura.
+- `test`: a primeira descoberta executou 92 testes com sete skips por ausencia de
+  `TEST_DATABASE_URL`; isso nao foi considerado aprovacao integral. A tentativa
+  seguinte encontrou bloqueio de conexao pelo sandbox; validacao retomada com
+  permissao de acesso a PostgreSQL descartavel e fixtures sinteticas.
+
+
 Formato: entradas incrementais com data, tipo de mudanca e resumo.
+
+- `docs`: criado protocolo dos tres comandos e referencia obrigatoria na raiz;
+  preservadas as regras anteriores dos AGENTS, com redirecionamento da fonte de
+  estado. Compatibilizados READMEs, guias, template e documentos historicos.
+- `test`: suite completa com `TEST_DATABASE_URL` no PostgreSQL 17.6 descartavel
+  em tmpfs: 92 aprovados, zero falhas, erros ou skips. Configuracao Docker com
+  `.env.example`, links relativos afetados e `git diff --check` aprovados.
+  Build/smoke/persistencia nao repetidos: escopo exclusivamente Markdown.
+- `docs`: etapas 1–4 preservadas como concluidas, progresso mantido em 31%,
+  Etapa 5 nao iniciada e proxima acao `continue o projeto`. Nenhuma alteracao
+  funcional, acesso a dados reais, OCI ou operacao de versionamento executada.
 
 ## 2026-09-01
 

@@ -152,6 +152,9 @@ Sem `--force`, o script bloqueia `assessment_id` ja existente. Com `--force`, re
 - `participant_name` e dado pessoal local e nao deve ser usado em nomes de arquivo, prints publicos, commits ou logs compartilhados.
 - O banco e uma camada local de organizacao e auditoria, sem interpretacao clinica.
 
-## Validacao pendente
+## Validacao
 
-A implementacao tem testes automatizados com CSVs temporarios ficticios. Ainda falta validacao manual em Pilot com um CSV real local, sem versionar dados.
+A implementacao tem testes automatizados com CSVs temporarios ficticios.
+A antiga pendencia de Pilot com CSV real e historica e nao integra o aceite
+vigente. Consulte o [backlog canonico](Projeto%20Stroop%20Test.md) e o
+[protocolo Codex CLI](WORKFLOW_CODEX_CLI.md); validacoes usam somente dados sinteticos.

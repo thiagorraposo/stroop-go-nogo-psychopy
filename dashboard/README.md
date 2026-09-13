@@ -1,5 +1,9 @@
 # Dashboard local
 
+Planejamento, estado e aceite: [backlog canonico](../docs/Projeto%20Stroop%20Test.md).
+Operacao do desenvolvimento: [protocolo Codex CLI](../docs/WORKFLOW_CODEX_CLI.md).
+
+
 Dashboard Streamlit local para visualizar resultados descritivos do experimento Stroop Go/No-Go importados para SQLite.
 
 Aviso fixo exibido na interface:

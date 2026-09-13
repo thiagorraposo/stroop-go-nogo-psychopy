@@ -1,5 +1,9 @@
 # Scripts
 
+Planejamento, estado e aceite: [backlog canonico](../docs/Projeto%20Stroop%20Test.md).
+Operacao do desenvolvimento: [protocolo Codex CLI](../docs/WORKFLOW_CODEX_CLI.md).
+
+
 Esta pasta contem scripts auxiliares para analise descritiva e manutencao local.
 
 Para executar a analise a partir da raiz do projeto:

@@ -1,5 +1,9 @@
 # Testes
 
+Planejamento, estado e aceite: [backlog canonico](../docs/Projeto%20Stroop%20Test.md).
+Operacao do desenvolvimento: [protocolo Codex CLI](../docs/WORKFLOW_CODEX_CLI.md).
+
+
 Esta pasta contem testes de consistencia do experimento e da exportacao unificada.
 
 Validacoes implementadas ou esperadas:

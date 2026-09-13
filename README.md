@@ -1,5 +1,21 @@
 # Stroop Go/No-Go PsychoPy
 
+## Desenvolvimento pelo Codex CLI
+
+Planejamento, execucao, validacao e proximas etapas acontecem na sessao do Codex
+CLI deste repositorio, seguindo o [protocolo](docs/WORKFLOW_CODEX_CLI.md) carregado
+pelo [AGENTS.md](AGENTS.md). O [backlog canonico](docs/Projeto%20Stroop%20Test.md)
+e a unica fonte de escopo, aceite, dependencias, estado e progresso.
+
+- `continue o projeto`: executa somente a primeira etapa nao concluida e encerra.
+- `mostrar status`: inspeciona progresso, bloqueios e proxima etapa sem escrever.
+- `validar etapa atual`: reexecuta o aceite da etapa alvo sem antecipar outra.
+
+Nao e necessario gerar prompts externos. Decisoes sao tratadas na propria sessao;
+validacoes usam somente dados sinteticos. O uso cotidiano do experimento e do
+dashboard continua descrito abaixo.
+
+
 Experimento PsychoPy Builder de Stroop Go/No-Go em portugues brasileiro.
 
 Regra da tarefa: pressionar `Espaco` apenas quando a palavra e a cor da tinta forem congruentes. Nao responder quando forem incongruentes.
@@ -187,7 +203,10 @@ Use `--db` para escolher outro caminho e `--force` para reimportar um `assessmen
 
 A arquitetura prevista e: PsychoPy -> CSV bruto unificado -> script de importacao -> SQLite local -> dashboard Streamlit local.
 
-A Fase 1 dessa camada, com formulario local de sessao, foi implementada. A Fase 2, com CSV unificado por execucao e analisador tecnico, foi implementada. A Fase 7, com importacao para SQLite local, foi implementada e segue pendente de validacao manual com CSV real em Pilot. A Fase 8, com dashboard Streamlit local, foi implementada tecnicamente e segue pendente de validacao manual com banco real importado. O modelo de dados, regras de privacidade e plano incremental estao documentados em `docs/DADOS_E_DASHBOARD.md`, `docs/MODELO_DE_DADOS.md`, `docs/CSV_UNIFICADO.md`, `docs/IMPORTACAO_SQLITE.md` e `docs/PLANO_DE_IMPLEMENTACAO_DASHBOARD.md`.
+Os contratos tecnicos estao em `docs/DADOS_E_DASHBOARD.md`,
+`docs/MODELO_DE_DADOS.md`, `docs/CSV_UNIFICADO.md` e `docs/IMPORTACAO_SQLITE.md`.
+As antigas fases sao historicas; nao exigem dados reais para aceite do workflow.
+Planejamento e progresso ficam somente no [backlog canonico](docs/Projeto%20Stroop%20Test.md).
 
 Para rodar o dashboard:
 

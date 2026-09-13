@@ -4,9 +4,10 @@ Data: 2026-09-01.
 
 Esta etapa introduz somente a infraestrutura local de desenvolvimento. O
 PsychoPy continua instalado e executado no host. O fluxo funcional vigente
-permanece CSV -> SQLite -> dashboard; schema PostgreSQL, importacao PostgreSQL e
-integracao do dashboard com PostgreSQL pertencem a etapas posteriores do
-[workflow](WORKFLOW_EVOLUCAO.md).
+permanece CSV -> SQLite -> dashboard. O schema ja possui
+[migrations documentadas](MIGRACOES_POSTGRESQL.md); sequenciamento, escopo e
+aceite das entregas sao definidos somente no
+[backlog canonico](Projeto%20Stroop%20Test.md).
 
 ## Componentes
 

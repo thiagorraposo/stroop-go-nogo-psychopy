@@ -27,8 +27,19 @@ ignorados. `assets/` aceita somente material proprio.
 
 ## Workflow por etapas
 
+Leitura obrigatoria antes de planejar, executar, validar ou informar status:
+[protocolo Codex CLI](docs/WORKFLOW_CODEX_CLI.md) e
+[backlog canonico](docs/Projeto%20Stroop%20Test.md), alem dos documentos acima.
+Planejamento, execucao, validacao e definicao das proximas etapas ocorrem
+exclusivamente nesta sessao do Codex CLI, sem depender de outro chat.
+`continue o projeto` autoriza somente a primeira etapa nao concluida do backlog;
+`mostrar status` e somente leitura; `validar etapa atual` revalida sem avancar.
+Siga integralmente o protocolo para os tres comandos. Nao acesse ou configure
+OCI antes da Etapa 11; decisoes materiais sao perguntadas ao usuario na sessao.
+Neste workflow, nao execute `git add`, `git commit`, `git tag` ou `git push`.
+
 - Execute somente a etapa explicitamente solicitada e pare antes da seguinte.
-- Consulte o estado e os criterios em `docs/WORKFLOW_EVOLUCAO.md`; nao antecipe
+- Consulte o estado e os criterios em `docs/Projeto Stroop Test.md`; nao antecipe
   infraestrutura, migracoes ou funcionalidades de etapas posteriores.
 - Antes de editar, inspecione o estado atual e apresente um plano curto.
 - Preserve todo comportamento fora do escopo. Prefira mudancas pequenas,
