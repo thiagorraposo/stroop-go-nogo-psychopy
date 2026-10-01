@@ -47,6 +47,9 @@ alternativas de etapas ou progresso.
   nenhum banco operacional ou backup foi reaberto nesta reorganizacao.
 - A origem do destino OCI e o backlog fornecido pelo usuario; disponibilidade,
   limites e regiao ainda dependem de verificacao na etapa autorizada.
+- Consulta somente publica da documentacao OCI registrada em
+  [OCI_ETAPA11.md](OCI_ETAPA11.md); tenancy, regiao, cota, dominio, certificado,
+  destino externo e deploy continuam sem verificacao autenticada.
 - Divergencias do workflow antigo e verificacoes desta tarefa estao no
   [registro de alteracoes](REGISTRO_DE_ALTERACOES.md).
 
@@ -758,6 +761,17 @@ real foi usado.
 
 **Progresso após conclusão:** 93%.
 
+**Preparação pública registrada:** a documentação da Oracle foi consultada sem
+acesso à tenancy e sem criação de recursos. O shape candidato é
+`VM.Standard.A1.Flex` ARM64, sujeito à cota total Always Free, à capacidade da
+região e à validação autenticada. Ver [OCI_ETAPA11.md](OCI_ETAPA11.md). Esta
+preparação não altera o estado da etapa nem concede crédito parcial.
+
+**Pendência registrada em 2026-09-13:** a autorização para leitura autenticada
+foi recebida, mas o workspace não possuía OCI CLI, SDK Python ou configuração
+de tenancy. A consulta ainda não foi comprovada e cabe ao usuário definir um
+meio seguro de realizá-la, sem compartilhar chaves ou secrets na sessão.
+
 ---
 
 ## Etapa 12 — Automação e encerramento operacional
@@ -847,6 +861,9 @@ Antes de usar dados reais, ainda será necessário confirmar:
 - procedimento em caso de incidente ou vazamento;
 
 - disponibilidade e limites atuais do OCI.
+
+- autorização para criar recursos e publicar o sistema na OCI; a autorização de
+  leitura da tenancy já foi registrada e não equivale à autorização de deploy.
 
 
 # Regras de conclusão

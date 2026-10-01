@@ -3,6 +3,25 @@
 Este arquivo preserva fatos datados; nao define estado ou aceite vigente.
 Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 
+## 2026-09-13 — Consulta pública para a Etapa 11
+
+- `docs`: registrada em [OCI_ETAPA11.md](OCI_ETAPA11.md) a consulta de
+  documentação pública da Oracle sobre Always Free, `VM.Standard.A1.Flex`
+  ARM64, cotas, disponibilidade, volumes e isolamento de rede.
+- `docs`: a proposta mantém limites do Compose configuráveis, reserva de
+  capacidade para o sistema operacional e exposição pública restrita a
+  HTTP/HTTPS; PostgreSQL e dashboard continuam internos.
+- `scope`: nenhuma tenancy, região, cota autenticada, domínio, certificado,
+  destino externo, credencial ou recurso OCI foi acessado ou criado. A Etapa 11
+  permanece não iniciada e sem crédito parcial.
+
+## 2026-09-13 — Bloqueio de consulta autenticada OCI
+
+- `blocker`: a autorização para leitura autenticada foi recebida, mas o
+  workspace não contém OCI CLI, SDK Python ou configuração de tenancy. Nenhuma
+  credencial foi solicitada, impressa ou versionada; a retomada depende de uma
+  configuração local segura do OCI CLI.
+
 ## 2026-09-13 — Dashboard PostgreSQL
 
 - `feat`: concluída a Etapa 10 com leitura operacional PostgreSQL em
