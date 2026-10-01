@@ -3,6 +3,18 @@
 Este arquivo preserva fatos datados; nao define estado ou aceite vigente.
 Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 
+## 2026-09-30 — Responsabilidade pelas Etapas 11 e 12
+
+- `docs`: por decisao do usuario, o planejamento, a execucao e a validacao das
+  Etapas 11 e 12 serao feitos diretamente por ele. O Codex nao as inicia com
+  `continue o projeto`; podera revisar evidencias e atualizar a documentacao
+  quando solicitado, sem presumir aceite.
+- `docs`: alinhados AGENTS, protocolo e README; corrigida a tabela do backlog
+  para refletir as conclusoes ja registradas das Etapas 9 e 10 e distinguida a
+  autorizacao de leitura da tenancy da autorizacao pendente para deploy.
+- `scope`: nenhum deploy, consulta autenticada OCI, validacao operacional ou
+  mudanca de progresso foi executado nesta atualizacao documental.
+
 ## 2026-09-13 — Consulta pública para a Etapa 11
 
 - `docs`: registrada em [OCI_ETAPA11.md](OCI_ETAPA11.md) a consulta de

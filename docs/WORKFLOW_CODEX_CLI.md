@@ -1,7 +1,6 @@
 # Protocolo operacional do Codex CLI
 
-Planejamento, execucao, validacao e definicao das proximas etapas acontecem
-exclusivamente na sessao do Codex CLI aberta neste repositorio. Os comandos
+Este protocolo orienta o trabalho do Codex CLI neste repositorio. Os comandos
 abaixo sao mensagens do usuario na sessao, nao comandos de shell ou scripts.
 O [AGENTS.md raiz](../AGENTS.md) exige a leitura deste protocolo.
 
@@ -10,7 +9,17 @@ estado, progresso, proxima etapa e decisoes externas pendentes e o
 [backlog canonico](Projeto%20Stroop%20Test.md). Documentos tecnicos detalham
 contratos; baselines e registros sao evidencias datadas, sem estado concorrente.
 
+As Etapas 11 e 12 serao planejadas, executadas e validadas diretamente pelo
+usuario. O Codex nao inicia essas etapas com `continue o projeto`, nao acessa
+OCI por iniciativa propria e nao concede aceite sem evidencias dos criterios do
+backlog. Pode consultar o estado e revisar ou registrar evidencias documentais
+quando o usuario solicitar.
+
 ## `continue o projeto`
+
+Se a primeira etapa nao concluida for a 11 ou a 12, informar que sua execucao
+pertence ao usuario e encerrar sem iniciar trabalhos dessa etapa. O procedimento
+abaixo aplica-se apenas a etapas executadas pelo Codex.
 
 1. Ler integralmente os `AGENTS.md` aplicaveis, este protocolo e o backlog canonico.
 2. Inspecionar codigo, Git e documentacao, preservando alteracoes preexistentes.
@@ -52,6 +61,10 @@ etapas. Informar divergencias encontradas na resposta.
 ## `validar etapa atual`
 
 O alvo e a etapa em andamento ou bloqueada; na ausencia dela, a ultima concluida.
+Para as Etapas 11 e 12, revisar somente as evidencias que o usuario disponibilizar,
+sem executar infraestrutura, testes operacionais ou alterar o progresso por
+presuncao. Os passos de revalidacao abaixo aplicam-se a etapas executadas pelo
+Codex.
 Identificar explicitamente esse alvo antes da validacao. Ler as mesmas fontes,
 confirmar pre-requisitos e executar novamente todos os seus criterios de aceite,
 testes especificos, suite completa, Docker aplicavel e `git diff --check`, somente
@@ -97,13 +110,14 @@ no registro de alteracoes e o bloqueio no backlog, sem marcar conclusao. Informa
 exatamente qual decisao ou acao permite retomar. Se a revalidacao contradisser uma
 conclusao antiga, registrar a divergencia sem recalcular progresso silenciosamente.
 
-Perguntar ao usuario dentro da sessao sobre decisoes materiais, clinicas,
-semanticas, arquiteturais, metodologicas, de privacidade, seguranca, producao ou
-envolvendo dados reais que alterem o resultado. Registrar a decisao no documento
+Nos trabalhos executados pelo Codex, perguntar ao usuario dentro da sessao sobre
+decisoes materiais, clinicas, semanticas, arquiteturais, metodologicas, de
+privacidade, seguranca, producao ou envolvendo dados reais que alterem o
+resultado. Registrar a decisao no documento
 tecnico pertinente e sua pendencia/resolucao no backlog. Nenhum aceite depende de
 outro chat; nao gerar novo prompt externo para cada etapa.
 
-Nao abrir, copiar, migrar ou publicar dados reais. Nao acessar ou configurar OCI
-antes da Etapa 11; nessa etapa, decisoes de producao exigem autorizacao explicita
-na sessao. Nao antecipar etapas posteriores, instalar dependencias sem necessidade
-comprovada ou executar `git add`, `git commit`, `git tag` ou `git push`.
+Nao abrir, copiar, migrar ou publicar dados reais. O Codex nao acessa ou configura
+OCI por iniciativa propria; decisoes de producao e execucao das Etapas 11 e 12
+cabem ao usuario. Nao antecipar etapas posteriores, instalar dependencias sem
+necessidade comprovada ou executar `git add`, `git commit`, `git tag` ou `git push`.

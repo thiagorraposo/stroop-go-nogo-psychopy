@@ -11,17 +11,22 @@ validar e registrar o trabalho; documentos auxiliares nao mantem outro backlog.
 - Progresso global: **87%**, soma de 5% + 7% + 11% + 8% + 13% + 8% + 10% + 10% + 8% + 7%, sem credito parcial.
 - Suite registrada: **164 testes aprovados**; ver evidencias datadas abaixo.
 - Etapa 11: **nao iniciada**, primeira etapa nao concluida e proxima etapa.
+- Etapas 11 e 12: planejamento, execucao e validacao diretamente pelo usuario;
+  o Codex pode revisar evidencias e atualizar a documentacao quando solicitado,
+  sem iniciar essas etapas por `continue o projeto`.
 - Destino futuro de hospedagem: **OCI Always Free**, somente na Etapa 11.
-- Bloqueios atuais: nenhum para a etapa concluida; decisoes dos instrumentos
-  futuros e de producao permanecem listadas neste backlog.
+- Bloqueios atuais: nenhum para as etapas concluidas; a consulta autenticada da
+  Etapa 11 aguardava configuracao local do OCI CLI na ultima verificacao
+  registrada (2026-09-13). Decisoes dos instrumentos futuros e de producao
+  permanecem listadas neste backlog.
 
 ## Dependencias e documentos de referencia
 
 A ordem e sequencial: cada etapa N, de 2 a 12, exige todas as etapas anteriores
 integralmente concluidas; a Etapa 1 e a base. Nenhuma execucao antecipa a seguinte.
-Decisoes externas listadas neste documento devem ser resolvidas na sessao do
-Codex CLI antes da acao que delas depende. Nao acessar/configurar OCI antes da
-Etapa 11; atos de producao exigem autorizacao explicita nessa sessao.
+Decisoes externas listadas neste documento cabem ao usuario antes da acao que
+delas depende. O Codex nao acessa/configura OCI por iniciativa propria; acoes
+de producao ficam sob responsabilidade do usuario nas Etapas 11 e 12.
 
 Consultar a [baseline](BASELINE_ETAPA_1.md), os contratos do
 [experimento](DECISOES_DO_EXPERIMENTO.md), [CSV](CSV_UNIFICADO.md) e
@@ -68,8 +73,8 @@ alternativas de etapas ou progresso.
 | 6     | Envio remoto de CSV              |   8% |       52% | Concluída |
 | 7     | Suporte a múltiplos instrumentos |  10% |       62% | Concluída |
 | 8     | Autenticação e permissões        |  10% |       72% | Concluída |
-| 9     | Hardening de produção            |   8% |       80% | Pendente  |
-| 10    | Dashboard usando PostgreSQL      |   7% |       87% | Pendente  |
+| 9     | Hardening de produção            |   8% |       80% | Concluída |
+| 10    | Dashboard usando PostgreSQL      |   7% |       87% | Concluída |
 | 11    | Deploy no OCI Always Free        |   6% |       93% | Pendente  |
 | 12    | Automação e validação final      |   7% |      100% | Pendente  |
 
@@ -705,6 +710,9 @@ real foi usado.
 
 **Objetivo:** hospedar o sistema no ambiente escolhido.
 
+**Responsavel pela execucao e validacao:** usuario. O Codex nao inicia o deploy;
+o estado e o progresso dependem de evidencias dos criterios de aceite.
+
 ### Backlog
 
 - Verificar limites e disponibilidade atuais do OCI.
@@ -777,6 +785,9 @@ meio seguro de realizá-la, sem compartilhar chaves ou secrets na sessão.
 ## Etapa 12 — Automação e encerramento operacional
 
 **Objetivo:** automatizar o fluxo e validar o sistema completo.
+
+**Responsavel pela execucao e validacao:** usuario, apos a conclusao integral
+da Etapa 11. O estado e o progresso dependem de evidencias dos criterios de aceite.
 
 ### Backlog
 
@@ -880,13 +891,15 @@ Uma etapa só conta no progresso quando:
 
 - nenhuma etapa posterior tiver sido antecipada;
 
-- exatamente uma mensagem de commit for sugerida;
+- em etapas executadas pelo Codex, exatamente uma mensagem de commit for sugerida;
 
-- nenhum `git add`, commit, tag ou push for executado.
+- o Codex não tiver executado `git add`, commit, tag ou push.
 
 Sem progresso parcial. Teste obrigatório indisponível ou falhando bloqueia o
 aceite: manter o progresso, registrar a causa e indicar a decisão ou ação
 necessária. Validar somente com dados sintéticos, sem dependência de outro chat.
 
 
-**Próxima ação:** `continue o projeto` na sessão do Codex CLI.
+**Próxima ação:** o usuário executa diretamente a Etapa 11 e registra evidências
+de aceite antes de iniciar a Etapa 12. `continue o projeto` não inicia nenhuma
+dessas etapas no Codex CLI.

@@ -1,19 +1,21 @@
 # Stroop Go/No-Go PsychoPy
 
-## Desenvolvimento pelo Codex CLI
+## Workflow de evolucao
 
-Planejamento, execucao, validacao e proximas etapas acontecem na sessao do Codex
-CLI deste repositorio, seguindo o [protocolo](docs/WORKFLOW_CODEX_CLI.md) carregado
-pelo [AGENTS.md](AGENTS.md). O [backlog canonico](docs/Projeto%20Stroop%20Test.md)
-e a unica fonte de escopo, aceite, dependencias, estado e progresso.
+O [backlog canonico](docs/Projeto%20Stroop%20Test.md) e a unica fonte de escopo,
+aceite, dependencias, estado e progresso. O [protocolo](docs/WORKFLOW_CODEX_CLI.md)
+orienta o trabalho do Codex CLI neste repositorio. As Etapas 11 e 12 serao
+executadas e validadas diretamente pelo usuario.
 
-- `continue o projeto`: executa somente a primeira etapa nao concluida e encerra.
+- `continue o projeto`: nao inicia as Etapas 11 e 12, reservadas ao usuario.
 - `mostrar status`: inspeciona progresso, bloqueios e proxima etapa sem escrever.
-- `validar etapa atual`: reexecuta o aceite da etapa alvo sem antecipar outra.
+- `validar etapa atual`: para etapas sob responsabilidade do Codex, reexecuta o
+  aceite sem antecipar outra; nas Etapas 11 e 12, revisa apenas evidencias
+  disponibilizadas pelo usuario.
 
-Nao e necessario gerar prompts externos. Decisoes sao tratadas na propria sessao;
-validacoes usam somente dados sinteticos. O uso cotidiano do experimento e do
-dashboard continua descrito abaixo.
+Nao e necessario gerar prompts externos. Validacoes do projeto usam somente dados
+sinteticos. O uso cotidiano do experimento e do dashboard continua descrito
+abaixo.
 
 
 Experimento PsychoPy Builder de Stroop Go/No-Go em portugues brasileiro.
