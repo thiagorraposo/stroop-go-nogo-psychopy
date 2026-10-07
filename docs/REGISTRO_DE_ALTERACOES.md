@@ -3,6 +3,17 @@
 Este arquivo preserva fatos datados; nao define estado ou aceite vigente.
 Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 
+## 2026-10-07 — Execucao do gerenciador de usuarios como modulo
+
+- `docs`: corrigidos os comandos `bootstrap` e `recover-admin` em
+  [autenticacao e permissoes](AUTENTICACAO_E_PERMISSOES.md) para usar
+  `python -m scripts.gerenciar_usuarios`; nenhuma outra ocorrencia equivalente
+  foi encontrada nos arquivos pesquisados, excluindo secrets e dados locais.
+- `test`: nove testes de autenticacao aprovados; ajuda dos dois subcomandos
+  executada como modulo, sem conexao com banco; `git diff --check` aprovado.
+- `scope`: nenhum codigo Python, banco, servico, segredo ou estado de etapa
+  foi alterado.
+
 ## 2026-10-07 — Revisao do OpenSSL no proxy
 
 - `fix`: atualizada somente a revisao fixada do pacote OpenSSL em

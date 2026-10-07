@@ -64,7 +64,7 @@ Com `AUTH_DATABASE_URL` ja configurada no ambiente, crie o primeiro
 administrador:
 
 ```bash
-python scripts/gerenciar_usuarios.py bootstrap \
+python -m scripts.gerenciar_usuarios bootstrap \
   --issuer https://accounts.google.com \
   --subject IDENTIFICADOR_SUB_GOOGLE
 ```
@@ -126,7 +126,7 @@ emergencia exige credencial de banco, identidade ja cadastrada e confirmacao
 explicita:
 
 ```bash
-python scripts/gerenciar_usuarios.py recover-admin \
+python -m scripts.gerenciar_usuarios recover-admin \
   --issuer https://accounts.google.com \
   --subject IDENTIFICADOR_SUB_GOOGLE \
   --confirm-break-glass
