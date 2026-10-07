@@ -3,6 +3,16 @@
 Este arquivo preserva fatos datados; nao define estado ou aceite vigente.
 Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 
+## 2026-10-07 — Revisao do OpenSSL no proxy
+
+- `fix`: atualizada somente a revisao fixada do pacote OpenSSL em
+  `Dockerfile.proxy`, de `3.3.7-r0` para `3.3.7-r2`.
+- `docs`: sincronizada a versao descrita em [hardening](HARDENING_PRODUCAO.md).
+- `test`: 12 testes estaticos de producao e seis de infraestrutura aprovados;
+  `git diff --check` aprovado.
+- `scope`: sem build, deploy, alteracao de banco, acesso a secrets ou mudanca
+  do estado das etapas.
+
 ## 2026-09-30 — Responsabilidade pelas Etapas 11 e 12
 
 - `docs`: por decisao do usuario, o planejamento, a execucao e a validacao das

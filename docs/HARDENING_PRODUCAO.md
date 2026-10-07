@@ -17,7 +17,7 @@ estado e aceite. O dashboard de resultados usa PostgreSQL por
 - `.env.production.example`: nomes e limites ficticios, nunca credenciais.
 
 As imagens-base estao fixadas por versao e digest de manifesto. O proxy tambem
-fixa o pacote OpenSSL 3.3.7-r0 usado para validar os arquivos TLS. Os manifests
+fixa o pacote OpenSSL 3.3.7-r2 usado para validar os arquivos TLS. Os manifests
 oficiais verificados em 2026-09-13 incluem `linux/arm64/v8` para PostgreSQL
 17.6, Nginx 1.28.0 e Python 3.12.11. As dependencias Python diretas tambem usam
 versoes exatas; `dashboard/requirements.lock` fixa todo o conjunto transitivo
