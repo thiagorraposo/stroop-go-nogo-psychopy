@@ -4,10 +4,35 @@ Este protocolo orienta o trabalho do Codex CLI neste repositorio. Os comandos
 abaixo sao mensagens do usuario na sessao, nao comandos de shell ou scripts.
 O [AGENTS.md raiz](../AGENTS.md) exige a leitura deste protocolo.
 
-A unica fonte de etapas, pesos, dependencias, escopo, criterios de aceite,
-estado, progresso, proxima etapa e decisoes externas pendentes e o
-[backlog canonico](Projeto%20Stroop%20Test.md). Documentos tecnicos detalham
-contratos; baselines e registros sao evidencias datadas, sem estado concorrente.
+Ha uma fonte de estado por escopo: o [backlog legado](Projeto%20Stroop%20Test.md)
+governa as etapas 1–12 da operacao existente; o [roadmap WEB](ROADMAP_WEB.md)
+governa a nova versao, com IDs Wxx. Os estados nao se somam. Documentos tecnicos
+detalham contratos; baselines e registros sao evidencias datadas.
+
+## Evolucao web — uma etapa por sessao
+
+`continue web` retoma uma etapa em andamento/bloqueada ou seleciona a primeira
+nao concluida cujas dependencias estejam concluidas. `execute Wxx` permite
+selecionar explicitamente uma etapa elegivel. Ler o contexto minimo, limites,
+entregaveis e validacoes indicados no roadmap; nao repetir a analise global
+quando o mapa e os contratos existentes forem suficientes.
+
+`mostrar status web` apenas consulta estado e evidencias. `validar etapa web
+Wxx` revalida somente a etapa indicada, sem implementar outra. Para uma etapa
+documental, validar documentos/links/diff; para codigo, executar a regressao
+afetada e os criterios da ficha. Registrar aprovados, falhas, erros e skips.
+
+Atualizar o estado apenas com aceite comprovado e registrar comandos/resultados
+em `REGISTRO_DE_ALTERACOES.md`. Uma pendencia manual exigida nao e um teste
+aprovado. Encerrar com arquivos, evidencias, riscos, proxima etapa e uma sugestao
+de commit, sem executa-lo. Nao gerar prompts nem copias de progresso por etapa.
+
+W22 pertence ao usuario: nenhum comando de continuacao autoriza acesso OCI,
+deploy, contratacao ou dados reais. As restricoes legadas abaixo tambem
+continuam validas. `continue o projeto`, `mostrar status` e `validar etapa
+atual` sem qualificacao conservam o significado legado.
+
+## Workflow legado
 
 As Etapas 11 e 12 serao planejadas, executadas e validadas diretamente pelo
 usuario. O Codex nao inicia essas etapas com `continue o projeto`, nao acessa

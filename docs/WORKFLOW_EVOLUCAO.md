@@ -1,5 +1,9 @@
 # Workflow de evolucao — referencia substituida
 
+A evolucao para a nova versao web usa [ROADMAP_WEB.md](ROADMAP_WEB.md) e o
+[ADR-001](arquitetura/ADR-001-evolucao-web.md). O redirecionamento abaixo trata
+do fluxo legado PsychoPy/Streamlit; os estados dos dois escopos sao separados.
+
 Este documento deixou de governar o planejamento em 2026-09-13. A unica fonte
 canonica de etapas, pesos, dependencias, escopo, criterios de aceite, estado,
 progresso, proxima etapa e decisoes externas pendentes e

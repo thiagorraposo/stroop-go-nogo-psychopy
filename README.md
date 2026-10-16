@@ -1,9 +1,25 @@
 # Stroop Go/No-Go PsychoPy
 
+## Evolucao para WEB
+
+O repositorio prepara uma versao web no mesmo projeto, com arquitetura de
+monolito modular. O nucleo Python em `stroop/` concentra contratos, validacao,
+metricas e adaptadores CSV reutilizados pelo fluxo atual. `api/` e `web/`
+reservam as futuras fronteiras HTTP e de interface; nesta preparacao contem
+somente documentacao.
+
+- [Estrutura e mapa de compatibilidade](docs/ESTRUTURA_DO_PROJETO.md).
+- [Decisao arquitetural e stack alvo](docs/arquitetura/ADR-001-evolucao-web.md).
+- [Roadmap WEB e ponto de retomada](docs/ROADMAP_WEB.md).
+
+No Codex CLI, `continue web` executa uma etapa do roadmap; `execute Wxx`
+seleciona uma etapa com dependencias atendidas. A operacao PsychoPy/Streamlit
+e os comandos abaixo continuam disponiveis.
+
 ## Workflow de evolucao
 
-O [backlog canonico](docs/Projeto%20Stroop%20Test.md) e a unica fonte de escopo,
-aceite, dependencias, estado e progresso. O [protocolo](docs/WORKFLOW_CODEX_CLI.md)
+O [backlog legado](docs/Projeto%20Stroop%20Test.md) e a unica fonte de escopo,
+aceite, dependencias, estado e progresso do fluxo existente. O [protocolo](docs/WORKFLOW_CODEX_CLI.md)
 orienta o trabalho do Codex CLI neste repositorio. As Etapas 11 e 12 serao
 executadas e validadas diretamente pelo usuario.
 
@@ -138,7 +154,7 @@ somente leitura descrita em [`docs/DASHBOARD_POSTGRESQL.md`](docs/DASHBOARD_POST
 - `AGENTS.md`: regras persistentes para agentes e contribuicoes futuras.
 - `docs/`: documentacao de governanca, decisoes e historico.
 - `assets/`: assets proprios do projeto.
-- `tests/`: espaco reservado para validacoes futuras.
+- `tests/`: testes de regressao e fixtures sinteticas.
 
 ## Como abrir no Builder
 

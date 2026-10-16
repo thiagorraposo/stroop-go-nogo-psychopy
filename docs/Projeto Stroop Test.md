@@ -1,6 +1,10 @@
 # Backlog completo — evolução do Stroop
 
-Este documento e a unica fonte canonica para etapas, pesos, dependencias,
+Este documento governa o escopo legado PsychoPy/Streamlit. A evolucao para a
+nova versao web tem escopo e estado em [ROADMAP_WEB.md](ROADMAP_WEB.md);
+seu progresso nao e representado pelos percentuais abaixo.
+
+Este documento e a unica fonte canonica do escopo legado para etapas, pesos, dependencias,
 escopo, criterios de aceite, estado, progresso, proxima etapa e decisoes externas
 pendentes. O [protocolo Codex CLI](WORKFLOW_CODEX_CLI.md) define como executar,
 validar e registrar o trabalho; documentos auxiliares nao mantem outro backlog.
@@ -9,7 +13,8 @@ validar e registrar o trabalho; documentos auxiliares nao mantem outro backlog.
 
 - Etapas 1–10: concluidas.
 - Progresso global: **87%**, soma de 5% + 7% + 11% + 8% + 13% + 8% + 10% + 10% + 8% + 7%, sem credito parcial.
-- Suite registrada: **164 testes aprovados**; ver evidencias datadas abaixo.
+- Suite registrada no ciclo legado: **164 testes aprovados**; evidencia historica
+  datada abaixo. Validacoes da reorganizacao e dos novos testes ficam no roadmap WEB.
 - Etapa 11: **nao iniciada**, primeira etapa nao concluida e proxima etapa.
 - Etapas 11 e 12: planejamento, execucao e validacao diretamente pelo usuario;
   o Codex pode revisar evidencias e atualizar a documentacao quando solicitado,

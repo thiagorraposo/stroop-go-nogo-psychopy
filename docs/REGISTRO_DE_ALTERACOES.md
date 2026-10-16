@@ -3,6 +3,46 @@
 Este arquivo preserva fatos datados; nao define estado ou aceite vigente.
 Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 
+O estado da nova versao web e mantido separadamente no
+[roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
+
+## 2026-10-16 — Preparacao estrutural da evolucao web
+
+- `refactor`: extraidos contratos, excecoes, validacao e metricas para
+  `stroop/domain/`; leitura CSV e adaptadores para `stroop/ingestion/`.
+  Removida a dependencia do registro de instrumentos no importador SQLite.
+  Os modulos anteriores reexportam os nomes por compatibilidade; persistencia
+  e CLIs conservam comportamento, caminhos, argumentos e codigos de saida.
+- `build`: `Dockerfile.dashboard` copia o novo pacote. Nenhuma dependencia,
+  imagem base, schema ou migration foi alterada.
+- `docs`: criado ADR-001 de monolito modular, atualizado o mapa estrutural e
+  reservado `api/` e `web/` somente com READMEs. Criado roadmap com 24 fichas
+  W00–W23, objetivos, entregaveis, dependencias, aceite, validacoes e leituras.
+  Instrucoes distinguem o workflow web do backlog legado e permitem uma etapa
+  por sessao, sem repetir a inspecao global.
+- `test`: baseline anterior de 164 testes aprovada; apos a extracao e quatro
+  regressoes novas, **168 aprovados, zero falhas, erros ou skips** em 5,584 s.
+  Comando: `.venv/bin/python -m unittest discover -s tests -v`, com
+  `TEST_DATABASE_URL` exclusivamente em PostgreSQL 17.6 descartavel em tmpfs,
+  nome `stroop_etapa4_test_web_structure` e dados sinteticos. Procedimento
+  reproduzivel no roadmap; nenhum banco operacional foi consultado.
+- `test`: 34 definicoes movidas/preservadas comparadas por AST com o HEAD;
+  regras e constantes identicas. Testes novos protegem os imports/excecoes
+  anteriores, o nucleo sem site-packages/banco/UI e as CLIs por caminho externo
+  e por modulo, incluindo duplicidade e `--force` no SQLite temporario.
+- `test`: configuracoes Compose de desenvolvimento, producao e restauracao
+  aprovadas com exemplos ficticios; avisos existentes sobre `secrets.mode`
+  ignorado fora do Swarm permanecem, sem alterar permissoes de arquivos reais.
+  `docker build --tag stroop-web-structure-dashboard --file Dockerfile.dashboard .`
+  aprovado; smoke com filesystem somente leitura retornou health `ok`, HTTP 200
+  e imports da aplicacao validos. CLI `--validate-only` validou fixture na imagem
+  sem rede. Links locais e `git diff --check` aprovados.
+- `scope`: nenhuma funcionalidade web, coleta, alteracao experimental, acesso
+  OCI ou deploy. Dados, secrets, PsychoPy, condicoes, dashboard, SQL e launchers
+  existentes preservados. As etapas legadas 11/12 nao foram iniciadas.
+  W01–W23 nao iniciadas; decisoes de protocolo/acesso/dados ficam nas fichas
+  W01–W03. Containers sinteticos de verificacao removidos ao concluir.
+
 ## 2026-10-07 — Execucao do gerenciador de usuarios como modulo
 
 - `docs`: corrigidos os comandos `bootstrap` e `recover-admin` em
