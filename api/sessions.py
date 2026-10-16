@@ -385,7 +385,7 @@ async def redeem(request: Request, body: Redeem):
 async def participant_session(request: Request):
     _reject_query(request)
     await _reject_empty_body(request)
-    _, token_hash = _participant(request)
+    token, token_hash = _participant(request)
     try:
         session = application.participant_session(request.app.state.config.database_url,
                                                   token_hash)
@@ -401,7 +401,10 @@ async def participant_session(request: Request):
               "activated_at": _serialize_time(session.activated_at),
               "expires_at": _serialize_time(session.expires_at), "can_resume": False}
     if session.state == 'completed':
-        return session.receipt
+        return JSONResponse(session.receipt, headers={
+            'X-CSRF-Token': _participant_csrf(request.app.state.config, token),
+            'X-Session-Expires-At': _serialize_time(session.expires_at),
+        })
     if session.state == "preparing":
         conditions = {row["condition_id"]: row for row in _load_conditions("main")}
         result.update({
@@ -468,3 +471,21 @@ async def abort(request: Request, body: Abort):
     except PersistenceError:
         raise _persistence_error() from None
     return result
+
+
+@router.post("/participant/logout", status_code=204)
+async def participant_logout(request: Request, body: EmptyRequest):
+    _reject_query(request)
+    config: APIConfig = request.app.state.config
+    if not _origin_is_valid(request, config):
+        raise APIError("csrf_failed")
+    token = _cookie(request, PARTICIPANT_COOKIE)
+    if token is not None:
+        _, token_hash = _participant_write(request)
+        try:
+            application.logout(config.database_url, token_hash)
+        except PersistenceError:
+            raise _persistence_error() from None
+    response = Response(status_code=204)
+    response.delete_cookie(PARTICIPANT_COOKIE, path="/", secure=True, httponly=True, samesite="lax")
+    return response

@@ -413,9 +413,11 @@ def _eligible_session(connection, token_hash: str):
            JOIN web_project_members m ON m.project_id=i.project_id
              AND m.issuer=i.evaluator_issuer AND m.subject=i.evaluator_subject
            JOIN app_users u ON (u.issuer,u.subject)=(i.evaluator_issuer,i.evaluator_subject)
-           WHERE s.session_id=%s""", (candidate[0],)
+           WHERE s.session_id=%s AND s.participant_token_sha256=%s""", (candidate[0], token_hash)
     ).fetchone()
-    if row is None or row[14] is not None:
+    if row is None:
+        raise UnknownCredentialError
+    if row[14] is not None:
         raise MissingError
     return row
 
@@ -604,3 +606,25 @@ def complete_participant_session(database_url: str, token_hash: str, payload: di
             return receipt, True
     except psycopg.Error as exc:
         raise PersistenceError from exc
+
+
+def logout_participant_session(database_url: str, token_hash: str, replacement_hash: str) -> None:
+    """Invalida a credencial sem apagar estado completed ou resultados associados."""
+    def operation():
+        with psycopg.connect(database_url) as connection:
+            row = connection.execute(
+                "SELECT session_id FROM web_participant_sessions WHERE participant_token_sha256=%s",
+                (token_hash,),
+            ).fetchone()
+            if row is None:
+                return
+            # Mesmo lock do ciclo de vida; revalidar hash depois de aguarda-lo.
+            connection.execute("SELECT session_id FROM web_invitations WHERE session_id=%s FOR UPDATE", (row[0],))
+            connection.execute(
+                """UPDATE web_participant_sessions SET participant_token_sha256=%s,
+                   abort_reason=CASE WHEN state IN ('preparing','running') THEN 'user_cancelled' ELSE abort_reason END,
+                   state=CASE WHEN state IN ('preparing','running') THEN 'aborted' ELSE state END
+                   WHERE session_id=%s AND participant_token_sha256=%s""",
+                (replacement_hash, row[0], token_hash),
+            )
+    return _run(operation)

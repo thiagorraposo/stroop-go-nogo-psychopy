@@ -81,7 +81,7 @@ export function apiErrorMessage(error: unknown): string {
   return error instanceof ApiError ? messageFor(error.code) : localErrors.invalid_response;
 }
 
-function record(value: unknown): value is Record<string, unknown> {
+export function record(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
@@ -107,7 +107,12 @@ async function responseError(response: Response): Promise<ApiError> {
   return new ApiError(code, response.status, retryAfter(response));
 }
 
-async function request<T>(path: '/api/v1/auth/me' | '/api/v1/auth/logout',
+type ApiPath = '/api/v1/auth/me' | '/api/v1/auth/logout' |
+  '/api/v1/participant/redeem' | '/api/v1/participant/session' |
+  '/api/v1/participant/start' | '/api/v1/participant/complete' | '/api/v1/participant/abort' |
+  '/api/v1/participant/logout';
+
+export async function request<T>(path: ApiPath,
   init: RequestInit, decode: (response: Response) => Promise<T>, signal?: AbortSignal): Promise<T> {
   if (signal?.aborted) throw new ApiError('request_cancelled', 0);
   const controller = new AbortController();

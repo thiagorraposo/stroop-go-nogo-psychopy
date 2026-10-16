@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import re
+import hashlib
+import secrets
 from uuid import UUID
 
 from stroop.domain.auth import AppUser
@@ -117,10 +119,15 @@ def redeem_limit(database_url: str, remote_hash: str, limit: int, window_seconds
 __all__ = ["InvalidDataError", "ConflictError", "ExpiredError", "MissingError",
            "PersistenceError", "projects", "create_project", "members", "set_member",
            "create_invitation", "revoke_invitation", "redeem", "participant_session",
-           "start", "abort", "redeem_limit"]
+           "start", "abort", "redeem_limit", "logout"]
 
 
 ConflictError = persistence.ConflictError
 ExpiredError = persistence.ExpiredError
 MissingError = persistence.MissingError
 UnknownCredentialError = persistence.UnknownCredentialError
+
+
+def logout(database_url: str, token_hash: str) -> None:
+    replacement_hash = hashlib.sha256(secrets.token_bytes(32)).hexdigest()
+    persistence.logout_participant_session(database_url, token_hash, replacement_hash)

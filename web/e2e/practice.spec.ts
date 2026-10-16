@@ -1,5 +1,8 @@
+import { mockParticipant } from './support/participant'
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
+
+test.beforeEach(async ({ page }) => { await mockParticipant(page) })
 
 async function feedbackOutcome(page: Page): Promise<string> {
   // O feedback dura 500 ms; observar a cada quadro evita perder a fase

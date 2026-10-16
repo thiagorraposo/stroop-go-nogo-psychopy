@@ -1,5 +1,8 @@
+import { mockParticipant } from './support/participant'
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
+
+test.beforeEach(async ({ page }) => { await mockParticipant(page) })
 
 async function finishPractice(page: Page) {
   await page.goto('/pratica')
@@ -20,10 +23,9 @@ test('principal executa 16 condicoes reais sem feedback nem encurtar resposta', 
   const kinds: string[] = []
   for (let trial = 1; trial <= 16; trial += 1) {
     const observed = await page.waitForFunction(index => {
-      if (document.querySelector('h1')?.textContent === 'Execução interrompida.') {
-        const temporal = document.querySelector('main')?.textContent?.includes('tempos de apresentação')
-        throw new Error(temporal ? 'Gate temporal interrompeu o principal.' : 'Principal interrompido.')
-      }
+      const alert = document.querySelector('[role="alert"]')?.textContent ?? ''
+      if (alert.includes('tempos de apresentação')) throw new Error('Gate temporal interrompeu o principal.')
+      if (alert.includes('A execução foi interrompida')) throw new Error('Principal interrompido.')
       const element = document.querySelector('[data-phase="stimulus"]')
       if (element?.getAttribute('data-trial-number') !== String(index)) return null
       return { id: Number(element.getAttribute('data-condition-id')), kind: element.getAttribute('data-condition') }
@@ -45,7 +47,7 @@ test('principal executa 16 condicoes reais sem feedback nem encurtar resposta', 
   expect(kinds.filter(kind => kind === 'incongruent')).toHaveLength(8)
   await expect(page.getByText('Dados descritivos das 16 tentativas principais.', { exact: false })).toBeVisible()
   await expect(page.getByRole('button', { name: /exportar|baixar|download/i })).toHaveCount(0)
-  await expect(page.getByRole('status')).toContainText('ainda não possui confirmação')
+  await expect(page.getByRole('status')).toContainText('Resultado recebido pela equipe.')
   expect(await page.evaluate(() => ({ local: localStorage.length, session: sessionStorage.length })))
     .toEqual({ local: 0, session: 0 })
   await page.getByRole('button', { name: 'Finalizar', exact: true }).click()
@@ -61,8 +63,8 @@ test('Escape no principal descarta execucao e exige nova sessao com pratica', { 
   await page.getByRole('button', { name: 'Começar bloco principal' }).click()
   await expect(page.locator('[data-phase="stimulus"]')).toBeVisible({ timeout: 8_000 })
   await page.keyboard.press('Escape')
-  await expect(page.getByRole('heading', { name: 'Execução interrompida.' })).toBeVisible()
-  await expect(page.getByRole('alert')).toContainText('nova sessão e fazer a prática novamente')
+  await expect(page.getByRole('alert')).toContainText('A execução foi interrompida')
+  await expect(page.getByRole('alert')).toContainText('novo convite e faça a prática novamente')
   await expect(page.getByRole('button', { name: 'Começar bloco principal' })).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Resumo da execução' })).toHaveCount(0)
 })

@@ -237,6 +237,49 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   HTTPS local sintetico; conectar convite/bootstrap/start/conclusao/abortamento,
   confirmar recibo e reenvio em RAM, sem usar storage JS ou repetir principal.
 
+## W13 — Concluida
+
+- W14 salva em `e8b01eb`, W12 em `07a465a`, W11 em `27b9a82`, W10 em `8d9e0a3`.
+  Worktree inicial seguinte somente AGENTS raiz preexistente, preservado.
+- Novos `web/src/api/participant.ts` e `.test.ts` usam transporte compartilhado
+  de `client.ts`: caminhos fixos, cookies same-origin/HttpOnly, CSRF RAM,
+  timeout/cancelamento e erros fechados. Bootstrap verifica snapshot e fontes
+  inteiros, preserva ordem API; running nunca oferece retomada; recibo valida
+  versoes, IDs e contagens. Payload completo imutavel/whitelist conserva RT e
+  corpo identico em retries. Redeem nao usa URL/storage para segredo.
+- Controlador RAM e ParticipantFlow integrados: convite, ordem da API, start
+  confirmado antes do motor, payload imutavel, recuperacao GET/reenvio manual,
+  expiracao e descarte. Native Web Locks impede motores concorrentes entre abas;
+  pagehide descarta estado e bfcache exige recarregar, sem retomar principal.
+- Logout com Origin/CSRF rotaciona hash da credencial e preserva completed.
+  GET completed fornece CSRF/prazo em headers sem alterar recibo JSON.
+  Finalizar aguarda confirmacao do logout antes de limpar a interface.
+- Evidencias: 157 testes frontend/typecheck/build e 26 testes isolados de
+  navegador aprovados; 22 testes backend focados com PostgreSQL real aprovados.
+  Quatro smoke tests HTTPS reais Chromium/Firefox aprovados: cookie seguro,
+  expiracao e refresh de running sem avaliacao parcial ou retomada.
+- Harness web/e2e/integrated usa API/banco reais com TLS local efemero; exige
+  TEST_DATABASE_URL com database stroop_etapa4_test_*, nunca .env. Profissional
+  sintetico preparado localmente; nao comprova OIDC externo ou TLS de producao.
+- Suite HTTPS ampliada aprovada: seis testes em 3 minutos, Chromium/Firefox.
+  Principal real de 60 segundos, perda da resposta depois do commit, recuperacao
+  de recibo sem duplicacao (1 avaliacao/16 tentativas/12 metricas), consulta
+  profissional autorizada e logout preservando resultado e invalidando cookie.
+- Mais dois testes HTTPS aprovados: falha antes do commit, reenvio manual
+  com corpo identico e duplo clique; uma unica avaliacao nos dois navegadores.
+  Harness ajustado para SO_REUSEADDR na verificacao de portas apos encerramento.
+- Regressao final backend: 262 testes/39,645 s, sem skips, PostgreSQL real.
+  Frontend: 157 testes aprovados novamente. Build/typecheck aprovados no harness.
+- Suite final `npm run test:browser`: 26 gerais/40,8 s e quatro temporais/3,5 min
+  aprovados nos dois navegadores. Links locais 31/31 e diff check aprovados.
+  Timeout coberto no transporte (inclusive leitura do corpo) e controlador;
+  cenarios reais de rede confirmam recuperacao e reenvio sem repetir motor.
+- Criterios W13 satisfeitos: confirmacao somente apos servidor, sem duplicacao,
+  interrupcao sem parcial, expiracao/refresh/limpeza e duplo clique verificados.
+  Sem alegacao de medicao fisica W16, OIDC externo ou infraestrutura de producao.
+- Proxima acao: salvar commit local W13 preservando AGENTS raiz; iniciar W15,
+  cliente profissional de consultas/cards/graficos/detalhe/exportacao W14.
+
 ## Decisoes e contexto preservados
 
 - Usuario aprovou explicitamente itens 1–19 da sessao. Finalidade coleta do

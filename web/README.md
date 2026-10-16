@@ -59,8 +59,8 @@ esses testes contra coleta real. `npm run preview` serve o build local em 4173.
   descarte de RAM. Nao oferecem download participante.
 - `src/experiment/protocol.ts`: consome `../condicoes/web_protocol.json`
   compartilhado com a API e os CSVs-fonte de pratica/principal. Nenhum parametro metodologico
-  e derivado de exemplos da interface. A integracao de sessao sera conectada
-  a API na etapa W13.
+  e derivado de exemplos da interface. A sessao usa bootstrap e ordem da API, com
+  confirmacao do inicio antes do motor.
 - `src/**/*.test.*` e `e2e/`: testes de logica/DOM e navegador.
 
 Nenhum resultado ou token e persistido por JavaScript. Segredos OIDC permanecem
@@ -87,4 +87,21 @@ Fixtures de paridade ficam em `../tests/fixtures/web_results_summary.json`,
 carregadas apenas nos testes. O servidor de desenvolvimento permite somente
 as pastas explicitas web/condicoes/fixtures; nao expor a raiz do repositorio.
 O serializador CSV de servidor fica em `stroop/domain/web_export.py`; a rota
-profissional autorizada sera conectada em W14.
+profissional autorizada foi implementada em W14.
+
+
+Integracao sintetica HTTPS real (W13): com PostgreSQL descartavel ja iniciado,
+configure `TEST_DATABASE_URL` para database cujo nome comece por
+`stroop_etapa4_test_` e execute `npm run test:integration` nesta pasta. O harness
+**recria o schema desse banco de teste**; nunca aponte para dados de pesquisa.
+Exige dependencias Python da raiz em `.venv`, Node, navegadores Playwright e
+OpenSSL. Usa portas locais 4373/4381, certificado efemero e proxy HTTPS somente
+para testes. Encerra apenas processos que iniciou e remove certificado/chave.
+Nao usa `.env`, nao altera VPS e nao comprova OIDC externo ou TLS de producao.
+
+Os testes isolados usam doubles explicitamente em `e2e/support/`; os testes de
+`e2e/integrated/` exercitam HTTP/API/PostgreSQL reais. Falhas de transporte podem
+ser injetadas mantendo a gravacao e as respostas do backend reais. Convites e
+cookies sinteticos nao devem aparecer em logs/traces nem ser versionados.
+`ParticipantRun` coordena dados em RAM, recuperacao de recibo e reenvio; a trava
+Web Locks impede motores concorrentes entre abas da mesma origem/perfil.

@@ -16,6 +16,9 @@ export type ResultSummary = {
   correct_rejections: number
 }
 
+export type DisplaySummary = Pick<ResultSummary, 'accuracy' | 'response_time' | 'total_trials' |
+  'hits' | 'omission_errors' | 'commission_errors' | 'correct_rejections'>
+
 /** Mesmas formulas do nucleo Python; ausencia de hits permanece ausencia. */
 export function summarizeMain(result: MainResult): ResultSummary {
   if (!validMainResult(result)) throw new Error('Resultado principal inválido.')

@@ -148,3 +148,10 @@ Horarios legados sem fuso permanecem sem fuso; nao se presume UTC.
 A prontidao existente consulta migrations da conexao de operacoes. Configuracao
 real da credencial de leitura e seus grants pertence a operacao/implantacao;
 nao usar o papel administrativo sintetico dos testes na VPS.
+
+Finalizacao participante: `POST /api/v1/participant/logout` com `{}`, Origin e
+CSRF invalida a credencial e remove cookie HttpOnly; preserva avaliacao concluida.
+Sem cookie, a operacao permanece idempotente com Origin valido. Bootstrap
+completed mantem recibo JSON e retorna `X-CSRF-Token`/`X-Session-Expires-At` nos
+headers para permitir finalizacao apos recuperacao de recibo. Contrato e limites:
+[contrato HTTP](../docs/desenvolvimento/CONTRATO_API_WEB.md).

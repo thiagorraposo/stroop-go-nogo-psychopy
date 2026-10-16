@@ -1,8 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { formatHalfEven } from '../experiment/summary'
-import type { ResultSummary } from '../experiment/summary'
+import type { DisplaySummary } from '../experiment/summary'
 
-export function ResultSummaryPanel({ summary, onFinish }: { summary: ResultSummary; onFinish: () => void }) {
+export function ResultSummaryPanel({ summary, onFinish, delivery = 'local', message, canRetry = false,
+  busy = false, onRetry, onNewInvitation }: {
+  summary: DisplaySummary; onFinish: () => void; delivery?: 'local' | 'sending' | 'pending' | 'saved';
+  message?: string | null; canRetry?: boolean; busy?: boolean; onRetry?: () => void; onNewInvitation?: () => void
+}) {
   const panel = useRef<HTMLElement>(null)
   useEffect(() => { panel.current?.focus({ preventScroll: true }) }, [])
   return <section ref={panel} className="content-card result-summary" tabIndex={-1} aria-labelledby="result-title">
@@ -21,7 +25,19 @@ export function ResultSummaryPanel({ summary, onFinish }: { summary: ResultSumma
       <div><dt>Respostas indevidas</dt><dd>{summary.commission_errors}</dd></div>
     </dl>
     <p>Este resumo descreve apenas esta execução e não representa diagnóstico ou avaliação clínica.</p>
-    <p role="status" className="notice">Esta execução local ainda não possui confirmação de recebimento pela equipe.</p>
-    <button className="button primary" onClick={onFinish}>Finalizar</button>
+    <p role="status" className={delivery === 'saved' ? 'status-line' : 'notice'}>
+      {delivery === 'saved' ? 'Resultado recebido pela equipe.' : delivery === 'sending'
+        ? 'Enviando o resultado. Aguarde a confirmação de recebimento.' : delivery === 'pending'
+          ? 'O recebimento ainda não foi confirmado. Você pode reenviar o mesmo resultado sem repetir a tarefa.'
+          : 'Esta execução local ainda não possui confirmação de recebimento pela equipe.'}
+    </p>
+    {message && <p role="alert" className="notice">{message}</p>}
+    {delivery === 'pending' && <>
+      <p>Ao sair sem confirmação, este navegador não conservará o resultado.</p>
+      <button className="button primary" onClick={onRetry} disabled={!canRetry || busy}>Reenviar resultado</button>{' '}
+    </>}
+    <button className={delivery === 'pending' ? 'button secondary' : 'button primary'} onClick={onFinish}
+      disabled={busy || delivery === 'sending'}>{busy ? 'Encerrando acesso…' : delivery === 'pending' ? 'Sair sem confirmação' : 'Finalizar'}</button>
+    {delivery === 'saved' && onNewInvitation && <>{' '}<button className="button secondary" disabled={busy} onClick={onNewInvitation}>Utilizar outro convite</button></>}
   </section>
 }

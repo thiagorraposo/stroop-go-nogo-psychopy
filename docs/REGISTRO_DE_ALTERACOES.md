@@ -6,6 +6,19 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W13: sessao participante integrada
+
+- `feat`: convite e bootstrap real, ordem do servidor, start confirmado antes
+  do motor, payload imutavel em RAM, recuperacao de recibo e reenvio manual.
+  Mensagem de recebido depende da confirmacao real; nenhuma retomada de running.
+- `security`: Web Locks entre abas, descarte em pagehide, expiracao e logout
+  HttpOnly com invalidacao no banco, sem apagar resultados. Nenhum storage JS.
+- `test`: oito testes HTTPS reais Chromium/Firefox com PostgreSQL, incluindo
+  principal completo, perda de resposta apos commit e falha antes da gravacao,
+  reenvio identico, duplo clique, expiracao, refresh e limpeza de cookie.
+  Regressao Python 262 testes sem skips e frontend 157 aprovados. Validacao
+  temporal fisica/homologacao permanece em W16, sem inferencia de equivalencia.
+
 ## 2026-10-16 — W14: consulta profissional e exportacao autorizada
 
 - `feat`: lista/detalhe/CSV sob projeto e sessao profissional, filtros fechados,

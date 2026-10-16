@@ -167,6 +167,15 @@ no frontend; a API nao consegue certificar que uma pessoa fez esse treino.
 | `POST /participant/abort` | `{"reason":"focus_lost"}`; 200 com `session_id`, `state:"aborted"` | CSRF; somente sessao propria `preparing`/`running`; repeticao apos abortamento devolve o mesmo estado |
 | `POST /participant/complete` | Corpo fechado abaixo; primeira conclusao 201, retry identico 200 com mesmo recibo | CSRF; somente `running` nao expirada, ou `completed` para comparacao idempotente |
 
+`GET /participant/session` em completed conserva o recibo JSON e fornece
+`X-CSRF-Token` e `X-Session-Expires-At` nos headers, para finalizar com seguranca.
+`POST /participant/logout` recebe `{}` sem query, exige Origin e CSRF quando ha
+cookie participante e responde 204; sem cookie e idempotente, mantendo a
+validacao de Origin. Invalida a credencial no servidor e remove o cookie
+HttpOnly/Secure/SameSite=Lax. Preparacao ou execucao sao abortadas com
+`user_cancelled`; resultados concluidos sao preservados. Finalizar no cliente
+aguarda essa confirmacao; falha permite tentar novamente sem anunciar saida.
+
 `abort.reason` e uma enumeracao fechada: `focus_lost`, `visibility_hidden`,
 `escape`, `reload`, `page_closed`, `timing_invalid`, `user_cancelled`.
 Nao aceitar texto livre. O frontend tenta comunicar interrupcao quando possivel;

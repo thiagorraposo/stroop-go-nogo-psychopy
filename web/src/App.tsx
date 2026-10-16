@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { MouseEvent, ReactNode } from 'react'
 import { ApiError, apiErrorMessage, getProfessionalProfile, logoutProfessional } from './api/client'
 import type { ProfessionalProfile } from './api/client'
-import { PracticePreparation } from './components/PracticePreparation'
+import { ParticipantFlow } from './components/ParticipantFlow'
 
 type Navigate = (path: string) => void
 
@@ -165,7 +165,7 @@ export function App() {
         </nav>
       </header>
       <main id="conteudo" ref={main} tabIndex={-1}>
-        {path === '/' ? <Welcome navigate={navigate} /> : path === '/instrucoes' ? <Instructions navigate={navigate} /> : path === '/pratica' ? <PracticePreparation onBack={() => navigate('/instrucoes')} /> : path === '/equipe' ? <ProfessionalAccess /> : <section className="content-card"><p className="eyebrow">Página não encontrada</p><h1>Vamos voltar ao início?</h1><LocalLink href="/" navigate={navigate} className="button primary">Ir para o início</LocalLink></section>}
+        {path === '/' ? <Welcome navigate={navigate} /> : path === '/instrucoes' ? <Instructions navigate={navigate} /> : path === '/pratica' ? <ParticipantFlow onBack={() => navigate('/instrucoes')} /> : path === '/equipe' ? <ProfessionalAccess /> : <section className="content-card"><p className="eyebrow">Página não encontrada</p><h1>Vamos voltar ao início?</h1><LocalLink href="/" navigate={navigate} className="button primary">Ir para o início</LocalLink></section>}
       </main>
       <footer className="site-footer"><span>Pesquisa · Atenção às cores</span><span>Siga as orientações da equipe responsável.</span></footer>
     </div>
