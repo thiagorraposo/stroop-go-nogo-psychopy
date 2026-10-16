@@ -280,6 +280,44 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 - Proxima acao: salvar commit local W13 preservando AGENTS raiz; iniciar W15,
   cliente profissional de consultas/cards/graficos/detalhe/exportacao W14.
 
+## W15 — Concluida
+
+- W13 salva em def93c5: 262 testes Python, 157 frontend, 30 browser e oito
+  HTTPS reais aprovados. AGENTS raiz preexistente permanece fora do commit.
+- Implementados cliente profissional fechado (26 testes novos) e painel
+  conectado a projetos/consultas/detalhe/CSV W14. Carrega todas as paginas antes
+  de agregar, cancela requisicoes obsoletas e rejeita IDs/cursor repetidos.
+  Filtros participante/visita no servidor; instrumento/plataforma na selecao
+  carregada, sem misturar metricas de instrumentos distintos.
+- Cards e graficos descritivos: datas, precisao por visita, distribuicao RT,
+  omissoes/comissoes; evolucao por visita ao filtrar participante. Detalhe com
+  metricas/tentativas e exportacao reautorizada. Streamlit intacto.
+- Tres testes de agregacao aprovados contra valores das fixtures Python;
+  ausencia de hits excluida da mediana, datas legadas sem conversao ficticia.
+  Typecheck/build aprovados. Suite frontend 187/187; Streamlit 20/20, sem skips.
+  Subagente cliente concluiu; navegador encontrou foco Chromium antes do commit
+  DOM; corrigido com efeito apos montar detalhe. Dashboard/navegacao 28/28
+  aprovados apos correcao; teste redundante de prazo sera removido.
+- Area profissional limpa RAM na expiracao/pagehide e revalida BFCache. Teste
+  de prazo usa clock controlado somente na area profissional, sem alterar o
+  motor experimental. Fixture antiga de perfil agora usa prazo futuro relativo.
+- Subagente navegador adicionou testes HTTPS reais com importacao CSVgolden,
+  mapa legado explicito e perfis reais sinteticos; revisao identifica que admin
+  lista projetos globais mas consulta exige membership, mantendo regra W03.
+- Evidencia final: 40/40 gerais Chromium/Firefox em 46,9 s; 6/6 HTTPS reais em
+  17,1 s por consulta/importacao/administracao. API/PostgreSQL, importacao pelo
+  nucleo, mapa legado explicito, valores, 16 tentativas, CSV mascarado e bloqueio
+  apos revogacao comprovados. Sem mocks na integracao real. Browser timing W13
+  permanece evidencia dos motores inalterados, sem reexecutar artificialmente.
+- Frontend 187/187, typecheck/build e Streamlit20/20 aprovados. Links27/27 e
+  diff check aprovados. Screenshots desktop/mobile390px sinteticos em /tmp
+  inspecionados, sem overflow de pagina; tabelas possuem scroll proprio.
+- README registra limites explicitos do MVP e coexistencia Streamlit; mapa
+  estrutural alinhado. Sem dependencias novas, push, deploy ou dados reais.
+- Proxima acao: commit local W15 preservando AGENTS raiz; iniciar W16 com matriz
+  e protocolo de evidencias. Ausencia de equipamento/manual impede homologacao
+  fisica, mas nao bloqueia revisao de seguranca W17 e automacao W18.
+
 ## Decisoes e contexto preservados
 
 - Usuario aprovou explicitamente itens 1–19 da sessao. Finalidade coleta do

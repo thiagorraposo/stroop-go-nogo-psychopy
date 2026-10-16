@@ -1,8 +1,10 @@
+import { flushSync } from 'react-dom'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { MouseEvent, ReactNode } from 'react'
 import { ApiError, apiErrorMessage, getProfessionalProfile, logoutProfessional } from './api/client'
 import type { ProfessionalProfile } from './api/client'
 import { ParticipantFlow } from './components/ParticipantFlow'
+import { ProfessionalDashboard } from './components/ProfessionalDashboard'
 
 type Navigate = (path: string) => void
 
@@ -75,6 +77,20 @@ function ProfessionalAccess() {
     return () => controller.abort()
   }, [revision])
 
+  useEffect(() => {
+    if (state.phase !== 'ready') return
+    const remaining = Math.max(0, Date.parse(state.profile.expires_at) - Date.now())
+    const timer = setTimeout(() => setState({ phase: 'login' }), remaining)
+    return () => clearTimeout(timer)
+  }, [state])
+  useEffect(() => {
+    const clear = () => flushSync(() => setState({ phase: 'login' }))
+    const restore = (event: PageTransitionEvent) => { if (event.persisted) window.location.reload() }
+    window.addEventListener('pagehide', clear)
+    window.addEventListener('pageshow', restore)
+    return () => { window.removeEventListener('pagehide', clear); window.removeEventListener('pageshow', restore) }
+  }, [])
+
   async function endSession(profile: ProfessionalProfile) {
     setEnding(true)
     setLogoutError(false)
@@ -106,6 +122,7 @@ function ProfessionalAccess() {
       <p className="role-badge">{roleNames[state.profile.role]}</p>
       {logoutError && <p role="alert" className="notice">Não foi possível confirmar o encerramento. Tente novamente.</p>}
       <button className="button secondary" disabled={ending} onClick={() => void endSession(state.profile)}>{ending ? 'Encerrando…' : 'Encerrar sessão'}</button>
+      {!ending && <ProfessionalDashboard />}
     </>}
   </section>
 }

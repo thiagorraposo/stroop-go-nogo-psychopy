@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 const profile = {
   user_id: 'c3ludGhldGljLXVzZXI', role: 'consulta',
-  expires_at: '2026-10-16T18:02:01.123456Z', csrf_token: 's'.repeat(43),
+  expires_at: new Date(Date.now() + 1_800_000).toISOString(), csrf_token: 's'.repeat(43),
 }
 
 test('navega pelas orientacoes e respeita o historico e o foco', async ({ page }) => {
@@ -95,4 +95,16 @@ test('perda de foco cancela avancar por tecla iniciada antes da interrupcao', as
   await expect(page).toHaveURL('/')
   await page.keyboard.press('Space')
   await expect(page).toHaveURL('/instrucoes')
+})
+
+test('expiracao profissional limpa painel e exige novo login sem persistir dados', async ({ page }) => {
+  await page.clock.install()
+  await page.route('**/api/v1/auth/me', route => route.fulfill({ status: 200, json: profile }))
+  await page.route('**/api/v1/projects?*', route => route.fulfill({ status: 200, json: { items: [], next_cursor: null } }))
+  await page.goto('/equipe')
+  await expect(page.getByRole('heading', { name: 'Resultados da pesquisa' })).toBeVisible()
+  await page.clock.fastForward(1_800_001)
+  await expect(page.getByRole('link', { name: 'Entrar com Google' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Resultados da pesquisa' })).toHaveCount(0)
+  expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0)
 })

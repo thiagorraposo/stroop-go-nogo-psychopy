@@ -88,3 +88,28 @@ kbd { font: inherit; font-size: .9em; border: 1px solid #b7bfca; border-radius: 
 .invitation-form label { display: block; font-weight: 700; margin-bottom: .75rem; }
 .invitation-form input { display: block; width: 100%; padding: .9rem 1rem; border: 1px solid #94a3b8; border-radius: .6rem; background: #fff; color: #0f172a; font: inherit; }
 .invitation-form input[aria-invalid="true"] { border-color: #9a3412; }
+.professional-dashboard { margin-top: 36px; border-top: 1px solid #b9c0ca; padding-top: 24px; }
+.professional-dashboard select, .professional-dashboard input { display: block; width: 100%; padding: 10px; border: 1px solid #8793a6; border-radius: 5px; background: white; color: #172139; font: inherit; margin-top: 6px; }
+.dashboard-filters { display: flex; gap: 16px; align-items: end; flex-wrap: wrap; margin: 20px 0; }
+.dashboard-filters label { flex: 1; min-width: 150px; }
+.dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; }
+.dashboard-cards div { padding: 16px; background: #e4e8ed; border-radius: 8px; }
+.dashboard-cards dt { font-size: 13px; color: #4c566a; }
+.dashboard-cards dd { margin: 8px 0 0; font-size: 25px; font-weight: 650; }
+.dashboard-chart { margin: 24px 0; }
+.dashboard-chart figcaption { font-weight: 650; }
+.dashboard-chart ul { list-style: none; padding: 0; max-height: 300px; overflow: auto; }
+.dashboard-chart li { display: grid; grid-template-columns: 100px 1fr 40px; gap: 12px; align-items: center; }
+.dashboard-chart meter { width: 100%; }
+.table-scroll { overflow: auto; margin: 20px 0; }
+.table-scroll table { border-collapse: collapse; min-width: 650px; width: 100%; font-size: 13px; }
+.table-scroll th, .table-scroll td { text-align: left; padding: 10px; border-bottom: 1px solid #b9c0ca; }
+.table-scroll caption { text-align: left; font-weight: 650; margin-bottom: 12px; }
+.assessment-detail { border-top: 1px solid #b9c0ca; margin-top: 24px; padding-top: 20px; overflow-wrap: anywhere; }
+.assessment-detail dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.assessment-detail dd { margin: 6px 0; }
+.access-card:has(.professional-dashboard) { max-width: none; }
+.professional-dashboard { min-width: 0; }
+.dashboard-chart li > span { overflow-wrap: anywhere; min-width: 0; }
+.professional-dashboard select { max-width: 100%; }
+.professional-dashboard input:focus-visible, .professional-dashboard select:focus-visible { outline: 3px solid #7350c7; outline-offset: 2px; }

@@ -6,6 +6,20 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W15: painel profissional integrado
+
+- `feat`: filtros/projetos autorizados, conjunto paginado completo, cards e
+  graficos descritivos por instrumento/plataforma, detalhe e CSV reautorizado.
+  Sem hits permanece ausente; instrumentos adicionais nao recebem formulas
+  Stroop. Limpeza na expiracao/pagehide e revalidacao de BFCache.
+- `fix`: foco do detalhe aplicado apos commit DOM para navegacao por teclado;
+  paginas repetidas falham sem totais inflados ou parciais.
+- `test`: 187 frontend, 40 browser gerais, seis HTTPS/API/PostgreSQL reais por
+  perfil e 20 regressao Streamlit aprovados; paridade Python, CSV mascarado,
+  revogacao, teclado e viewport390px verificados. Build/typecheck/links/diff OK.
+- `docs`: limites do MVP explicitos no README; operacao Streamlit preservada,
+  sem alteracao do legado, dependencia adicional ou deploy.
+
 ## 2026-10-16 — W13: sessao participante integrada
 
 - `feat`: convite e bootstrap real, ordem do servidor, start confirmado antes

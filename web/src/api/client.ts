@@ -107,7 +107,8 @@ async function responseError(response: Response): Promise<ApiError> {
   return new ApiError(code, response.status, retryAfter(response));
 }
 
-type ApiPath = '/api/v1/auth/me' | '/api/v1/auth/logout' |
+export type ApiPath = '/api/v1/projects' | `/api/v1/projects?${string}` |
+  `/api/v1/projects/${string}/assessments${string}` | '/api/v1/auth/me' | '/api/v1/auth/logout' |
   '/api/v1/participant/redeem' | '/api/v1/participant/session' |
   '/api/v1/participant/start' | '/api/v1/participant/complete' | '/api/v1/participant/abort' |
   '/api/v1/participant/logout';

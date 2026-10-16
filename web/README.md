@@ -105,3 +105,33 @@ ser injetadas mantendo a gravacao e as respostas do backend reais. Convites e
 cookies sinteticos nao devem aparecer em logs/traces nem ser versionados.
 `ParticipantRun` coordena dados em RAM, recuperacao de recibo e reenvio; a trava
 Web Locks impede motores concorrentes entre abas da mesma origem/perfil.
+
+Painel profissional (W15): a area `/equipe` consulta projetos autorizados e
+carrega todas as paginas do resultado filtrado antes de apresentar totais. Os
+filtros de participante e visita sao enviados ao servidor; instrumento e
+plataforma selecionam o conjunto carregado. Cursor ou ID repetido invalida a
+consulta para evitar agregacao parcial/duplicada. Uma falha exige atualizar a
+consulta; resultados parciais nao sao exibidos como completos.
+
+Os cards Stroop reproduzem precisao media/mediana, mediana dos RTs por avaliacao,
+participantes unicos e totais de erros. Sem hits, o RT e ausente; nao conta como
+zero. Graficos mostram datas de inicio, precisao por visita, distribuicao de
+RTs medianos e erros. Filtrar participante mostra evolucao por visita. O detalhe
+conserva metricas/tentativas e proveniencia, inclusive campos ausentes do legado.
+Datas sem fuso nao recebem conversao implicita. Instrumentos adicionais exibem
+suas proprias metricas no detalhe, sem graficos Stroop ou CSV inventado.
+
+O download explicito usa CSV oficial W14, reautorizado no servidor em cada
+clique. Apenas essa acao solicitada pelo profissional cria arquivo; consultas
+ficam em RAM e sao descartadas na saida, expiracao, troca de projeto ou logout.
+O navegador nao guarda dados em storage JavaScript. A area e limpa em pagehide;
+restauracao de BFCache exige revalidar o acesso por recarga.
+
+Coexistencia do MVP: Streamlit e seus launchers permanecem disponiveis para
+importacao local autenticada, administracao operacional e exportacao agregada
+historica. Esses recursos nao sao removidos nem implicitamente migrados ao
+painel WEB. O painel WEB oferece detalhe e CSV oficial por avaliacao; nao
+transmite nomes/iniciais pessoais do legado, nao oferece exportacao agregada,
+filtros por nome de participante/avaliador ou personalizacao de instrumentos.
+Filtros por periodo/versao e exportacao agregada continuam no Streamlit neste
+MVP. Nao ha interpretacao clinica, normativa ou comparacao entre instrumentos.
