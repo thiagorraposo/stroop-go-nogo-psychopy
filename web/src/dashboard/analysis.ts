@@ -1,4 +1,5 @@
 /** Agregacoes descritivas sobre o conjunto autorizado filtrado, sem normas. */
+import { formatHalfEven } from '../experiment/summary'
 import type { Assessment } from '../api/assessments'
 export function median(values: readonly number[]): number | null {
   if (!values.length) return null
@@ -44,4 +45,11 @@ export function responseDistribution(rows: readonly Assessment[]): [string, numb
     groups[index]![1] += 1
   }
   return groups
+}
+
+/** Exibicao igual ao formatador Python do Streamlit, com separador pt-BR. */
+export function formatMetric(value: number | null, digits = 0): string {
+  if (value === null) return '—'
+  const sign = value < 0 || Object.is(value, -0) ? '-' : ''
+  return sign + formatHalfEven(Math.abs(value), digits).replace('.', ',')
 }

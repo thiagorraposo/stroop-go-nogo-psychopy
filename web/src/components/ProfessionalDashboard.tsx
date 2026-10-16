@@ -3,11 +3,10 @@ import type { FormEvent } from 'react'
 import { ApiError, apiErrorMessage } from '../api/client'
 import { listProjects, listAssessments, getAssessment, exportAssessment } from '../api/assessments'
 import type { Assessment, AssessmentDetail, Project } from '../api/assessments'
-import { accuracyByVisit, countByDate, responseDistribution, summarize } from '../dashboard/analysis'
+import { accuracyByVisit, countByDate, formatMetric as number, responseDistribution, summarize } from '../dashboard/analysis'
 
 type Filters = { participant_id: string; visit: string }
 const emptyFilters: Filters = { participant_id: '', visit: '' }
-const number = (value: number | null, digits = 0) => value === null ? '—' : value.toLocaleString('pt-BR', { minimumFractionDigits: digits, maximumFractionDigits: digits })
 
 export function ProfessionalDashboard() {
   const [projects, setProjects] = useState<Project[]>([])

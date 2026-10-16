@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 import cases from '../../../tests/fixtures/web_results_summary.json'
 import type { Assessment } from '../api/assessments'
-import { accuracyByVisit, countByDate, median, responseDistribution, summarize } from './analysis'
+import { accuracyByVisit, countByDate, formatMetric, median, responseDistribution, summarize } from './analysis'
 const rows: Assessment[] = cases.cases.map((item, index) => ({
   assessment_id: `SYNTHETIC_${index}`, participant_id: `P_${index % 2}`, visit: 'V1', evaluator_id: null,
   created_at: '2026-10-16T00:00:00Z', started_at: '2026-10-16T00:00:00Z', platform: 'web',
@@ -37,4 +37,11 @@ test('faixas de tempo incluem cada fronteira uma vez, sem perder RT positivo peq
     ...rows[index]!, summary: { ...rows[index]!.summary, response_time_seconds: seconds },
   })) as Assessment[]
   expect(responseDistribution(source).map(([, count]) => count)).toEqual([1, 1, 1, 1, 1])
+})
+
+test('exibicao profissional preserva arredondamento Python em empates e metricas negativas', () => {
+  expect(formatMetric(56.25, 1)).toBe('56,2')
+  expect(formatMetric(0.5125, 3)).toBe('0,512')
+  expect(formatMetric(-0.5125, 3)).toBe('-0,512')
+  expect(formatMetric(null, 3)).toBe('—')
 })

@@ -20,7 +20,7 @@ for (const [role, label] of [['consulta', 'Consulta'], ['importacao', 'Coleta e 
     await expect(page.getByText(label!, { exact: true })).toBeVisible()
     await page.getByRole('combobox', { name: 'Projeto', exact: true }).selectOption(prepared.project_id)
     await expect(page.locator('.dashboard-cards').getByText('1', { exact: true })).toHaveCount(2)
-    await expect(page.locator('.dashboard-cards')).toContainText('56,3%')
+    await expect(page.locator('.dashboard-cards')).toContainText('56,2%')
     await expect(page.locator('.dashboard-cards')).toContainText('0,512 s')
     const table = page.getByRole('table', { name: 'Avaliações filtradas' })
     await expect(table).toContainText('P_SINTETICO_W15')

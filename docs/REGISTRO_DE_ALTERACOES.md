@@ -6,6 +6,14 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — Correcao de arredondamento do painel WEB
+
+- `fix`: exibicao profissional reutiliza half-even Python do resumo W12,
+  incluindo valores negativos de outros instrumentos. 56,25% com uma casa
+  aparece56,2%, como no Streamlit, sem alterar numeros crus ou formulas.
+- `test`: 188 frontend e seis HTTPS reais de painel sob CSP estrita aprovados,
+  incluindo empate56.25 e CSV/detalhe/revogacao por perfil.
+
 ## 2026-10-16 — W15: painel profissional integrado
 
 - `feat`: filtros/projetos autorizados, conjunto paginado completo, cards e
