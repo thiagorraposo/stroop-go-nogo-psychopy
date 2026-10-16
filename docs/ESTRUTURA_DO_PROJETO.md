@@ -67,7 +67,12 @@ stroop-cognifit/
 │   ├── google_oidc.py          # descoberta e validacao criptografica do provedor
 │   ├── models.py / errors.py   # contratos de entrada e erros publicos
 │   └── requirements*.txt       # dependencias e lock da API
-├── web/README.md               # interface planejada; sem implementacao
+├── web/                        # interface React/TypeScript
+│   ├── src/App.tsx             # navegacao e acesso da equipe
+│   ├── src/api/client.ts       # cliente HTTP da mesma origem
+│   ├── src/experiment/         # host DOM isolado do motor
+│   ├── e2e/                   # verificacao em Chromium/Firefox
+│   └── package*.json          # dependencias exatas e lockfile
 ├── tests/                      # unittest e fixtures sinteticas
 ├── docs/
 │   ├── README.md              # indice de navegacao por assunto
@@ -116,7 +121,8 @@ de instrumentos tem finalidade distinta do registro de ingestao. A base HTTP
 esta organizada por fronteira de transporte (`api/`), regras reaproveitaveis
 (`stroop/domain` e `stroop/application`) e persistencia (`stroop/persistence`).
 `dashboard/auth.py` preserva a fachada publica do dashboard; SQL e drivers de
-autenticacao ficam na persistencia. A interface em `web/` permanece planejada.
+autenticacao ficam na persistencia. A base React em `web/` possui navegacao,
+cliente HTTP e host experimental isolado; o motor segue o protocolo/roadmap.
 O mapa localiza arquivos, sem substituir o aceite registrado no roadmap.
 
 ## Mapa de extracao e compatibilidade

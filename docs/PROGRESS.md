@@ -106,6 +106,29 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   preexistente em `AGENTS.md` permanece fora dos commits da etapa.
 - W22 e implantacao futura pelo usuario; nao ha evidencia de deploy WEB concluido.
 
+## 2026-10-16 — W09 concluida
+
+- Base em `web/`: React/TypeScript/Vite com navegacao/historico/foco, orientacoes,
+  acesso da equipe, loading/erro/retry e logout. Cliente usa endpoints relativos,
+  cookies same-origin, no-store, CSRF somente em RAM, timeout/cancelamento e
+  schema/erros fechados. `ExperimentHost` conserva DOM imperativo e limpa ao sair;
+  jsPsych/pratica/motor ainda serao implementados nas proximas etapas.
+- Versoes diretas exatas e lockfile; Node 24.15.0/npm 11.16.0 locais.
+  `npm ci`, `npm run typecheck`, `npm test` (36 aprovados), `npm run build` e
+  `npm run test:browser` (10 aprovados) passaram. `npm audit` nao apontou
+  vulnerabilidades. Build servido por preview foi inspecionado visualmente em
+  1440x1000; nenhuma excecao JavaScript observada. Servidores de teste encerrados.
+- Navegadores observados: Chromium 156.0.8078.4 e Firefox 157.0 do Playwright
+  1.64.1, headless no Linux Mint 22.2, binarios fallback Ubuntu 24.04.
+  Rede API interceptada apenas em testes sinteticos; W13 exige integracao real.
+  Sem evidencia de Windows, latencia fisica ou homologacao W16/W21 nesta etapa.
+- Revisao independente sem bloqueantes; logout verifica Origin e CSRF no
+  navegador. UI nao exibe ID/token, nem usa storage JS. Fontes npm/React/Vite/
+  Vitest/Playwright conferidas antes da instalacao; README/AGENTS/mapa atualizados.
+- Proxima acao exata: W10 — ler protocolo W01/contrato W02 e fontes de pratica;
+  implementar preparo, elegibilidade do ambiente, instrucoes/contagens e pratica
+  jsPsych com teclado/foco/feedback, sem gravar treino como resultado oficial.
+
 ## Decisoes e contexto preservados
 
 - Usuario aprovou explicitamente itens 1–19 da sessao. Finalidade coleta do

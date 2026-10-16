@@ -5,7 +5,9 @@
 O repositorio prepara uma versao web no mesmo projeto, com arquitetura de
 monolito modular. O nucleo Python em `stroop/` concentra contratos, validacao,
 metricas e adaptadores CSV reutilizados pelo fluxo atual. `api/` concentra a
-fronteira HTTP em desenvolvimento na W05; `web/` reserva a futura interface.
+autenticacao, sessoes e resultados HTTP; `web/` contem a base React/TypeScript,
+navegacao e cliente HTTP. Comandos e fronteiras da interface ficam no
+[README WEB](web/README.md).
 O estado de entrega e validacao permanece no roadmap.
 
 - [Estrutura e mapa de compatibilidade](docs/ESTRUTURA_DO_PROJETO.md).

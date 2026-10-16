@@ -19,11 +19,12 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W06 | Concluida em 2026-10-16; OIDC, sessao segura, CSRF, autorizacao e limites de login |
 | W07 | Concluida em 2026-10-16; ciclo de sessao, autorizacao, limites e migrations validados |
 | W08 | Concluida em 2026-10-16; conclusao atomica, protocolo/tempos, recalculo e replay validados em 240 testes |
-| W09–W21, W23 | Nao iniciadas |
+| W09 | Concluida em 2026-10-16; React/TypeScript, cliente HTTP, 36 testes DOM/logica e 10 browser aprovados |
+| W10–W21, W23 | Nao iniciadas |
 | W22 | Nao iniciada; implantacao futura de responsabilidade do usuario |
 
-Pedido de organizacao documental concluido em commit proprio. W00–W08 estao
-validadas e integradas; W09 e a proxima etapa. Retomada detalhada em
+Pedido de organizacao documental concluido em commit proprio. W00–W09 estao
+validadas e integradas; W10 e a proxima etapa. Retomada detalhada em
 [PROGRESS.md](PROGRESS.md). Evidencias em
 [registro de alteracoes](REGISTRO_DE_ALTERACOES.md).
 Bloqueio de produto/metodo resolvido pela aprovacao explicita na sessao.

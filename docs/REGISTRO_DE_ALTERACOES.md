@@ -6,6 +6,17 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W09: base React e cliente HTTP
+
+- `feat`: interface React/TypeScript com navegacao acessivel, historico, orientacoes,
+  acesso da equipe, estados de rede e cliente HTTP seguro. Host experimental
+  separa DOM imperativo do ciclo React; ainda sem execucao do experimento.
+- `build`: Vite, TypeScript, Vitest e Playwright com versoes exatas/lockfile;
+  comandos e fronteiras documentados. Artefatos npm/build/traces ignorados.
+- `test`: 36 testes de logica/DOM e 10 em Chromium/Firefox aprovados; typecheck,
+  build, instalacao limpa e auditoria aprovados. Preview visual sem excecoes.
+  Rede API sintetica nos testes nao substitui integracao real ou validacao temporal.
+
 ## 2026-10-16 — W08: conclusao transacional e resultados WEB
 
 - `feat`: conclusao valida protocolo, ordem persistida, temporalidade e RT;
