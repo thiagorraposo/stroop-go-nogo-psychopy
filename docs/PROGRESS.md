@@ -17,8 +17,8 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   integridade dos 37 documentos, 240 links locais e `git diff --check`.
   Revisao independente sem achados bloqueantes. Sem build novo: fontes e
   configuracoes executaveis existentes inalteradas nesta reorganizacao.
-- W02/W03 concluidas em `88a48c5`/`ea87120`, W05 em `wip` (commit apos esta
-  validacao). W05 cobre factory FastAPI sem Streamlit, configuracao fechada,
+- W02/W03 concluidas em `88a48c5`/`ea87120`, W05 em `b19d8b6`. W05 cobre
+  factory FastAPI sem Streamlit, configuracao fechada,
   health/readiness somente leitura, limite real de 64 KiB, erros sanitizados,
   dependencias fixadas e `RequestModel` estrito.
 - W05: 189 testes aprovados, zero falhas/erros/skips, incluindo readiness com
