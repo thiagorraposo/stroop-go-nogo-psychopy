@@ -18,8 +18,9 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W05 | Concluida em 2026-10-16; API FastAPI, limites/erros seguros, readiness real PostgreSQL, 189 testes e smoke Uvicorn |
 | W06 | Concluida em 2026-10-16; OIDC, sessao segura, CSRF, autorizacao e limites de login |
 | W07 | Concluida em 2026-10-16; ciclo de sessao, autorizacao, limites e migrations validados |
-| W08–W21, W23 | Nao iniciadas; W08 e a proxima etapa elegivel |
-| W22 | Executada pelo usuario conforme escopo registrado |
+| W08 | Preparacao iniciada; contrato e persistencia consultados, sem entrega funcional validada |
+| W09–W21, W23 | Nao iniciadas |
+| W22 | Nao iniciada; implantacao futura de responsabilidade do usuario |
 
 Pedido de organizacao documental concluido em commit proprio. W05/W06 foram
 validadas e integradas; W07 concluida e W08 e a proxima etapa. Retomada detalhada em

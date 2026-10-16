@@ -80,6 +80,21 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 - Proxima acao exata: iniciar W08 — conclusao e recebimento de resultados;
   ler ficha W08, contrato HTTP, modelo de dados e caminhos de calculo canonicos.
 
+## 2026-10-16 — Retomada W08
+
+- Consultados ficha W08, contrato de conclusao/tempos/idempotencia, calculo
+  canonico em `stroop/domain/stroop.py` e persistencia/schema existentes.
+  Ainda nao existe entrega funcional de W08. Rascunho de rota sem caso de uso
+  foi removido; a API permanece no estado validado de W07 (`55d5e82`).
+- Proxima acao: implementar migration aditiva 0006 para proveniencia WEB,
+  vinculo unico sessao/avaliacao e tempos observados; validacao temporal e
+  canonizacao do payload; conclusao atomica com recalculo e testes de
+  rollback, concorrencia e replay conforme contrato. Nao alterar 0001–0005.
+- O ambiente informa objetivo `usageLimited`; saldo e renovacao nao estao
+  disponiveis. Preservada alteracao preexistente em `AGENTS.md`.
+- Corrigida a leitura de W22: ela sera executada pelo usuario futuramente;
+  nao ha evidencias de implantacao WEB concluida.
+
 ## Decisoes e contexto preservados
 
 - Usuario aprovou explicitamente itens 1–19 da sessao. Finalidade coleta do
@@ -92,7 +107,7 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 - VPS adquirida e dominio existente: [ADR-002](arquitetura/ADR-002-hospedagem-vps.md).
   Nao presumir OCI/ARM64. Informacoes reais do host, DNS, OIDC e backup externo
   serao usadas apenas nas etapas autorizadas. Push/merge/producao continuam
-  exigindo autorizacao especifica; W22 executada pelo usuario.
+  exigindo autorizacao especifica; W22 sera executada pelo usuario.
 - Medicoes W16/homologacao alvo, textos/configuracoes especificas da pesquisa
   e retencao definitiva nao foram evidenciados pela aprovacao; permanecem
   entregas futuras, sem bloquear testes locais com dados sinteticos.
