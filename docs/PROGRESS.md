@@ -318,62 +318,31 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   e protocolo de evidencias. Ausencia de equipamento/manual impede homologacao
   fisica, mas nao bloqueia revisao de seguranca W17 e automacao W18.
 
-## W16 pendente de piloto / W17 concluida / W18 em validacao
+## W16 pendente / W17 e W18 concluidas / W19 seguinte
 
-- W15 salva em 4d539f9; W13 em def93c5. AGENTS raiz preexistente preservado.
-- Previa solicitada pelo usuario ativa em http://127.0.0.1:4173, processo67560,
-  frontend Vite apenas (HTTP200); nao encerrar inadvertidamente nem usar porta
- 4173 para testes enquanto estiver aberta. API nao esta ativa nessa previa.
-- W16: docs/VALIDACAO_WEB.md registra matriz real, evidencias e procedimento
-  D5 sem conceder aceite. Mint22.2/Chromium156.0.8078.4/Firefox157.0 confirmados.
-  Headless/teclado sintetico nao comprovam monitor60Hz nem dez pilotos fisicos.
-- W17: subagente revisou API, aplicou headers seguros em sucesso/erro/CSV,
-  rejeicao de framing ambiguo e nonce OIDCUnicode fechado. Principal corrigiu
-  cardinalidade de rate limits: cookie nao emitido nao gera contador. Novo
-  teste real: oito cookies/16operacoes401 e zero linhas. Nenhum dado real.
-- Regressao Python completa274/47,608s, sem skips, aprovada em PostgreSQL17.6
-  descartavel proprio stroop-web-test/32781/stroop_etapa4_test_w13. Suite gera
-  mensagens negativas esperadas; codigo0/OK. Threat model atualizado com limites.
-- npm audit de producao0 vulnerabilidades. Source frontend sem HTML arbitrario,
-  eval, logs de dados ou storage JS; matches de storage estao so em testes.
-- Suite HTTPS14 em execucao84191 depois do hardeningAPI. Nao rodar outra carga
-  CPU/DB durante mains reais. Novo security-headers.json define CSP estrita
-  self sem inline/eval; proxy de teste consumira no proximo startup. Novo
-  integrated/security.spec.ts verifica bloqueio script/conexaoalheia e pratica
-  completa/mainEscape sem violacao; ainda nao executado. W19 consumira baseline.
-- Subagente w15_browser_tests prepara W18 em .github/workflows, runner/checks
-  e docs/desenvolvimento/CI_WEB.md; somente fontes/docs enquanto HTTPS roda.
-  Ferramentas audit isoladas, sem novos deps de app. Scanner nao pode abrir
-  data/database/.env; dominio/VPS nao acessados.
-- Encontrada/corrigida diferenca de exibicao W15: locale arredondava56.25 para
-  56,3, enquanto StreamlitformatPython exige56,2. Painel agora reutiliza half-even
-  W12, preserva numeros crus e metricas negativas. Teste novo e assertHTTPS
-  ajustados; executar apos ensaios atuais. Nenhuma formula alterada.
-- W18runner/fluxo/checker escritos por subagente; aguardam testes. Checkout
-  isolado/CI deve ser SPARSE antes de materializar fontes: nao copiar CSVs
-  historicos trackeados em data/database nem .env. npmci so em checkoutisolado,
-  preservando node_modules da previa4173. Scanner nunca le esses dados.
-- Evidencias finais antes de commit: HTTPS14/6,1min aprovado apos hardeningAPI;
-  CSP4/50,9s e painel6/20s aprovados sob politica estrita. Frontend188, build e
-  typecheck aprovados. urllib3atualizado2.7->2.8 em diretas/locksAPI+dashboard,
-  conforme release oficial; pipcheckOK, npm/Python audits sem vulnerabilidades.
-- Scanner Gitleaks240fontes semallowlist e falsoPAT estruturado confirmados;
-  novasfontes W17 staged e scan244/244 aprovado antes do commit.
-  CheckerCI10/10; suitecompleta284/36,739s semskips via runnerCI aprovada.
-  Imagem dashboard:w17-urllib3-test construida; smoke redeoff/rootRO/coreOK.
-- Corrigidas validacoes do runner: discovery nao exige tests/__init__.py;
-  selftest exige metadata real de finding, sem confundir erroinfra com deteccao.
-- W17 salva em 8bdeab2; paridade de exibicao em fd212a9. W18 fontes novas
-  staged e scanner248/248 aprovado, sem exclusoes de testes/markers. Selftest
-  encontra falsoPAT e recusa erroinfra como resultado positivo; metadados apenas.
-  Locks API/dashboard auditados sem achados apos urllib3 2.8.0.
-- W18 runner/workflow/checkertests e docs prontos; validacoes iniciais aprovadas.
-  Node24.15.0/Python3.12.3 locais coincidem com workflow. Porta de testes4273
-  separada da previa4173. Falta executar CIall no checkout sparse isolado.
-- Proxima acao: commit de implementacao W18 ainda em validacao; criar worktree
-  --no-checkout/sparse sem dados/.env; preparar venv/node_modules proprios,
-  PostgreSQLtmpfs novo e executar CIall/18HTTPS. Somente depois conceder aceite.
-  Preservar previa4173 e AGENTS raiz. W16 continua pendencia localizada.
+- Commits: W15 4d539f9, paridade fd212a9, W17 8bdeab2, CI721c86c e fixYAML
+  3b20144. AGENTS raiz preexistente preservado fora dos commits.
+- W16: VALIDACAO_WEB registra matriz/protocolo sem conceder aceite; faltam
+  equipamento de referencia e dez pilotos por ambiente. Pergunta assincrona
+  sobre sistema/navegador/monitor/Hz/teclado enviada, ainda sem resposta.
+- W17: seguranca API/CSP, cardinalidade de limites, nonce e framing corrigidos;
+  urllib3 2.8.0 nos dois locks/diretas; imagem dashboard reconstruida/smokeOK.
+- W18: CIall processo70771 terminou com codigo0 no checkout sparse limpo
+  /tmp/stroop-web-ci-721c86c. Python284/50,302s sem skips, frontend188,
+  typecheck/build, 40browsergerais/49,8s, quatro temporais/3,5min e HTTPS18/6,9min
+  aprovados. Audits npm/Python sem achados; scanner248 e falsoPAT confirmados.
+  Actionlint1.7.7 e SHAs das actions conferidos. Sem push/GitHub hospedado.
+- Worktree isolada sem data/database/.env, venv/node_modules proprios, ainda
+  limpa ao final. Container proprio CI stroop-web-ci-721c86c foi encerrado.
+  Container anterior stroop-web-test/32781 permanece disponivel para testes
+  sinteticos futuros, banco stroop_etapa4_test_w13. Nenhum servico real acessado.
+- Previa do usuario: http://127.0.0.1:4173, processo67560, frontend apenas,
+  HTTP200 confirmado; preservar. Testes isolados usam4273; HTTPS4373/API4381.
+- Proxima acao: registrar aceite/commit documental W18 e iniciar W19. Plano API
+  preliminar do subagente w15_client: imagem nao-root, *_FILE, healthcheck Host
+  correto e migrate explicito com credencial separada. Root cuidara proxy,
+  frontend/Compose/integração. Resolver IP real do proxy sem confiar XFF externo;
+  nao executar migrations, configure/deploy na VPS nem alterar legado.
 
 ## Decisoes e contexto preservados
 

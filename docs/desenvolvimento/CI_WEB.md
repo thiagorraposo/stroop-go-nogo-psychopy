@@ -132,3 +132,20 @@ inocua deve passar e um token falso gerado na hora deve bloquear. Valores e
 findings nao sao impressos. Isso comprova o caminho de falha, sem desabilitar
 verificacoes ou introduzir um secret versionado. Os testes do runner tambem
 protegem falha imediata, rejeicao de skips e validacao do banco descartavel.
+
+
+## Evidencia local de execucao
+
+Em 2026-10-16, `verify_web_ci.py all` passou no checkout sparse limpo de
+721c86c, Python3.12.3/Node24.15.0 e PostgreSQL17.6 em tmpfs: 284 testes Python
+sem skips, 188 frontend, typecheck/build, 40 casos gerais de navegador, quatro
+temporais seriais e 18 HTTPS/API/PostgreSQL reais sob CSP. Gitleaks248fontes,
+falso PAT controlado e auditorias npm/Python aprovados. Dados historicos nao
+foram materializados. O checkout permaneceu sem alteracoes versionadas.
+
+Actionlint1.7.7 identificou/corrigiu o contexto da porta de servico no workflow;
+a correcao em 3b20144 foi validada estaticamente, sem mudar codigo/runner
+exercitados. SHAs das tres actions foram conferidos na API oficial do GitHub.
+Nao houve push ou execucao no GitHub hospedado: os comandos do pipeline foram
+executados localmente, e a configuracao do workflow foi validada por lint.
+Resultados e proximos passos ficam em [PROGRESS](../PROGRESS.md).

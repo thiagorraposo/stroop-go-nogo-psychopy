@@ -27,8 +27,9 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W15 | Concluida; painel autorizado, metricas/graficos/CSV e perfis validados em HTTPS real |
 | W16 | Em preparacao; matriz/protocolo registrados, piloto no equipamento de referencia pendente |
 | W17 | Concluida; hardening, CSP, 284 testes Python, HTTPS e auditorias aprovados |
-| W18 | Em implementacao; runner/workflow e verificadores aprovados; pipeline limpo integral pendente |
-| W19–W21, W23 | Nao iniciadas |
+| W18 | Concluida; pipeline completo em checkout sparse limpo, testes e auditorias aprovados |
+| W19 | Em preparacao; W17/W18 concluidas, empacotamento WEB e smoke sintetico seguintes |
+| W20–W21, W23 | Nao iniciadas |
 | W14 | Concluida em 2026-10-16; consulta/CSV autorizados, papel SELECT, mapa legado e testes PostgreSQL validados |
 | W22 | Nao iniciada; implantacao futura de responsabilidade do usuario |
 

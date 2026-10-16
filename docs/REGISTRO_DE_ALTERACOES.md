@@ -6,6 +6,20 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W18: pipeline reproduzivel e falhas bloqueantes
+
+- `ci`: workflow sem deploy, actions fixadas por SHA, PostgreSQL17.6/tmpfs e
+  runner com secrets/dependencias, Python sem skips, frontend e navegador real.
+  Checkout sparse antecede materializacao; sem copiar dados historicos/.env.
+- `test`: CIall aprovado em checkout limpo: 284 Python, 188 frontend, 40 browser
+  gerais, quatro temporais e 18 HTTPS reais. Build/typecheck, Gitleaks248,
+  falsoPAT controlado e audits npm/Python aprovados; nenhum secret impresso.
+- `fix`: discovery compativel com tests sem __init__, selftest exige finding
+  estruturado e erroinfra falha; porta do job em contexto GitHub valido.
+  Actionlint e revisoes oficiais das actions confirmados. Sem execucao remota.
+- `docs`: comandos/isolamento/limites em desenvolvimento/CI_WEB.md. Previa4173
+  preservada; container CI encerrado, sem push/deploy ou dados reais.
+
 ## 2026-10-16 — W17: seguranca integrada e preparacao do piloto W16
 
 - `fix`: headers seguros inclusive erros/CSV, framing ambiguo recusado, nonce
