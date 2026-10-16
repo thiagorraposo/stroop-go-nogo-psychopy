@@ -153,7 +153,10 @@ def _participant_rate_limit(request: Request, token: str, operation: str) -> Non
     try:
         allowed, retry_after = persistence.participant_request_limit(
             config.database_url, digest, operation, limit, config.participant_rate_window_seconds,
+            token_hash=hashlib.sha256(token.encode('ascii')).hexdigest(),
         )
+    except persistence.UnknownCredentialError:
+        raise APIError('authentication_required') from None
     except PersistenceError:
         raise _persistence_error() from None
     if not allowed:

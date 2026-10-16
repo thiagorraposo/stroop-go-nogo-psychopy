@@ -9,6 +9,7 @@ localizar codigo, comandos publicos e contratos.
 - [Roadmap WEB](ROADMAP_WEB.md): escopo, dependencias, criterios e estado.
 - [Progresso e retomada](PROGRESS.md): ultima unidade e proxima acao.
 - [Protocolo de trabalho](desenvolvimento/WORKFLOW_CODEX_CLI.md).
+- [Validacao WEB e piloto](VALIDACAO_WEB.md).
 - [Contrato HTTP WEB](desenvolvimento/CONTRATO_API_WEB.md).
 - [Padrao de commits](desenvolvimento/PADRAO_DE_COMMITS.md).
 - [Registro de alteracoes](REGISTRO_DE_ALTERACOES.md): evidencias datadas.

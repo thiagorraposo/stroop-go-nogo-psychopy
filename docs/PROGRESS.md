@@ -318,6 +318,56 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   e protocolo de evidencias. Ausencia de equipamento/manual impede homologacao
   fisica, mas nao bloqueia revisao de seguranca W17 e automacao W18.
 
+## W16 pendente de piloto / W17 concluida / W18 em validacao
+
+- W15 salva em 4d539f9; W13 em def93c5. AGENTS raiz preexistente preservado.
+- Previa solicitada pelo usuario ativa em http://127.0.0.1:4173, processo67560,
+  frontend Vite apenas (HTTP200); nao encerrar inadvertidamente nem usar porta
+ 4173 para testes enquanto estiver aberta. API nao esta ativa nessa previa.
+- W16: docs/VALIDACAO_WEB.md registra matriz real, evidencias e procedimento
+  D5 sem conceder aceite. Mint22.2/Chromium156.0.8078.4/Firefox157.0 confirmados.
+  Headless/teclado sintetico nao comprovam monitor60Hz nem dez pilotos fisicos.
+- W17: subagente revisou API, aplicou headers seguros em sucesso/erro/CSV,
+  rejeicao de framing ambiguo e nonce OIDCUnicode fechado. Principal corrigiu
+  cardinalidade de rate limits: cookie nao emitido nao gera contador. Novo
+  teste real: oito cookies/16operacoes401 e zero linhas. Nenhum dado real.
+- Regressao Python completa274/47,608s, sem skips, aprovada em PostgreSQL17.6
+  descartavel proprio stroop-web-test/32781/stroop_etapa4_test_w13. Suite gera
+  mensagens negativas esperadas; codigo0/OK. Threat model atualizado com limites.
+- npm audit de producao0 vulnerabilidades. Source frontend sem HTML arbitrario,
+  eval, logs de dados ou storage JS; matches de storage estao so em testes.
+- Suite HTTPS14 em execucao84191 depois do hardeningAPI. Nao rodar outra carga
+  CPU/DB durante mains reais. Novo security-headers.json define CSP estrita
+  self sem inline/eval; proxy de teste consumira no proximo startup. Novo
+  integrated/security.spec.ts verifica bloqueio script/conexaoalheia e pratica
+  completa/mainEscape sem violacao; ainda nao executado. W19 consumira baseline.
+- Subagente w15_browser_tests prepara W18 em .github/workflows, runner/checks
+  e docs/desenvolvimento/CI_WEB.md; somente fontes/docs enquanto HTTPS roda.
+  Ferramentas audit isoladas, sem novos deps de app. Scanner nao pode abrir
+  data/database/.env; dominio/VPS nao acessados.
+- Encontrada/corrigida diferenca de exibicao W15: locale arredondava56.25 para
+  56,3, enquanto StreamlitformatPython exige56,2. Painel agora reutiliza half-even
+  W12, preserva numeros crus e metricas negativas. Teste novo e assertHTTPS
+  ajustados; executar apos ensaios atuais. Nenhuma formula alterada.
+- W18runner/fluxo/checker escritos por subagente; aguardam testes. Checkout
+  isolado/CI deve ser SPARSE antes de materializar fontes: nao copiar CSVs
+  historicos trackeados em data/database nem .env. npmci so em checkoutisolado,
+  preservando node_modules da previa4173. Scanner nunca le esses dados.
+- Evidencias finais antes de commit: HTTPS14/6,1min aprovado apos hardeningAPI;
+  CSP4/50,9s e painel6/20s aprovados sob politica estrita. Frontend188, build e
+  typecheck aprovados. urllib3atualizado2.7->2.8 em diretas/locksAPI+dashboard,
+  conforme release oficial; pipcheckOK, npm/Python audits sem vulnerabilidades.
+- Scanner Gitleaks240fontes semallowlist e falsoPAT estruturado confirmados;
+  novasfontes W17 staged e scan244/244 aprovado antes do commit.
+  CheckerCI10/10; suitecompleta284/36,739s semskips via runnerCI aprovada.
+  Imagem dashboard:w17-urllib3-test construida; smoke redeoff/rootRO/coreOK.
+- Corrigidas validacoes do runner: discovery nao exige tests/__init__.py;
+  selftest exige metadata real de finding, sem confundir erroinfra com deteccao.
+- Proxima acao: stage/scan fontes novas W17 e commit isolado preservando AGENTS;
+  stage/scan W18 e commit de implementacao ainda em validacao. Criar worktree
+  sparse semcheckoutde dados, venv/node_modules proprios e rodar CIall/18HTTPS.
+  Preservar previa4173. W16 continua pendencia localizada.
+
 ## Decisoes e contexto preservados
 
 - Usuario aprovou explicitamente itens 1–19 da sessao. Finalidade coleta do

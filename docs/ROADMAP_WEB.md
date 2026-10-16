@@ -25,7 +25,10 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W12 | Concluida em 2026-10-16; resumo, CSV de 21 campos, paridade Python/TypeScript e importacao real validados |
 | W13 | Concluida; fluxo HTTPS real, reenvio e finalizacao validados |
 | W15 | Concluida; painel autorizado, metricas/graficos/CSV e perfis validados em HTTPS real |
-| W16–W21, W23 | Nao iniciadas |
+| W16 | Em preparacao; matriz/protocolo registrados, piloto no equipamento de referencia pendente |
+| W17 | Concluida; hardening, CSP, 284 testes Python, HTTPS e auditorias aprovados |
+| W18 | Em implementacao; runner/workflow e verificadores aprovados; pipeline limpo integral pendente |
+| W19–W21, W23 | Nao iniciadas |
 | W14 | Concluida em 2026-10-16; consulta/CSV autorizados, papel SELECT, mapa legado e testes PostgreSQL validados |
 | W22 | Nao iniciada; implantacao futura de responsabilidade do usuario |
 

@@ -6,6 +6,7 @@ import { dirname, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 // integrated -> e2e -> web -> dist
 const dist = resolve(dirname(fileURLToPath(import.meta.url)), '../../dist')
+const securityHeaders = JSON.parse(readFileSync(resolve(dist, '../security-headers.json'), 'utf8'))
 const mime = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml' }
 const server = createServer({ key: readFileSync(process.env.STROOP_TEST_TLS_KEY), cert: readFileSync(process.env.STROOP_TEST_TLS_CERT) }, (incoming, outgoing) => {
   const pathname = new URL(incoming.url, 'https://127.0.0.1:4373').pathname
@@ -31,7 +32,7 @@ const server = createServer({ key: readFileSync(process.env.STROOP_TEST_TLS_KEY)
   const extension = file.slice(file.lastIndexOf('.'))
   try {
     const content = readFileSync(file)
-    outgoing.writeHead(200, { 'Content-Type': mime[extension] ?? 'application/octet-stream', 'Cache-Control': 'no-store' })
+    outgoing.writeHead(200, { ...securityHeaders, 'Content-Type': mime[extension] ?? 'application/octet-stream', 'Cache-Control': 'no-store' })
     outgoing.end(content)
   } catch { outgoing.writeHead(404); outgoing.end() }
 })

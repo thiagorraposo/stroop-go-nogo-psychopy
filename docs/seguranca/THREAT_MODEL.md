@@ -87,3 +87,50 @@ o responsavel configura TLS/OIDC/firewall, backup externo e custodia de chave,
 valida capacidade/recuperacao e fornece textos/requisitos da pesquisa.
 Os controles WEB exigem os testes negativos e de concorrencia das etapas
 correspondentes; esta matriz nao comprova sua execucao.
+
+## Revisao WEB integrada — W17, 2026-10-16
+
+Escopo adicional: frontend React, motor jsPsych, API FastAPI, cookies separados
+profissional/participante e PostgreSQL. Fontes de autorizacao e minimizacao:
+[acesso WEB](ACESSO_WEB.md) e [contrato HTTP](../desenvolvimento/CONTRATO_API_WEB.md).
+VPS e dominio foram adquiridos; nenhuma configuracao real de host, DNS, TLS ou
+OIDC foi validada por esta revisao local. Referencias antigas a OCI nao definem
+provedor atual; prevalece [ADR-002](../arquitetura/ADR-002-hospedagem-vps.md).
+
+| Ameaca WEB | Controle observado/correcao | Evidencia e limite |
+|---|---|---|
+| Confusao entre sessao profissional e participante | Cookies __Host separados, hashes e HMAC com dominios distintos; Origin/CSRF exatos e escopo revalidado | Testes negativos, logout e replay reais; navegador nao declara privilegios |
+| Acesso cruzado ou heranca por nome legado | Membership ativo inclusive admin; mapa legado operacional explicito; SELECT por coluna e READ ONLY | W14/W15: consulta/exportacao negadas apos revogacao, sem nome/iniciais |
+| Duplicacao/resultado parcial | Lock transacional, ordem persistida, validacao/recalculo servidor e recibo idempotente | Concorrencia backend e falhas de rede antes/depois do commit em HTTPS real |
+| XSS/inclusao de dados como documento | React trata texto; sem HTML arbitrario. API impoe nosniff, CSP default-src none/frame-ancestors none/base-uri none/form-action none, XFO DENY, no-referrer e CORP same-origin em sucesso/erro/CSV | Testes ASGI verificam headers, inclusive substituicao de valores fracos. CSP da pagina frontend pertence ao proxy W19 e precisa de teste proprio |
+| Framing HTTP ambiguo | Recusa Content-Length com Transfer-Encoding, TE duplicado/invalido, comprimento divergente e corpo acima64KiB | Testes no limite ASGI; nao alegar que substituem validacao do parser/proxy publico |
+| Abuso por cookies aleatorios | Somente hash de credencial emitida cria contador participante; leitura/escrita e profissional sao separados | Variar16 operacoes com oito cookies inventados resulta401 e zero contadores; proxy deve limitar volume por IP/conexao antes da API |
+| Nonce OIDC invalido | Unicode fora do contrato produz falha fechada de OIDC | Teste negativo evita TypeError500; loginGoogle externo continua gate de homologacao |
+| Vazamento em resposta/log/storage | Erros fechados e request_id; no-store; sem log de path/query/body/cookies. CSRF/resultados em RAM; limpeza/logout/expiracao/BFCache | Testes de logs/erros, navegador e CSV. Comprometimento de host/conta/captura de tela permanecem externos |
+
+### Pendencias operacionais de seguranca
+
+- W19 deve aplicar CSP de pagina compativel com bundle local/jsPsych, TLS,
+  HSTS, protecao de enquadramento, limites por IP/conexao e roteamento de mesma
+  origem. Headers da API sao politica para respostas de dados, nao politica
+  suficiente para servir HTML da aplicacao.
+- W18 deve automatizar verificacoes de dependencias/secrets e testes negativos.
+  Dependencias fixadas, por si so, nao comprovam ausencia de vulnerabilidades.
+- W21 deve testar OIDC/redirect/certificados e configuracao efetiva no ambiente
+  alvo; nao existem credenciais reais disponiveis nesta validacao.
+- Pesquisador/operador responde por elegibilidade, informacao/consentimento,
+  prazos finais de retencao e acesso institucional antes de dados reais.
+
+Nao executar ataques ou scanners contra VPS/dominio como decorrencia destes
+testes locais. Risco operacional nao resolvido continua visivel no roadmap;
+nenhuma configuracao futura e descrita como protecao ja implantada.
+
+Baseline da pagina WEB: `web/security-headers.json` restringe scripts, estilos,
+imagens, fontes e conexoes a propria origem, sem unsafe-inline/unsafe-eval;
+proibe frames, objetos e workers, restringe base/form e desabilita permissoes
+nao usadas. O proxy de teste HTTPS consome esse arquivo; a integracao ao proxy
+operacional pertence a W19. A manipulacao de propriedades CSS pelo motor nao
+e uma permissao geral de HTML inline, conforme a
+[documentacao de style-src](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/style-src).
+Os testes de CSP precisam passar no bundle real; a previa Vite de desenvolvimento
+na porta4173 nao constitui hospedagem com essa politica de producao.

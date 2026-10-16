@@ -316,6 +316,21 @@ class WebSessionsPostgresTests(unittest.TestCase):
         self.assertEqual(unknown.get('/api/v1/participant/session').status_code, 401)
         self.assertEqual(unknown.post('/api/v1/participant/complete', json={}).status_code, 401)
 
+    def test_cookies_inventados_nao_criam_contadores_de_participante(self):
+        import secrets
+        from api.sessions import PARTICIPANT_COOKIE, _participant_csrf
+        client = self._participant_client()
+        self.addCleanup(client.close)
+        for _ in range(8):
+            token = secrets.token_urlsafe(32)
+            client.cookies.set(PARTICIPANT_COOKIE, token)
+            client.headers['X-CSRF-Token'] = _participant_csrf(self._config(), token)
+            self.assertEqual(client.get('/api/v1/participant/session').status_code, 401)
+            self.assertEqual(client.post('/api/v1/participant/complete', json={}).status_code, 401)
+        with psycopg.connect(self.database_url) as connection:
+            count = connection.execute('SELECT COUNT(*) FROM web_participant_request_limits').fetchone()[0]
+        self.assertEqual(count, 0)
+
     def test_limites_participantes_isolam_leitura_escrita_e_profissional(self):
         participant, payload, _ = self._completion()
         self.app.state.config = replace(self._config(), participant_read_rate_limit=1,

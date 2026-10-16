@@ -277,17 +277,23 @@ def professional_request_limit(database_url: str, credential_hash: str, operatio
 
 
 def participant_request_limit(database_url: str, credential_hash: str, operation_name: str,
-                              limit: int, window_seconds: int) -> tuple[bool, int]:
+                              limit: int, window_seconds: int, *, token_hash: str) -> tuple[bool, int]:
     return _credential_request_limit(database_url, credential_hash, operation_name,
-                                      limit, window_seconds, participant=True)
+                                      limit, window_seconds, participant=True, token_hash=token_hash)
 
 
 def _credential_request_limit(database_url: str, credential_hash: str, operation_name: str,
-                              limit: int, window_seconds: int, *, participant: bool):
+                              limit: int, window_seconds: int, *, participant: bool, token_hash: str | None = None):
     # Nomes fechados internos; nenhum identificador vem da requisicao.
     table = 'web_participant_request_limits' if participant else 'web_professional_request_limits'
     def operation():
         with psycopg.connect(database_url) as connection:
+            if participant and connection.execute(
+                "SELECT 1 FROM web_participant_sessions WHERE participant_token_sha256=%s",
+                (token_hash,),
+            ).fetchone() is None:
+                # Credenciais arbitrarias nao criam linhas nem cardinalidade de contadores.
+                raise UnknownCredentialError
             row = connection.execute(
                 f"""INSERT INTO {table}
                      (credential_sha256,operation,window_started_at,request_count)

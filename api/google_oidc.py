@@ -162,7 +162,8 @@ def exchange_code(
         session.close()
 
     nonce = claims.get("nonce")
-    if not isinstance(nonce, str) or not hmac.compare_digest(nonce, expected_nonce):
+    if (not isinstance(nonce, str) or not nonce.isascii()
+            or not hmac.compare_digest(nonce, expected_nonce)):
         raise InvalidOIDCResponse("Token OIDC invalido.")
     authorized_party = claims.get("azp")
     if authorized_party is not None and authorized_party != config.oidc_client_id:

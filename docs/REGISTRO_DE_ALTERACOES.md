@@ -6,11 +6,27 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W17: seguranca integrada e preparacao do piloto W16
+
+- `fix`: headers seguros inclusive erros/CSV, framing ambiguo recusado, nonce
+  OIDCUnicode fechado e cookies inventados sem criar contadores no banco.
+- `security`: CSP de pagina estrita, sem inline/eval, em baseline compartilhada
+  com proxy sintetico; script inline/conexao alheia bloqueados, pratica e
+  principal preservados em Chromium/Firefox. Proxy de producao continua W19.
+- `security`: urllib3 2.8.0 nas diretas/locks API e dashboard corrige tres
+  advisories detectados pela auditoria. Fonte: [release oficial](https://github.com/urllib3/urllib3/releases/tag/2.8.0).
+- `test`: 284 Python sem skips, 188 frontend, HTTPS14 apos hardening, CSP4 e
+  painel6 aprovados; npm/Python audits sem achados, Gitleaks244fontes e falha
+  controlada sem imprimir credenciais. Imagem dashboard reconstruida/smokeOK.
+- `docs`: threat model atualizado; VALIDACAO_WEB registra matriz/procedimento,
+  mantendo W16 pendente dos pilotos no equipamento de referencia, sem inventar
+  medicoes. Previa local4173 preservada; nenhum deploy ou dado real.
+
 ## 2026-10-16 — Correcao de arredondamento do painel WEB
 
 - `fix`: exibicao profissional reutiliza half-even Python do resumo W12,
   incluindo valores negativos de outros instrumentos. 56,25% com uma casa
-  aparece56,2%, como no Streamlit, sem alterar numeros crus ou formulas.
+  aparece 56,2%, como no Streamlit, sem alterar numeros crus ou formulas.
 - `test`: 188 frontend e seis HTTPS reais de painel sob CSP estrita aprovados,
   incluindo empate56.25 e CSV/detalhe/revogacao por perfil.
 

@@ -135,3 +135,9 @@ transmite nomes/iniciais pessoais do legado, nao oferece exportacao agregada,
 filtros por nome de participante/avaliador ou personalizacao de instrumentos.
 Filtros por periodo/versao e exportacao agregada continuam no Streamlit neste
 MVP. Nao ha interpretacao clinica, normativa ou comparacao entre instrumentos.
+
+Seguranca da pagina (W17): `security-headers.json` e a baseline testada no proxy
+HTTPS sintetico, a ser consumida no empacotamento W19. Scripts/estilos/conexoes
+sao restritos a mesma origem, sem unsafe-inline ou unsafe-eval. Os motores usam
+propriedades CSS diretas; testes verificam pratica e principal sem violacoes.
+A previa Vite e destinada a desenvolvimento e nao atesta headers de producao.

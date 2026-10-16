@@ -155,3 +155,11 @@ Sem cookie, a operacao permanece idempotente com Origin valido. Bootstrap
 completed mantem recibo JSON e retorna `X-CSRF-Token`/`X-Session-Expires-At` nos
 headers para permitir finalizacao apos recuperacao de recibo. Contrato e limites:
 [contrato HTTP](../docs/desenvolvimento/CONTRATO_API_WEB.md).
+
+Hardening W17: a fronteira ASGI aplica no-store/nosniff/CSP restrita a dados,
+X-Frame-Options DENY, no-referrer e CORP same-origin inclusive em erros e CSV.
+Framing ambiguo (Content-Length com Transfer-Encoding, TE duplicado/invalido
+ou tamanho divergente) e rejeitado. Cookies participantes nao emitidos recebem
+401 sem criar contadores; limites de volume por IP/conexao no proxy continuam
+necessarios. A CSP de paginas/bundle e separada, em `web/security-headers.json`;
+a API nao serve HTML da aplicacao.

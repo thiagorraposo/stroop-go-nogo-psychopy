@@ -15,6 +15,18 @@ from api.errors import APIError, error_response
 
 
 MAX_BODY_BYTES = 65536
+# Defesa do proprio adaptador, inclusive quando o proxy nao participou do teste.
+# Sao respostas de dados/redirecionamento, nunca paginas executaveis.
+RESPONSE_HEADERS = {
+    b"cache-control": b"no-store",
+    b"x-content-type-options": b"nosniff",
+    b"content-security-policy": (
+        b"default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+    ),
+    b"x-frame-options": b"DENY",
+    b"referrer-policy": b"no-referrer",
+    b"cross-origin-resource-policy": b"same-origin",
+}
 logger = logging.getLogger("stroop.api")
 
 
@@ -85,11 +97,11 @@ class RequestBoundary:
                 started = True
                 headers = [
                     (key, value) for key, value in message.get("headers", [])
-                    if key.lower() not in {b"x-request-id", b"cache-control"}
+                    if key.lower() != b"x-request-id" and key.lower() not in RESPONSE_HEADERS
                 ]
                 message = dict(message, headers=headers + [
                     (b"x-request-id", request_id.encode("ascii")),
-                    (b"cache-control", b"no-store"),
+                    *RESPONSE_HEADERS.items(),
                 ])
             await send(message)
 
@@ -100,6 +112,12 @@ class RequestBoundary:
             if not self._valid_host(headers):
                 raise APIError("invalid_request")
             declared_lengths = headers.get(b"content-length", [])
+            # Framing ambiguo deve ser recusado tambem se chegar de um adaptador
+            # ASGI/proxy permissivo; o proxy publico deve rejeita-lo antes.
+            transfers = headers.get(b"transfer-encoding", [])
+            if transfers and (declared_lengths or len(transfers) != 1
+                              or transfers[0].strip().lower() != b"chunked"):
+                raise APIError("invalid_json")
             if declared_lengths:
                 if len(declared_lengths) != 1 or not declared_lengths[0].isdigit():
                     raise APIError("invalid_json")
@@ -122,6 +140,8 @@ class RequestBoundary:
                 if not message.get("more_body", False):
                     break
             body = bytes(chunks)
+            if declared_lengths and len(body) != int(size):
+                raise APIError("invalid_json")
             requires_json = scope["method"] in {"POST", "PUT", "PATCH", "DELETE"} or bool(body)
             if requires_json:
                 media_types = headers.get(b"content-type", [])
