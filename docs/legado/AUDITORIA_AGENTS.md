@@ -4,7 +4,7 @@
 > As instrucoes, estados, criterios e referencias antigas abaixo nao governam
 > execucoes atuais, nem autorizam validacao com dados reais. Consulte o
 > [backlog canonico](Projeto%20Stroop%20Test.md) e o
-> [protocolo Codex CLI](WORKFLOW_CODEX_CLI.md).
+> [protocolo Codex CLI](../desenvolvimento/WORKFLOW_CODEX_CLI.md).
 
 
 Data: 2026-09-01.

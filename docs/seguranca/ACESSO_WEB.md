@@ -8,9 +8,9 @@ protocolo, validacao, operacao, textos e requisitos especificos da pesquisa.
 
 Este documento especifica os controles de W03; nao afirma que autenticacao
 HTTP, vinculos ou coleta WEB ja foram implementados. Implementacao e evidencias
-seguem o [roadmap WEB](ROADMAP_WEB.md). Operacoes, payloads, cookies, CSRF,
-codigos de erro e prazos estao no [contrato HTTP](CONTRATO_API_WEB.md);
-o metodo fica no [protocolo](PROTOCOLO_WEB.md).
+seguem o [roadmap WEB](../ROADMAP_WEB.md). Operacoes, payloads, cookies, CSRF,
+codigos de erro e prazos estao no [contrato HTTP](../desenvolvimento/CONTRATO_API_WEB.md);
+o metodo fica no [protocolo](../experimento/PROTOCOLO_WEB.md).
 
 ## Profissionais e autorizacao
 
@@ -139,7 +139,7 @@ substitui procedimento institucional. Nao prometer comprovacao de consentimento
 que o software nao registrou.
 
 VPS ja adquirida e dominio existente seguem
-[ADR-002](arquitetura/ADR-002-hospedagem-vps.md). Hostname, credenciais OIDC,
+[ADR-002](../arquitetura/ADR-002-hospedagem-vps.md). Hostname, credenciais OIDC,
 DNS/TLS, destino externo de backup e textos reais sao configuracoes de
 homologacao/operacao. Sua ausencia nao bloqueia desenvolvimento e testes
 sinteticos locais; acesso/deploy de producao continuam sob autorizacao propria.

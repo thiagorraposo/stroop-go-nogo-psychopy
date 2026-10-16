@@ -27,7 +27,7 @@ As tabelas de autenticacao da Etapa 8 ficam separadas desse dominio:
   identificador aleatorio, sem conteudo clinico.
 
 O contrato detalhado de acesso esta em
-[AUTENTICACAO_E_PERMISSOES.md](AUTENTICACAO_E_PERMISSOES.md).
+[AUTENTICACAO_E_PERMISSOES.md](../seguranca/AUTENTICACAO_E_PERMISSOES.md).
 
 ## Tabela assessments
 

@@ -1,12 +1,12 @@
 # Backlog completo — evolução do Stroop
 
 Este documento governa o escopo legado PsychoPy/Streamlit. A evolucao para a
-nova versao web tem escopo e estado em [ROADMAP_WEB.md](ROADMAP_WEB.md);
+nova versao web tem escopo e estado em [ROADMAP_WEB.md](../ROADMAP_WEB.md);
 seu progresso nao e representado pelos percentuais abaixo.
 
 Este documento e a unica fonte canonica do escopo legado para etapas, pesos, dependencias,
 escopo, criterios de aceite, estado, progresso, proxima etapa e decisoes externas
-pendentes. O [protocolo Codex CLI](WORKFLOW_CODEX_CLI.md) define como executar,
+pendentes. O [protocolo Codex CLI](../desenvolvimento/WORKFLOW_CODEX_CLI.md) define como executar,
 validar e registrar o trabalho; documentos auxiliares nao mantem outro backlog.
 
 ## Estado consolidado
@@ -34,10 +34,10 @@ delas depende. O Codex nao acessa/configura OCI por iniciativa propria; acoes
 de producao ficam sob responsabilidade do usuario nas Etapas 11 e 12.
 
 Consultar a [baseline](BASELINE_ETAPA_1.md), os contratos do
-[experimento](DECISOES_DO_EXPERIMENTO.md), [CSV](CSV_UNIFICADO.md) e
-[modelo de dados](MODELO_DE_DADOS.md), os guias de
-[Docker](INFRAESTRUTURA_DOCKER.md), [migrations](MIGRACOES_POSTGRESQL.md),
-[importacao SQLite](IMPORTACAO_SQLITE.md) e [dashboard](../dashboard/README.md)
+[experimento](../experimento/DECISOES_DO_EXPERIMENTO.md), [CSV](../experimento/CSV_UNIFICADO.md) e
+[modelo de dados](../dados/MODELO_DE_DADOS.md), os guias de
+[Docker](../operacao/INFRAESTRUTURA_DOCKER.md), [migrations](../dados/MIGRACOES_POSTGRESQL.md),
+[importacao SQLite](../dados/IMPORTACAO_SQLITE.md) e [dashboard](../../dashboard/README.md)
 conforme o componente envolvido. Sao contratos tecnicos e evidencias, nao fontes
 alternativas de etapas ou progresso.
 
@@ -61,7 +61,7 @@ alternativas de etapas ou progresso.
   [OCI_ETAPA11.md](OCI_ETAPA11.md); tenancy, regiao, cota, dominio, certificado,
   destino externo e deploy continuam sem verificacao autenticada.
 - Divergencias do workflow antigo e verificacoes desta tarefa estao no
-  [registro de alteracoes](REGISTRO_DE_ALTERACOES.md).
+  [registro de alteracoes](../REGISTRO_DE_ALTERACOES.md).
 
 ## Etapas e pesos
 
@@ -307,7 +307,7 @@ Docker, CLI sem persistencia, links e `git diff --check` aprovados.
 Decisao operacional da sessao: incluir `--validate-only` sem conexao; duplicatas
 sao recusadas sem `--force`, preservando o contrato legado. Origem e resultado
 usam as colunas existentes, sem nova migration. Comandos, codigos e limites em
-[IMPORTACAO_POSTGRESQL.md](IMPORTACAO_POSTGRESQL.md). Etapa 6 nao iniciada.
+[IMPORTACAO_POSTGRESQL.md](../dados/IMPORTACAO_POSTGRESQL.md). Etapa 6 nao iniciada.
 
 ---
 
@@ -379,7 +379,7 @@ Como a autenticação só será implementada na Etapa 8, o upload desta etapa de
 
 
 Evidencias de 2026-09-13: `scripts/upload_local.py`,
-`tests/test_upload_local.py` e [operacao documentada](UPLOAD_LOCAL.md).
+`tests/test_upload_local.py` e [operacao documentada](../dados/UPLOAD_LOCAL.md).
 Suite integral: 118 aprovados, sem skips, falhas ou erros; 14 testes especificos.
 Smoke HTTP com PostgreSQL descartavel comprovou pagina, upload sintetico,
 duplicidade, rejeicao e ausencia de residuos apos processamento normal.
@@ -402,7 +402,7 @@ demonstrativo sintético validando métricas separadas, coexistência em SQLite 
 PostgreSQL e ausência de tentativas incompatíveis. O dashboard passou a
 selecionar um instrumento por vez e adaptar cards, gráficos, tabelas, detalhe e
 exportação conforme `dashboard/instrumentos.py`. A documentação de extensão
-está em [MULTIPLOS_INSTRUMENTOS.md](MULTIPLOS_INSTRUMENTOS.md).
+está em [MULTIPLOS_INSTRUMENTOS.md](../dados/MULTIPLOS_INSTRUMENTOS.md).
 
 Suíte integral: 124 testes aprovados, zero falhas, erros ou skips, com
 PostgreSQL 17.6 descartável e fixtures sintéticas. Configuração Docker,
@@ -502,7 +502,7 @@ revalidacao de expiracao e bloqueio em toda operacao protegida.
 Evidencias de 2026-09-13: `scripts/migrations/0002_authentication.sql`,
 `dashboard/auth.py`, area protegida em `dashboard/app.py`, bootstrap e
 recuperacao em `scripts/gerenciar_usuarios.py` e operacao documentada em
-[AUTENTICACAO_E_PERMISSOES.md](AUTENTICACAO_E_PERMISSOES.md). A antiga rota
+[AUTENTICACAO_E_PERMISSOES.md](../seguranca/AUTENTICACAO_E_PERMISSOES.md). A antiga rota
 HTTP de upload sem OIDC foi removida; o comando publico abre a area autenticada
 do Streamlit em `127.0.0.1`.
 

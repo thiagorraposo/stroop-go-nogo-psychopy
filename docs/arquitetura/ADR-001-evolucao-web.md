@@ -105,8 +105,8 @@ com interfaces abstratas para cada funcao excederia a complexidade observada.
 ## Referencias
 
 - [Mapa de arquivos](../ESTRUTURA_DO_PROJETO.md).
-- [Decisoes metodologicas](../DECISOES_DO_EXPERIMENTO.md),
-  [CSV](../CSV_UNIFICADO.md) e [modelo de dados](../MODELO_DE_DADOS.md).
+- [Decisoes metodologicas](../experimento/DECISOES_DO_EXPERIMENTO.md),
+  [CSV](../experimento/CSV_UNIFICADO.md) e [modelo de dados](../dados/MODELO_DE_DADOS.md).
 - [Pacotes Python](https://docs.python.org/3/tutorial/modules.html#packages).
 - [Organizacao modular no FastAPI](https://fastapi.tiangolo.com/tutorial/bigger-applications/).
 - [Execucao e servidor proprio no jsPsych](https://www.jspsych.org/v8/overview/running-experiments/).

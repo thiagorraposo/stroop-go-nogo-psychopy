@@ -1,7 +1,7 @@
 # Dashboard local
 
-Planejamento, estado e aceite: [backlog canonico](../docs/Projeto%20Stroop%20Test.md).
-Operacao do desenvolvimento: [protocolo Codex CLI](../docs/WORKFLOW_CODEX_CLI.md).
+Planejamento, estado e aceite: [backlog canonico](../docs/legado/Projeto%20Stroop%20Test.md).
+Operacao do desenvolvimento: [protocolo Codex CLI](../docs/desenvolvimento/WORKFLOW_CODEX_CLI.md).
 
 
 Dashboard Streamlit autenticado para visualizar resultados descritivos do
@@ -9,12 +9,12 @@ experimento Stroop Go/No-Go importados para PostgreSQL.
 
 O acesso usa Google OIDC e exige cadastro previo por `iss` + `sub` no
 PostgreSQL. Perfis, bootstrap e configuracao sem secrets versionados estao em
-[`docs/AUTENTICACAO_E_PERMISSOES.md`](../docs/AUTENTICACAO_E_PERMISSOES.md).
+[`docs/seguranca/AUTENTICACAO_E_PERMISSOES.md`](../docs/seguranca/AUTENTICACAO_E_PERMISSOES.md).
 
 O registro de visões em `dashboard/instrumentos.py` também permite validar
 instrumentos adicionais sem misturar métricas. A tela sempre seleciona um
 instrumento por vez; o contrato e o adaptador demonstrativo estão em
-[`docs/MULTIPLOS_INSTRUMENTOS.md`](../docs/MULTIPLOS_INSTRUMENTOS.md).
+[`docs/dados/MULTIPLOS_INSTRUMENTOS.md`](../docs/dados/MULTIPLOS_INSTRUMENTOS.md).
 
 Aviso fixo exibido na interface:
 

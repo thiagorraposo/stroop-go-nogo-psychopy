@@ -12,8 +12,8 @@ Experimento original Stroop Go/No-Go para uso educacional e pesquisa
 exploratoria. Nao e instrumento clinico, diagnostico ou normativo.
 
 Antes de alterar codigo, leia o protocolo, a ficha da etapa e os `AGENTS.md`
-aplicaveis. Para o fluxo legado, consulte tambem `docs/BASELINE_ETAPA_1.md` e
-`docs/WORKFLOW_EVOLUCAO.md`. Para a evolucao web, use o contexto minimo de
+aplicaveis. Para o fluxo legado, consulte tambem `docs/legado/BASELINE_ETAPA_1.md` e
+`docs/desenvolvimento/WORKFLOW_EVOLUCAO.md`. Para a evolucao web, use o contexto minimo de
 `docs/ROADMAP_WEB.md` e `docs/arquitetura/ADR-001-evolucao-web.md`; nao refaca a
 inspecao completa sem divergencia concreta. Contratos nao devem ser duplicados.
 
@@ -38,8 +38,8 @@ Mapa: `docs/ESTRUTURA_DO_PROJETO.md`. `assets/` aceita somente material proprio.
 
 ## Inicializacao e contexto persistente
 
-Leia o [protocolo Codex CLI](docs/WORKFLOW_CODEX_CLI.md). Cada escopo tem uma
-fonte de estado: [backlog legado](docs/Projeto%20Stroop%20Test.md) para a
+Leia o [protocolo Codex CLI](docs/desenvolvimento/WORKFLOW_CODEX_CLI.md). Cada escopo tem uma
+fonte de estado: [backlog legado](docs/legado/Projeto%20Stroop%20Test.md) para a
 operacao existente; [roadmap WEB](docs/ROADMAP_WEB.md) para a nova versao.
 Nao misture IDs Wxx com as antigas fases ou etapas 1–12.
 
@@ -148,7 +148,7 @@ limitam o workflow WEB continuo acima.
   e as migrations conservam os caminhos publicos em `scripts/`.
 - Nao mude paradigma, tempos, estimulos, contrato CSV, schema ou formulas de
   metricas sem decisao explicita e documentada. Regras do paradigma e formulas:
-  `docs/DECISOES_DO_EXPERIMENTO.md` e `docs/MODELO_DE_DADOS.md`.
+  `docs/experimento/DECISOES_DO_EXPERIMENTO.md` e `docs/dados/MODELO_DE_DADOS.md`.
 - Nao copiar identidade, textos, pontuacao ou alegacoes proprietarias; nao criar
   diagnostico, norma, percentil clinico ou equivalencia psicometrica.
 - Use somente dados inequivocamente sinteticos em testes e documentacao. Nao
@@ -187,7 +187,7 @@ limitam o workflow WEB continuo acima.
   seu estado nem sobrescreva trabalho preexistente.
 - No trabalho WEB autonomo, faca commits locais pequenos e coerentes apos
   validacao, preferindo Conventional Commits em portugues conforme
-  `docs/PADRAO_DE_COMMITS.md`. Adicione apenas os arquivos ou hunks da tarefa;
+  `docs/desenvolvimento/PADRAO_DE_COMMITS.md`. Adicione apenas os arquivos ou hunks da tarefa;
   nao inclua alteracoes preexistentes ou alheias. Se nao puder isolar o commit
   com seguranca, preserve o trabalho e registre a pendencia.
 - No workflow legado ou quando o usuario limitar o versionamento, apenas sugira

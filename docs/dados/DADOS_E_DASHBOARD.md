@@ -2,7 +2,7 @@
 
 Data: 2026-07-15.
 
-Este documento define a arquitetura de coleta estruturada, consolidacao e visualizacao local de dados do experimento Stroop Go/No-Go. A Fase 1 foi implementada no PsychoPy com formulario local de sessao e metadados canonicos no `expInfo`. A Fase 2 implementou o CSV unificado por execucao e um analisador tecnico local. A Fase 7 implementou a importacao para SQLite local. A Fase 8 implementou o dashboard Streamlit local. Essas fases sao historicas; estado e aceite vigente ficam exclusivamente no [backlog canonico](Projeto%20Stroop%20Test.md), com validacao sintetica pelo [protocolo Codex CLI](WORKFLOW_CODEX_CLI.md).
+Este documento define a arquitetura de coleta estruturada, consolidacao e visualizacao local de dados do experimento Stroop Go/No-Go. A Fase 1 foi implementada no PsychoPy com formulario local de sessao e metadados canonicos no `expInfo`. A Fase 2 implementou o CSV unificado por execucao e um analisador tecnico local. A Fase 7 implementou a importacao para SQLite local. A Fase 8 implementou o dashboard Streamlit local. Essas fases sao historicas; estado e aceite vigente ficam exclusivamente no [backlog canonico](../legado/Projeto%20Stroop%20Test.md), com validacao sintetica pelo [protocolo Codex CLI](../desenvolvimento/WORKFLOW_CODEX_CLI.md).
 
 ## Objetivo
 
@@ -123,7 +123,7 @@ Campos tecnicos de auditoria a registrar futuramente:
 - Permanecer local em `data/`.
 - Nao ser modificado por scripts de importacao ou dashboard.
 - Conter metadados, tentativas, respostas, tempos e classificacao por tentativa.
-- Usar o contrato documentado em `docs/CSV_UNIFICADO.md`.
+- Usar o contrato documentado em `docs/experimento/CSV_UNIFICADO.md`.
 - Ser a fonte primária da auditoria da execução; o importador PostgreSQL é a
   fonte operacional do dashboard.
 

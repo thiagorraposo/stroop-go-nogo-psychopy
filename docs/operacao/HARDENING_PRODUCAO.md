@@ -2,7 +2,7 @@
 
 Esta configuracao prepara a exposicao futura do sistema sem realizar deploy,
 configurar dominio, certificado real, destino externo ou OCI. O
-[backlog canonico](Projeto%20Stroop%20Test.md) continua sendo a unica fonte de
+[backlog canonico](../legado/Projeto%20Stroop%20Test.md) continua sendo a unica fonte de
 estado e aceite. O dashboard de resultados usa PostgreSQL por
 `DASHBOARD_DATABASE_URL`; SQLite permanece apenas como fallback local.
 

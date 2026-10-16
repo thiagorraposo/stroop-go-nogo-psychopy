@@ -161,5 +161,5 @@ Sem `--force`, o script bloqueia `assessment_id` ja existente. Com `--force`, re
 
 A implementacao tem testes automatizados com CSVs temporarios ficticios.
 A antiga pendencia de Pilot com CSV real e historica e nao integra o aceite
-vigente. Consulte o [backlog canonico](Projeto%20Stroop%20Test.md) e o
-[protocolo Codex CLI](WORKFLOW_CODEX_CLI.md); validacoes usam somente dados sinteticos.
+vigente. Consulte o [backlog canonico](../legado/Projeto%20Stroop%20Test.md) e o
+[protocolo Codex CLI](../desenvolvimento/WORKFLOW_CODEX_CLI.md); validacoes usam somente dados sinteticos.

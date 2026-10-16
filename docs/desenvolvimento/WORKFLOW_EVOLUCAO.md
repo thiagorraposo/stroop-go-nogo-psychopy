@@ -1,21 +1,21 @@
 # Workflow de evolucao — referencia substituida
 
-A evolucao para a nova versao web usa [ROADMAP_WEB.md](ROADMAP_WEB.md) e o
-[ADR-001](arquitetura/ADR-001-evolucao-web.md). O redirecionamento abaixo trata
+A evolucao para a nova versao web usa [ROADMAP_WEB.md](../ROADMAP_WEB.md) e o
+[ADR-001](../arquitetura/ADR-001-evolucao-web.md). O redirecionamento abaixo trata
 do fluxo legado PsychoPy/Streamlit; os estados dos dois escopos sao separados.
 
 Este documento deixou de governar o planejamento em 2026-09-13. A unica fonte
 canonica de etapas, pesos, dependencias, escopo, criterios de aceite, estado,
 progresso, proxima etapa e decisoes externas pendentes e
-[Projeto Stroop Test.md](Projeto%20Stroop%20Test.md).
+[Projeto Stroop Test.md](../legado/Projeto%20Stroop%20Test.md).
 
 O processo operacional esta em [WORKFLOW_CODEX_CLI.md](WORKFLOW_CODEX_CLI.md).
 Nao gerar prompts externos por etapa. A distribuicao anterior de entregas e a
 regra antiga de contratacao de VPS foram substituidas pela decisao registrada no
-[historico de alteracoes](REGISTRO_DE_ALTERACOES.md). O conteudo anterior
+[historico de alteracoes](../REGISTRO_DE_ALTERACOES.md). O conteudo anterior
 permanece no historico Git; este arquivo foi preservado como redirecionamento.
 
-A [baseline](BASELINE_ETAPA_1.md) preserva evidencias datadas. Contratos de
+A [baseline](../legado/BASELINE_ETAPA_1.md) preserva evidencias datadas. Contratos de
 experimento e dados permanecem nos documentos tecnicos citados pelo backlog.
 
 ## Riscos tecnicos herdados da baseline

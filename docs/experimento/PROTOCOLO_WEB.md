@@ -5,7 +5,7 @@ usuario em 2026-10-16, ao aprovar os itens 1–19 apresentados na sessao. Este
 documento distingue o experimento local existente do protocolo aprovado para
 sua variante web. A aprovacao define requisitos; nao comprova implementacao,
 medicao temporal ou homologacao. Escopo, dependencias e estado de W01
-permanecem exclusivamente no [roadmap WEB](ROADMAP_WEB.md).
+permanecem exclusivamente no [roadmap WEB](../ROADMAP_WEB.md).
 
 ## Fontes e limites
 
@@ -13,16 +13,16 @@ permanecem exclusivamente no [roadmap WEB](ROADMAP_WEB.md).
   metodologicas canonicas, incluindo as decisoes aprovadas para a variante web.
 - [Validacao de condicoes e tempos](VALIDACAO_CONDICOES.md): balanceamento,
   paleta, duracoes e HUD da versao local `0.2.2`.
-- [Fonte Builder](../stroop_go_nogo_ptbr.psyexp) e CSVs de
-  [pratica](../condicoes/pratica_stroop_go_nogo_ptbr.csv),
-  [principal](../condicoes/bloco_principal_stroop_go_nogo_ptbr.csv) e
-  [contagem](../condicoes/contagem_regressiva.csv): comportamento configurado
+- [Fonte Builder](../../stroop_go_nogo_ptbr.psyexp) e CSVs de
+  [pratica](../../condicoes/pratica_stroop_go_nogo_ptbr.csv),
+  [principal](../../condicoes/bloco_principal_stroop_go_nogo_ptbr.csv) e
+  [contagem](../../condicoes/contagem_regressiva.csv): comportamento configurado
   efetivamente, conferido por leitura do XML e das condicoes versionadas.
-- [CSV unificado](CSV_UNIFICADO.md) e [modelo de dados](MODELO_DE_DADOS.md):
+- [CSV unificado](CSV_UNIFICADO.md) e [modelo de dados](../dados/MODELO_DE_DADOS.md):
   contratos de exportacao e formulas; exemplos antigos sao discutidos abaixo.
-- [ADR-001](arquitetura/ADR-001-evolucao-web.md): limites de medicao no
+- [ADR-001](../arquitetura/ADR-001-evolucao-web.md): limites de medicao no
   navegador e arquitetura; paridade funcional nao comprova equivalencia de RT.
-- [Especificacao visual e fluxo](ESPECIFICACAO_VISUAL_E_FLUXO.md): proposta
+- [Especificacao visual e fluxo](../legado/ESPECIFICACAO_VISUAL_E_FLUXO.md): proposta
   historica de 2026-07-06, sem precedencia sobre a fonte atual.
 
 A finalidade WEB aprovada e a coleta de dados pelo grupo de pesquisa do qual

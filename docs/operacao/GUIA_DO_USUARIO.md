@@ -58,6 +58,6 @@ Use `participant_id` como identificador tecnico. `participant_name` e informacao
 - Streamlit ausente: execute o setup novamente e use o launcher do projeto.
 - Banco ausente: gere um CSV oficial e abra o dashboard novamente.
 - Nenhum CSV encontrado: confirme o sufixo `_trials.csv` dentro de `data/`.
-- Cabecalho incompativel: use o CSV oficial sem edicao manual e consulte `CSV_UNIFICADO.md`.
+- Cabecalho incompativel: use o CSV oficial sem edicao manual e consulte `../experimento/CSV_UNIFICADO.md`.
 
 Para instrucoes detalhadas de Download ZIP e solucao de problemas, consulte `USO_POR_ZIP_GITHUB.md`.

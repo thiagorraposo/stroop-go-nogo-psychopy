@@ -9,8 +9,8 @@ e transacao. A CLI reexporta o caso de uso e as mesmas classes publicas
 `PostgresImportError` e `DuplicateAssessmentError`.
 O adaptador Stroop mantém o leitor, as validações, conversões e fórmulas do
 importador SQLite.
-O CSV permanece imutavel. O [backlog canonico](Projeto%20Stroop%20Test.md) define
-estado e aceite; o [protocolo Codex CLI](WORKFLOW_CODEX_CLI.md) governa a execucao.
+O CSV permanece imutavel. O [backlog canonico](../legado/Projeto%20Stroop%20Test.md) define
+estado e aceite; o [protocolo Codex CLI](../desenvolvimento/WORKFLOW_CODEX_CLI.md) governa a execucao.
 
 ## Pre-requisitos e comandos
 

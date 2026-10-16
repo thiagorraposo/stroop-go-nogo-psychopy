@@ -66,7 +66,7 @@ class ProductionConfigurationTests(unittest.TestCase):
         )
         example = (ROOT / ".env.production.example").read_text(encoding="utf-8")
         self.assertIn("DASHBOARD_DATABASE_URL=postgresql://stroop_dashboard_ro:", example)
-        dashboard_docs = (ROOT / "docs" / "DASHBOARD_POSTGRESQL.md").read_text(
+        dashboard_docs = (ROOT / "docs" / "dados" / "DASHBOARD_POSTGRESQL.md").read_text(
             encoding="utf-8"
         )
         self.assertIn("GRANT SELECT ON TABLE", dashboard_docs)

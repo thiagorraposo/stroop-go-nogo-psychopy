@@ -2,11 +2,11 @@
 
 Data: 2026-10-16. Especificacao implementavel de W02; nao representa rotas ja
 implementadas. Usa as decisoes aprovadas em
-[PROTOCOLO_WEB.md](PROTOCOLO_WEB.md), os perfis de
-[AUTENTICACAO_E_PERMISSOES.md](AUTENTICACAO_E_PERMISSOES.md) e os contratos de
-[CSV](CSV_UNIFICADO.md) e [dados](MODELO_DE_DADOS.md). Formulas e metodo
+[PROTOCOLO_WEB.md](../experimento/PROTOCOLO_WEB.md), os perfis de
+[AUTENTICACAO_E_PERMISSOES.md](../seguranca/AUTENTICACAO_E_PERMISSOES.md) e os contratos de
+[CSV](../experimento/CSV_UNIFICADO.md) e [dados](../dados/MODELO_DE_DADOS.md). Formulas e metodo
 continuam nessas fontes; `NormalizedAssessment` e um contrato interno Python,
-nao o corpo HTTP. Estado e aceite ficam no [roadmap](ROADMAP_WEB.md).
+nao o corpo HTTP. Estado e aceite ficam no [roadmap](../ROADMAP_WEB.md).
 
 ## Convencoes e limites
 
@@ -192,7 +192,7 @@ Objeto devolvido por `GET /participant/session` em `preparing`:
   independente da versao do aplicativo. Mudanca de tempos/condicoes exige nova
   identidade de protocolo; atualizar o app nao reinterpreta sessoes existentes.
 - `protocol`: dados de apresentacao necessarios ao motor, correspondentes ao
-  [protocolo aprovado](PROTOCOLO_WEB.md): tempos numericos em ms, contagem,
+  [protocolo aprovado](../experimento/PROTOCOLO_WEB.md): tempos numericos em ms, contagem,
   cores, regra/HUD, politica de interrupcao e repeticao de pratica. Testes
   verificarao correspondencia ao snapshot; nao duplicar decisoes neste contrato.
 - `practice_conditions`: exatamente quatro objetos com `condition_id` 1–4,
@@ -205,7 +205,7 @@ Objeto devolvido por `GET /participant/session` em `preparing`:
 `condition` e `congruent|incongruent`; `correct_response` e `space|null`.
 Os campos de cor logica e visual sao distintos; o CSV continua usando a cor
 logica. A API deriva a condicao das fontes e a cor visual da paleta efetiva
-do Builder, registrada em `UX_DECISIONS.md`, nao do cliente. O Builder substitui
+do Builder, registrada em `../experimento/UX_DECISIONS.md`, nao do cliente. O Builder substitui
 os hexadecimais historicos de `ink_color_display` dos CSVs-fonte; preservar a
 paleta efetivamente exibida ao montar o snapshot WEB.
 Exemplo sintetico de um item de `main_conditions` (o bootstrap real possui 16):
@@ -394,7 +394,7 @@ Lista profissional devolve por item: `assessment_id`, `participant_id`, `visit`,
 `evaluator_id`, `created_at`, `started_at`, `platform`, `test_code`,
 `test_version`, `protocol_id`, `app_version` e `summary`. Detalhe acrescenta
 `project_id`, `session_id`, `completed_at`, `metrics` (codigos/unidades do
-[modelo canonico](MODELO_DE_DADOS.md)), `frame_period_ms` e 16 `trials` com os
+[modelo canonico](../dados/MODELO_DE_DADOS.md)), `frame_period_ms` e 16 `trials` com os
 campos recebidos e as classificacoes/cor/palavra derivadas do snapshot.
 Avaliacoes locais existentes podem ter `platform="psychopy"`, sem
 `protocol_id`, `session_id`, `app_version`, tempos observados ou periodo de

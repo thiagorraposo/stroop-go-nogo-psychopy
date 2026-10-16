@@ -11,5 +11,5 @@ Escopo: `dashboard/`. Herda todas as regras da raiz.
   nao clinico documentados em `dashboard/README.md`.
 - Nao exponha dados sensiveis em mensagens, logs, screenshots ou fixtures. Teste
   acesso a dados com bancos temporarios inteiramente sinteticos.
-- Mudanca visual vai para `docs/UX_DECISIONS.md`; mudanca de dados/arquitetura,
+- Mudanca visual vai para `docs/experimento/UX_DECISIONS.md`; mudanca de dados/arquitetura,
   para o documento canonico correspondente e o registro de alteracoes.

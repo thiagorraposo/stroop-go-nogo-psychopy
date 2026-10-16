@@ -6,9 +6,9 @@ Esta etapa introduz a infraestrutura local de desenvolvimento. O PsychoPy
 continua instalado e executado no host. O fluxo aceita CSV -> PostgreSQL ->
 dashboard autenticado; sem URL de leitura, o fallback CSV -> SQLite -> dashboard
 permanece disponível. O schema ja possui
-[migrations documentadas](MIGRACOES_POSTGRESQL.md); sequenciamento, escopo e
+[migrations documentadas](../dados/MIGRACOES_POSTGRESQL.md); sequenciamento, escopo e
 aceite das entregas sao definidos somente no
-[backlog canonico](Projeto%20Stroop%20Test.md).
+[backlog canonico](../legado/Projeto%20Stroop%20Test.md).
 
 A configuracao endurecida, separada desta base local, esta em
 [Hardening de producao](HARDENING_PRODUCAO.md). Ela nao altera o comando de
@@ -30,7 +30,7 @@ desenvolvimento descrito neste documento.
 
 O dashboard e o PostgreSQL publicam suas portas configuraveis somente em
 `127.0.0.1` no desenvolvimento; o PostgreSQL usa 55432 por padrao. Isso permite executar no host as
-[migrations PostgreSQL](MIGRACOES_POSTGRESQL.md) sem expor o banco na rede.
+[migrations PostgreSQL](../dados/MIGRACOES_POSTGRESQL.md) sem expor o banco na rede.
 
 O contexto da imagem exclui coletas, bancos, backups, exports, logs,
 credenciais, chaves, secrets, PsychoPy e arquivos do experimento. A telemetria
@@ -52,7 +52,7 @@ O dashboard fica em `http://localhost:8501` e exige Google OIDC e cadastro
 previo. Ele pode exibir a mensagem esperada de SQLite ausente dentro da imagem
 de desenvolvimento; a saude do servico apenas confirma que o ponto de entrada
 Streamlit responde. Consulte
-[AUTENTICACAO_E_PERMISSOES.md](AUTENTICACAO_E_PERMISSOES.md).
+[AUTENTICACAO_E_PERMISSOES.md](../seguranca/AUTENTICACAO_E_PERMISSOES.md).
 
 Para encerrar sem apagar o volume PostgreSQL:
 

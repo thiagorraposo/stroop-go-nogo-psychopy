@@ -3,7 +3,7 @@
 A aplicacao usa o OIDC nativo do Streamlit com Google Identity. O Google
 autentica a conta; o PostgreSQL decide se a identidade pode acessar o sistema e
 qual perfil possui. Estado e aceite da etapa permanecem somente no
-[backlog canonico](Projeto%20Stroop%20Test.md).
+[backlog canonico](../legado/Projeto%20Stroop%20Test.md).
 
 ## Identidade e cadastro previo
 
@@ -41,7 +41,7 @@ Configure separadamente:
 - `DATABASE_URL`: conexao de escrita usada apenas pela importacao PostgreSQL.
 - `DASHBOARD_DATABASE_URL`: conexao da conta `dashboard_ro`, somente leitura
   das tabelas de dominio; detalhes da concessao ficam em
-  [`DASHBOARD_POSTGRESQL.md`](DASHBOARD_POSTGRESQL.md).
+  [`../dados/DASHBOARD_POSTGRESQL.md`](../dados/DASHBOARD_POSTGRESQL.md).
 
 Em Docker, `STREAMLIT_SECRETS_FILE` aponta para o arquivo real no host, montado
 como somente leitura em `/app/.streamlit/secrets.toml`. O exemplo versionado
@@ -145,7 +145,7 @@ O prazo provisorio da auditoria OIDC e 180 dias. Resultados de importacao ficam
 em tabela separada, sem e-mail, nome de arquivo ou identidade: somente hash
 SHA-256 do conteudo, status, codigo fechado de erro, horario e identificador
 aleatorio por 30 dias. Prazos, expurgo e logging de producao estao em
-[hardening](HARDENING_PRODUCAO.md) e
+[hardening](../operacao/HARDENING_PRODUCAO.md) e
 [tratamento de dados](TRATAMENTO_DE_DADOS.md).
 
 O logout remove a sessao atual do Streamlit. Uma aba ja aberta pode continuar

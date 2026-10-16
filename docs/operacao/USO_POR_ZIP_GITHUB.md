@@ -83,7 +83,7 @@ Confirme que o experimento terminou e que existe um arquivo com sufixo `_trials.
 
 ### CSV com cabecalho incompativel
 
-Use o CSV unificado oficial gerado por esta versao do experimento. Nao use CSV automatico de loop, arquivo editado em planilha ou exportacao de outra versao sem verificar o contrato em `CSV_UNIFICADO.md`. O importador rejeita cabecalhos diferentes para evitar dados inconsistentes.
+Use o CSV unificado oficial gerado por esta versao do experimento. Nao use CSV automatico de loop, arquivo editado em planilha ou exportacao de outra versao sem verificar o contrato em `../experimento/CSV_UNIFICADO.md`. O importador rejeita cabecalhos diferentes para evitar dados inconsistentes.
 
 ## Checklist do usuario
 

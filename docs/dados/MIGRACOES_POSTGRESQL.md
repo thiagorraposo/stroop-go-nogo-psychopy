@@ -6,16 +6,16 @@ Esta etapa versionou o schema PostgreSQL das tres tabelas de dominio e oferece
 uma migracao explicita do SQLite legado. O importador SQLite e o dashboard
 continuam no fluxo local legado. A CLI de [importacao CSV PostgreSQL](IMPORTACAO_POSTGRESQL.md)
 usa este schema ja aplicado; o sequenciamento das transicoes e definido no
-[backlog canonico](Projeto%20Stroop%20Test.md).
+[backlog canonico](../legado/Projeto%20Stroop%20Test.md).
 
 A Etapa 8 acrescentou `0002_authentication.sql`, com `app_users` e
 `auth_audit_events`, sem alterar as tabelas de dominio. Operacao e modelo de
-acesso: [AUTENTICACAO_E_PERMISSOES.md](AUTENTICACAO_E_PERMISSOES.md).
+acesso: [AUTENTICACAO_E_PERMISSOES.md](../seguranca/AUTENTICACAO_E_PERMISSOES.md).
 
 A Etapa 9 acrescentou `0003_import_audit.sql`. A tabela registra somente hash
 SHA-256, status, codigo de erro controlado, horario e UUID da operacao; nao
 armazena arquivo, nome, path, conteudo ou identificador de participante.
-Retencao e backup: [HARDENING_PRODUCAO.md](HARDENING_PRODUCAO.md).
+Retencao e backup: [HARDENING_PRODUCAO.md](../operacao/HARDENING_PRODUCAO.md).
 
 ## Schema versionado
 
@@ -74,5 +74,5 @@ temporario inteiramente sintetico e um banco PostgreSQL descartavel.
 
 ## Evolucao
 
-Consulte exclusivamente o [backlog canonico](Projeto%20Stroop%20Test.md) e o
-[protocolo Codex CLI](WORKFLOW_CODEX_CLI.md) para proximas entregas e validacao.
+Consulte exclusivamente o [backlog canonico](../legado/Projeto%20Stroop%20Test.md) e o
+[protocolo Codex CLI](../desenvolvimento/WORKFLOW_CODEX_CLI.md) para proximas entregas e validacao.

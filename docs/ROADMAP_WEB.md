@@ -1,7 +1,7 @@
 # Roadmap WEB — execucao incremental
 
 Este arquivo e a unica fonte de escopo, dependencias, aceite, estado e proxima
-etapa da evolucao web. O [backlog legado](Projeto%20Stroop%20Test.md) conserva
+etapa da evolucao web. O [backlog legado](legado/Projeto%20Stroop%20Test.md) conserva
 seu proprio escopo e progresso; seus 87% nao medem a implementacao web.
 Decisoes tecnicas: [ADR-001](arquitetura/ADR-001-evolucao-web.md).
 Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
@@ -18,8 +18,12 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W05 | Em andamento; base HTTP, configuracao e testes |
 | W06–W23 | Nao iniciadas |
 
-Proxima acao: **concluir W05 e integrar autenticacao W06**; W04 independente
-concluida. Evidencias em
+Pedido atual de organizacao documental atendido sem alterar o aceite das
+etapas. W05 local preservada para revisao/integracao; retomada detalhada em
+[PROGRESS.md](PROGRESS.md).
+
+Proxima acao do roadmap: **concluir W05 e integrar autenticacao W06**.
+Evidencias em
 [registro de alteracoes](REGISTRO_DE_ALTERACOES.md).
 Bloqueio de produto/metodo resolvido pela aprovacao explicita na sessao.
 Finalidade: coleta do grupo de pesquisa do usuario; participantes da pesquisa
@@ -39,7 +43,7 @@ Comandos para o Codex CLI, a partir da raiz do repositorio:
 - `mostrar status web`: somente leitura deste estado e das evidencias.
 - `validar etapa web Wxx`: revalidar a etapa indicada, sem iniciar outra.
 
-O [protocolo](WORKFLOW_CODEX_CLI.md) detalha as regras comuns e as condicoes
+O [protocolo](desenvolvimento/WORKFLOW_CODEX_CLI.md) detalha as regras comuns e as condicoes
 reais de parada. Acoes de producao dependem do usuario; solicitacoes somente
 documentais ou de consulta nao iniciam o roadmap nem retomam objetivos pausados.
 
@@ -65,7 +69,7 @@ documentais ou de consulta nao iniciam o roadmap nem retomam objetivos pausados.
 
 Nao copiar contratos ou tabelas de progresso para READMEs. Quando uma decisao
 alterar arquitetura, escrever outro ADR; quando alterar paradigma, registrar
-primeiro em `DECISOES_DO_EXPERIMENTO.md`. Nao considerar aceite funcional como
+primeiro em `experimento/DECISOES_DO_EXPERIMENTO.md`. Nao considerar aceite funcional como
 validacao psicometrica.
 
 ### Validacao comum
@@ -129,7 +133,7 @@ Entregavel da fase: nucleo extraido, compatibilidade e plano verificavel.
   funcionando; nenhuma rota, tela, dependencia ou migration web criada.
 - **Validacoes:** regressao integral sintetica, testes de imports e CLIs,
   comparacao das definicoes movidas, links, Compose, build e smoke da imagem.
-- **Leitura:** `BASELINE_ETAPA_1.md`, `ESTRUTURA_DO_PROJETO.md` e ADR-001.
+- **Leitura:** `legado/BASELINE_ETAPA_1.md`, `ESTRUTURA_DO_PROJETO.md` e ADR-001.
 
 ## Fase 1 — Especificacao e contratos
 
@@ -140,7 +144,7 @@ Dependencia da fase: W00; concluir as tres fichas antes de persistir sessoes web
 ### W01 — Protocolo e aceite experimental web
 
 - **Objetivo:** fixar a versao web e seus limites de medicao.
-- **Entregaveis:** `docs/PROTOCOLO_WEB.md` referenciando as regras canonicas;
+- **Entregaveis:** `docs/experimento/PROTOCOLO_WEB.md` referenciando as regras canonicas;
   matriz de fluxos e casos de resposta, politica de foco/interrupcao, navegadores
   e dispositivos suportados, criterio temporal verificavel e versao da tarefa.
 - **Dependencias:** W00.
@@ -150,13 +154,13 @@ Dependencia da fase: W00; concluir as tres fichas antes de persistir sessoes web
 - **Validacoes:** conferir `.psyexp` e condicoes; cobrir pratica, quatro tipos
   de resposta, limites da janela, tecla mantida, abortamento e ausencia de hits.
   Revisar exemplos antigos do CSV contra suas 21 colunas oficiais.
-- **Leitura:** `DECISOES_DO_EXPERIMENTO.md`, `VALIDACAO_CONDICOES.md`,
-  `CSV_UNIFICADO.md` e `ESPECIFICACAO_VISUAL_E_FLUXO.md` (proposta historica).
+- **Leitura:** `experimento/DECISOES_DO_EXPERIMENTO.md`, `experimento/VALIDACAO_CONDICOES.md`,
+  `experimento/CSV_UNIFICADO.md` e `legado/ESPECIFICACAO_VISUAL_E_FLUXO.md` (proposta historica).
 
 ### W02 — Contrato de sessao, resultados e HTTP
 
 - **Objetivo:** especificar o intercambio entre navegador e backend.
-- **Entregaveis:** `docs/CONTRATO_API_WEB.md` com operacoes, payloads sinteticos,
+- **Entregaveis:** `docs/desenvolvimento/CONTRATO_API_WEB.md` com operacoes, payloads sinteticos,
   estados de sessao, erros, limites, idempotencia, timestamps e unidades.
 - **Dependencias:** W01.
 - **Conclusao:** distinguir protocolo, versao do app e plataforma de coleta;
@@ -165,12 +169,12 @@ Dependencia da fase: W00; concluir as tres fichas antes de persistir sessoes web
 - **Validacoes:** percorrer criacao, conclusao, conflito, reenvio, expiracao,
   interrupcao e resultado invalido; definir verificacao de quantidade, condicoes,
   versao, ordem efetivamente apresentada e janela de resposta.
-- **Leitura:** protocolo web, `CSV_UNIFICADO.md` e `MODELO_DE_DADOS.md`.
+- **Leitura:** protocolo web, `experimento/CSV_UNIFICADO.md` e `dados/MODELO_DE_DADOS.md`.
 
 ### W03 — Acesso, participantes e minimizacao de dados
 
 - **Objetivo:** definir o acesso remoto antes da primeira coleta.
-- **Entregaveis:** `docs/ACESSO_WEB.md`, matriz de autorizacao por operacao,
+- **Entregaveis:** `docs/seguranca/ACESSO_WEB.md`, matriz de autorizacao por operacao,
   escopo por projeto/avaliador e atualizacao do threat model/tratamento de dados.
 - **Dependencias:** W02.
 - **Conclusao:** decidir acesso supervisionado ou convite, expiracao e uso unico,
@@ -179,8 +183,8 @@ Dependencia da fase: W00; concluir as tres fichas antes de persistir sessoes web
 - **Validacoes:** cenarios de acesso cruzado, token vazado/reutilizado, bloqueio,
   consentimento aplicavel e exportacao; registrar decisoes do usuario pendentes,
   sem inventar finalidade ou politica de retencao.
-- **Leitura:** `AUTENTICACAO_E_PERMISSOES.md`, `FORMULARIO_DE_SESSAO.md`,
-  `THREAT_MODEL.md` e `TRATAMENTO_DE_DADOS.md`.
+- **Leitura:** `seguranca/AUTENTICACAO_E_PERMISSOES.md`, `experimento/FORMULARIO_DE_SESSAO.md`,
+  `seguranca/THREAT_MODEL.md` e `seguranca/TRATAMENTO_DE_DADOS.md`.
 
 ## Fase 2 — Backend reutilizavel
 
@@ -199,8 +203,8 @@ Dependencias da fase: W01–W03 para os contratos; W04 preserva comportamento.
   repositorios genericos ou unificar validadores com semanticas diferentes.
 - **Validacoes:** suite SQLite/PostgreSQL, rollback, concorrencia, paridade e
   CLIs; conservar caminhos e hashes das migrations ja aplicadas.
-- **Leitura:** `IMPORTACAO_SQLITE.md`, `IMPORTACAO_POSTGRESQL.md`,
-  `MIGRACOES_POSTGRESQL.md` e os importadores atuais.
+- **Leitura:** `dados/IMPORTACAO_SQLITE.md`, `dados/IMPORTACAO_POSTGRESQL.md`,
+  `dados/MIGRACOES_POSTGRESQL.md` e os importadores atuais.
 
 ### W05 — Base HTTP, configuracao e testes da API
 
@@ -212,7 +216,7 @@ Dependencias da fase: W01–W03 para os contratos; W04 preserva comportamento.
   indisponibilidade de banco sao tratadas; regras permanecem no nucleo.
 - **Validacoes:** cliente de teste HTTP, configuracao ausente, readiness,
   erros sem conexoes/secrets no corpo e suite Python existente.
-- **Leitura:** contrato HTTP, ADR-001 e `HARDENING_PRODUCAO.md`.
+- **Leitura:** contrato HTTP, ADR-001 e `operacao/HARDENING_PRODUCAO.md`.
 
 ### W06 — Autenticacao e autorizacao HTTP
 
@@ -226,7 +230,7 @@ Dependencias da fase: W01–W03 para os contratos; W04 preserva comportamento.
 - **Validacoes:** identidade sintetica/JWKS de teste, assinatura invalida,
   token vencido, usuario bloqueado, perfil insuficiente e acesso a outro projeto;
   regressao da autenticacao Streamlit. Sem credenciais Google reais em testes.
-- **Leitura:** acesso web e `AUTENTICACAO_E_PERMISSOES.md`.
+- **Leitura:** acesso web e `seguranca/AUTENTICACAO_E_PERMISSOES.md`.
 
 ## Fase 3 — Sessoes e persistencia web
 
@@ -244,7 +248,7 @@ Dependencias da fase: W01–W06.
   nao aparece como avaliacao valida; nenhum schema antigo e reescrito.
 - **Validacoes:** banco vazio e atualizado, autorizacao negativa, sessao
   expirada, identificador imprevisivel e concorrencia na criacao.
-- **Leitura:** contratos web, `MODELO_DE_DADOS.md` e migrations existentes.
+- **Leitura:** contratos web, `dados/MODELO_DE_DADOS.md` e migrations existentes.
 
 ### W08 — Conclusao e recebimento de resultados
 
@@ -274,7 +278,7 @@ Dependencias da fase: W01–W03; integrar ao backend somente em W13.
 - **Conclusao:** navegacao minima e estados de carregamento/erro funcionam;
   segredos ficam no servidor; motor nao depende de renderizacoes React por frame.
 - **Validacoes:** TypeScript, testes, build e navegadores suportados.
-- **Leitura:** contratos web, ADR-001 e `COPY_DAS_TELAS.md`.
+- **Leitura:** contratos web, ADR-001 e `experimento/COPY_DAS_TELAS.md`.
 
 ### W10 — Preparacao e pratica
 
@@ -286,7 +290,7 @@ Dependencias da fase: W01–W03; integrar ao backend somente em W13.
   instrucoes nao vaza para a tentativa; pratica nao entra no resultado oficial.
 - **Validacoes:** mouse/teclado na navegacao, tecla mantida, feedback das quatro
   respostas, foco, contraste e bloqueio do dispositivo nao suportado.
-- **Leitura:** protocolo web, `COPY_DAS_TELAS.md` e condicoes de pratica.
+- **Leitura:** protocolo web, `experimento/COPY_DAS_TELAS.md` e condicoes de pratica.
 
 ### W11 — Motor do bloco principal
 
@@ -299,7 +303,7 @@ Dependencias da fase: W01–W03; integrar ao backend somente em W13.
   da API nem o relogio civil como cronometro experimental.
 - **Validacoes:** testes de estados/limites com relogio controlado, ordem sem
   reposicao, quatro respostas, perda de foco e verificacao em navegador real.
-- **Leitura:** protocolo e `VALIDACAO_CONDICOES.md`.
+- **Leitura:** protocolo e `experimento/VALIDACAO_CONDICOES.md`.
 
 ### W12 — Resumo e exportacao compativel
 
@@ -311,7 +315,7 @@ Dependencias da fase: W01–W03; integrar ao backend somente em W13.
   ausencia de hits/arredondamentos seguem a decisao W01; exportacao respeita W03.
 - **Validacoes:** arquivo web sintetico aceito pelo importador atual, formulas
   comparadas com o nucleo, caracteres especiais e ausencia de dados no nome.
-- **Leitura:** `CSV_UNIFICADO.md`, `MODELO_DE_DADOS.md` e protocolo web.
+- **Leitura:** `experimento/CSV_UNIFICADO.md`, `dados/MODELO_DE_DADOS.md` e protocolo web.
 
 ## Fase 5 — Integracao e consulta
 
@@ -341,7 +345,7 @@ Dependencias da fase: backend e execucao local aprovados.
   instrumentos, limita pagina/tamanho e usa credencial de leitura adequada.
 - **Validacoes:** acesso cruzado, filtros, paginacao, ausencia de dados,
   exportacao autorizada, paridade com consultas existentes e schema invalido.
-- **Leitura:** acesso web, `DASHBOARD_POSTGRESQL.md` e `MULTIPLOS_INSTRUMENTOS.md`.
+- **Leitura:** acesso web, `dados/DASHBOARD_POSTGRESQL.md` e `dados/MULTIPLOS_INSTRUMENTOS.md`.
 
 ### W15 — Painel web e coexistencia com Streamlit
 
@@ -385,7 +389,7 @@ Dependencias da fase: fluxo integrado; seguranca basica ja e obrigatoria desde W
   profissionais e participantes tem limites distintos quando aplicavel.
 - **Validacoes:** autorizacao negativa, acesso a objeto alheio, XSS, replay,
   payload excessivo, rate limit, dependencias e secrets; sem ataques em producao.
-- **Leitura:** `THREAT_MODEL.md`, `HARDENING_PRODUCAO.md` e acesso web.
+- **Leitura:** `seguranca/THREAT_MODEL.md`, `operacao/HARDENING_PRODUCAO.md` e acesso web.
 
 ### W18 — CI e verificacoes reproduziveis
 
@@ -415,7 +419,7 @@ Dependencias da fase: integracao e seguranca validadas; nenhuma acao em OCI.
   imagens sem PsychoPy, dados ou secrets; execucao com privilegios minimos.
 - **Validacoes:** Compose com valores ficticios, build, smoke HTTPS sintetico,
   persistencia/reinicio e verificacao de rotas e conexoes internas.
-- **Leitura:** `INFRAESTRUTURA_DOCKER.md`, `HARDENING_PRODUCAO.md` e ADR-001.
+- **Leitura:** `operacao/INFRAESTRUTURA_DOCKER.md`, `operacao/HARDENING_PRODUCAO.md` e ADR-001.
 
 ### W20 — Observabilidade e recuperacao
 
@@ -428,7 +432,7 @@ Dependencias da fase: integracao e seguranca validadas; nenhuma acao em OCI.
   nem presume que toda migration tem reversao destrutiva segura.
 - **Validacoes:** backup criptografado sintetico, restauracao, indisponibilidade
   de banco, alerta simulado e retorno a versao anterior compativel.
-- **Leitura:** `RESPOSTA_A_INCIDENTES.md`, `TRATAMENTO_DE_DADOS.md` e backup atual.
+- **Leitura:** `seguranca/RESPOSTA_A_INCIDENTES.md`, `seguranca/TRATAMENTO_DE_DADOS.md` e backup atual.
 
 ## Fase 8 — Homologacao, implantacao e transicao
 
@@ -459,7 +463,7 @@ Dependencias da fase: evidencias funcionais, temporais, de seguranca e operacao.
   custos, publicacao, dados reais ou mudanca do estado por presuncao.
 - **Validacoes:** HTTPS real, login configurado, portas internas fechadas,
   backup/restauracao, reboot e rollback com evidencias do ambiente publicado.
-- **Leitura:** runbook web e ADR-002; `OCI_ETAPA11.md` e somente historico legado.
+- **Leitura:** runbook web e ADR-002; `legado/OCI_ETAPA11.md` e somente historico legado.
   Verificar SO, recursos e dominio da VPS existente antes da implantacao.
 
 ### W23 — Transicao e eventual descontinuacao

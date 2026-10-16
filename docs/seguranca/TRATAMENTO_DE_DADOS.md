@@ -58,7 +58,7 @@ O usuario aprovou os itens 1–19 da proposta da sessao: coleta pelo grupo de
 pesquisa ao qual pertence, participantes da pesquisa sem filtro demografico
 novo e responsabilidade propria pelo protocolo, validacao, operacao e
 incidentes. A hospedagem sera em VPS ja adquirida, com dominio existente,
-conforme [ADR-002](arquitetura/ADR-002-hospedagem-vps.md). Essa aprovacao de
+conforme [ADR-002](../arquitetura/ADR-002-hospedagem-vps.md). Essa aprovacao de
 produto nao demonstra aprovacao etica, consentimento aplicavel ou adequacao
 institucional de uma coleta concreta.
 
@@ -128,4 +128,4 @@ aprovados, a comprovar em ensaio de recuperacao; nao sao garantias demonstradas.
 Os controles WEB desta extensao sao requisitos para as etapas futuras; nao
 declarar que ja existem por estarem documentados. Evidencias de autorizacao,
 replay/revogacao, minimizacao/exportacao e recuperacao seguem o
-[roadmap](ROADMAP_WEB.md) e o [threat model](THREAT_MODEL.md).
+[roadmap](../ROADMAP_WEB.md) e o [threat model](THREAT_MODEL.md).

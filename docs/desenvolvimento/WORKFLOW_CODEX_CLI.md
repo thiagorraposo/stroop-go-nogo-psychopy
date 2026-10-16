@@ -2,10 +2,10 @@
 
 Este protocolo orienta o trabalho do Codex CLI neste repositorio. Os comandos
 abaixo sao mensagens do usuario na sessao, nao comandos de shell ou scripts.
-O [AGENTS.md raiz](../AGENTS.md) exige a leitura deste protocolo.
+O [AGENTS.md raiz](../../AGENTS.md) exige a leitura deste protocolo.
 
-Ha uma fonte de estado por escopo: o [backlog legado](Projeto%20Stroop%20Test.md)
-governa as etapas 1–12 da operacao existente; o [roadmap WEB](ROADMAP_WEB.md)
+Ha uma fonte de estado por escopo: o [backlog legado](../legado/Projeto%20Stroop%20Test.md)
+governa as etapas 1–12 da operacao existente; o [roadmap WEB](../ROADMAP_WEB.md)
 governa a nova versao, com IDs Wxx. Os estados nao se somam. Documentos tecnicos
 detalham contratos; baselines e registros sao evidencias datadas.
 
@@ -19,7 +19,7 @@ salvo limite de escopo expresso pelo usuario. Uma solicitacao apenas documental
 ou de revisao nao inicia esse ciclo nem retoma objetivo pausado.
 
 Na inicializacao, ler os `AGENTS.md` aplicaveis, roadmap, arquitetura e
-[memoria de retomada](PROGRESS.md); conferir Git e as evidencias atuais sem
+[memoria de retomada](../PROGRESS.md); conferir Git e as evidencias atuais sem
 descartar alteracoes. Identificar aceite, pendencias e dependencias. Apresentar
 plano breve e iniciar a primeira tarefa executavel sem pedir autorizacao para
 escolhas tecnicas rotineiras. Nas etapas seguintes, ler apenas o contexto minimo,
@@ -154,7 +154,7 @@ docker compose --env-file .env.example config --quiet
 
 Quando exigidos pelo escopo/aceite, verificar build, inicializacao, healthchecks,
 smoke, persistencia e recuperacao em ambiente isolado sintetico, seguindo os
-[procedimentos Docker](INFRAESTRUTURA_DOCKER.md). Justificar verificacoes nao
+[procedimentos Docker](../operacao/INFRAESTRUTURA_DOCKER.md). Justificar verificacoes nao
 aplicaveis; indisponibilidade de teste obrigatorio nunca significa nao aplicabilidade.
 O PsychoPy permanece local e fora do Docker. Alteracoes experimentais exigem
 validacao estrutural e checklist Pilot autorizado, sem coleta real.

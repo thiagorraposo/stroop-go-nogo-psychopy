@@ -2,7 +2,7 @@
 
 Mapa vigente da evolucao web. Decisao:
 [ADR-001](arquitetura/ADR-001-evolucao-web.md). Estado e tarefas web:
-[roadmap](ROADMAP_WEB.md). O [backlog legado](Projeto%20Stroop%20Test.md)
+[roadmap](ROADMAP_WEB.md). O [backlog legado](legado/Projeto%20Stroop%20Test.md)
 continua governando a operacao PsychoPy/Streamlit existente.
 
 ## Arvore funcional
@@ -46,14 +46,23 @@ stroop-cognifit/
 │   ├── instrumentos.py        # apresentacao, separado da ingestao
 │   ├── requirements.txt
 │   └── requirements.lock
-├── api/README.md               # fronteira HTTP planejada; sem implementacao
+├── api/                        # fronteira HTTP em desenvolvimento na W05
 ├── web/README.md               # interface planejada; sem implementacao
 ├── tests/                      # unittest e fixtures sinteticas
 ├── docs/
+│   ├── README.md              # indice de navegacao por assunto
+│   ├── AGENTS.md              # instrucoes para documentacao
 │   ├── arquitetura/           # decisoes arquiteturais
+│   ├── experimento/           # protocolo, condicoes, CSV e UX
+│   ├── dados/                 # modelo, importacao, migracoes e dashboard
+│   ├── seguranca/             # acesso, ameacas, privacidade e incidentes
+│   ├── operacao/              # instalacao, uso, Docker e hardening
+│   ├── desenvolvimento/       # workflow, contrato HTTP, commits e prompts
+│   ├── legado/                # backlog legado, baselines e propostas antigas
 │   ├── ROADMAP_WEB.md         # unico estado da evolucao web
 │   ├── PROGRESS.md            # memoria concisa de trabalho e retomada
-│   └── contratos, guias e historico existentes
+│   ├── REGISTRO_DE_ALTERACOES.md
+│   └── ESTRUTURA_DO_PROJETO.md # este mapa
 ├── nginx/                      # proxy existente
 ├── compose*.yaml               # dev, producao e restauracao existentes
 ├── Dockerfile.dashboard
@@ -68,6 +77,10 @@ stroop-cognifit/
 
 ## Direcao das dependencias
 
+A [documentacao](README.md) e agrupada por assunto; roadmap, retomada, registro
+e mapa continuam na raiz de `docs/`. A reorganizacao documental conserva os
+caminhos operacionais de codigo, launchers, SQL, condicoes e infraestrutura.
+
 `scripts` delega importacao a `stroop.application`, que coordena ingestao e
 persistencia. `stroop.persistence` concentra SQL e drivers; nao importa CLIs ou
 dashboard. O recurso SQLite continua em `scripts/db_schema.sql` sem importacao
@@ -79,8 +92,9 @@ banco. Dominio e ingestao usam somente biblioteca padrao. SQLite pode ser usado
 sem instalar drivers PostgreSQL; importar o caso PostgreSQL requer `psycopg`.
 
 O dashboard permanece modular e em seu caminho publico. Seu registro visual
-de instrumentos tem finalidade distinta do registro de ingestao. Nenhum codigo
-da futura API ou interface foi criado nesta preparacao.
+de instrumentos tem finalidade distinta do registro de ingestao. A base HTTP
+esta em desenvolvimento na W05; a interface em `web/` permanece planejada.
+O mapa localiza arquivos, sem substituir o aceite registrado no roadmap.
 
 ## Mapa de extracao e compatibilidade
 
@@ -109,7 +123,7 @@ python scripts/doctor.py
 ```
 
 Os atalhos da raiz e o uso por ZIP continuam descritos no
-[guia de instalacao](INSTALACAO_MULTIPLATAFORMA.md). PsychoPy permanece fora do
+[guia de instalacao](operacao/INSTALACAO_MULTIPLATAFORMA.md). PsychoPy permanece fora do
 Docker. SQL, Compose e proxy conservam caminhos para evitar migracao de
 ambiente junto de uma extracao de codigo.
 

@@ -5,9 +5,9 @@ a Etapa 8, ela faz parte do dashboard protegido por Google OIDC e exige usuario
 previamente cadastrado com perfil `importacao` ou `administracao`. O contrato do
 Stroop e o adaptador demonstrativo estao em
 [MULTIPLOS_INSTRUMENTOS.md](MULTIPLOS_INSTRUMENTOS.md); identidade, perfis e
-bootstrap estao em [AUTENTICACAO_E_PERMISSOES.md](AUTENTICACAO_E_PERMISSOES.md).
+bootstrap estao em [AUTENTICACAO_E_PERMISSOES.md](../seguranca/AUTENTICACAO_E_PERMISSOES.md).
 O dashboard ainda consulta o SQLite ate a etapa prevista para troca do backend.
-Estado e aceite ficam no [backlog canonico](Projeto%20Stroop%20Test.md).
+Estado e aceite ficam no [backlog canonico](../legado/Projeto%20Stroop%20Test.md).
 
 ## Abrir a area de upload
 
@@ -81,7 +81,7 @@ provisorio desse registro e 30 dias.
 A origem da avaliacao importada e o caminho temporario aleatorio com esse ID;
 o arquivo nao permanece disponivel. O banco conserva a avaliacao,
 metricas e tentativas importadas, conforme seu contrato existente. A retencao de
-dados e provisoria e esta em [tratamento de dados](TRATAMENTO_DE_DADOS.md).
+dados e provisoria e esta em [tratamento de dados](../seguranca/TRATAMENTO_DE_DADOS.md).
 
 ## Falhas e verificacao
 

@@ -3,12 +3,12 @@
 > Documento historico, substituido para fins de planejamento, estado e aceite.
 > As instrucoes, estados, criterios e referencias antigas abaixo nao governam
 > execucoes atuais, nem autorizam validacao com dados reais. Consulte o
-> [backlog canonico](../Projeto%20Stroop%20Test.md) e o
+> [backlog canonico](../../legado/Projeto%20Stroop%20Test.md) e o
 > [protocolo Codex CLI](../WORKFLOW_CODEX_CLI.md).
 
 
 Leia os `AGENTS.md` aplicaveis, a
-[baseline](../BASELINE_ETAPA_1.md), o
+[baseline](../../legado/BASELINE_ETAPA_1.md), o
 [workflow](../WORKFLOW_EVOLUCAO.md), `dashboard/README.md` e os testes atuais do
 dashboard. Inspecione `dashboard/app.py` e apresente um plano curto antes de
 editar.

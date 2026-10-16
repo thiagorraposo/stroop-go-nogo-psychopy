@@ -54,8 +54,8 @@ As secoes anteriores registram o hardening legado. Esta extensao especifica
 ameacas e controles alvo da API/navegador, **a implementar e verificar** nas
 etapas WEB; nao lhes atribui o estado de controles ja implementados. Regras
 de acesso ficam em [ACESSO_WEB.md](ACESSO_WEB.md), transporte em
-[CONTRATO_API_WEB.md](CONTRATO_API_WEB.md), e hospedagem na VPS ja adquirida
-com dominio existente em [ADR-002](arquitetura/ADR-002-hospedagem-vps.md).
+[CONTRATO_API_WEB.md](../desenvolvimento/CONTRATO_API_WEB.md), e hospedagem na VPS ja adquirida
+com dominio existente em [ADR-002](../arquitetura/ADR-002-hospedagem-vps.md).
 As antigas referencias a OCI/ARM64/hostname inexistente descrevem preparacao
 legada, sem impor esse provedor nem negar a existencia do dominio atual.
 

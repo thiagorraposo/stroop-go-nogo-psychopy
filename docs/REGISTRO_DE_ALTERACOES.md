@@ -1,10 +1,30 @@
 # Registro de alteracoes
 
 Este arquivo preserva fatos datados; nao define estado ou aceite vigente.
-Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
+Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
+
+## 2026-10-16 — Documentacao organizada por assunto
+
+- `docs`: 37 documentos agrupados em `experimento/`, `dados/`, `seguranca/`,
+  `operacao/`, `desenvolvimento/` (incluindo prompts) e `legado/`.
+  ADRs continuam em `arquitetura/`; roadmap, progresso, registro e mapa
+  continuam na raiz. Criado [indice](README.md), atualizado mapa e simplificada
+  a listagem da raiz. Backlog legado continua vigente para seu fluxo.
+- `compat`: referencias atuais de Markdown/AGENTS atualizadas. Integridade
+  dos 37 documentos conferida contra snapshot anterior: apenas referencias
+  alteradas. Caminhos textuais historicos preservados em registros datados.
+  Nenhuma fonte executavel existente, condicao, launcher, schema, migration,
+  dependencia ou configuracao de infraestrutura alterada por esta unidade.
+- `test`: caminho documental corrigido em `test_hardening_producao.py`,
+  mantendo assercoes. Suite integral: 189 testes aprovados em 5,651 s,
+  zero falhas/erros/skips, com PostgreSQL sintetico descartavel; 240 links
+  locais validos, revisao independente e `git diff --check` aprovados.
+  Container exclusivo de testes encerrado sem volume persistente.
+- `scope`: implementacao W05 ja em andamento preservada fora do commit de
+  organizacao. Nenhuma nova etapa iniciada; W05 nao recebeu aceite antecipado.
 
 ## 2026-10-16 — W03: acesso e dados WEB especificados
 
@@ -187,7 +207,7 @@ O estado da nova versao web e mantido separadamente no
 ## 2026-10-07 — Execucao do gerenciador de usuarios como modulo
 
 - `docs`: corrigidos os comandos `bootstrap` e `recover-admin` em
-  [autenticacao e permissoes](AUTENTICACAO_E_PERMISSOES.md) para usar
+  [autenticacao e permissoes](seguranca/AUTENTICACAO_E_PERMISSOES.md) para usar
   `python -m scripts.gerenciar_usuarios`; nenhuma outra ocorrencia equivalente
   foi encontrada nos arquivos pesquisados, excluindo secrets e dados locais.
 - `test`: nove testes de autenticacao aprovados; ajuda dos dois subcomandos
@@ -199,7 +219,7 @@ O estado da nova versao web e mantido separadamente no
 
 - `fix`: atualizada somente a revisao fixada do pacote OpenSSL em
   `Dockerfile.proxy`, de `3.3.7-r0` para `3.3.7-r2`.
-- `docs`: sincronizada a versao descrita em [hardening](HARDENING_PRODUCAO.md).
+- `docs`: sincronizada a versao descrita em [hardening](operacao/HARDENING_PRODUCAO.md).
 - `test`: 12 testes estaticos de producao e seis de infraestrutura aprovados;
   `git diff --check` aprovado.
 - `scope`: sem build, deploy, alteracao de banco, acesso a secrets ou mudanca
@@ -219,7 +239,7 @@ O estado da nova versao web e mantido separadamente no
 
 ## 2026-09-13 — Consulta pública para a Etapa 11
 
-- `docs`: registrada em [OCI_ETAPA11.md](OCI_ETAPA11.md) a consulta de
+- `docs`: registrada em [OCI_ETAPA11.md](legado/OCI_ETAPA11.md) a consulta de
   documentação pública da Oracle sobre Always Free, `VM.Standard.A1.Flex`
   ARM64, cotas, disponibilidade, volumes e isolamento de rede.
 - `docs`: a proposta mantém limites do Compose configuráveis, reserva de
