@@ -1,6 +1,6 @@
 # API HTTP
 
-Base FastAPI com autenticacao profissional de W06, sem rotas de coleta. O estado
+Base FastAPI com autenticacao profissional e fluxo de convites/sessoes W07. O estado
 de cada etapa fica no [roadmap](../docs/ROADMAP_WEB.md); o
 [contrato HTTP](../docs/desenvolvimento/CONTRATO_API_WEB.md) define formatos e limites.
 
@@ -11,6 +11,9 @@ de cada etapa fica no [roadmap](../docs/ROADMAP_WEB.md); o
 - `health.py` implementa verificacoes live/readiness somente leitura.
 - `auth.py` expoe login, callback, identidade propria e logout; verifica Origin,
   CSRF e revalida a autorizacao local para cada operacao protegida.
+- `sessions.py` expoe projetos/vinculos administrativos, convites profissionais
+  e resgate, bootstrap, inicio e abortamento do participante. O backend guarda
+  somente hashes de credenciais; sessoes ativas nao viram avaliacoes.
 - `google_oidc.py` concentra descoberta do provedor, montagem do pedido de
   autorizacao e verificacao criptografica do token.
 - Regras de identidade ficam em `stroop/domain` e `stroop/application`; SQL e
@@ -20,7 +23,9 @@ de cada etapa fica no [roadmap](../docs/ROADMAP_WEB.md); o
   local publico e a aplicacao explicita pelo utilitario existente.
 
 O roadmap continua sendo a fonte de aceite; a presenca das rotas nao substitui
-as evidencias de teste e integracao registradas para W06.
+as evidencias de teste e integracao registradas para W06/W07. Projetos ficam em
+modo sintetico; coleta real permanece desabilitada enquanto nao houver a
+configuracao explicita exigida por `docs/seguranca/ACESSO_WEB.md`.
 
 Na raiz do checkout, com Python 3.12 e a `.venv` existente:
 
@@ -43,6 +48,13 @@ factory de iniciar com uma mensagem fixa, sem imprimir a configuracao.
 `API_LOGIN_RATE_WINDOW_SECONDS` (padrao 60) configuram a janela por endereco
 remoto. A API armazena apenas HMAC do endereco e remove janelas expiradas.
 Headers de IP encaminhado nao sao confiados.
+`API_REDEEM_RATE_LIMIT` (padrao 10) e
+`API_REDEEM_RATE_WINDOW_SECONDS` (padrao 60) aplicam o mesmo principio ao
+resgate publico de convites.
+`API_PROFESSIONAL_READ_RATE_LIMIT` (120),
+`API_PROFESSIONAL_WRITE_RATE_LIMIT` (60) e
+`API_PROFESSIONAL_RATE_WINDOW_SECONDS` (60) limitam leituras e escritas por
+credencial profissional; somente HMAC da credencial e armazenado.
 
 Exemplo exclusivamente sintetico de preparacao local:
 
@@ -85,7 +97,7 @@ servidor; logs proprios contem apenas categoria fixa e request_id.
 Validacoes:
 
 ```bash
-.venv/bin/python -m unittest tests.test_api_base -v
+.venv/bin/python -m unittest tests.test_api_base tests.test_web_auth tests.test_web_sessions -v
 .venv/bin/python -m compileall -q api
 .venv/bin/python -m pip check
 git diff --check

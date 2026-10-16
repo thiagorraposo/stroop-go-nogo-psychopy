@@ -17,6 +17,10 @@ PERMISSIONS = {
     "export_dashboard": frozenset(ROLES),
     "import_csv": frozenset({"importacao", "administracao"}),
     "manage_users": frozenset({"administracao"}),
+    "manage_projects": frozenset({"administracao"}),
+    "manage_project_members": frozenset({"administracao"}),
+    "create_invitation": frozenset({"importacao", "administracao"}),
+    "revoke_invitation": frozenset({"importacao", "administracao"}),
 }
 DENIAL_LIMIT = 5
 DENIAL_WINDOW_MINUTES = 15

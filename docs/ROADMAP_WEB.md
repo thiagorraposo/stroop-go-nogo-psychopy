@@ -17,10 +17,12 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W04 | Concluida em 2026-10-16; casos de uso/persistencia extraidos, 173 testes e smoke na imagem aprovados |
 | W05 | Concluida em 2026-10-16; API FastAPI, limites/erros seguros, readiness real PostgreSQL, 189 testes e smoke Uvicorn |
 | W06 | Concluida em 2026-10-16; OIDC, sessao segura, CSRF, autorizacao e limites de login |
-| W07–W23 | Nao iniciadas |
+| W07 | Concluida em 2026-10-16; ciclo de sessao, autorizacao, limites e migrations validados |
+| W08–W21, W23 | Nao iniciadas; W08 e a proxima etapa elegivel |
+| W22 | Executada pelo usuario conforme escopo registrado |
 
-Pedido de organizacao documental concluido em commit proprio. W05 foi validada
-e integrada; W06 e a etapa em execucao. Retomada detalhada em
+Pedido de organizacao documental concluido em commit proprio. W05/W06 foram
+validadas e integradas; W07 concluida e W08 e a proxima etapa. Retomada detalhada em
 [PROGRESS.md](PROGRESS.md). Evidencias em
 [registro de alteracoes](REGISTRO_DE_ALTERACOES.md).
 Bloqueio de produto/metodo resolvido pela aprovacao explicita na sessao.
@@ -241,13 +243,14 @@ Dependencias da fase: W01–W06.
 ### W07 — Criacao e ciclo de vida da sessao
 
 - **Objetivo:** iniciar uma sessao vinculada ao protocolo e acesso aprovados.
-- **Entregaveis:** novas migrations aditivas e rotas de criacao/consulta do
-  estado; identificadores, expiracao e restricoes conforme W02/W03.
+- **Entregaveis:** migration aditiva; gestao minima de projetos e vinculos,
+  emissao/revogacao de convites e rotas de resgate, consulta, inicio e
+  abortamento; identificadores, expiracao e restricoes conforme W02/W03.
 - **Dependencias:** W01, W02, W03, W06.
 - **Conclusao:** distinguir sessao de avaliacao concluida; tentativa abortada
   nao aparece como avaliacao valida; nenhum schema antigo e reescrito.
 - **Validacoes:** banco vazio e atualizado, autorizacao negativa, sessao
-  expirada, identificador imprevisivel e concorrencia na criacao.
+  expirada, identificador imprevisivel e concorrencia na criacao/resgate.
 - **Leitura:** contratos web, `dados/MODELO_DE_DADOS.md` e migrations existentes.
 
 ### W08 — Conclusao e recebimento de resultados

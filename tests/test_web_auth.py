@@ -14,7 +14,7 @@ from fastapi import Request
 from fastapi.testclient import TestClient
 
 from api.config import APIConfig
-from api.auth import require_professional
+from api.auth import opaque_user_id, require_professional
 from api.main import create_app
 from scripts.migrations import apply_migrations
 from stroop.application import auth as auth_application
@@ -183,7 +183,7 @@ class WebAuthPostgresTests(unittest.TestCase):
 
         profile = self.client.get("/api/v1/auth/me")
         self.assertEqual(profile.status_code, 200, profile.text)
-        self.assertEqual(profile.json()["user_id"], SUBJECT)
+        self.assertEqual(profile.json()["user_id"], opaque_user_id(ISSUER, SUBJECT))
         self.assertEqual(profile.json()["role"], "administracao")
         csrf = profile.json()["csrf_token"]
         self.assertNotEqual(csrf, cookie)

@@ -6,6 +6,25 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W07: ciclo de sessao participante
+
+- `feat`: migration aditiva 0005 cria projetos sinteticos, vinculos,
+  convites, sessoes participantes, ordem principal persistida e limite de
+  resgate. Sem migrar ou reescrever `assessments`, metricas ou tentativas.
+- `feat`: API implementa gestao de projetos/vinculos, convite com segredo
+  aleatorio exibido uma vez e hash no banco, resgate atomicamente one-use,
+  cookie participante separado, bootstrap, start idempotente, abortamento e
+  revogacao. Valida origem/CSRF, escopo, perfil, estado, prazos absolutos e
+  limites configuraveis; ordem de 16 condicoes usa as fontes/paleta oficiais.
+  Projetos estao restritos a `synthetic`; coleta real continua desabilitada.
+- `security`: limites configuraveis de leitura/escrita por credencial profissional
+  armazenam somente HMAC; `user_id` opaco preserva a identidade composta `iss` +
+  `sub`; convite desconhecido ou fora do projeto retorna 404 antes da permissao.
+- `test`: PostgreSQL descartavel valida migration vazia e upgrade com dados
+  legados preservados, concorrencia de resgate, autorizacao negativa,
+  identificadores, ordem fixa, start/retry/conflito, abortamento, expiracao,
+  revogacao e rate limit. Resultados detalhados em `PROGRESS.md`.
+
 ## 2026-10-16 — Documentacao organizada por assunto
 
 - `docs`: 37 documentos agrupados em `experimento/`, `dados/`, `seguranca/`,

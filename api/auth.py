@@ -32,7 +32,7 @@ from stroop.domain.auth import (
     UnregisteredUserError,
 )
 from stroop.persistence.auth import PersistenceError
-from stroop.persistence import web_auth
+from stroop.persistence import web_auth, web_sessions as web_session_persistence
 
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
@@ -157,6 +157,45 @@ def _professional_context(request: Request, action: str):
     except AuthError as exc:
         raise _auth_error(exc) from None
     return user, session, token
+
+
+def opaque_user_id(issuer: str, subject: str) -> str:
+    raw = issuer.encode("ascii") + b"\0" + subject.encode("ascii")
+    return base64.urlsafe_b64encode(raw).rstrip(b"=").decode("ascii")
+
+
+def parse_opaque_user_id(value: str) -> tuple[str, str] | None:
+    if not 1 <= len(value) <= 512 or re.fullmatch(r"[A-Za-z0-9_-]+", value) is None:
+        return None
+    try:
+        raw = base64.urlsafe_b64decode(value + "=" * (-len(value) % 4))
+        issuer, subject = raw.decode("ascii").split("\0", 1)
+    except (ValueError, UnicodeError):
+        return None
+    if issuer not in {"https://accounts.google.com", "accounts.google.com"}:
+        return None
+    if not 1 <= len(subject) <= 255 or any(c.isspace() for c in subject):
+        return None
+    return issuer, subject
+
+
+def _professional_rate_limit(request: Request, token: str, operation: str) -> None:
+    config: APIConfig = request.app.state.config
+    digest = hmac.new(
+        config.session_secret.encode("utf-8"),
+        b"stroop-professional-rate-v1\0" + token.encode("ascii"),
+        hashlib.sha256,
+    ).hexdigest()
+    limit = config.professional_read_rate_limit if operation == "read" else config.professional_write_rate_limit
+    try:
+        allowed, retry_after = web_session_persistence.professional_request_limit(
+            config.database_url, digest, operation, limit,
+            config.professional_rate_window_seconds,
+        )
+    except PersistenceError:
+        raise APIError("service_unavailable") from None
+    if not allowed:
+        raise APIError("rate_limited", headers={"Retry-After": str(retry_after)})
 
 
 def require_professional(request: Request, action: str = "view_dashboard"):
@@ -324,8 +363,9 @@ async def me(request: Request):
     await _reject_body(request)
     config: APIConfig = request.app.state.config
     user, session, token = _professional_context(request, "view_dashboard")
+    _professional_rate_limit(request, token, "read")
     return {
-        "user_id": user.subject,
+        "user_id": opaque_user_id(user.issuer, user.subject),
         "role": user.role,
         "expires_at": session.expires_at.astimezone(timezone.utc).isoformat().replace("+00:00", "Z"),
         "csrf_token": _csrf_token(config, token),
@@ -349,6 +389,7 @@ async def logout(request: Request, body: LogoutRequest):
         return response
     if TOKEN_PATTERN.fullmatch(token) is None or not csrf_is_valid(request, config, token):
         raise APIError("csrf_failed")
+    _professional_rate_limit(request, token, "write")
     try:
         web_auth.revoke_professional_session(
             config.database_url, hashlib.sha256(token.encode("ascii")).hexdigest()

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import sqlite3
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -85,6 +86,7 @@ class PostgresMigrationsTests(unittest.TestCase):
                 "0002_authentication.sql",
                 "0003_import_audit.sql",
                 "0004_web_professional_auth.sql",
+                "0005_web_participant_sessions.sql",
             ],
         )
         with psycopg.connect(TEST_DATABASE_URL) as connection:
@@ -106,6 +108,13 @@ class PostgresMigrationsTests(unittest.TestCase):
                     "web_oidc_transactions",
                     "web_professional_sessions",
                     "web_login_rate_limits",
+                    "web_projects",
+                    "web_project_members",
+                    "web_invitations",
+                    "web_participant_sessions",
+                    "web_session_main_order",
+                    "web_participant_redeem_limits",
+                    "web_professional_request_limits",
                 }
                 .issubset(tables)
             )
@@ -123,11 +132,28 @@ class PostgresMigrationsTests(unittest.TestCase):
                 WHERE constraint_schema = 'public' AND constraint_type = 'FOREIGN KEY'
                 """
             ).fetchone()[0]
-            self.assertEqual(foreign_keys, 3)
+            self.assertEqual(foreign_keys, 10)
 
     def test_migrations_sao_idempotentes(self) -> None:
         apply_migrations(TEST_DATABASE_URL)
         self.assertEqual(apply_migrations(TEST_DATABASE_URL), [])
+
+    def test_migration_web_e_aditiva_sobre_schema_legado_com_dados(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            older_migrations = Path(directory)
+            for path in sorted(MIGRATIONS_DIR.glob("000[1-4]_*.sql")):
+                shutil.copyfile(path, older_migrations / path.name)
+            self.assertEqual(len(apply_migrations(TEST_DATABASE_URL, older_migrations)), 4)
+        source = self.create_sqlite_fixture()
+        self.assertEqual(
+            migrate_sqlite_to_postgres(source, TEST_DATABASE_URL),
+            {"assessments": 1, "assessment_metrics": 2, "trial_results": 2},
+        )
+        self.assertEqual(apply_migrations(TEST_DATABASE_URL), ["0005_web_participant_sessions.sql"])
+        with psycopg.connect(TEST_DATABASE_URL) as connection:
+            self.assertEqual(connection.execute("SELECT COUNT(*) FROM assessments").fetchone()[0], 1)
+            self.assertEqual(connection.execute("SELECT COUNT(*) FROM assessment_metrics").fetchone()[0], 2)
+            self.assertEqual(connection.execute("SELECT COUNT(*) FROM trial_results").fetchone()[0], 2)
 
     def test_falha_de_migration_reverte_lote_inteiro(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -211,6 +237,7 @@ class PostgresMigrationStaticTests(unittest.TestCase):
                 "0002_authentication.sql",
                 "0003_import_audit.sql",
                 "0004_web_professional_auth.sql",
+                "0005_web_participant_sessions.sql",
             ],
         )
 

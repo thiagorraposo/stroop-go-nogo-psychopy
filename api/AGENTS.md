@@ -11,7 +11,12 @@ Herda [as regras da raiz](../AGENTS.md). Contrato canonico em
   Nunca devolver `exc.detail`, erros de schema, entrada, DSN ou traceback.
 - Novas rotas validam queries permitidas e aplicam autenticacao, escopo e CSRF
   previstos na respectiva etapa. Nao criar rotas de coleta antes das dependencias.
+- O fluxo participante usa cookie/token separado, hash no banco, Origin/CSRF,
+  prazos absolutos e revalidacao do projeto, emissor e vinculo em cada operacao.
+  Projetos WEB permanecem sinteticos ate uma etapa implementar e habilitar a
+  configuracao aprovada de pesquisa real.
 - Readiness apenas consulta migrations; sua aplicacao continua sendo operacional.
 - Nao habilitar access log com path/query sensiveis nem CORS arbitrario.
 - Atualize requirements e lock juntos, respeitando versoes compartilhadas com o
-  dashboard; valide com `tests/test_api_base.py` e regressao integral.
+  dashboard; valide com `tests/test_api_base.py`, `tests/test_web_auth.py`,
+  `tests/test_web_sessions.py` e regressao integral.

@@ -30,6 +30,11 @@ class APIConfig:
     session_secret: str = field(repr=False)
     login_rate_limit: int = 20
     login_rate_window_seconds: int = 60
+    redeem_rate_limit: int = 10
+    redeem_rate_window_seconds: int = 60
+    professional_read_rate_limit: int = 120
+    professional_write_rate_limit: int = 60
+    professional_rate_window_seconds: int = 60
 
     def __post_init__(self) -> None:
         if self.app_env not in {"development", "test", "production"}:
@@ -41,6 +46,21 @@ class APIConfig:
             or isinstance(self.login_rate_window_seconds, bool)
             or not isinstance(self.login_rate_window_seconds, int)
             or not 1 <= self.login_rate_window_seconds <= 86400
+            or isinstance(self.redeem_rate_limit, bool)
+            or not isinstance(self.redeem_rate_limit, int)
+            or not 1 <= self.redeem_rate_limit <= 1000
+            or isinstance(self.redeem_rate_window_seconds, bool)
+            or not isinstance(self.redeem_rate_window_seconds, int)
+            or not 1 <= self.redeem_rate_window_seconds <= 86400
+            or isinstance(self.professional_read_rate_limit, bool)
+            or not isinstance(self.professional_read_rate_limit, int)
+            or not 1 <= self.professional_read_rate_limit <= 10000
+            or isinstance(self.professional_write_rate_limit, bool)
+            or not isinstance(self.professional_write_rate_limit, int)
+            or not 1 <= self.professional_write_rate_limit <= 10000
+            or isinstance(self.professional_rate_window_seconds, bool)
+            or not isinstance(self.professional_rate_window_seconds, int)
+            or not 1 <= self.professional_rate_window_seconds <= 86400
         ):
             _invalid()
         for value, minimum, maximum in (
@@ -101,6 +121,13 @@ class APIConfig:
             login_rate_window_seconds = int(
                 values.get("API_LOGIN_RATE_WINDOW_SECONDS", "60")
             )
+            redeem_rate_limit = int(values.get("API_REDEEM_RATE_LIMIT", "10"))
+            redeem_rate_window_seconds = int(
+                values.get("API_REDEEM_RATE_WINDOW_SECONDS", "60")
+            )
+            professional_read_rate_limit = int(values.get("API_PROFESSIONAL_READ_RATE_LIMIT", "120"))
+            professional_write_rate_limit = int(values.get("API_PROFESSIONAL_WRITE_RATE_LIMIT", "60"))
+            professional_rate_window_seconds = int(values.get("API_PROFESSIONAL_RATE_WINDOW_SECONDS", "60"))
         except (TypeError, ValueError):
             _invalid()
         return cls(
@@ -112,4 +139,9 @@ class APIConfig:
             session_secret=values.get("API_SESSION_SECRET", ""),
             login_rate_limit=login_rate_limit,
             login_rate_window_seconds=login_rate_window_seconds,
+            redeem_rate_limit=redeem_rate_limit,
+            redeem_rate_window_seconds=redeem_rate_window_seconds,
+            professional_read_rate_limit=professional_read_rate_limit,
+            professional_write_rate_limit=professional_write_rate_limit,
+            professional_rate_window_seconds=professional_rate_window_seconds,
         )

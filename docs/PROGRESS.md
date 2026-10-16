@@ -52,8 +52,33 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   `pip check` sem dependencias quebradas.
 - Delimitacao por dependencia: acesso cruzado de projetos fica para W14, quando
   a API expuser consultas de objetos; W06 nao possui essa superficie HTTP.
-- Proxima acao: iniciar W07 — criacao e ciclo de vida de sessao participante;
-  ler contrato W02/W03 e validar limites de projeto/convite antes de persistir.
+- Proxima acao registrada a conclusao de W06: iniciar W07 — criacao e ciclo
+  de vida de sessao participante; ler contrato W02/W03 antes de persistir.
+
+## 2026-10-16 — W07 concluida
+
+- Implementados em `api/sessions.py`, `stroop/application/web_sessions.py` e
+  `stroop/persistence/web_sessions.py`: projetos/vinculos administrativos,
+  convites unicos de 24h, resgate atomico, sessao participante de 30min,
+  bootstrap com condicoes/paleta/protocolo, ordem principal persistida, inicio
+  idempotente, abortamento fechado e revogacao. API guarda hashes de convite e
+  sessao; rate limit de resgate guarda HMAC do endereco.
+- Migration aditiva 0005 cria tabelas WEB sem alterar tabelas de avaliacao; modo
+  de projeto e restrito a `synthetic`. Revalidacao verifica projeto, membro,
+  perfil e emissor em cada operacao participante. Gestao e convites exigem
+  autenticacao profissional, escopo e CSRF nas escritas.
+- Revisao independente identificou e levou a correcoes: rate limits configuraveis
+  para rotas profissionais (120 leituras/60 escritas por minuto, armazenando HMAC
+  da credencial), `user_id` opaco derivado de `iss` + `sub`, e 404 para projeto
+  fora do escopo antes de revelar permissao. A consulta com vinculo sem papel
+  suficiente recebe 403. Contrato W02 e testes estao alinhados.
+- Evidencias finais: suite focada 43 testes e suite integral 210 testes aprovados
+  no PostgreSQL sintetico descartavel, sem skips; `compileall`, `pip check` e
+  `git diff --check` aprovados. Abrange migration vazia/upgrade, concorrencia,
+  expiracao, revogacao, rate limits, identidade e autorizacao. Container de teste
+  encerrado apos validacao. W07 foi registrada e commitada localmente.
+- Proxima acao exata: iniciar W08 — conclusao e recebimento de resultados;
+  ler ficha W08, contrato HTTP, modelo de dados e caminhos de calculo canonicos.
 
 ## Decisoes e contexto preservados
 

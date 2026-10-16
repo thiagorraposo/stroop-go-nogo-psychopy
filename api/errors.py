@@ -44,10 +44,10 @@ STATUS_CODES = {
 class APIError(HTTPException):
     """Erro de negocio com codigo pertencente ao catalogo estatico."""
 
-    def __init__(self, code: str) -> None:
+    def __init__(self, code: str, headers: dict[str, str] | None = None) -> None:
         status, message = ERRORS[code]
         self.code = code
-        super().__init__(status_code=status, detail=message)
+        super().__init__(status_code=status, detail=message, headers=headers)
 
 
 def error_response(code: str, request_id: str) -> JSONResponse:
@@ -64,7 +64,12 @@ def error_response(code: str, request_id: str) -> JSONResponse:
 
 async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
     code = exc.code if isinstance(exc, APIError) else STATUS_CODES.get(exc.status_code, "internal_error")
-    return error_response(code, request.state.request_id)
+    response = error_response(code, request.state.request_id)
+    if exc.headers:
+        for name, value in exc.headers.items():
+            if name.lower() == "retry-after" and value.isdigit():
+                response.headers["Retry-After"] = value
+    return response
 
 
 async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:

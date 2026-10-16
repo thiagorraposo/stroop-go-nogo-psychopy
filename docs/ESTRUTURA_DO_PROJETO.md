@@ -23,12 +23,14 @@ stroop-cognifit/
 │   │   └── instruments.py      # registro e adaptadores de instrumentos
 │   ├── application/
 │   │   ├── auth.py             # autorizacao e bootstrap profissional
+│   │   ├── web_sessions.py     # casos de uso de projetos, convites e sessoes
 │   │   ├── import_sqlite.py    # casos de uso locais
 │   │   ├── import_postgres.py  # importacao e validacao sem CLI
 │   │   ├── clock.py            # timestamp UTC compartilhado
 │   │   └── errors.py           # erros publicos de importacao PostgreSQL
 │   └── persistence/
 │       ├── auth.py             # persistencia de usuarios e auditoria
+│       ├── web_sessions.py     # SQL transacional de projetos e sessoes WEB
 │       ├── sqlite.py           # conexao, SQL e transacao SQLite
 │       ├── postgres.py         # conexao, lock, SQL e transacao PostgreSQL
 │       └── web_auth.py         # transacoes OIDC e sessoes web
@@ -40,6 +42,7 @@ stroop-cognifit/
 │   ├── db_schema.sql           # schema SQLite, caminho preservado
 │   ├── migrations.py
 │   ├── migrations/             # migrations PostgreSQL, caminho preservado
+│   │   └── 0005_web_participant_sessions.sql
 │   └── demais utilitarios
 ├── dashboard/                  # aplicacao Streamlit existente
 │   ├── app.py                 # composicao da interface
@@ -50,9 +53,10 @@ stroop-cognifit/
 │   ├── instrumentos.py        # apresentacao, separado da ingestao
 │   ├── requirements.txt
 │   └── requirements.lock
-├── api/                        # fronteira HTTP e autenticacao profissional
+├── api/                        # fronteira HTTP, autenticacao e sessoes WEB
 │   ├── main.py                 # factory e composicao FastAPI
 │   ├── auth.py                 # rotas OIDC, sessao, logout e CSRF
+│   ├── sessions.py             # projetos, convites e ciclo de sessao participante
 │   ├── config.py               # configuracao validada por ambiente
 │   ├── transport.py            # limites ASGI e erros de transporte
 │   ├── health.py               # live/readiness

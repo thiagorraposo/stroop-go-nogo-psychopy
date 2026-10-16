@@ -47,6 +47,9 @@ nao o corpo HTTP. Estado e aceite ficam no [roadmap](../ROADMAP_WEB.md).
   `Retry-After` em segundos; o proxy deve obter IP somente de origem confiavel.
   Os limites podem ser ajustados conforme a medicao operacional, sem mudar o
   protocolo experimental.
+- `user_id` e um identificador opaco e estavel da identidade composta por
+  emissor OIDC e `sub`; clientes devem apenas devolve-lo sem interpretar sua
+  codificacao. Ele nao contem e-mail nem substitui autorizacao.
 
 ## Autenticacao, cookies e CSRF
 
@@ -88,7 +91,7 @@ Todos os caminhos desta tabela tem prefixo `/api/v1`.
 | `GET /auth/login` | Sem corpo/query; 303 para Google, cria transacao OIDC de 10 min | Publica, com rate limit |
 | `GET /auth/callback` | Query OIDC `code` e `state`, ou `error` e `state`; apos validar, 303 para aplicacao e cookie profissional novo | Transacao OIDC valida; cadastro previo ativo |
 | `POST /auth/logout` | Corpo `{}`; 204 e remocao do cookie/sessao profissional | Sessao profissional e CSRF; repeticao sem cookie continua 204 apos validar origem |
-| `GET /auth/me` | 200 com `user_id`, `role`, `expires_at`, `csrf_token` | Profissional ativo |
+| `GET /auth/me` | 200 com `user_id` opaco (`iss` + `sub`), `role`, `expires_at`, `csrf_token` | Profissional ativo |
 | `GET /projects` | Lista paginada de `id`, `code`, `name`, `active`, `created_at`; sem corpo | Profissional; somente projetos vinculados, admin pode listar todos |
 | `POST /projects` | `{"code":"PROJETO_SINTETICO","name":"Projeto sintetico"}`; 201 com objeto do projeto | `administracao` + CSRF; `code` unico, duplicado 409 |
 | `GET /projects/{project_id}/members` | Lista paginada de `user_id`, `active`; nao devolve tokens/e-mails | `administracao` |
