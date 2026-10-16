@@ -12,6 +12,11 @@ CSV unificado -> validacao -> SQLite local
 
 O banco e local, descritivo e nao clinico. Ele nao gera diagnostico, norma, percentil, classificacao individual ou recomendacao clinica.
 
+O caso de uso reutilizavel e `stroop.application.import_sqlite.import_csv`;
+`stroop.persistence.sqlite` mantem conexao, SQL e transacoes. A CLI publica
+reexporta `import_csv`, `import_rows` e `import_normalized`, preservando suas
+assinaturas. O schema continua em `scripts/db_schema.sql`.
+
 ## Uso
 
 Execute a partir da raiz do projeto:

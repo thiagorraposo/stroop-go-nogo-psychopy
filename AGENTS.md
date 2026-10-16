@@ -29,7 +29,8 @@ Pontos de entrada preservados:
 - diagnostico somente leitura: `python scripts/doctor.py`;
 - testes: `.venv/bin/python -m unittest discover -s tests -v` (Linux/macOS).
 
-Diretorios: `stroop/` contem dominio e ingestao reutilizaveis; `condicoes/`,
+Diretorios: `stroop/` contem dominio, ingestao, casos de uso e persistencia;
+`condicoes/`,
 fontes do experimento; `dashboard/`, Streamlit; `scripts/`, CLIs e utilitarios;
 `api/` e `web/`, fronteiras futuras; `tests/`, testes e fixtures sinteticas;
 `docs/`, contratos e governanca; `data/` e `database/`, dados locais ignorados.
@@ -142,6 +143,9 @@ limitam o workflow WEB continuo acima.
 - `stroop/domain` nao depende de interface, arquivos, HTTP ou drivers de banco;
   `stroop/ingestion` depende do dominio. Novos consumidores importam o nucleo,
   preservando os nomes reexportados pelas CLIs existentes.
+- `stroop/application` coordena importacao e `stroop/persistence` concentra SQL
+  e drivers. Nenhuma dessas camadas importa CLIs ou dashboard; o schema SQLite
+  e as migrations conservam os caminhos publicos em `scripts/`.
 - Nao mude paradigma, tempos, estimulos, contrato CSV, schema ou formulas de
   metricas sem decisao explicita e documentada. Regras do paradigma e formulas:
   `docs/DECISOES_DO_EXPERIMENTO.md` e `docs/MODELO_DE_DADOS.md`.

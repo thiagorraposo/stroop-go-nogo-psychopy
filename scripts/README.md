@@ -9,8 +9,11 @@ Esta pasta contem scripts auxiliares para analise descritiva e manutencao local.
 As regras reutilizaveis foram extraidas para `stroop/domain/`; leitura CSV e
 registro de instrumentos ficam em `stroop/ingestion/`. `importar_csv_sqlite.py`
 e `instrumentos.py` reexportam os nomes anteriores para preservar imports e
-CLIs. A persistencia permanece nos importadores ate a etapa prevista no
-[roadmap WEB](../docs/ROADMAP_WEB.md). Novos consumidores importam `stroop`.
+CLIs. Os casos de uso ficam em `stroop/application/import_sqlite.py` e
+`stroop/application/import_postgres.py`; SQL e transacoes ficam em
+`stroop/persistence/`. Os dois importadores reexportam as funcoes e excecoes
+publicas extraidas. Novos consumidores importam `stroop`, sem depender de CLI.
+O [roadmap WEB](../docs/ROADMAP_WEB.md) governa a evolucao.
 Veja o [mapa de compatibilidade](../docs/ESTRUTURA_DO_PROJETO.md).
 
 Para executar a analise a partir da raiz do projeto:

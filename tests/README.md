@@ -9,6 +9,10 @@ Esta pasta contem testes de consistencia do experimento e da exportacao unificad
 `test_nucleo_compartilhado.py` protege os imports anteriores, a normalizacao
 sem banco/Streamlit/site-packages e a execucao das CLIs por caminho fora da
 raiz e como modulo. Usa somente fixtures sinteticas e SQLite temporario.
+`test_casos_uso_importacao.py` protege a reutilizacao dos casos SQLite/PostgreSQL
+sem carregar CLIs ou interfaces, as reexportacoes e a CLI SQLite por modulo.
+Os testes de persistencia cobrem rollback real de insercao e preservacao de
+avaliacao, tentativas e metricas quando `--force` falha.
 Os testes existentes continuam no mesmo local e com o mesmo comando de
 descoberta. A evolucao dos testes web esta no [roadmap WEB](../docs/ROADMAP_WEB.md).
 

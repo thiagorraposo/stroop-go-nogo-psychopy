@@ -6,6 +6,40 @@ Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W04: casos de uso e persistencia reutilizaveis
+
+- `refactor`: importacao SQLite/PostgreSQL extraida para `stroop/application/`
+  e SQL/conexoes/transacoes para `stroop/persistence/`. Relogio UTC compartilhado
+  e erros publicos separados; CLIs delegam e reexportam nomes/assinaturas.
+  Nenhuma camada nova importa scripts, dashboard ou frameworks web.
+- `compat`: preservados retornos, excecoes, duplicidade, `--force`,
+  `--validate-only`, lock PostgreSQL, rastreabilidade e codigos de CLI. Validadores
+  distintos e caminhos do schema/migrations mantidos; sem repositorio generico.
+  Comparacao AST: 12 literais SQL SQLite e seis PostgreSQL identicos ao HEAD
+  anterior; hashes SHA-256 do schema e das tres migrations inalterados.
+- `test`: baseline integral de 168 testes em 5,554 s; apos extracao, **173
+  aprovados, zero falhas, erros ou skips**, em 5,778 s. Comando:
+  `TEST_DATABASE_URL=URL_SINTETICA .venv/bin/python -m unittest discover -s tests -v`.
+  Banco exclusivo `stroop_etapa4_test_web_w04`, PostgreSQL 17.6 em tmpfs,
+  sem volume operacional. Logs sinteticos temporarios fora do repositorio.
+- `test`: novas regressoes de reexportacao, casos de uso sem interfaces,
+  SQLite sem site-packages/psycopg, CLI por modulo e rollback integral de
+  `--force`. Teste anterior de rollback atualizado para falha real do SQLite;
+  teste de paridade controla o relogio compartilhado em seu novo modulo.
+  Suite existente cobre concorrencia, paridade integral SQLite/PostgreSQL,
+  rollback, CSV imutavel, multiplos instrumentos e erros sanitizados.
+- `test`: `compileall`, configuracao Compose com `.env.example`,
+  `docker build --tag stroop-web-w04-dashboard --file Dockerfile.dashboard .`
+  e smoke isolado aprovados. Imagem em filesystem somente leitura retornou
+  health `ok`/HTTP 200 e imports validos; sem rede, validou fixture PostgreSQL
+  e importou quatro tentativas/12 metricas em SQLite tmpfs. Revisao independente
+  confirmou equivalencia SQLite; links locais e `git diff --check` aprovados.
+  Lint/tipos autonomos nao possuem configuracao no projeto Python atual.
+- `scope`: W04 depende apenas de W00 e foi executada enquanto W01 aguarda
+  decisoes de produto/metodo. Nenhuma rota, frontend, dependencia, schema,
+  migration, formula, coleta, dado operacional ou recurso OCI alterado.
+  Arquitetura ja prevista no ADR-001, sem nova decisao de stack.
+
 ## 2026-10-16 — Regras de execucao autonoma e memoria de retomada
 
 - `docs`: consolidadas as sete secoes solicitadas em `AGENTS.md`,

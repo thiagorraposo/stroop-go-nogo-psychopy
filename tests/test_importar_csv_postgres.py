@@ -13,6 +13,7 @@ import psycopg
 from scripts import importar_csv_postgres as pg
 from scripts import importar_csv_sqlite as legacy
 from scripts.migrations import apply_migrations
+from stroop.application import clock
 
 FIXTURES = Path(__file__).parent / "fixtures" / "csv"
 URL = os.environ.get("TEST_DATABASE_URL", "")
@@ -84,7 +85,7 @@ class PostgresCsvIntegrationTests(unittest.TestCase):
         original = self.source.read_bytes()
         with tempfile.TemporaryDirectory() as directory:
             target = Path(directory) / "synthetic.sqlite3"
-            with patch.object(legacy, "utc_now_iso", return_value="2026-09-13T00:00:00+00:00"):
+            with patch.object(clock, "utc_now_iso", return_value="2026-09-13T00:00:00+00:00"):
                 legacy.import_csv(self.source, target)
                 result = pg.import_csv(self.source, URL)
             self.assertEqual(result["status"], "imported")

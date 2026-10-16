@@ -1,6 +1,6 @@
 # Estrutura do projeto
 
-Mapa vigente apos a preparacao da evolucao web. Decisao:
+Mapa vigente da evolucao web. Decisao:
 [ADR-001](arquitetura/ADR-001-evolucao-web.md). Estado e tarefas web:
 [roadmap](ROADMAP_WEB.md). O [backlog legado](Projeto%20Stroop%20Test.md)
 continua governando a operacao PsychoPy/Streamlit existente.
@@ -17,11 +17,19 @@ stroop-cognifit/
 │   │   ├── assessment.py       # NormalizedAssessment
 │   │   ├── errors.py           # excecoes de validacao
 │   │   └── stroop.py           # contrato, validacao e metricas
-│   └── ingestion/
-│       ├── stroop_csv.py       # leitura e conversao de tentativas
-│       └── instruments.py      # registro e adaptadores de instrumentos
+│   ├── ingestion/
+│   │   ├── stroop_csv.py       # leitura e conversao de tentativas
+│   │   └── instruments.py      # registro e adaptadores de instrumentos
+│   ├── application/
+│   │   ├── import_sqlite.py    # casos de uso locais
+│   │   ├── import_postgres.py  # importacao e validacao sem CLI
+│   │   ├── clock.py            # timestamp UTC compartilhado
+│   │   └── errors.py           # erros publicos de importacao PostgreSQL
+│   └── persistence/
+│       ├── sqlite.py           # conexao, SQL e transacao SQLite
+│       └── postgres.py         # conexao, lock, SQL e transacao PostgreSQL
 ├── scripts/                    # CLIs e infraestrutura local existentes
-│   ├── importar_csv_sqlite.py  # persistencia e nomes anteriores reexportados
+│   ├── importar_csv_sqlite.py  # CLI e nomes anteriores reexportados
 │   ├── importar_csv_postgres.py
 │   ├── instrumentos.py        # compatibilidade com o registro extraido
 │   ├── analisar_stroop.py      # analisador existente, preservado
@@ -60,11 +68,15 @@ stroop-cognifit/
 
 ## Direcao das dependencias
 
-`scripts` e as interfaces consomem `stroop.ingestion` e `stroop.domain`.
+`scripts` delega importacao a `stroop.application`, que coordena ingestao e
+persistencia. `stroop.persistence` concentra SQL e drivers; nao importa CLIs ou
+dashboard. O recurso SQLite continua em `scripts/db_schema.sql` sem importacao
+de codigo de scripts. PostgreSQL exige migrations explicitas em seus caminhos
+existentes. Nao ha repositorio generico nem unificacao de validadores distintos.
+
 Ingestao conhece o dominio; dominio nao conhece interfaces, arquivos, HTTP ou
-banco. O nucleo extraido usa somente biblioteca padrao. Os importadores ainda
-compoem transacoes e SQL existentes; separar essa persistencia da CLI esta no
-roadmap, antes da API de escrita.
+banco. Dominio e ingestao usam somente biblioteca padrao. SQLite pode ser usado
+sem instalar drivers PostgreSQL; importar o caso PostgreSQL requer `psycopg`.
 
 O dashboard permanece modular e em seu caminho publico. Seu registro visual
 de instrumentos tem finalidade distinta do registro de ingestao. Nenhum codigo
@@ -79,6 +91,8 @@ da futura API ou interface foi criado nesta preparacao.
 | `NormalizedAssessment` em `scripts/instrumentos.py` | `stroop/domain/assessment.py` | Reexportado pelo modulo anterior |
 | Leitura CSV e conversao de tentativas no importador SQLite | `stroop/ingestion/stroop_csv.py` | Funcoes reexportadas pela CLI |
 | Registro e adaptadores em `scripts/instrumentos.py` | `stroop/ingestion/instruments.py` | Modulo anterior reexporta os nomes |
+| Casos de importacao nas CLIs SQLite/PostgreSQL | `stroop/application/import_sqlite.py` e `import_postgres.py` | Funcoes e excecoes publicas reexportadas pelas CLIs |
+| SQL e transacoes nos importadores | `stroop/persistence/sqlite.py` e `postgres.py` | Schema/migrations, locks, transacoes e retornos preservados |
 
 Nao houve mudanca de assinatura, formula, unidade, schema ou classificacao.
 O analisador e os componentes embarcados do PsychoPy permanecem preservados,

@@ -3,6 +3,10 @@
 O comando `scripts/importar_csv_postgres.py` importa uma avaliacao por CSV,
 selecionando o adaptador registrado pelo cabeçalho e reutilizando o contrato
 normalizado descrito em [MULTIPLOS_INSTRUMENTOS.md](MULTIPLOS_INSTRUMENTOS.md).
+O caso de uso e `stroop.application.import_postgres.import_csv`, sem dependencia
+de CLI ou Streamlit; `stroop.persistence.postgres` concentra driver, SQL, lock
+e transacao. A CLI reexporta o caso de uso e as mesmas classes publicas
+`PostgresImportError` e `DuplicateAssessmentError`.
 O adaptador Stroop mantém o leitor, as validações, conversões e fórmulas do
 importador SQLite.
 O CSV permanece imutavel. O [backlog canonico](Projeto%20Stroop%20Test.md) define

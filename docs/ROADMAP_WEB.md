@@ -11,9 +11,13 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | Etapas | Estado |
 |---|---|
 | W00 | Concluida em 2026-10-16; evidencias no registro de alteracoes |
-| W01–W23 | Nao iniciadas |
+| W01 | Em andamento; protocolo factual em elaboracao e decisoes de produto/metodo solicitadas ao usuario |
+| W02–W03 | Nao iniciadas; dependem do aceite W01 |
+| W04 | Concluida em 2026-10-16; casos de uso/persistencia extraidos, 173 testes e smoke na imagem aprovados |
+| W05–W23 | Nao iniciadas |
 
-Proxima etapa: **W01 — protocolo web**. Evidencias da preparacao em
+Proxima acao: **consolidar W01 apos as decisoes de produto/metodo solicitadas
+ao usuario**; W04 independente concluida. Evidencias em
 [registro de alteracoes](REGISTRO_DE_ALTERACOES.md).
 Nao atribuir percentual por quantidade de etapas: elas possuem esforcos distintos.
 
