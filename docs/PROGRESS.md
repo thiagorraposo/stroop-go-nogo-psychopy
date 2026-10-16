@@ -363,10 +363,17 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   Imagem dashboard:w17-urllib3-test construida; smoke redeoff/rootRO/coreOK.
 - Corrigidas validacoes do runner: discovery nao exige tests/__init__.py;
   selftest exige metadata real de finding, sem confundir erroinfra com deteccao.
-- Proxima acao: stage/scan fontes novas W17 e commit isolado preservando AGENTS;
-  stage/scan W18 e commit de implementacao ainda em validacao. Criar worktree
-  sparse semcheckoutde dados, venv/node_modules proprios e rodar CIall/18HTTPS.
-  Preservar previa4173. W16 continua pendencia localizada.
+- W17 salva em 8bdeab2; paridade de exibicao em fd212a9. W18 fontes novas
+  staged e scanner248/248 aprovado, sem exclusoes de testes/markers. Selftest
+  encontra falsoPAT e recusa erroinfra como resultado positivo; metadados apenas.
+  Locks API/dashboard auditados sem achados apos urllib3 2.8.0.
+- W18 runner/workflow/checkertests e docs prontos; validacoes iniciais aprovadas.
+  Node24.15.0/Python3.12.3 locais coincidem com workflow. Porta de testes4273
+  separada da previa4173. Falta executar CIall no checkout sparse isolado.
+- Proxima acao: commit de implementacao W18 ainda em validacao; criar worktree
+  --no-checkout/sparse sem dados/.env; preparar venv/node_modules proprios,
+  PostgreSQLtmpfs novo e executar CIall/18HTTPS. Somente depois conceder aceite.
+  Preservar previa4173 e AGENTS raiz. W16 continua pendencia localizada.
 
 ## Decisoes e contexto preservados
 
