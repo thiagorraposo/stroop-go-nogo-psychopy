@@ -6,6 +6,13 @@ Operacao do desenvolvimento: [protocolo Codex CLI](../docs/WORKFLOW_CODEX_CLI.md
 
 Esta pasta contem scripts auxiliares para analise descritiva e manutencao local.
 
+As regras reutilizaveis foram extraidas para `stroop/domain/`; leitura CSV e
+registro de instrumentos ficam em `stroop/ingestion/`. `importar_csv_sqlite.py`
+e `instrumentos.py` reexportam os nomes anteriores para preservar imports e
+CLIs. A persistencia permanece nos importadores ate a etapa prevista no
+[roadmap WEB](../docs/ROADMAP_WEB.md). Novos consumidores importam `stroop`.
+Veja o [mapa de compatibilidade](../docs/ESTRUTURA_DO_PROJETO.md).
+
 Para executar a analise a partir da raiz do projeto:
 
 ```bash

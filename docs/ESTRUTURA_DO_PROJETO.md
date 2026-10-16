@@ -1,131 +1,107 @@
 # Estrutura do projeto
 
-Planejamento, estado e aceite: [backlog canonico](../docs/Projeto%20Stroop%20Test.md).
-Operacao do desenvolvimento: [protocolo Codex CLI](../docs/WORKFLOW_CODEX_CLI.md).
+Mapa vigente apos a preparacao da evolucao web. Decisao:
+[ADR-001](arquitetura/ADR-001-evolucao-web.md). Estado e tarefas web:
+[roadmap](ROADMAP_WEB.md). O [backlog legado](Projeto%20Stroop%20Test.md)
+continua governando a operacao PsychoPy/Streamlit existente.
 
-
-## Arvore principal
+## Arvore funcional
 
 ```text
-.
-├── AGENTS.md
-├── README.md
-├── .gitignore
-├── .dockerignore
-├── .env.example
-├── compose.yaml
-├── compose.production.yaml
-├── compose.restore-test.yaml
-├── Dockerfile.dashboard
-├── Dockerfile.proxy
-├── requirements.txt
-├── setup.bat
-├── setup.sh
-├── abrir_dashboard.bat
-├── abrir_dashboard.sh
-├── stroop_go_nogo_ptbr.psyexp
-├── assets/
-│   ├── README.md
-│   └── ui/
-├── condicoes/
-│   ├── AGENTS.md
-│   ├── README.md
-│   └── *.csv
-├── data/
-│   └── README.md
-├── dashboard/
-│   ├── AGENTS.md
-│   ├── README.md
-│   ├── app.py
+stroop-cognifit/
+├── stroop_go_nogo_ptbr.psyexp    # entrada PsychoPy preservada
+├── condicoes/                  # CSVs-fonte do experimento
+├── assets/                     # material proprio
+├── stroop/                     # nucleo Python reutilizavel
+│   ├── domain/
+│   │   ├── assessment.py       # NormalizedAssessment
+│   │   ├── errors.py           # excecoes de validacao
+│   │   └── stroop.py           # contrato, validacao e metricas
+│   └── ingestion/
+│       ├── stroop_csv.py       # leitura e conversao de tentativas
+│       └── instruments.py      # registro e adaptadores de instrumentos
+├── scripts/                    # CLIs e infraestrutura local existentes
+│   ├── importar_csv_sqlite.py  # persistencia e nomes anteriores reexportados
+│   ├── importar_csv_postgres.py
+│   ├── instrumentos.py        # compatibilidade com o registro extraido
+│   ├── analisar_stroop.py      # analisador existente, preservado
+│   ├── db_schema.sql          # schema SQLite, caminho preservado
+│   ├── migrations.py
+│   ├── migrations/            # migrations PostgreSQL existentes
+│   └── demais utilitarios
+├── dashboard/                  # aplicacao Streamlit existente
+│   ├── app.py                 # composicao da interface
 │   ├── components.py
-│   ├── data_access.py
 │   ├── transformations.py
+│   ├── data_access.py
+│   ├── auth.py
+│   ├── instrumentos.py        # apresentacao, separado da ingestao
 │   ├── requirements.txt
 │   └── requirements.lock
-├── nginx/
-│   ├── nginx.conf
-│   └── proxy-entrypoint.sh
+├── api/README.md               # fronteira HTTP planejada; sem implementacao
+├── web/README.md               # interface planejada; sem implementacao
+├── tests/                      # unittest e fixtures sinteticas
 ├── docs/
-│   ├── AGENTS.md
-│   ├── GUIA_DO_USUARIO.md
-│   ├── INSTALACAO_MULTIPLATAFORMA.md
-│   ├── USO_POR_ZIP_GITHUB.md
-│   └── demais documentos metodologicos e de governanca
-├── scripts/
-│   ├── AGENTS.md
-│   ├── README.md
-│   ├── analisar_stroop.py
-│   ├── aplicar_retencao.py
-│   ├── backup_postgres.py
-│   ├── db_schema.sql
-│   ├── importar_csv_sqlite.py
-│   ├── migrations.py
-│   ├── migrar_sqlite_postgres.py
-│   ├── migrations/
-│   ├── run_dashboard.py
-│   └── setup_env.py
-└── tests/
-    ├── AGENTS.md
-    ├── README.md
-    └── test_*.py
+│   ├── arquitetura/           # decisoes arquiteturais
+│   ├── ROADMAP_WEB.md         # unico estado da evolucao web
+│   └── contratos, guias e historico existentes
+├── nginx/                      # proxy existente
+├── compose*.yaml               # dev, producao e restauracao existentes
+├── Dockerfile.dashboard
+├── Dockerfile.proxy
+├── .streamlit/                 # configuracao; secrets reais ignorados
+├── setup.bat / setup.sh
+├── abrir_dashboard.bat / abrir_dashboard.sh
+├── requirements.txt
+├── data/                       # saidas locais ignoradas
+└── database/                   # bancos locais ignorados
 ```
 
-Os nomes dos CSVs de condicoes sao preservados porque eles sao referenciados diretamente pelo `.psyexp`.
+## Direcao das dependencias
 
-## Finalidade das pastas
+`scripts` e as interfaces consomem `stroop.ingestion` e `stroop.domain`.
+Ingestao conhece o dominio; dominio nao conhece interfaces, arquivos, HTTP ou
+banco. O nucleo extraido usa somente biblioteca padrao. Os importadores ainda
+compoem transacoes e SQL existentes; separar essa persistencia da CLI esta no
+roadmap, antes da API de escrita.
 
-- `assets/`: assets proprios do projeto.
-- `compose.yaml` e `Dockerfile.dashboard`: infraestrutura local de
-  desenvolvimento para Streamlit e PostgreSQL, sem PsychoPy.
-- `compose.production.yaml`, `compose.restore-test.yaml`, `Dockerfile.proxy` e
-  `nginx/`: preparacao endurecida, TLS fail-closed e restauracao isolada.
-- `assets/ui/`: elementos visuais proprios da interface.
-- `condicoes/`: CSVs-fonte usados pelos loops do PsychoPy.
-- `data/`: saidas locais de execucao e coleta, ignoradas pelo Git.
-- `dashboard/`: aplicacao Streamlit local, com interface, componentes, acesso
-  SQLite somente leitura e transformacoes separados.
-- `docs/`: documentacao metodologica, historico, guias e governanca.
-- `scripts/`: analise, importacao, migrations, migracao legada, configuracao e
-  inicializacao local.
-- `tests/`: validacoes estaticas e testes automatizados sem dados reais.
+O dashboard permanece modular e em seu caminho publico. Seu registro visual
+de instrumentos tem finalidade distinta do registro de ingestao. Nenhum codigo
+da futura API ou interface foi criado nesta preparacao.
 
-Os atalhos `setup.bat`, `setup.sh`, `abrir_dashboard.bat` e `abrir_dashboard.sh` ficam na raiz para facilitar o uso por outra pessoa, inclusive depois de `Code` -> `Download ZIP` no GitHub. A logica multiplataforma correspondente fica nos scripts Python em `scripts/`.
+## Mapa de extracao e compatibilidade
 
-## Arquivos-fonte
+| Origem anterior | Fonte canonica atual | Compatibilidade |
+|---|---|---|
+| Constantes, validacao e metricas em `scripts/importar_csv_sqlite.py` | `stroop/domain/stroop.py` | Nomes reexportados pela CLI |
+| Excecoes dos importadores e instrumentos | `stroop/domain/errors.py` | Mesmas classes reexportadas |
+| `NormalizedAssessment` em `scripts/instrumentos.py` | `stroop/domain/assessment.py` | Reexportado pelo modulo anterior |
+| Leitura CSV e conversao de tentativas no importador SQLite | `stroop/ingestion/stroop_csv.py` | Funcoes reexportadas pela CLI |
+| Registro e adaptadores em `scripts/instrumentos.py` | `stroop/ingestion/instruments.py` | Modulo anterior reexporta os nomes |
 
-- `stroop_go_nogo_ptbr.psyexp`
-- `condicoes/*.csv`
-- `scripts/*.py` e `scripts/db_schema.sql`
-- `dashboard/*.py` e `dashboard/requirements.txt`
-- atalhos e requisitos multiplataforma da raiz
-- `README.md`, `AGENTS.md`, `docs/*.md` e documentos locais
+Nao houve mudanca de assinatura, formula, unidade, schema ou classificacao.
+O analisador e os componentes embarcados do PsychoPy permanecem preservados,
+sem consolidacao de suas diferencas historicas nesta etapa.
 
-## Arquivos gerados
+## Entradas operacionais preservadas
 
-- `*_lastrun.py`
-- arquivos de dados criados em `data/`
-- exports locais em `.csv`, `.tsv`, `.xlsx`, `.psydat` e `.log`
-- bancos locais em `.sqlite`, `.sqlite3` e `.db`
-- pastas locais `exports/`, `storage/`, `database/` e `backups/`
-- `.venv`, caches Python e caches de ferramentas
+```bash
+python scripts/run_dashboard.py
+python scripts/importar_csv_sqlite.py CAMINHO.csv
+python scripts/importar_csv_postgres.py CAMINHO.csv --validate-only
+python scripts/doctor.py
+.venv/bin/python -m unittest discover -s tests -v
+```
 
-## Arquivos ignorados pelo Git
+Os atalhos da raiz e o uso por ZIP continuam descritos no
+[guia de instalacao](INSTALACAO_MULTIPLATAFORMA.md). PsychoPy permanece fora do
+Docker. SQL, Compose e proxy conservam caminhos para evitar migracao de
+ambiente junto de uma extracao de codigo.
 
-O `.gitignore` mantem fora do versionamento:
+## Dados e artefatos gerados
 
-- conteudo de `data/`, exceto `data/README.md`;
-- `*_lastrun.py`, `*.psydat` e `*.log`;
-- CSVs e exports gerais, exceto os CSVs-fonte em `condicoes/`;
-- bancos locais em `.sqlite`, `.sqlite3` e `.db`;
-- `exports/`, `storage/`, `database/` e `backups/`;
-- `.venv`, caches, credenciais, segredos e temporarios locais.
-
-## Fluxo para uso por ZIP
-
-1. Baixar pelo GitHub em `Code` -> `Download ZIP` e descompactar.
-2. Instalar Python e executar o atalho de setup do sistema.
-3. Instalar o PsychoPy separadamente e abrir o `.psyexp` no Builder.
-4. Testar em modo Pilot e confirmar a saida local em `data/`.
-5. Executar o atalho do dashboard para importar o CSV mais recente e abrir o Streamlit.
-
-Consulte `USO_POR_ZIP_GITHUB.md` para o procedimento completo e as regras de privacidade.
+`data/`, `database/`, backups, exports, logs, `.venv`, caches, secrets e
+`*_lastrun.py` nao sao fontes de codigo. Permanecem ignorados pelo Git e nao
+devem ser movidos, inspecionados como fixtures ou incorporados aos novos
+diretorios. Os CSVs de `condicoes/` e `tests/fixtures/` sao fontes permitidas.
+O `.gitignore` continua sendo a regra efetiva de versionamento.

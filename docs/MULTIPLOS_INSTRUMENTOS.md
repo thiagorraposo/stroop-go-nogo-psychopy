@@ -7,9 +7,12 @@ identificam o instrumento e sua versão em todas as avaliações.
 
 ## Adaptadores
 
-Os adaptadores ficam em `scripts/instrumentos.py` e retornam uma avaliação
-normalizada com metadados, métricas e, quando aplicável, tentativas. Cada
-adaptador valida seu próprio cabeçalho, campos, unidades, valores ausentes e
+Os adaptadores ficam em `stroop/ingestion/instruments.py`; o contrato
+`NormalizedAssessment` fica em `stroop/domain/assessment.py`.
+`scripts/instrumentos.py` reexporta os nomes anteriores por compatibilidade.
+Os adaptadores retornam uma avaliação normalizada com metadados, métricas e,
+quando aplicável, tentativas. Cada adaptador valida seu próprio cabeçalho,
+campos, unidades, valores ausentes e
 fórmulas antes de qualquer gravação.
 
 O adaptador `stroop_go_nogo_ptbr` preserva integralmente o CSV de 21 colunas, as
