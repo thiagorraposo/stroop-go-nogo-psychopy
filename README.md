@@ -12,8 +12,10 @@ somente documentacao.
 - [Decisao arquitetural e stack alvo](docs/arquitetura/ADR-001-evolucao-web.md).
 - [Roadmap WEB e ponto de retomada](docs/ROADMAP_WEB.md).
 
-No Codex CLI, `continue web` executa uma etapa do roadmap; `execute Wxx`
-seleciona uma etapa com dependencias atendidas. A operacao PsychoPy/Streamlit
+No Codex CLI, `continue web` executa o roadmap continuamente, validando e
+registrando cada etapa antes de avancar; `execute Wxx` seleciona a etapa inicial
+com dependencias atendidas, salvo limite explicito de escopo. Contexto de
+retomada: [PROGRESS.md](docs/PROGRESS.md). A operacao PsychoPy/Streamlit
 e os comandos abaixo continuam disponiveis.
 
 ## Workflow de evolucao

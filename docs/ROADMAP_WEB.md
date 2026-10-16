@@ -19,13 +19,16 @@ Nao atribuir percentual por quantidade de etapas: elas possuem esforcos distinto
 
 Comandos para o Codex CLI, a partir da raiz do repositorio:
 
-- `continue web`: executar somente a primeira etapa elegivel nao concluida.
-- `execute Wxx`: executar somente a etapa indicada, com dependencias concluidas.
+- `continue web`: retomar a primeira etapa elegivel e continuar automaticamente
+  pelas proximas tarefas viaveis, respeitando dependencias e prioridades.
+- `execute Wxx`: iniciar pela etapa indicada, com dependencias concluidas, e
+  continuar o ciclo, salvo limite explicito do usuario.
 - `mostrar status web`: somente leitura deste estado e das evidencias.
 - `validar etapa web Wxx`: revalidar a etapa indicada, sem iniciar outra.
 
-O [protocolo](WORKFLOW_CODEX_CLI.md) detalha as regras comuns. Uma solicitacao
-inicia uma etapa, nao todo este roadmap. Acoes de producao dependem do usuario.
+O [protocolo](WORKFLOW_CODEX_CLI.md) detalha as regras comuns e as condicoes
+reais de parada. Acoes de producao dependem do usuario; solicitacoes somente
+documentais ou de consulta nao iniciam o roadmap nem retomam objetivos pausados.
 
 ### Contexto minimo por sessao
 
@@ -34,14 +37,18 @@ inicia uma etapa, nao todo este roadmap. Acoes de producao dependem do usuario.
 2. Ler o ADR e apenas os contratos indicados em **Leitura**. O mapa estrutural
    substitui uma nova varredura completa do projeto. Conferir Git e os trechos
    afetados; investigar novamente somente divergencias concretas.
-3. Apresentar plano curto; implementar apenas o entregavel da etapa.
+3. Apresentar plano curto; implementar o entregavel da etapa, sem antecipar
+   trabalho com dependencias pendentes. Integrar e revisar tarefas delegadas.
 4. Executar as validacoes da ficha e a regressao afetada. Documentacao pura
    exige links e diff; nao precisa iniciar banco ou servicos.
-5. Atualizar somente a linha da etapa neste arquivo e adicionar evidencia datada
-   ao registro. Ao separar uma etapa concluida do intervalo, manter uma unica
-   linha de estado por ID. Registrar comandos, resultados e decisoes pendentes.
-6. Entregar resultado, limitacoes e proxima etapa. Nao iniciar a seguinte nem
-   executar versionamento sem solicitacao.
+5. Atualizar a linha da etapa neste arquivo conforme as evidencias e adicionar
+   evidencia datada ao registro. Ao separar uma etapa concluida do intervalo,
+   manter uma unica linha de estado por ID. Registrar comandos, resultados e
+   decisoes pendentes.
+6. Salvar contexto conciso em [PROGRESS.md](PROGRESS.md), fazer commit local
+   coerente apos validacao e iniciar a proxima etapa elegivel automaticamente.
+   Se houver bloqueio localizado, registrar e selecionar trabalho independente;
+   encerrar somente nas condicoes do protocolo ou por limite expresso do usuario.
 
 Nao copiar contratos ou tabelas de progresso para READMEs. Quando uma decisao
 alterar arquitetura, escrever outro ADR; quando alterar paradigma, registrar

@@ -6,6 +6,27 @@ Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — Regras de execucao autonoma e memoria de retomada
+
+- `docs`: consolidadas as sete secoes solicitadas em `AGENTS.md`,
+  `docs/AGENTS.md` e `tests/AGENTS.md`: inicializacao, continuidade WEB,
+  coordenacao de subagentes, qualidade, contexto, Git e encerramento.
+- `docs`: protocolo, comandos no roadmap e README alinhados com execucao
+  continua e commits locais validados em branch de desenvolvimento. Ritmo e
+  versionamento manual do legado preservados; producao e OCI dependem do usuario.
+- `docs`: criado `PROGRESS.md` para retomada concisa e adicionado ao mapa.
+  Mantidos `ROADMAP_WEB.md` e ADRs existentes nos papeis dos nomes genericos
+  `ROADMAP.md` e `ARCHITECTURE.md`, sem duplicar estado ou decisoes.
+- `test`: verificador Python ad hoc conferiu 50 destinos de links relativos
+  nos nove documentos da unidade, sem ausencias. Comparacao com o HEAD comprovou
+  preservacao das fichas W00–W23, estado/aceite do roadmap, protocolo legado e
+  limites de dominio/seguranca. Revisao independente por subagente nao encontrou
+  lacunas materiais nas sete secoes; `git diff --check` aprovado.
+- `scope`: mudanca exclusivamente documental, sem alterar codigo ou ADR.
+  Testes de codigo, lint, tipos, build e integracao nao se aplicam a este escopo.
+  Objetivo de implementacao permanece pausado; nenhuma etapa funcional iniciada
+  ou concluida por presuncao. Branch `prep-web` ja existente, inicialmente limpa.
+
 ## 2026-10-16 — Preparacao estrutural da evolucao web
 
 - `refactor`: extraidos contratos, excecoes, validacao e metricas para

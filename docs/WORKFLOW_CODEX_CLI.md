@@ -9,13 +9,29 @@ governa as etapas 1–12 da operacao existente; o [roadmap WEB](ROADMAP_WEB.md)
 governa a nova versao, com IDs Wxx. Os estados nao se somam. Documentos tecnicos
 detalham contratos; baselines e registros sao evidencias datadas.
 
-## Evolucao web — uma etapa por sessao
+## Evolucao web — execucao continua
 
 `continue web` retoma uma etapa em andamento/bloqueada ou seleciona a primeira
 nao concluida cujas dependencias estejam concluidas. `execute Wxx` permite
-selecionar explicitamente uma etapa elegivel. Ler o contexto minimo, limites,
-entregaveis e validacoes indicados no roadmap; nao repetir a analise global
-quando o mapa e os contratos existentes forem suficientes.
+selecionar explicitamente uma etapa inicial elegivel. Ambos continuam
+automaticamente para a proxima etapa viavel apos validar e registrar a atual,
+salvo limite de escopo expresso pelo usuario. Uma solicitacao apenas documental
+ou de revisao nao inicia esse ciclo nem retoma objetivo pausado.
+
+Na inicializacao, ler os `AGENTS.md` aplicaveis, roadmap, arquitetura e
+[memoria de retomada](PROGRESS.md); conferir Git e as evidencias atuais sem
+descartar alteracoes. Identificar aceite, pendencias e dependencias. Apresentar
+plano breve e iniciar a primeira tarefa executavel sem pedir autorizacao para
+escolhas tecnicas rotineiras. Nas etapas seguintes, ler apenas o contexto minimo,
+limites, entregaveis e validacoes da ficha; nao repetir a analise global quando
+o mapa e os contratos existentes forem suficientes.
+
+Seguir o ciclo planejar -> implementar -> testar -> corrigir -> validar ->
+documentar -> avancar. Delegar tarefas independentes a subagentes conforme o
+AGENTS raiz, com escopo e arquivos definidos, integrando e validando o resultado.
+Nao antecipar trabalho com dependencia pendente nem substituir implementacao
+por documentacao ou simulacoes. Bloqueios localizados sao registrados e nao
+impedem outras etapas independentes elegiveis.
 
 `mostrar status web` apenas consulta estado e evidencias. `validar etapa web
 Wxx` revalida somente a etapa indicada, sem implementar outra. Para uma etapa
@@ -24,12 +40,28 @@ afetada e os criterios da ficha. Registrar aprovados, falhas, erros e skips.
 
 Atualizar o estado apenas com aceite comprovado e registrar comandos/resultados
 em `REGISTRO_DE_ALTERACOES.md`. Uma pendencia manual exigida nao e um teste
-aprovado. Encerrar com arquivos, evidencias, riscos, proxima etapa e uma sugestao
-de commit, sem executa-lo. Nao gerar prompts nem copias de progresso por etapa.
+aprovado. Manter `PROGRESS.md` conciso com contexto de retomada, arquivos,
+decisoes, impedimentos, verificacoes e proxima acao; o estado formal continua
+somente no roadmap. Nao gerar prompts nem copias de tabelas de progresso.
+
+Trabalhar em branch de desenvolvimento separada e fazer commits locais pequenos
+apos validacao, conforme o AGENTS raiz e `PADRAO_DE_COMMITS.md`, sem incluir
+alteracoes preexistentes. Nao fazer push, merge na principal, tags ou deploy
+sem autorizacao explicita. O versionamento manual abaixo pertence ao legado.
+
+Nao encerrar entre etapas para relatar resultados. Continuar enquanto houver
+tarefa viavel e recursos, usando a janela de 5 horas quando disponivel, sem
+inventar trabalho ou cota restante. Encerrar com roadmap integralmente validado,
+bloqueio incontornavel sem alternativa viavel, interrupcao externa ou limite
+de uso impeditivo; respeitar pausa do usuario. Quando o limite estiver proximo
+e essa informacao for conhecida, priorizar validacao da unidade atual e salvar
+o estado exato em `PROGRESS.md`. Na entrega final, informar arquivos, evidencias,
+limitacoes e proxima acao de forma objetiva.
 
 W22 pertence ao usuario: nenhum comando de continuacao autoriza acesso OCI,
-deploy, contratacao ou dados reais. As restricoes legadas abaixo tambem
-continuam validas. `continue o projeto`, `mostrar status` e `validar etapa
+deploy, contratacao ou dados reais. As restricoes operacionais de seguranca
+abaixo continuam validas; o ritmo e o versionamento do legado aplicam-se somente
+aos comandos legados. `continue o projeto`, `mostrar status` e `validar etapa
 atual` sem qualificacao conservam o significado legado.
 
 ## Workflow legado
@@ -136,13 +168,17 @@ exatamente qual decisao ou acao permite retomar. Se a revalidacao contradisser u
 conclusao antiga, registrar a divergencia sem recalcular progresso silenciosamente.
 
 Nos trabalhos executados pelo Codex, perguntar ao usuario dentro da sessao sobre
-decisoes materiais, clinicas, semanticas, arquiteturais, metodologicas, de
-privacidade, seguranca, producao ou envolvendo dados reais que alterem o
-resultado. Registrar a decisao no documento
+decisoes de produto ou metodologicas indispensaveis, credenciais, autorizacoes
+de risco e recursos externos inacessiveis. Resolver escolhas tecnicas rotineiras
+autonomamente, documentando decisoes arquiteturais relevantes em ADR. Nao
+presumir escolhas clinicas, semanticas, de privacidade, seguranca, producao ou
+envolvendo dados reais que alterem os requisitos. Registrar a decisao no documento
 tecnico pertinente e sua pendencia/resolucao no backlog. Nenhum aceite depende de
 outro chat; nao gerar novo prompt externo para cada etapa.
 
 Nao abrir, copiar, migrar ou publicar dados reais. O Codex nao acessa ou configura
 OCI por iniciativa propria; decisoes de producao e execucao das Etapas 11 e 12
 cabem ao usuario. Nao antecipar etapas posteriores, instalar dependencias sem
-necessidade comprovada ou executar `git add`, `git commit`, `git tag` ou `git push`.
+necessidade comprovada ou ignorar as regras de Git do escopo: commits locais
+validados no WEB autonomo; versionamento manual no legado. Na execucao WEB,
+uma etapa posterior com dependencias concluidas passa a ser trabalho elegivel.

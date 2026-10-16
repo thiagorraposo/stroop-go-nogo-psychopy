@@ -44,6 +44,7 @@ stroop-cognifit/
 ├── docs/
 │   ├── arquitetura/           # decisoes arquiteturais
 │   ├── ROADMAP_WEB.md         # unico estado da evolucao web
+│   ├── PROGRESS.md            # memoria concisa de trabalho e retomada
 │   └── contratos, guias e historico existentes
 ├── nginx/                      # proxy existente
 ├── compose*.yaml               # dev, producao e restauracao existentes
