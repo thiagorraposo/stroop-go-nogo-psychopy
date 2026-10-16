@@ -29,14 +29,16 @@ genericos ou biblioteca compartilhada entre Python e TypeScript.
 | `stroop/ingestion/` | Leitura CSV, selecao e normalizacao de instrumentos | `domain/` e biblioteca padrao |
 | `scripts/` | CLIs e infraestrutura local existentes | Nucleo e drivers atuais |
 | `dashboard/` | Adaptador Streamlit existente | Nucleo, dados e modulos atuais |
-| `api/` | Futuro adaptador HTTP e composicao do backend | Casos de uso e infraestrutura |
+| `api/` | Adaptador HTTP em desenvolvimento desde W05 | Casos de uso e infraestrutura |
 | `web/` | Futura interface e execucao no navegador | Contrato HTTP e motor da tarefa |
 
-Hoje `api/` e `web/` contem somente READMEs. A fronteira de persistencia ainda
-esta nos importadores em `scripts/`; sua extracao posterior sera mecanica e
-validada por paridade antes de criar rotas de escrita. Autorizacao e consultas
-do dashboard tambem mantem seus locais atuais ate as etapas correspondentes.
-Nao apresentar essas separacoes futuras como implementadas.
+`api/` possui a base FastAPI e health checks de W05, sem autenticacao ou rotas
+de coleta; W06 implementa autenticacao e autorizacao. `web/` ainda contem
+somente o README. A fronteira de persistencia
+esta em `stroop/persistence/`; futuras operacoes web devem reutilizar essa
+camada e os casos de uso existentes. Autorizacao e consultas do dashboard
+mantem seus locais atuais ate as etapas correspondentes. Nao apresentar essas
+separacoes futuras como implementadas.
 
 ```mermaid
 flowchart LR
@@ -45,9 +47,10 @@ flowchart LR
     cli --> db[(SQLite / PostgreSQL)]
     dashboard[Streamlit existente] --> cli
     dashboard --> db
-    web[Web futura] -. HTTP .-> api[API futura]
-    api -. casos de uso futuros .-> domain
-    api -. persistencia futura .-> db
+    web[Web futura] -. HTTP .-> api[API em desenvolvimento]
+    api --> cases[stroop.application]
+    api --> persistence[stroop.persistence]
+    persistence --> db
 ```
 
 Os processos web e API sao unidades de execucao da mesma aplicacao, sem

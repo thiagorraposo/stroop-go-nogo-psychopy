@@ -17,15 +17,22 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   integridade dos 37 documentos, 240 links locais e `git diff --check`.
   Revisao independente sem achados bloqueantes. Sem build novo: fontes e
   configuracoes executaveis existentes inalteradas nesta reorganizacao.
-- W02 e W03 concluidas em `88a48c5` e `ea87120`. W05 permanece em andamento:
-  codigo/dependencias em `api/`, README da API e `tests/test_api_base.py`
-  preexistentes a esta organizacao, preservados fora do seu commit. A suite
-  acima inclui seus 16 testes; aceite e integracao da etapa ainda pendentes.
-- Retomada WEB: revisar/integrar W05 e seus arquivos locais antes de W06.
-  Nao iniciar novas funcionalidades sob o pedido atual de organizacao.
-- Branch `prep-web`. Container exclusivo `stroop-web-roadmap-test` encerrado
-  apos os testes; sem volume persistente. Para futuras suites PostgreSQL,
-  preparar outro banco descartavel e executar sequencialmente.
+- W02/W03 concluidas em `88a48c5`/`ea87120`, W05 em `wip` (commit apos esta
+  validacao). W05 cobre factory FastAPI sem Streamlit, configuracao fechada,
+  health/readiness somente leitura, limite real de 64 KiB, erros sanitizados,
+  dependencias fixadas e `RequestModel` estrito.
+- W05: 189 testes aprovados, zero falhas/erros/skips, incluindo readiness com
+  PostgreSQL real descartavel e preservacao de migrations/contagens;
+  `compileall`, `pip check`, `git diff --check` e revisao independente aprovados.
+  Smoke Uvicorn em loopback respondeu live 200 e ready 200 com `no-store` e
+  request ID; Host divergente foi recusado (422). A factory de teste comprova
+  que importar a API nao carrega Streamlit, dashboard ou CLIs.
+- W06 iniciada: validar primeiro o fluxo de login Google ja usado no dashboard
+  e contratos autorizados. Autenticacao web sera verificada criptograficamente
+  no servidor; testes usam chaves/claims sinteticos, sem credencial Google real.
+- Container de teste W05 encerrado sem volume persistente. Proxima acao:
+  identificar componentes OIDC reaproveitaveis e definir validacao/token e
+  sessao do servidor para os criterios W06.
 
 ## Decisoes e contexto preservados
 

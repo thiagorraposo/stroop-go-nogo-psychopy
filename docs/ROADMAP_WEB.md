@@ -15,15 +15,13 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W02 | Concluida em 2026-10-16; contrato HTTP e cenarios, seis JSONs e links validados |
 | W03 | Concluida em 2026-10-16; matriz de acesso/finalidades e cenarios negativos revisados, 16 links validados |
 | W04 | Concluida em 2026-10-16; casos de uso/persistencia extraidos, 173 testes e smoke na imagem aprovados |
-| W05 | Em andamento; base HTTP, configuracao e testes |
-| W06–W23 | Nao iniciadas |
+| W05 | Concluida em 2026-10-16; API FastAPI, limites/erros seguros, readiness real PostgreSQL, 189 testes e smoke Uvicorn |
+| W06 | Em andamento; autenticacao profissional OIDC e autorizacao HTTP |
+| W07–W23 | Nao iniciadas |
 
-Pedido atual de organizacao documental atendido sem alterar o aceite das
-etapas. W05 local preservada para revisao/integracao; retomada detalhada em
-[PROGRESS.md](PROGRESS.md).
-
-Proxima acao do roadmap: **concluir W05 e integrar autenticacao W06**.
-Evidencias em
+Pedido de organizacao documental concluido em commit proprio. W05 foi validada
+e integrada; W06 e a etapa em execucao. Retomada detalhada em
+[PROGRESS.md](PROGRESS.md). Evidencias em
 [registro de alteracoes](REGISTRO_DE_ALTERACOES.md).
 Bloqueio de produto/metodo resolvido pela aprovacao explicita na sessao.
 Finalidade: coleta do grupo de pesquisa do usuario; participantes da pesquisa

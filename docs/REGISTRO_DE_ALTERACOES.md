@@ -26,6 +26,25 @@ O estado da nova versao web e mantido separadamente no
 - `scope`: implementacao W05 ja em andamento preservada fora do commit de
   organizacao. Nenhuma nova etapa iniciada; W05 nao recebeu aceite antecipado.
 
+## 2026-10-16 — W05: base HTTP validada
+
+- `feat`: criada factory `api.main:create_app`, configuracao obrigatoria
+  (PostgreSQL, origem HTTPS e ambiente), schemas estritos, health/readiness
+  e fronteira ASGI com limite real de 64 KiB, rejeicao de JSON inseguro,
+  erros de formato fixo e logs sem payload/traceback. Readiness e somente
+  leitura, exige conjunto exato de migrations e timeout limitado. Sem rotas
+  de coleta ou autenticacao; dependencias API fixadas em arquivos proprios.
+- `test`: suite integral com PostgreSQL descartavel: 189 testes aprovados,
+  zero falhas/erros/skips. Integracao real aplicou migrations na fixture e
+  confirmou que readiness nao alterou migrations nem contagens de tabelas.
+  `compileall`, `pip check` e `git diff --check` aprovados.
+- `test`: processo real Uvicorn iniciado em loopback, sem access log;
+  `/health/live` e `/health/ready` retornaram 200, `Cache-Control: no-store`
+  e request IDs; Host divergente retornou 422. A configuracao apontou apenas
+  ao banco sintetico temporario. Revisao independente sem defeitos criticos.
+- `scope`: W05 concluida; segue W06 para OIDC e autorizacao. Sem credenciais,
+  migrations, rotas de pesquisa, servico de producao ou coleta real.
+
 ## 2026-10-16 — W03: acesso e dados WEB especificados
 
 - `docs`: criado `ACESSO_WEB.md` com matriz de perfis/projeto, dados permitidos
