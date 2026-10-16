@@ -87,6 +87,7 @@ class PostgresMigrationsTests(unittest.TestCase):
                 "0003_import_audit.sql",
                 "0004_web_professional_auth.sql",
                 "0005_web_participant_sessions.sql",
+                "0006_web_completed_results.sql",
             ],
         )
         with psycopg.connect(TEST_DATABASE_URL) as connection:
@@ -115,6 +116,9 @@ class PostgresMigrationsTests(unittest.TestCase):
                     "web_session_main_order",
                     "web_participant_redeem_limits",
                     "web_professional_request_limits",
+                    "web_assessments",
+                    "web_trial_observations",
+                    "web_participant_request_limits",
                 }
                 .issubset(tables)
             )
@@ -132,7 +136,7 @@ class PostgresMigrationsTests(unittest.TestCase):
                 WHERE constraint_schema = 'public' AND constraint_type = 'FOREIGN KEY'
                 """
             ).fetchone()[0]
-            self.assertEqual(foreign_keys, 10)
+            self.assertEqual(foreign_keys, 14)
 
     def test_migrations_sao_idempotentes(self) -> None:
         apply_migrations(TEST_DATABASE_URL)
@@ -149,7 +153,9 @@ class PostgresMigrationsTests(unittest.TestCase):
             migrate_sqlite_to_postgres(source, TEST_DATABASE_URL),
             {"assessments": 1, "assessment_metrics": 2, "trial_results": 2},
         )
-        self.assertEqual(apply_migrations(TEST_DATABASE_URL), ["0005_web_participant_sessions.sql"])
+        self.assertEqual(apply_migrations(TEST_DATABASE_URL), [
+            "0005_web_participant_sessions.sql", "0006_web_completed_results.sql",
+        ])
         with psycopg.connect(TEST_DATABASE_URL) as connection:
             self.assertEqual(connection.execute("SELECT COUNT(*) FROM assessments").fetchone()[0], 1)
             self.assertEqual(connection.execute("SELECT COUNT(*) FROM assessment_metrics").fetchone()[0], 2)
@@ -169,6 +175,33 @@ class PostgresMigrationsTests(unittest.TestCase):
         with psycopg.connect(TEST_DATABASE_URL) as connection:
             exists = connection.execute("SELECT to_regclass('public.should_rollback')").fetchone()[0]
             self.assertIsNone(exists)
+
+    def test_migration_resultados_preserva_sessao_web_em_execucao(self) -> None:
+        from datetime import datetime, timedelta, timezone
+        from uuid import uuid4
+        from stroop.application import auth as auth_application, web_sessions
+
+        with tempfile.TemporaryDirectory() as directory:
+            older = Path(directory)
+            for path in sorted(MIGRATIONS_DIR.glob('000[1-5]_*.sql')):
+                shutil.copyfile(path, older / path.name)
+            self.assertEqual(len(apply_migrations(TEST_DATABASE_URL, older)), 5)
+        issuer, subject = 'https://accounts.google.com', 'synthetic-upgrade-user'
+        auth_application.bootstrap_admin(TEST_DATABASE_URL, issuer, subject)
+        actor = auth_application.authorize(TEST_DATABASE_URL, {
+            'iss': issuer, 'sub': subject,
+            'exp': int((datetime.now(timezone.utc) + timedelta(hours=1)).timestamp()),
+        }, 'manage_projects')
+        project_id = uuid4()
+        web_sessions.create_project(TEST_DATABASE_URL, project_id, 'SYNTHETIC_UPGRADE', 'Projeto sintetico', actor)
+        web_sessions.set_member(TEST_DATABASE_URL, project_id, issuer, subject, True, actor)
+        web_sessions.create_invitation(TEST_DATABASE_URL, uuid4(), uuid4(), project_id,
+                                       'a' * 64, 'P_SINTETICO', 'V1', actor)
+        web_sessions.redeem(TEST_DATABASE_URL, 'a' * 64, 'b' * 64)
+        web_sessions.start(TEST_DATABASE_URL, 'b' * 64, 'synthetic-web-0.1.0')
+        before = web_sessions.participant_session(TEST_DATABASE_URL, 'b' * 64)
+        self.assertEqual(apply_migrations(TEST_DATABASE_URL), ['0006_web_completed_results.sql'])
+        self.assertEqual(web_sessions.participant_session(TEST_DATABASE_URL, 'b' * 64), before)
 
     def test_migracao_sqlite_preserva_dados_relacionamentos_e_sequences(self) -> None:
         apply_migrations(TEST_DATABASE_URL)
@@ -238,6 +271,7 @@ class PostgresMigrationStaticTests(unittest.TestCase):
                 "0003_import_audit.sql",
                 "0004_web_professional_auth.sql",
                 "0005_web_participant_sessions.sql",
+                "0006_web_completed_results.sql",
             ],
         )
 

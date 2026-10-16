@@ -157,3 +157,22 @@ Esta tabela permite auditoria e analises futuras. O dashboard geral deve prioriz
 | `error_type` | `trial_results.error_type` |
 
 Campos como `source_file`, `imported_at` e `import_status` sao adicionados no processo de importacao para SQLite, sem modificar o CSV bruto original.
+
+## Proveniencia de conclusoes WEB
+
+A migration aditiva `0006_web_completed_results.sql` preserva as tabelas e linhas
+legadas. Conclusoes WEB gravam as mesmas tentativas principais e metricas
+canonicas em `assessments`, `trial_results` e `assessment_metrics`; nomes nao
+sao coletados (`participant_name=NAO_COLETADO`, `initials=NULL`). `source_file`
+recebe uma referencia tecnica `web:<session_id>`, sem alegar existencia de CSV.
+
+`web_assessments` vincula uma unica avaliacao a sessao/projeto, identificando
+plataforma, protocolo, versao do aplicativo, periodo de quadro, hash canonico,
+instante de conclusao e recibo. `web_trial_observations` conserva condicao-fonte
+e tempos observados em milissegundos; o RT canonico continua em segundos.
+Ausencia desses metadados em linhas legadas nao autoriza inventar proveniencia
+WEB. A FK impede que reimportacao `--force` sobrescreva uma conclusao WEB.
+
+Semantica, idempotencia e unidades seguem o
+[contrato HTTP](../desenvolvimento/CONTRATO_API_WEB.md); formulas continuam neste
+modelo e em `stroop/domain/stroop.py`. Nao ha alteracao no CSV de 21 colunas.

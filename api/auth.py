@@ -23,6 +23,7 @@ from api.google_oidc import (
 )
 from stroop.application import auth as auth_application
 from stroop.domain.auth import (
+    opaque_user_id,
     AuthDatabaseError,
     AuthError,
     BlockedUserError,
@@ -157,11 +158,6 @@ def _professional_context(request: Request, action: str):
     except AuthError as exc:
         raise _auth_error(exc) from None
     return user, session, token
-
-
-def opaque_user_id(issuer: str, subject: str) -> str:
-    raw = issuer.encode("ascii") + b"\0" + subject.encode("ascii")
-    return base64.urlsafe_b64encode(raw).rstrip(b"=").decode("ascii")
 
 
 def parse_opaque_user_id(value: str) -> tuple[str, str] | None:

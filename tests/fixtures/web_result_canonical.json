@@ -1,0 +1,45 @@
+[
+  {
+    "name": "ordem-unicode-numeros",
+    "input": {
+      "z": [
+        1.0,
+        -0.0,
+        1e-06,
+        1e+21,
+        true,
+        null
+      ],
+      "a": "SINTÉTICO\n\"texto\""
+    },
+    "canonical": "{\"a\":\"SINTÉTICO\\n\\\"texto\\\"\",\"z\":[1,0,0.000001,1000000000000000000000,true,null]}",
+    "sha256": "71f7a09252305b3cfe38a0175b6c782b3b0d1de7c7c8eec0e0f5df115d34991c"
+  },
+  {
+    "name": "numeros-equivalentes",
+    "input": {
+      "a": 1.0,
+      "b": -0.0
+    },
+    "canonical": "{\"a\":1,\"b\":0}",
+    "sha256": "70c75ca39048db680b52c5fd0040136c6bcb678be341277eaaac5afd16d4e70d"
+  },
+  {
+    "name": "inteiros-equivalentes",
+    "input": {
+      "b": 0,
+      "a": 1
+    },
+    "canonical": "{\"a\":1,\"b\":0}",
+    "sha256": "70c75ca39048db680b52c5fd0040136c6bcb678be341277eaaac5afd16d4e70d"
+  },
+  {
+    "name": "precisao-sem-quantizacao",
+    "input": {
+      "reaction_time_ms": 512.123456789,
+      "time": 1e-07
+    },
+    "canonical": "{\"reaction_time_ms\":512.123456789,\"time\":0.0000001}",
+    "sha256": "751a57d7bf43a88da5f077343780184aef4b1b24e610dac85538c081ea5167c4"
+  }
+]

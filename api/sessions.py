@@ -162,11 +162,29 @@ def _professional_read(request: Request, action: str = "view_dashboard"):
     return user
 
 
-def _participant(request: Request) -> tuple[str, str]:
+def _participant(request: Request, *, count_read: bool = True) -> tuple[str, str]:
     token = _cookie(request, PARTICIPANT_COOKIE)
     if token is None or PARTICIPANT_TOKEN_PATTERN.fullmatch(token) is None:
         raise APIError("authentication_required")
+    if count_read:
+        _participant_rate_limit(request, token, 'read')
     return token, hashlib.sha256(token.encode("ascii")).hexdigest()
+
+
+def _participant_rate_limit(request: Request, token: str, operation: str) -> None:
+    config: APIConfig = request.app.state.config
+    digest = hmac.new(config.session_secret.encode('utf-8'),
+                      b'stroop-participant-rate-v1\0' + token.encode('ascii'),
+                      hashlib.sha256).hexdigest()
+    limit = config.participant_read_rate_limit if operation == 'read' else config.participant_write_rate_limit
+    try:
+        allowed, retry_after = persistence.participant_request_limit(
+            config.database_url, digest, operation, limit, config.participant_rate_window_seconds,
+        )
+    except PersistenceError:
+        raise _persistence_error() from None
+    if not allowed:
+        raise APIError('rate_limited', headers={'Retry-After': str(retry_after)})
 
 
 def _participant_csrf(config: APIConfig, token: str) -> str:
@@ -179,14 +197,18 @@ def _participant_csrf(config: APIConfig, token: str) -> str:
 
 
 def _participant_write(request: Request) -> tuple[str, str]:
-    token, token_hash = _participant(request)
+    token, token_hash = _participant(request, count_read=False)
     config: APIConfig = request.app.state.config
     supplied = request.headers.getlist("x-csrf-token")
-    if (
-        not _origin_is_valid(request, config) or len(supplied) != 1
-        or not hmac.compare_digest(supplied[0], _participant_csrf(config, token))
-    ):
+    try:
+        valid_csrf = len(supplied) == 1 and hmac.compare_digest(
+            supplied[0].encode('ascii'), _participant_csrf(config, token).encode('ascii')
+        )
+    except UnicodeError:
+        valid_csrf = False
+    if not _origin_is_valid(request, config) or not valid_csrf:
         raise APIError("csrf_failed")
+    _participant_rate_limit(request, token, 'write')
     return token, token_hash
 
 
@@ -396,6 +418,8 @@ async def participant_session(request: Request):
                                                   token_hash)
     except application.ExpiredError:
         raise APIError("session_expired") from None
+    except application.UnknownCredentialError:
+        raise APIError("authentication_required") from None
     except application.MissingError:
         raise APIError("not_found") from None
     except PersistenceError:
@@ -403,6 +427,8 @@ async def participant_session(request: Request):
     result = {"session_id": session.session_id, "state": session.state,
               "activated_at": _serialize_time(session.activated_at),
               "expires_at": _serialize_time(session.expires_at), "can_resume": False}
+    if session.state == 'completed':
+        return session.receipt
     if session.state == "preparing":
         conditions = {row["condition_id"]: row for row in _load_conditions("main")}
         result.update({
@@ -439,6 +465,8 @@ async def start(request: Request, body: Start):
         raise APIError("session_expired") from None
     except application.ConflictError:
         raise APIError("state_conflict") from None
+    except application.UnknownCredentialError:
+        raise APIError("authentication_required") from None
     except application.MissingError:
         raise APIError("not_found") from None
     except PersistenceError:
@@ -460,6 +488,8 @@ async def abort(request: Request, body: Abort):
         raise APIError("session_expired") from None
     except application.ConflictError:
         raise APIError("state_conflict") from None
+    except application.UnknownCredentialError:
+        raise APIError("authentication_required") from None
     except application.MissingError:
         raise APIError("not_found") from None
     except PersistenceError:

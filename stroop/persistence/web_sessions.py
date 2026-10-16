@@ -3,14 +3,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID
 
 import psycopg
 from psycopg.rows import dict_row
+from psycopg.types.json import Jsonb
 from uuid import uuid4
 
 from stroop.persistence.auth import PersistenceError
+from stroop.domain.auth import opaque_user_id
 
 
 @dataclass(frozen=True, slots=True)
@@ -22,10 +24,15 @@ class SessionRecord:
     started_at: datetime | None
     app_version: str | None
     order: tuple[int, ...]
+    receipt: dict | None = None
 
 
 class ConflictError(Exception):
     """Transicao concorrente ou recurso em estado incompatível."""
+
+
+class ResultConflictError(ConflictError):
+    """A sessao ja possui resultado diferente do payload recebido."""
 
 
 class ExpiredError(Exception):
@@ -34,6 +41,10 @@ class ExpiredError(Exception):
 
 class MissingError(Exception):
     """Recurso inexistente ou fora do escopo atual."""
+
+
+class UnknownCredentialError(MissingError):
+    """Credencial estruturalmente valida, mas nao emitida pelo servidor."""
 
 
 def project_invitation_access(database_url: str, project_id: UUID,
@@ -261,23 +272,37 @@ def redeem_limit(database_url: str, remote_hash: str, limit: int,
 
 def professional_request_limit(database_url: str, credential_hash: str, operation_name: str,
                                limit: int, window_seconds: int) -> tuple[bool, int]:
+    return _credential_request_limit(database_url, credential_hash, operation_name,
+                                      limit, window_seconds, participant=False)
+
+
+def participant_request_limit(database_url: str, credential_hash: str, operation_name: str,
+                              limit: int, window_seconds: int) -> tuple[bool, int]:
+    return _credential_request_limit(database_url, credential_hash, operation_name,
+                                      limit, window_seconds, participant=True)
+
+
+def _credential_request_limit(database_url: str, credential_hash: str, operation_name: str,
+                              limit: int, window_seconds: int, *, participant: bool):
+    # Nomes fechados internos; nenhum identificador vem da requisicao.
+    table = 'web_participant_request_limits' if participant else 'web_professional_request_limits'
     def operation():
         with psycopg.connect(database_url) as connection:
             row = connection.execute(
-                """INSERT INTO web_professional_request_limits
+                f"""INSERT INTO {table}
                      (credential_sha256,operation,window_started_at,request_count)
                    VALUES (%s,%s,clock_timestamp(),1)
                    ON CONFLICT (credential_sha256,operation) DO UPDATE SET
-                     window_started_at=CASE WHEN web_professional_request_limits.window_started_at <= clock_timestamp()-make_interval(secs => %s)
-                       THEN clock_timestamp() ELSE web_professional_request_limits.window_started_at END,
-                     request_count=CASE WHEN web_professional_request_limits.window_started_at <= clock_timestamp()-make_interval(secs => %s)
-                       THEN 1 ELSE LEAST(web_professional_request_limits.request_count+1,%s+1) END
+                     window_started_at=CASE WHEN {table}.window_started_at <= clock_timestamp()-make_interval(secs => %s)
+                       THEN clock_timestamp() ELSE {table}.window_started_at END,
+                     request_count=CASE WHEN {table}.window_started_at <= clock_timestamp()-make_interval(secs => %s)
+                       THEN 1 ELSE LEAST({table}.request_count+1,%s+1) END
                    RETURNING request_count,GREATEST(1,ceil(extract(epoch FROM
                      (window_started_at+make_interval(secs => %s)-clock_timestamp())))::integer)""",
                 (credential_hash, operation_name, window_seconds, window_seconds, limit, window_seconds),
             ).fetchone()
             connection.execute(
-                "DELETE FROM web_professional_request_limits WHERE window_started_at <= clock_timestamp() - make_interval(secs => %s * 2)",
+                f"DELETE FROM {table} WHERE window_started_at <= clock_timestamp() - make_interval(secs => %s * 2)",
                 (window_seconds,),
             )
             return row[0] <= limit, row[1]
@@ -358,7 +383,7 @@ def _eligible_session(connection, token_hash: str):
         (token_hash,),
     ).fetchone()
     if candidate is None:
-        raise MissingError
+        raise UnknownCredentialError
     project = connection.execute(
         "SELECT active FROM web_projects WHERE project_id=%s FOR SHARE", (candidate[1],)
     ).fetchone()
@@ -399,16 +424,22 @@ def get_participant_session(database_url: str, token_hash: str) -> SessionRecord
     def operation():
         with psycopg.connect(database_url) as connection:
             row = _eligible_session(connection, token_hash)
-            if row[3] <= connection.execute("SELECT CURRENT_TIMESTAMP").fetchone()[0] and row[1] in {'preparing','running'}:
-                connection.execute("UPDATE web_participant_sessions SET state='expired' WHERE session_id=%s",(row[0],))
-                connection.commit()
-                row = (*row[:1], 'expired', *row[2:])
+            if row[3] <= connection.execute("SELECT clock_timestamp()").fetchone()[0]:
+                if row[1] in {'preparing','running'}:
+                    connection.execute("UPDATE web_participant_sessions SET state='expired' WHERE session_id=%s",(row[0],))
+                    connection.commit()
+                raise ExpiredError
             if row[1] == 'expired':
                 raise ExpiredError
             order = tuple(item[0] for item in connection.execute(
                 "SELECT condition_id FROM web_session_main_order WHERE session_id=%s ORDER BY trial_number",(row[0],)
             ).fetchall())
-            return SessionRecord(row[0],row[1],row[2],row[3],row[4],row[5],order)
+            receipt = None
+            if row[1] == 'completed':
+                receipt = connection.execute(
+                    "SELECT receipt FROM web_assessments WHERE session_id=%s", (row[0],)
+                ).fetchone()[0]
+            return SessionRecord(row[0],row[1],row[2],row[3],row[4],row[5],order,receipt)
     try:
         return operation()
     except (MissingError, ExpiredError):
@@ -421,10 +452,11 @@ def start_participant_session(database_url: str, token_hash: str, app_version: s
     def operation():
         with psycopg.connect(database_url) as connection:
             row = _eligible_session(connection, token_hash)
-            now = connection.execute("SELECT CURRENT_TIMESTAMP").fetchone()[0]
+            now = connection.execute("SELECT clock_timestamp()").fetchone()[0]
             if row[3] <= now:
-                connection.execute("UPDATE web_participant_sessions SET state='expired' WHERE session_id=%s",(row[0],))
-                connection.commit()
+                if row[1] in {'preparing','running'}:
+                    connection.execute("UPDATE web_participant_sessions SET state='expired' WHERE session_id=%s",(row[0],))
+                    connection.commit()
                 raise ExpiredError
             if row[1] == 'preparing':
                 started = connection.execute(
@@ -466,5 +498,109 @@ def abort_participant_session(database_url: str, token_hash: str, reason: str):
         return operation()
     except (MissingError, ExpiredError, ConflictError):
         raise
+    except psycopg.Error as exc:
+        raise PersistenceError from exc
+
+
+def complete_participant_session(database_url: str, token_hash: str, payload: dict,
+                                 prepare_result):
+    """Bloqueia acesso/sessao, normaliza e grava resultado e recibo atomicamente."""
+    try:
+        with psycopg.connect(database_url, connect_timeout=5) as connection:
+            row = _eligible_session(connection, token_hash)
+            now = connection.execute("SELECT clock_timestamp()").fetchone()[0]
+            if row[1] == 'expired' or row[3] <= now:
+                if row[1] in {'preparing', 'running'}:
+                    connection.execute(
+                        "UPDATE web_participant_sessions SET state='expired' WHERE session_id=%s",
+                        (row[0],),
+                    )
+                    connection.commit()
+                raise ExpiredError
+            if row[1] not in {'running', 'completed'}:
+                raise ConflictError
+            order = tuple(item[0] for item in connection.execute(
+                "SELECT condition_id FROM web_session_main_order WHERE session_id=%s ORDER BY trial_number",
+                (row[0],),
+            ).fetchall())
+            result = prepare_result(order, row[5])
+            if row[1] == 'completed':
+                saved = connection.execute(
+                    "SELECT payload_sha256,receipt FROM web_assessments WHERE session_id=%s",
+                    (row[0],),
+                ).fetchone()
+                if saved[0] != result['payload_sha256']:
+                    raise ResultConflictError
+                return saved[1], False
+
+            metadata = connection.execute(
+                """SELECT p.code,i.participant_id,i.visit,i.protocol_id
+                   FROM web_invitations i JOIN web_projects p USING(project_id)
+                   WHERE i.session_id=%s""", (row[0],),
+            ).fetchone()
+            completed_at = connection.execute("SELECT clock_timestamp()").fetchone()[0]
+            if completed_at >= row[3]:
+                connection.execute(
+                    "UPDATE web_participant_sessions SET state='expired' WHERE session_id=%s", (row[0],)
+                )
+                connection.commit()
+                raise ExpiredError
+            assessment_id = str(uuid4())
+            timestamp = completed_at.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z')
+            started = row[4].astimezone(timezone.utc)
+            receipt = {
+                'session_id': str(row[0]), 'assessment_id': assessment_id,
+                'state': 'completed', 'completed_at': timestamp,
+                'platform': 'web', 'test_code': 'stroop_go_nogo_ptbr',
+                'test_version': payload['test_version'], 'protocol_id': metadata[3],
+                'app_version': row[5], 'summary': result['summary'],
+            }
+            connection.execute(
+                """INSERT INTO assessments
+                   (assessment_id,test_code,test_version,project,participant_id,participant_name,
+                    initials,visit,evaluator,assessment_date,started_at,source_file,imported_at,import_status)
+                   VALUES (%s,'stroop_go_nogo_ptbr',%s,%s,%s,'NAO_COLETADO',NULL,%s,%s,%s,%s,%s,%s,'valid')""",
+                (assessment_id, payload['test_version'], metadata[0], metadata[1], metadata[2],
+                 opaque_user_id(row[7],row[8]), started.date().isoformat(),
+                 started.isoformat().replace('+00:00','Z'), f'web:{row[0]}', timestamp),
+            )
+            connection.cursor().executemany(
+                """INSERT INTO trial_results
+                   (assessment_id,block,trial_number,word,ink_color,condition,
+                    correct_response,key_pressed,reaction_time,correct,error_type)
+                   VALUES (%s,'main',%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                [(assessment_id, int(item['trial_number']), item['word'], item['ink_color'],
+                  item['condition'], item['correct_response'] or None, item['key_pressed'] or None,
+                  float(item['reaction_time']) if item['reaction_time'] else None,
+                  int(item['correct']), item['error_type']) for item in result['rows']],
+            )
+            connection.cursor().executemany(
+                """INSERT INTO assessment_metrics
+                   (assessment_id,metric_code,metric_label,metric_value,unit,calculated_at)
+                   VALUES (%s,%s,%s,%s,%s,%s)""",
+                [(assessment_id, item['metric_code'], item['metric_label'], item['metric_value'],
+                  item['unit'], timestamp) for item in result['metrics']],
+            )
+            connection.execute(
+                """INSERT INTO web_assessments
+                   (assessment_id,session_id,project_id,protocol_id,app_version,frame_period_ms,
+                    payload_sha256,completed_at,receipt)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                (assessment_id,row[0],row[6],metadata[3],row[5],payload['frame_period_ms'],
+                 result['payload_sha256'],completed_at,Jsonb(receipt)),
+            )
+            connection.cursor().executemany(
+                """INSERT INTO web_trial_observations
+                   (assessment_id,trial_number,condition_id,trial_start_ms,stimulus_onset_ms,
+                    stimulus_offset_ms,trial_end_ms,key_at_ms,reaction_time_ms)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                [(assessment_id,item['trial_number'],item['condition_id'],item['trial_start_ms'],
+                  item['stimulus_onset_ms'],item['stimulus_offset_ms'],item['trial_end_ms'],
+                  item['key_at_ms'],item['reaction_time_ms']) for item in payload['trials']],
+            )
+            connection.execute(
+                "UPDATE web_participant_sessions SET state='completed' WHERE session_id=%s", (row[0],)
+            )
+            return receipt, True
     except psycopg.Error as exc:
         raise PersistenceError from exc

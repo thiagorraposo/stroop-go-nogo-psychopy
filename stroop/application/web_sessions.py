@@ -123,3 +123,4 @@ __all__ = ["InvalidDataError", "ConflictError", "ExpiredError", "MissingError",
 ConflictError = persistence.ConflictError
 ExpiredError = persistence.ExpiredError
 MissingError = persistence.MissingError
+UnknownCredentialError = persistence.UnknownCredentialError

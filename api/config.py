@@ -35,8 +35,18 @@ class APIConfig:
     professional_read_rate_limit: int = 120
     professional_write_rate_limit: int = 60
     professional_rate_window_seconds: int = 60
+    participant_read_rate_limit: int = 120
+    participant_write_rate_limit: int = 60
+    participant_rate_window_seconds: int = 60
 
     def __post_init__(self) -> None:
+        for value, upper_bound in (
+            (self.participant_read_rate_limit, 10000),
+            (self.participant_write_rate_limit, 10000),
+            (self.participant_rate_window_seconds, 86400),
+        ):
+            if type(value) is not int or not 1 <= value <= upper_bound:
+                _invalid()
         if self.app_env not in {"development", "test", "production"}:
             _invalid()
         if (
@@ -128,6 +138,9 @@ class APIConfig:
             professional_read_rate_limit = int(values.get("API_PROFESSIONAL_READ_RATE_LIMIT", "120"))
             professional_write_rate_limit = int(values.get("API_PROFESSIONAL_WRITE_RATE_LIMIT", "60"))
             professional_rate_window_seconds = int(values.get("API_PROFESSIONAL_RATE_WINDOW_SECONDS", "60"))
+            participant_read_rate_limit = int(values.get("API_PARTICIPANT_READ_RATE_LIMIT", "120"))
+            participant_write_rate_limit = int(values.get("API_PARTICIPANT_WRITE_RATE_LIMIT", "60"))
+            participant_rate_window_seconds = int(values.get("API_PARTICIPANT_RATE_WINDOW_SECONDS", "60"))
         except (TypeError, ValueError):
             _invalid()
         return cls(
@@ -144,4 +157,7 @@ class APIConfig:
             professional_read_rate_limit=professional_read_rate_limit,
             professional_write_rate_limit=professional_write_rate_limit,
             professional_rate_window_seconds=professional_rate_window_seconds,
+            participant_read_rate_limit=participant_read_rate_limit,
+            participant_write_rate_limit=participant_write_rate_limit,
+            participant_rate_window_seconds=participant_rate_window_seconds,
         )

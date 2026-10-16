@@ -10,6 +10,7 @@ from api.health import database_ready
 from api.transport import RequestBoundary
 from api.auth import router as auth_router
 from api.sessions import router as sessions_router
+from api.results import router as results_router
 
 
 def create_app(config: APIConfig | None = None) -> FastAPI:
@@ -21,6 +22,7 @@ def create_app(config: APIConfig | None = None) -> FastAPI:
     app.state.config = config
     app.include_router(auth_router)
     app.include_router(sessions_router)
+    app.include_router(results_router)
     app.add_exception_handler(HTTPException, http_exception_handler)
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_middleware(RequestBoundary, config=config)

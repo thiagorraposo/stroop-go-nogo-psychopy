@@ -97,6 +97,9 @@ class APIConfigurationTests(unittest.TestCase):
         self.assertEqual((default.professional_read_rate_limit,
                           default.professional_write_rate_limit,
                           default.professional_rate_window_seconds), (120, 60, 60))
+        self.assertEqual((default.participant_read_rate_limit,
+                          default.participant_write_rate_limit,
+                          default.participant_rate_window_seconds), (120, 60, 60))
         configured = APIConfig.from_env({
             **environment,
             "API_LOGIN_RATE_LIMIT": "7",
@@ -119,6 +122,9 @@ class APIConfigurationTests(unittest.TestCase):
             ("API_PROFESSIONAL_READ_RATE_LIMIT", "0"),
             ("API_PROFESSIONAL_WRITE_RATE_LIMIT", "10001"),
             ("API_PROFESSIONAL_RATE_WINDOW_SECONDS", "86401"),
+            ("API_PARTICIPANT_READ_RATE_LIMIT", "0"),
+            ("API_PARTICIPANT_WRITE_RATE_LIMIT", "10001"),
+            ("API_PARTICIPANT_RATE_WINDOW_SECONDS", "86401"),
         ):
             with self.subTest(key=key, value=value), self.assertRaises(ConfigurationError):
                 APIConfig.from_env({**environment, key: value})

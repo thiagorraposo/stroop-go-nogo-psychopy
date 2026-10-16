@@ -15,8 +15,11 @@ Herda [as regras da raiz](../AGENTS.md). Contrato canonico em
   prazos absolutos e revalidacao do projeto, emissor e vinculo em cada operacao.
   Projetos WEB permanecem sinteticos ate uma etapa implementar e habilitar a
   configuracao aprovada de pesquisa real.
+- Conclusao valida schema dentro do fluxo autenticado/transacional, depois de
+  acesso, prazo e estado. Participantes e profissionais possuem limites HMAC
+  independentes; hash de payload/recibo nao substitui a revalidacao de acesso.
 - Readiness apenas consulta migrations; sua aplicacao continua sendo operacional.
 - Nao habilitar access log com path/query sensiveis nem CORS arbitrario.
 - Atualize requirements e lock juntos, respeitando versoes compartilhadas com o
   dashboard; valide com `tests/test_api_base.py`, `tests/test_web_auth.py`,
-  `tests/test_web_sessions.py` e regressao integral.
+  `tests/test_web_sessions.py`, `tests/test_web_results.py` e regressao integral.

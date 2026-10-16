@@ -17,6 +17,7 @@ stroop-cognifit/
 │   │   ├── assessment.py       # NormalizedAssessment
 │   │   ├── auth.py             # regras e erros de autenticacao
 │   │   ├── errors.py           # excecoes de validacao
+│   │   ├── web_results.py      # validacao temporal, normalizacao e hash canonico WEB
 │   │   └── stroop.py           # contrato, validacao e metricas
 │   ├── ingestion/
 │   │   ├── stroop_csv.py       # leitura e conversao de tentativas
@@ -24,6 +25,7 @@ stroop-cognifit/
 │   ├── application/
 │   │   ├── auth.py             # autorizacao e bootstrap profissional
 │   │   ├── web_sessions.py     # casos de uso de projetos, convites e sessoes
+│   │   ├── web_results.py      # conclusao WEB e validacao transacional
 │   │   ├── import_sqlite.py    # casos de uso locais
 │   │   ├── import_postgres.py  # importacao e validacao sem CLI
 │   │   ├── clock.py            # timestamp UTC compartilhado
@@ -42,7 +44,8 @@ stroop-cognifit/
 │   ├── db_schema.sql           # schema SQLite, caminho preservado
 │   ├── migrations.py
 │   ├── migrations/             # migrations PostgreSQL, caminho preservado
-│   │   └── 0005_web_participant_sessions.sql
+│   │   ├── 0005_web_participant_sessions.sql
+│   │   └── 0006_web_completed_results.sql
 │   └── demais utilitarios
 ├── dashboard/                  # aplicacao Streamlit existente
 │   ├── app.py                 # composicao da interface
@@ -57,6 +60,7 @@ stroop-cognifit/
 │   ├── main.py                 # factory e composicao FastAPI
 │   ├── auth.py                 # rotas OIDC, sessao, logout e CSRF
 │   ├── sessions.py             # projetos, convites e ciclo de sessao participante
+│   ├── results.py              # conclusao e recibo idempotente
 │   ├── config.py               # configuracao validada por ambiente
 │   ├── transport.py            # limites ASGI e erros de transporte
 │   ├── health.py               # live/readiness

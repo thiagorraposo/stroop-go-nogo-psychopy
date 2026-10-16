@@ -80,20 +80,31 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 - Proxima acao exata: iniciar W08 — conclusao e recebimento de resultados;
   ler ficha W08, contrato HTTP, modelo de dados e caminhos de calculo canonicos.
 
-## 2026-10-16 — Retomada W08
+## 2026-10-16 — W08 concluida
 
-- Consultados ficha W08, contrato de conclusao/tempos/idempotencia, calculo
-  canonico em `stroop/domain/stroop.py` e persistencia/schema existentes.
-  Ainda nao existe entrega funcional de W08. Rascunho de rota sem caso de uso
-  foi removido; a API permanece no estado validado de W07 (`55d5e82`).
-- Proxima acao: implementar migration aditiva 0006 para proveniencia WEB,
-  vinculo unico sessao/avaliacao e tempos observados; validacao temporal e
-  canonizacao do payload; conclusao atomica com recalculo e testes de
-  rollback, concorrencia e replay conforme contrato. Nao alterar 0001–0005.
-- O ambiente informa objetivo `usageLimited`; saldo e renovacao nao estao
-  disponiveis. Preservada alteracao preexistente em `AGENTS.md`.
-- Corrigida a leitura de W22: ela sera executada pelo usuario futuramente;
-  nao ha evidencias de implantacao WEB concluida.
+- `api/results.py` implementa conclusao com autenticacao/CSRF/estado antes do
+  schema. `stroop/domain/web_results.py` valida ordem, versoes e todos os gates
+  temporais, deriva quatro respostas e reutiliza o calculo canonico. Hash
+  decimal normalizado tem quatro vetores compartilhados com o futuro frontend.
+- Migration 0006 adiciona `web_assessments`/`web_trial_observations`; preserva
+  linhas legadas e sessoes WEB ativas. `stroop/application/web_results.py` e
+  persistencia coordenam uma transacao: locks, validacao, avaliacao, 16 tentativas,
+  12 metricas, proveniencia, recibo e estado completed. Retry identico retorna
+  mesmo recibo; divergente recebe 409. Nenhuma gravacao parcial sobrevive a falha.
+- Participantes possuem limites HMAC independentes de leitura/escrita;
+  credencial desconhecida recebe 401, revogacao/escopo 404. Resultado concluido
+  e preservado apos vencer seu canal participante. RT sem hits permanece 0 no
+  nucleo/banco e null no HTTP; conversao que perde positividade e rejeitada.
+- Evidencias: 65 testes focados; regressao integral PostgreSQL sintetico,
+  240 testes aprovados em 29,019 s, zero falhas/erros/skips. `compileall`,
+  `pip check` e `git diff --check` aprovados. Revisao independente sem bloqueantes.
+  Integracao inclui falha real em trigger com rollback/retry, concorrencia
+  identica/divergente, CSRF, estados, expiracao, schema e upgrades 0004/0005.
+- Proxima acao: W09 — ler README web/ADR/protocolo, criar React/TypeScript com
+  cliente HTTP, navegacao minima, testes DOM/navegador e build. Node local
+  24.15.0/npm 11.16.0; nenhuma dependencia frontend instalada ainda. Alteracao
+  preexistente em `AGENTS.md` permanece fora dos commits da etapa.
+- W22 e implantacao futura pelo usuario; nao ha evidencia de deploy WEB concluido.
 
 ## Decisoes e contexto preservados
 

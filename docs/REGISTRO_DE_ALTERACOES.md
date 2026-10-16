@@ -6,6 +6,20 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W08: conclusao transacional e resultados WEB
+
+- `feat`: conclusao valida protocolo, ordem persistida, temporalidade e RT;
+  deriva respostas e recalcula metricas no nucleo, sem aceitar metricas do cliente.
+  Migration aditiva 0006 vincula sessao/avaliacao e conserva proveniencia WEB,
+  observacoes temporais, hash canonico e recibo, preservando o schema legado.
+- `fix`: limites de participantes por HMAC sao independentes; cookie desconhecido
+  recebe 401. Acesso/estado precedem schema na conclusao; expiracao do canal nao
+  muda resultado completed. RT nao representavel em segundos positivos e rejeitado.
+- `test`: 19 testes puros e integracao real cobrem quatro respostas, gates,
+  equivalencia numerica de replay, conflito, concorrencia, rollback tardio por
+  trigger e upgrades com dados/sessao em andamento. Regressao integral: 240
+  testes aprovados, sem skips; compilacao, dependencias e diff aprovados.
+
 ## 2026-10-16 — W07: ciclo de sessao participante
 
 - `feat`: migration aditiva 0005 cria projetos sinteticos, vinculos,

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
+import base64
 import re
 from typing import Any, Mapping
 
@@ -82,6 +83,12 @@ class AppUser:
     email: str | None
     role: str
     active: bool
+
+
+def opaque_user_id(issuer: str, subject: str) -> str:
+    """Identificador tecnico estavel; a identidade continua sendo issuer + subject."""
+    raw = issuer.encode("ascii") + b"\0" + subject.encode("ascii")
+    return base64.urlsafe_b64encode(raw).rstrip(b"=").decode("ascii")
 
 
 def parse_identity(claims: Mapping[str, Any]) -> Identity:

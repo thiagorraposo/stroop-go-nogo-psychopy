@@ -353,6 +353,11 @@ ordem, numeros finitos em representacao decimal normalizada (`1` e `1.0`
 equivalem; `-0` equivale a `0`). A implementacao deve definir uma unica funcao
 canonizadora e fixtures Python/TypeScript; nao usar o hash dos bytes brutos nem
 comparar arredondamentos de RT. Nao e necessario header de idempotencia do cliente.
+Referencia implementada: `stroop/domain/web_results.py::canonical_payload` usa
+decimal normalizado sem expoente; vetores compartilhados em
+[`web_result_canonical.json`](../../tests/fixtures/web_result_canonical.json).
+RT cuja conversao para segundos nao seja representavel como numero positivo
+finito no nucleo e rejeitado, preservando ausencia versus medida.
 Depois de `completed`, payload identico devolve o mesmo recibo/ID com 200;
 payload diferente devolve 409 `result_conflict`. Requisicao malformada continua
 400/422. Duas conclusoes simultaneas identicas produzem uma avaliacao; duas
