@@ -6,6 +6,24 @@ Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W03: acesso e dados WEB especificados
+
+- `docs`: criado `ACESSO_WEB.md` com matriz de perfis/projeto, dados permitidos
+  e finalidade de cada campo. Administracao global de vinculos nao concede
+  acesso automatico a pesquisa; criacao de convites, consulta e exportacao
+  exigem vinculo inclusive para administrador. Revogacao/bloqueio revalidam
+  tambem a autorizacao de convites/sessoes participantes ainda ativos.
+- `docs`: threat model e tratamento de dados recebem extensoes WEB, preservando
+  integralmente o historico anterior. Documentados codigo vazado, replay,
+  concorrencia, expiracao, interrupcao, reenvio em RAM e exportacao minimizada.
+  Coleta real por projeto exige configuracao especifica pelo responsavel;
+  desenvolvimento sintetico segue liberado, sem filtro etario novo.
+- `test`: revisao dos cenarios da ficha, 16 links relativos e
+  `git diff --check` aprovados. Documentos descrevem controles a implementar,
+  sem atribuir aceite de autenticacao/coleta ou medicao fisica.
+- `scope`: W03 concluida; W05 permanece em implementacao. Direcionamento
+  posterior do usuario prioriza organizar arquivos preservando funcionamento.
+
 ## 2026-10-16 — W02: contrato HTTP e ciclo de sessao
 
 - `docs`: especificado `CONTRATO_API_WEB.md`, com catalogo de operacoes,
