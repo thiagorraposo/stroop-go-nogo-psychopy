@@ -12,12 +12,13 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 |---|---|
 | W00 | Concluida em 2026-10-16; evidencias no registro de alteracoes |
 | W01 | Concluida em 2026-10-16; D1–D6 aprovadas e fontes/39 testes focados validados |
-| W02 | Em andamento; contrato de sessao, resultados e HTTP |
-| W03 | Nao iniciada; depende de W02 e usa as decisoes de acesso/dados ja aprovadas |
+| W02 | Concluida em 2026-10-16; contrato HTTP e cenarios, seis JSONs e links validados |
+| W03 | Em andamento; matriz de acesso/dados com as decisoes ja aprovadas |
 | W04 | Concluida em 2026-10-16; casos de uso/persistencia extraidos, 173 testes e smoke na imagem aprovados |
-| W05–W23 | Nao iniciadas |
+| W05 | Em andamento; base HTTP, configuracao e testes |
+| W06–W23 | Nao iniciadas |
 
-Proxima acao: **concluir W02 e avancar para W03/W05**; W04 independente
+Proxima acao: **concluir W03/W05 e integrar autenticacao W06**; W04 independente
 concluida. Evidencias em
 [registro de alteracoes](REGISTRO_DE_ALTERACOES.md).
 Bloqueio de produto/metodo resolvido pela aprovacao explicita na sessao.

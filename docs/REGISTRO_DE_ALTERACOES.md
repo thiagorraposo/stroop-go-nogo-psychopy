@@ -6,6 +6,25 @@ Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W02: contrato HTTP e ciclo de sessao
+
+- `docs`: especificado `CONTRATO_API_WEB.md`, com catalogo de operacoes,
+  cookies/CSRF, estados, expiracao, limites, erros seguros e idempotencia por
+  sessao/hash canonico. Criacao, resgate, inicio, abortamento, conclusao,
+  consulta e exportacao possuem escopos e resultados definidos.
+- `decision`: administrador gerencia projetos/vinculos globalmente, mas acesso
+  a pesquisa/convites exige vinculo inclusive para administradores. Identidade
+  do avaliador vem do servidor; cliente nao envia nome/iniciais ou metricas.
+  Snapshot preserva paleta efetiva do Builder, nao hexadecimais historicos dos
+  CSVs de condicoes. RT HTTP em ms e normalizado uma vez para segundos.
+- `test`: seis exemplos JSON parseaveis; corpo completo com 16 tentativas,
+  permutacao sem reposicao, sequencia e tempos coerentes. Sete links locais
+  validos; matriz revisada de reenvio/conflito/expiracao/interrupcao/acesso
+  cruzado/resultado invalido. `git diff --check` aprovado.
+- `scope`: contrato nao representa rotas implementadas; W02 concluida e W03/W05
+  iniciadas conforme dependencias. Start HTTP nao prova apresentacao fisica;
+  nao retomar motor apos reload. Medicao W16 preservada.
+
 ## 2026-10-16 — W01 aprovada e retomada da implementacao WEB
 
 - `decision`: usuario aprovou explicitamente os itens 1–19 da proposta da
