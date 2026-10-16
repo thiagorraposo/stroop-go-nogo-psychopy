@@ -33,7 +33,13 @@ class SyntheticRequest(RequestModel):
 
 
 def synthetic_config(**changes):
-    return APIConfig(**{"database_url": DATABASE, "public_origin": ORIGIN, "app_env": "test", **changes})
+    return APIConfig(**{
+        "database_url": DATABASE, "public_origin": ORIGIN, "app_env": "test",
+        "oidc_client_id": "synthetic-client-id",
+        "oidc_client_secret": "synthetic-client-secret-never-use",
+        "session_secret": "synthetic-session-secret-never-use-0000000000",
+        **changes,
+    })
 
 
 class APIConfigurationTests(unittest.TestCase):
@@ -43,7 +49,12 @@ class APIConfigurationTests(unittest.TestCase):
         self.assertEqual(str(caught.exception), "Configuracao da API ausente ou invalida.")
 
     def test_ambiente_obrigatorio_e_invalido_nao_reflete_valores(self):
-        valid = {"API_DATABASE_URL": DATABASE, "API_PUBLIC_ORIGIN": ORIGIN, "APP_ENV": "test"}
+        valid = {
+            "API_DATABASE_URL": DATABASE, "API_PUBLIC_ORIGIN": ORIGIN, "APP_ENV": "test",
+            "OIDC_CLIENT_ID": "synthetic-client-id",
+            "OIDC_CLIENT_SECRET": "synthetic-client-secret-never-use",
+            "API_SESSION_SECRET": "synthetic-session-secret-never-use-0000000000",
+        }
         for missing in valid:
             environment = {key: value for key, value in valid.items() if key != missing}
             with self.subTest(missing=missing), self.assertRaises(ConfigurationError):
@@ -63,8 +74,41 @@ class APIConfigurationTests(unittest.TestCase):
         config = synthetic_config(public_origin="https://SYNTHETIC.example.test:443/")
         self.assertEqual(config.public_origin, ORIGIN)
         self.assertNotIn("SYNTHETIC_SECRET", repr(config))
-        with patch.dict(os.environ, {"API_DATABASE_URL": DATABASE, "API_PUBLIC_ORIGIN": ORIGIN, "APP_ENV": "test"}, clear=True):
+        with patch.dict(os.environ, {
+            "API_DATABASE_URL": DATABASE, "API_PUBLIC_ORIGIN": ORIGIN, "APP_ENV": "test",
+            "OIDC_CLIENT_ID": "synthetic-client-id",
+            "OIDC_CLIENT_SECRET": "synthetic-client-secret-never-use",
+            "API_SESSION_SECRET": "synthetic-session-secret-never-use-0000000000",
+        }, clear=True):
             self.assertEqual(create_app().state.config.public_origin, ORIGIN)
+
+    def test_rate_limit_login_tem_defaults_e_limites_configuraveis_validos(self):
+        environment = {
+            "API_DATABASE_URL": DATABASE,
+            "API_PUBLIC_ORIGIN": ORIGIN,
+            "APP_ENV": "test",
+            "OIDC_CLIENT_ID": "synthetic-client-id",
+            "OIDC_CLIENT_SECRET": "synthetic-client-secret-never-use",
+            "API_SESSION_SECRET": "synthetic-session-secret-never-use-0000000000",
+        }
+        default = APIConfig.from_env(environment)
+        self.assertEqual((default.login_rate_limit, default.login_rate_window_seconds), (20, 60))
+        configured = APIConfig.from_env({
+            **environment,
+            "API_LOGIN_RATE_LIMIT": "7",
+            "API_LOGIN_RATE_WINDOW_SECONDS": "120",
+        })
+        self.assertEqual((configured.login_rate_limit, configured.login_rate_window_seconds), (7, 120))
+        for key, value in (
+            ("API_LOGIN_RATE_LIMIT", "0"),
+            ("API_LOGIN_RATE_LIMIT", "1001"),
+            ("API_LOGIN_RATE_LIMIT", "invalid"),
+            ("API_LOGIN_RATE_WINDOW_SECONDS", "0"),
+            ("API_LOGIN_RATE_WINDOW_SECONDS", "86401"),
+            ("API_LOGIN_RATE_WINDOW_SECONDS", "invalid"),
+        ):
+            with self.subTest(key=key, value=value), self.assertRaises(ConfigurationError):
+                APIConfig.from_env({**environment, key: value})
 
     def test_importar_factory_nao_carrega_streamlit_dashboard_ou_clis(self):
         code = """

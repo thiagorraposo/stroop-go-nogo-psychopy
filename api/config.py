@@ -25,10 +25,34 @@ class APIConfig:
     database_url: str = field(repr=False)
     public_origin: str
     app_env: str
+    oidc_client_id: str = field(repr=False)
+    oidc_client_secret: str = field(repr=False)
+    session_secret: str = field(repr=False)
+    login_rate_limit: int = 20
+    login_rate_window_seconds: int = 60
 
     def __post_init__(self) -> None:
         if self.app_env not in {"development", "test", "production"}:
             _invalid()
+        if (
+            isinstance(self.login_rate_limit, bool)
+            or not isinstance(self.login_rate_limit, int)
+            or not 1 <= self.login_rate_limit <= 1000
+            or isinstance(self.login_rate_window_seconds, bool)
+            or not isinstance(self.login_rate_window_seconds, int)
+            or not 1 <= self.login_rate_window_seconds <= 86400
+        ):
+            _invalid()
+        for value, minimum, maximum in (
+            (self.oidc_client_id, 8, 256),
+            (self.oidc_client_secret, 16, 512),
+            (self.session_secret, 32, 512),
+        ):
+            if (
+                not isinstance(value, str) or not minimum <= len(value) <= maximum
+                or any(character.isspace() or ord(character) < 32 for character in value)
+            ):
+                _invalid()
         try:
             if not isinstance(self.database_url, str) or not self.database_url.startswith(
                 ("postgresql://", "postgres://")
@@ -72,8 +96,20 @@ class APIConfig:
     @classmethod
     def from_env(cls, environment: Mapping[str, str] | None = None) -> APIConfig:
         values = os.environ if environment is None else environment
+        try:
+            login_rate_limit = int(values.get("API_LOGIN_RATE_LIMIT", "20"))
+            login_rate_window_seconds = int(
+                values.get("API_LOGIN_RATE_WINDOW_SECONDS", "60")
+            )
+        except (TypeError, ValueError):
+            _invalid()
         return cls(
             database_url=values.get("API_DATABASE_URL", ""),
             public_origin=values.get("API_PUBLIC_ORIGIN", ""),
             app_env=values.get("APP_ENV", ""),
+            oidc_client_id=values.get("OIDC_CLIENT_ID", ""),
+            oidc_client_secret=values.get("OIDC_CLIENT_SECRET", ""),
+            session_secret=values.get("API_SESSION_SECRET", ""),
+            login_rate_limit=login_rate_limit,
+            login_rate_window_seconds=login_rate_window_seconds,
         )

@@ -16,7 +16,7 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W03 | Concluida em 2026-10-16; matriz de acesso/finalidades e cenarios negativos revisados, 16 links validados |
 | W04 | Concluida em 2026-10-16; casos de uso/persistencia extraidos, 173 testes e smoke na imagem aprovados |
 | W05 | Concluida em 2026-10-16; API FastAPI, limites/erros seguros, readiness real PostgreSQL, 189 testes e smoke Uvicorn |
-| W06 | Em andamento; autenticacao profissional OIDC e autorizacao HTTP |
+| W06 | Concluida em 2026-10-16; OIDC, sessao segura, CSRF, autorizacao e limites de login |
 | W07–W23 | Nao iniciadas |
 
 Pedido de organizacao documental concluido em commit proprio. W05 foi validada
@@ -225,9 +225,11 @@ Dependencias da fase: W01–W03 para os contratos; W04 preserva comportamento.
 - **Conclusao:** validar assinatura, emissor, audiencia e expiracao antes de
   autorizar; preservar `iss` + `sub`, bloqueio e perfis. Claims JSON fornecidos
   pelo cliente nao substituem validacao criptografica. Definir CSRF conforme a sessao.
-- **Validacoes:** identidade sintetica/JWKS de teste, assinatura invalida,
-  token vencido, usuario bloqueado, perfil insuficiente e acesso a outro projeto;
+- **Validacoes:** identidade/chave RSA sinteticas, assinatura invalida, emissor,
+  audiencia, nonce, token vencido, usuario bloqueado, perfil insuficiente e
   regressao da autenticacao Streamlit. Sem credenciais Google reais em testes.
+  Acesso cruzado entre projetos sera validado em W14, quando a API consultar
+  objetos de projeto; W06 ainda nao possui essa superficie HTTP.
 - **Leitura:** acesso web e `seguranca/AUTENTICACAO_E_PERMISSOES.md`.
 
 ## Fase 3 — Sessoes e persistencia web

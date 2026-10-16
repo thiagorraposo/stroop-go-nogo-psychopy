@@ -84,6 +84,7 @@ class PostgresMigrationsTests(unittest.TestCase):
                 "0001_initial.sql",
                 "0002_authentication.sql",
                 "0003_import_audit.sql",
+                "0004_web_professional_auth.sql",
             ],
         )
         with psycopg.connect(TEST_DATABASE_URL) as connection:
@@ -102,6 +103,9 @@ class PostgresMigrationsTests(unittest.TestCase):
                     "app_users",
                     "auth_audit_events",
                     "import_audit_events",
+                    "web_oidc_transactions",
+                    "web_professional_sessions",
+                    "web_login_rate_limits",
                 }
                 .issubset(tables)
             )
@@ -119,7 +123,7 @@ class PostgresMigrationsTests(unittest.TestCase):
                 WHERE constraint_schema = 'public' AND constraint_type = 'FOREIGN KEY'
                 """
             ).fetchone()[0]
-            self.assertEqual(foreign_keys, 2)
+            self.assertEqual(foreign_keys, 3)
 
     def test_migrations_sao_idempotentes(self) -> None:
         apply_migrations(TEST_DATABASE_URL)
@@ -206,6 +210,7 @@ class PostgresMigrationStaticTests(unittest.TestCase):
                 "0001_initial.sql",
                 "0002_authentication.sql",
                 "0003_import_audit.sql",
+                "0004_web_professional_auth.sql",
             ],
         )
 

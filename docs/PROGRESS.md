@@ -27,12 +27,33 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   Smoke Uvicorn em loopback respondeu live 200 e ready 200 com `no-store` e
   request ID; Host divergente foi recusado (422). A factory de teste comprova
   que importar a API nao carrega Streamlit, dashboard ou CLIs.
-- W06 iniciada: validar primeiro o fluxo de login Google ja usado no dashboard
-  e contratos autorizados. Autenticacao web sera verificada criptograficamente
-  no servidor; testes usam chaves/claims sinteticos, sem credencial Google real.
-- Container de teste W05 encerrado sem volume persistente. Proxima acao:
-  identificar componentes OIDC reaproveitaveis e definir validacao/token e
-  sessao do servidor para os criterios W06.
+- Container PostgreSQL temporario da validacao W06 foi encerrado sem volume
+  persistente. O registro especifico e os testes aprovados estao em W06 abaixo.
+
+## 2026-10-16 — W06 autenticacao HTTP concluida
+
+- Login Google OIDC em `api/auth.py` usa state, nonce, PKCE S256 e cookie
+  temporario de uso unico; callback valida cookie/transacao e nao aceita destino
+  externo. `api/google_oidc.py` valida assinatura RS256, emissor, audiencia,
+  nonce, expiracao e `azp` com `google-auth`; rede externa tem timeout de cinco
+  segundos, endpoints fixados e respostas limitadas.
+- Sessao profissional opaca de 256 bits, cookie `__Host-` Secure/HttpOnly/Lax,
+  hash no PostgreSQL e duracao limitada a oito horas e ao ID token. `/auth/me`
+  revalida cadastro, bloqueio e perfil; logout exige Origin/CSRF e revoga sessao.
+  Login limita chamadas por IP em janela configuravel, guardando apenas HMAC.
+- `dashboard/auth.py` preserva a fachada do Streamlit; regras de identidade e
+  autorizacao ficam em `stroop/`, SQL em persistencia. Migration 0004 e locks
+  API atualizados sem modificar as migrations anteriores.
+- Evidencia: teste Google OIDC usa RSA/certificado sintetico e exercita o
+  verificador real (assinatura, issuer, audience, nonce, exp e azp); integracao
+  real cobre state one-use, cookies/hash, 8h, bloqueio, perfil insuficiente,
+  CSRF/logout, limite de login e migration. Suite integral PostgreSQL: 201
+  testes aprovados, zero falhas/erros/skips; focused W06/API 37 aprovados;
+  `pip check` sem dependencias quebradas.
+- Delimitacao por dependencia: acesso cruzado de projetos fica para W14, quando
+  a API expuser consultas de objetos; W06 nao possui essa superficie HTTP.
+- Proxima acao: iniciar W07 — criacao e ciclo de vida de sessao participante;
+  ler contrato W02/W03 e validar limites de projeto/convite antes de persistir.
 
 ## Decisoes e contexto preservados
 

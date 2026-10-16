@@ -45,6 +45,27 @@ O estado da nova versao web e mantido separadamente no
 - `scope`: W05 concluida; segue W06 para OIDC e autorizacao. Sem credenciais,
   migrations, rotas de pesquisa, servico de producao ou coleta real.
 
+## 2026-10-16 — W06: autenticacao e autorizacao HTTP
+
+- `feat`: adicionados login/callback OIDC Google com state, nonce, PKCE S256,
+  endpoints de provedor restritos, verificacao de assinatura RS256, emissor,
+  audiencia, nonce, `azp` e expiracao; callback usa destino local fixo e nao
+  expõe tokens ou valores da query.
+- `feat`: adicionada sessao profissional opaca, cookie `__Host-` seguro,
+  persistencia somente do hash, limite absoluto de oito horas limitado ao ID
+  token, `/auth/me`, logout com Origin/CSRF, revalidacao de cadastro/perfil e
+  rate limit de login configuravel por IP sem guardar endereco bruto. Fachada
+  `dashboard/auth.py` preserva imports existentes; migration 0004 e lock API.
+- `test`: certificados RSA sintéticos exercitam o verificador real do
+  `google-auth`, inclusive assinatura inválida, issuer, audience, token vencido,
+  nonce e `azp`. Integração PostgreSQL descartável valida transação one-use,
+  hash de sessão, bloqueio, perfil insuficiente, limite e logout. Suite integral
+  com banco temporário: 201 testes aprovados, sem falhas, erros ou skips;
+  `pip check` aprovado.
+- `scope`: W06 concluída. Acesso entre projetos é validado em W14, quando as
+  rotas de consulta estiverem implementadas; não existe endpoint equivalente
+  nesta etapa. Nenhuma credencial real, dado de pesquisa, push ou deploy foi usado.
+
 ## 2026-10-16 — W03: acesso e dados WEB especificados
 
 - `docs`: criado `ACESSO_WEB.md` com matriz de perfis/projeto, dados permitidos

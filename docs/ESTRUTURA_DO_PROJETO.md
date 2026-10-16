@@ -15,27 +15,31 @@ stroop-cognifit/
 ├── stroop/                     # nucleo Python reutilizavel
 │   ├── domain/
 │   │   ├── assessment.py       # NormalizedAssessment
+│   │   ├── auth.py             # regras e erros de autenticacao
 │   │   ├── errors.py           # excecoes de validacao
 │   │   └── stroop.py           # contrato, validacao e metricas
 │   ├── ingestion/
 │   │   ├── stroop_csv.py       # leitura e conversao de tentativas
 │   │   └── instruments.py      # registro e adaptadores de instrumentos
 │   ├── application/
+│   │   ├── auth.py             # autorizacao e bootstrap profissional
 │   │   ├── import_sqlite.py    # casos de uso locais
 │   │   ├── import_postgres.py  # importacao e validacao sem CLI
 │   │   ├── clock.py            # timestamp UTC compartilhado
 │   │   └── errors.py           # erros publicos de importacao PostgreSQL
 │   └── persistence/
+│       ├── auth.py             # persistencia de usuarios e auditoria
 │       ├── sqlite.py           # conexao, SQL e transacao SQLite
-│       └── postgres.py         # conexao, lock, SQL e transacao PostgreSQL
+│       ├── postgres.py         # conexao, lock, SQL e transacao PostgreSQL
+│       └── web_auth.py         # transacoes OIDC e sessoes web
 ├── scripts/                    # CLIs e infraestrutura local existentes
 │   ├── importar_csv_sqlite.py  # CLI e nomes anteriores reexportados
 │   ├── importar_csv_postgres.py
 │   ├── instrumentos.py        # compatibilidade com o registro extraido
 │   ├── analisar_stroop.py      # analisador existente, preservado
-│   ├── db_schema.sql          # schema SQLite, caminho preservado
+│   ├── db_schema.sql           # schema SQLite, caminho preservado
 │   ├── migrations.py
-│   ├── migrations/            # migrations PostgreSQL existentes
+│   ├── migrations/             # migrations PostgreSQL, caminho preservado
 │   └── demais utilitarios
 ├── dashboard/                  # aplicacao Streamlit existente
 │   ├── app.py                 # composicao da interface
@@ -46,7 +50,15 @@ stroop-cognifit/
 │   ├── instrumentos.py        # apresentacao, separado da ingestao
 │   ├── requirements.txt
 │   └── requirements.lock
-├── api/                        # fronteira HTTP em desenvolvimento na W05
+├── api/                        # fronteira HTTP e autenticacao profissional
+│   ├── main.py                 # factory e composicao FastAPI
+│   ├── auth.py                 # rotas OIDC, sessao, logout e CSRF
+│   ├── config.py               # configuracao validada por ambiente
+│   ├── transport.py            # limites ASGI e erros de transporte
+│   ├── health.py               # live/readiness
+│   ├── google_oidc.py          # descoberta e validacao criptografica do provedor
+│   ├── models.py / errors.py   # contratos de entrada e erros publicos
+│   └── requirements*.txt       # dependencias e lock da API
 ├── web/README.md               # interface planejada; sem implementacao
 ├── tests/                      # unittest e fixtures sinteticas
 ├── docs/
@@ -93,7 +105,10 @@ sem instalar drivers PostgreSQL; importar o caso PostgreSQL requer `psycopg`.
 
 O dashboard permanece modular e em seu caminho publico. Seu registro visual
 de instrumentos tem finalidade distinta do registro de ingestao. A base HTTP
-esta em desenvolvimento na W05; a interface em `web/` permanece planejada.
+esta organizada por fronteira de transporte (`api/`), regras reaproveitaveis
+(`stroop/domain` e `stroop/application`) e persistencia (`stroop/persistence`).
+`dashboard/auth.py` preserva a fachada publica do dashboard; SQL e drivers de
+autenticacao ficam na persistencia. A interface em `web/` permanece planejada.
 O mapa localiza arquivos, sem substituir o aceite registrado no roadmap.
 
 ## Mapa de extracao e compatibilidade

@@ -1,8 +1,26 @@
 # API HTTP
 
-Base FastAPI de W05, sem rotas de coleta ou autenticacao. O estado de cada etapa
-fica no [roadmap](../docs/ROADMAP_WEB.md); o
+Base FastAPI com autenticacao profissional de W06, sem rotas de coleta. O estado
+de cada etapa fica no [roadmap](../docs/ROADMAP_WEB.md); o
 [contrato HTTP](../docs/desenvolvimento/CONTRATO_API_WEB.md) define formatos e limites.
+
+## Organizacao
+
+- `main.py`, `transport.py`, `models.py` e `errors.py` compoem a fronteira HTTP.
+- `config.py` valida configuracao sem ler arquivos `.env` operacionais.
+- `health.py` implementa verificacoes live/readiness somente leitura.
+- `auth.py` expoe login, callback, identidade propria e logout; verifica Origin,
+  CSRF e revalida a autorizacao local para cada operacao protegida.
+- `google_oidc.py` concentra descoberta do provedor, montagem do pedido de
+  autorizacao e verificacao criptografica do token.
+- Regras de identidade ficam em `stroop/domain` e `stroop/application`; SQL e
+  sessoes ficam em `stroop/persistence`. `dashboard/auth.py` mantem a fachada
+  usada pelo Streamlit.
+- Alteracoes do schema PostgreSQL ficam em `scripts/migrations/`, preservando o
+  local publico e a aplicacao explicita pelo utilitario existente.
+
+O roadmap continua sendo a fonte de aceite; a presenca das rotas nao substitui
+as evidencias de teste e integracao registradas para W06.
 
 Na raiz do checkout, com Python 3.12 e a `.venv` existente:
 
@@ -16,9 +34,15 @@ seguem `dashboard/requirements.lock`. Atualize ambos e valide a suite ao renovar
 
 Configure no ambiente da sessao `API_DATABASE_URL` (URI PostgreSQL com host e
 banco), `API_PUBLIC_ORIGIN` (origem HTTPS sem caminho, credenciais ou query) e
-`APP_ENV` (`development`, `test` ou `production`). As tres sao obrigatorias.
+`APP_ENV` (`development`, `test` ou `production`), `OIDC_CLIENT_ID`,
+`OIDC_CLIENT_SECRET` e `API_SESSION_SECRET` (ao menos 32 caracteres aleatorios).
+Todos sao obrigatorios.
 Nenhum `.env` e lido automaticamente. Ausencia ou valor invalido impede a
 factory de iniciar com uma mensagem fixa, sem imprimir a configuracao.
+`API_LOGIN_RATE_LIMIT` (padrao 20) e
+`API_LOGIN_RATE_WINDOW_SECONDS` (padrao 60) configuram a janela por endereco
+remoto. A API armazena apenas HMAC do endereco e remove janelas expiradas.
+Headers de IP encaminhado nao sao confiados.
 
 Exemplo exclusivamente sintetico de preparacao local:
 
@@ -26,6 +50,9 @@ Exemplo exclusivamente sintetico de preparacao local:
 export API_DATABASE_URL='postgresql://synthetic:synthetic-local-only@127.0.0.1:55432/stroop_etapa4_test_web'
 export API_PUBLIC_ORIGIN='https://localhost:8000'
 export APP_ENV='test'
+export OIDC_CLIENT_ID='synthetic-client-id'
+export OIDC_CLIENT_SECRET='synthetic-client-secret-never-use'
+export API_SESSION_SECRET='synthetic-session-secret-never-use-0000000000'
 .venv/bin/python -m uvicorn api.main:create_app --factory --host 127.0.0.1 --port 8000 --no-access-log --log-level warning --no-proxy-headers
 ```
 

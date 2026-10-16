@@ -8,6 +8,7 @@ from api.config import APIConfig
 from api.errors import APIError, error_response, http_exception_handler, validation_exception_handler
 from api.health import database_ready
 from api.transport import RequestBoundary
+from api.auth import router as auth_router
 
 
 def create_app(config: APIConfig | None = None) -> FastAPI:
@@ -17,6 +18,7 @@ def create_app(config: APIConfig | None = None) -> FastAPI:
         debug=False, redirect_slashes=False,
     )
     app.state.config = config
+    app.include_router(auth_router)
     app.add_exception_handler(HTTPException, http_exception_handler)
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_middleware(RequestBoundary, config=config)

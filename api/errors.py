@@ -52,10 +52,13 @@ class APIError(HTTPException):
 
 def error_response(code: str, request_id: str) -> JSONResponse:
     status, message = ERRORS[code]
+    headers = {"X-Request-ID": request_id, "Cache-Control": "no-store"}
+    if code == "rate_limited":
+        headers["Retry-After"] = "900"
     return JSONResponse(
         {"error": {"code": code, "message": message}, "request_id": request_id},
         status_code=status,
-        headers={"X-Request-ID": request_id, "Cache-Control": "no-store"},
+        headers=headers,
     )
 
 
