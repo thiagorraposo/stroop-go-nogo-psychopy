@@ -73,10 +73,11 @@ def _reject_query(request: Request) -> None:
         raise APIError("invalid_request")
 
 
-def _page(request: Request, scope: str, config: APIConfig) -> tuple[int, int]:
+def _page(request: Request, scope: str, config: APIConfig,
+          allowed_filters: frozenset[str] = frozenset()) -> tuple[int, int]:
     pairs = request.query_params.multi_items()
     keys = [key for key, _ in pairs]
-    if len(keys) != len(set(keys)) or set(keys) - {"limit", "cursor"}:
+    if len(keys) != len(set(keys)) or set(keys) - {"limit", "cursor"} - allowed_filters:
         raise APIError("invalid_request")
     values = dict(pairs)
     raw_limit = values.get("limit", "25")

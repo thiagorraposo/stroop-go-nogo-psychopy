@@ -1,0 +1,297 @@
+"""Consultas reais com papel SELECT, escopo e coletas inequivocamente sinteticas."""
+from dataclasses import replace
+import csv
+import io
+import os
+from pathlib import Path
+import tempfile
+import unittest
+from urllib.parse import urlsplit, urlunsplit
+from uuid import uuid4
+
+import psycopg
+from psycopg import sql
+from fastapi.testclient import TestClient
+
+from api.config import APIConfig, ConfigurationError
+from stroop.application.import_postgres import import_csv
+from stroop.persistence import web_assessments as persistence
+from tests import test_web_sessions as helpers
+
+ROOT = Path(__file__).resolve().parents[1]
+READER = 'synthetic_w14_reader'
+
+
+class ReadConfigTests(unittest.TestCase):
+    def test_config_leitura_nao_usa_fallback_e_valida_uri_sem_expor_valores(self):
+        values = {'APP_ENV': 'test', 'API_DATABASE_URL': 'postgresql://synthetic@127.0.0.1/synthetic',
+                  'API_PUBLIC_ORIGIN': helpers.ORIGIN, 'OIDC_CLIENT_ID': 'synthetic-client-id',
+                  'OIDC_CLIENT_SECRET': 'synthetic-client-secret-never-use',
+                  'API_SESSION_SECRET': 'synthetic-session-secret-never-use-0000000000'}
+        self.assertEqual(APIConfig.from_env(values).read_database_url, '')
+        uri = 'postgresql://synthetic_reader:synthetic-only@127.0.0.1/synthetic'
+        config = APIConfig.from_env({**values, 'API_READ_DATABASE_URL': uri})
+        self.assertEqual(config.read_database_url, uri)
+        self.assertNotIn('synthetic-only', repr(config))
+        for invalid in ('sqlite:///local.db', 'postgresql:///missing_host', 'postgresql://host/', 'bad secret'):
+            with self.subTest(value=invalid), self.assertRaises(ConfigurationError) as error:
+                APIConfig.from_env({**values, 'API_READ_DATABASE_URL': invalid})
+            self.assertNotIn(invalid, str(error.exception))
+
+
+@unittest.skipUnless(os.environ.get('TEST_DATABASE_URL'), 'TEST_DATABASE_URL nao configurada')
+class WebAssessmentsTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.database_url = os.environ['TEST_DATABASE_URL']
+        if not psycopg.conninfo.conninfo_to_dict(cls.database_url).get('dbname', '').startswith('stroop_etapa4_test'):
+            raise RuntimeError('Banco descartavel obrigatorio')
+        with psycopg.connect(cls.database_url, autocommit=True) as connection:
+            if not connection.execute('SELECT 1 FROM pg_roles WHERE rolname=%s', (READER,)).fetchone():
+                connection.execute(sql.SQL('CREATE ROLE {} LOGIN PASSWORD {}').format(
+                    sql.Identifier(READER), sql.Literal('synthetic-read-only')))
+        uri = urlsplit(cls.database_url)
+        cls.read_url = urlunsplit((uri.scheme,
+            f'{READER}:synthetic-read-only@{uri.hostname}:{uri.port}', uri.path, uri.query, ''))
+
+    def setUp(self):
+        self.h = helpers.WebSessionsPostgresTests()
+        self.h.database_url = self.database_url
+        self.addCleanup(self.h.doCleanups)
+        self.h.setUp()
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute(sql.SQL('GRANT USAGE ON SCHEMA public TO {}').format(sql.Identifier(READER)))
+            for table, columns in persistence.REQUIRED_COLUMNS.items():
+                connection.execute(sql.SQL('GRANT SELECT ({}) ON {} TO {}').format(
+                    sql.SQL(',').join(map(sql.Identifier, sorted(columns))),
+                    sql.Identifier(table), sql.Identifier(READER)))
+        self.h.app.state.config = replace(self.h.app.state.config, read_database_url=self.read_url)
+        self.path = f'/api/v1/projects/{self.h.project_id}/assessments'
+
+    def complete(self, **kwargs):
+        participant, payload, issued = self.h._completion(**kwargs)
+        response = participant.post('/api/v1/participant/complete', json=payload)
+        self.assertEqual(response.status_code, 201, response.text)
+        return response.json(), participant
+
+    def legacy(self):
+        with (ROOT / 'tests/fixtures/csv/valido_minimo.csv').open() as source:
+            rows = list(csv.DictReader(source))
+        assessment_id = str(uuid4())
+        for row in rows:
+            row.update(project='SYNTHETIC_WEB', assessment_id=assessment_id,
+                       participant_name='NOME_SINTETICO_RESTRITO', initials='SR',
+                       evaluator='AVALIADOR_SINTETICO_RESTRITO')
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'synthetic_legacy.csv'
+            with path.open('w', newline='') as output:
+                writer = csv.DictWriter(output, fieldnames=list(rows[0]))
+                writer.writeheader()
+                writer.writerows(rows)
+            import_csv(path, self.database_url)
+        return assessment_id
+
+    def link_legacy(self, active=True):
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute('''INSERT INTO web_legacy_project_links(legacy_project,project_id,active)
+                VALUES ('SYNTHETIC_WEB',%s,%s) ON CONFLICT(legacy_project)
+                DO UPDATE SET active=EXCLUDED.active''', (self.h.project_id, active))
+
+    def test_lista_detalhe_exportacao_reais_com_credencial_select(self):
+        receipt, participant = self.complete()
+        for client in (self.h.admin, self.h.importer, self.h.consulta):
+            response = client.get(self.path)
+            self.assertEqual(response.status_code, 200, response.text)
+            self.assertEqual(len(response.json()['items']), 1)
+            item = response.json()['items'][0]
+            self.assertEqual(item['summary'], receipt['summary'])
+            self.assertEqual(item['platform'], 'web')
+            self.assertNotIn('participant_name', response.text)
+            detail = client.get(self.path + '/' + receipt['assessment_id'])
+            self.assertEqual(detail.status_code, 200, detail.text)
+            self.assertEqual(len(detail.json()['trials']), 16)
+            self.assertEqual(len(detail.json()['metrics']), 12)
+            exported = client.get(self.path + '/' + receipt['assessment_id'] + '/export')
+            self.assertEqual(exported.status_code, 200, exported.text)
+            self.assertEqual(exported.headers['cache-control'], 'no-store')
+            self.assertIn('text/csv', exported.headers['content-type'])
+            rows = list(csv.DictReader(io.StringIO(exported.text)))
+            self.assertEqual(len(rows), 16)
+            self.assertEqual(rows[0]['participant_name'], 'NAO_COLETADO')
+            self.assertEqual(rows[0]['initials'], '')
+            self.assertNotIn('P_SINTETICO', exported.headers['content-disposition'])
+        self.assertEqual(participant.get(self.path).status_code, 401)
+        with psycopg.connect(self.read_url) as connection:
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                connection.execute("UPDATE web_projects SET active=false")
+        with psycopg.connect(self.read_url) as connection:
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                connection.execute('SELECT participant_name,initials FROM assessments')
+        with persistence._connect(self.database_url) as connection:
+            self.assertEqual(connection.execute('SHOW transaction_read_only').fetchone()['transaction_read_only'], 'on')
+            with self.assertRaises(psycopg.errors.ReadOnlySqlTransaction):
+                connection.execute("UPDATE web_projects SET active=false")
+
+    def test_legado_nao_e_associado_por_codigo_mapa_explicito_mascara_e_revoga(self):
+        legacy_id = self.legacy()
+        self.assertEqual(self.h.consulta.get(self.path).json()['items'], [])
+        self.assertEqual(self.h.consulta.get(f'{self.path}/{legacy_id}').status_code, 404)
+        self.link_legacy()
+        listed = self.h.consulta.get(self.path)
+        self.assertEqual(listed.status_code, 200, listed.text)
+        self.assertEqual(listed.json()['items'][0]['platform'], 'psychopy')
+        detail = self.h.consulta.get(f'{self.path}/{legacy_id}')
+        self.assertEqual(detail.status_code, 200, detail.text)
+        self.assertIsNone(detail.json()['protocol_id'])
+        self.assertIsNone(detail.json()['frame_period_ms'])
+        self.assertTrue(all(row['trial_start_ms'] is None for row in detail.json()['trials']))
+        exported = self.h.consulta.get(f'{self.path}/{legacy_id}/export')
+        self.assertEqual(exported.status_code, 200, exported.text)
+        self.assertEqual(len(list(csv.DictReader(io.StringIO(exported.text)))), 4)
+        self.assertIn('LEGADO_NAO_MAPEADO', exported.text)
+        for response in (listed, detail, exported):
+            for restricted in ('NOME_SINTETICO_RESTRITO', 'AVALIADOR_SINTETICO_RESTRITO'):
+                self.assertNotIn(restricted, response.text)
+        self.link_legacy(False)
+        self.assertEqual(self.h.consulta.get(f'{self.path}/{legacy_id}/export').status_code, 404)
+
+    def test_rotulo_legado_longo_preservado_sem_impor_novo_limite_ao_csv_antigo(self):
+        legacy_id = self.legacy()
+        label = 'PROJETO_SINTETICO_' + 'X' * 240
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute('UPDATE assessments SET project=%s WHERE assessment_id=%s', (label, legacy_id))
+            connection.execute('INSERT INTO web_legacy_project_links(legacy_project,project_id) VALUES (%s,%s)',
+                               (label, self.h.project_id))
+        response = self.h.consulta.get(self.path + '/' + legacy_id)
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertNotIn(label, response.text)
+
+    def test_escopo_revalidado_admin_sem_vinculo_e_acesso_cruzado_recebem404(self):
+        receipt, _ = self.complete()
+        for suffix in ('', '/' + receipt['assessment_id'], '/' + receipt['assessment_id'] + '/export'):
+            self.assertEqual(self.h.outsider.get(self.path + suffix).status_code, 404)
+        self.h._set_member(self.h.admin, helpers.ADMIN, False)
+        self.assertEqual(self.h.admin.get(self.path).status_code, 404)
+        self.h._set_member(self.h.admin, helpers.CONSULTA, False)
+        self.assertEqual(self.h.consulta.get(self.path + '/' + receipt['assessment_id'] + '/export').status_code, 404)
+        self.assertEqual(self.h.importer.get(f'/api/v1/projects/{uuid4()}/assessments').status_code, 404)
+
+    def test_paginacao_assinada_vinculada_a_usuario_projeto_e_filtros(self):
+        first, _ = self.complete()
+        second, _ = self.complete()
+        response = self.h.consulta.get(self.path + '?limit=1')
+        self.assertEqual(response.status_code, 200, response.text)
+        body = response.json()
+        self.assertEqual(len(body['items']), 1)
+        cursor = body['next_cursor']
+        self.assertTrue(cursor)
+        next_page = self.h.consulta.get(self.path, params={'limit': 1, 'cursor': cursor})
+        self.assertEqual(next_page.status_code, 200, next_page.text)
+        self.assertNotEqual(body['items'][0]['assessment_id'], next_page.json()['items'][0]['assessment_id'])
+        self.assertIsNone(next_page.json()['next_cursor'])
+        self.assertEqual(self.h.importer.get(self.path, params={'cursor': cursor}).status_code, 422)
+        self.assertEqual(self.h.consulta.get(
+            f'/api/v1/projects/{uuid4()}/assessments', params={'cursor': cursor}).status_code, 422)
+        self.assertEqual(self.h.consulta.get(self.path, params={'cursor': cursor, 'visit': 'OTHER_SYNTHETIC'}).status_code, 422)
+        self.assertEqual(self.h.consulta.get(self.path + '?participant_id=NOT_FOUND').json()['items'], [])
+        self.assertEqual(len(self.h.consulta.get(self.path + '?visit=V_SINTETICA').json()['items']), 2)
+
+    def test_metricas_stroop_recalculadas_e_ausencia_de_hits_no_http(self):
+        receipt, _ = self.complete(no_responses=True)
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute("UPDATE assessment_metrics SET metric_value=1 WHERE metric_code='accuracy'")
+            connection.execute("UPDATE trial_results SET correct=0,error_type='commission'")
+        listed = self.h.consulta.get(self.path)
+        self.assertEqual(listed.status_code, 200, listed.text)
+        self.assertEqual(listed.json()['items'][0]['summary'], receipt['summary'])
+        detail = self.h.consulta.get(self.path + '/' + receipt['assessment_id'])
+        self.assertEqual(detail.status_code, 200, detail.text)
+        metrics = {metric['metric_code']: metric['metric_value'] for metric in detail.json()['metrics']}
+        self.assertEqual(metrics['accuracy'], 50)
+        self.assertIsNone(metrics['response_time'])
+        self.assertEqual(sum(row['correct'] for row in detail.json()['trials']), 8)
+        with psycopg.connect(self.database_url) as connection:
+            self.assertEqual(connection.execute(
+                "SELECT metric_value FROM assessment_metrics WHERE metric_code='accuracy'").fetchone()[0], 1)
+
+    def test_schema_incompleto_falha_fechado_sem_sql_e_projeto_inativo_e404(self):
+        receipt, _ = self.complete()
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute('UPDATE web_projects SET active=false')
+        self.assertEqual(self.h.consulta.get(self.path).status_code, 404)
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute('UPDATE web_projects SET active=true')
+            connection.execute('DROP TABLE web_legacy_project_links')
+        response = self.h.consulta.get(self.path)
+        self.assertEqual(response.status_code, 503, response.text)
+        self.assertNotIn('web_legacy_project_links', response.text)
+        self.assertNotIn('SELECT', response.text)
+
+    def test_id_de_avaliacao_nao_cruza_outro_projeto_mesmo_com_ambos_vinculos(self):
+        receipt, _ = self.complete()
+        response = self.h.admin.post('/api/v1/projects', json={
+            'code': 'SECOND_SYNTHETIC', 'name': 'Outro projeto sintetico'})
+        self.assertEqual(response.status_code, 201, response.text)
+        project = response.json()['id']
+        user_id = helpers.opaque_user_id(helpers.ISSUER, helpers.CONSULTA)
+        self.assertEqual(self.h.admin.put(f'/api/v1/projects/{project}/members/{user_id}',
+                                         json={'active': True}).status_code, 200)
+        other = f'/api/v1/projects/{project}/assessments'
+        self.assertEqual(self.h.consulta.get(other).json()['items'], [])
+        for suffix in ('', '/export'):
+            self.assertEqual(self.h.consulta.get(other + '/' + receipt['assessment_id'] + suffix).status_code, 404)
+
+    def test_instrumento_generico_preserva_metricas_sem_fabricar_tentativas_stroop(self):
+        assessment_id = self.legacy()
+        self.link_legacy()
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute("UPDATE assessments SET test_code='synthetic_demo' WHERE assessment_id=%s", (assessment_id,))
+            connection.execute('DELETE FROM trial_results WHERE assessment_id=%s', (assessment_id,))
+            connection.execute('DELETE FROM assessment_metrics WHERE assessment_id=%s', (assessment_id,))
+            for code, value, unit in (('synthetic_value', 42, 'count'), ('response_time', 0.75, 'seconds')):
+                connection.execute('''INSERT INTO assessment_metrics
+                    (assessment_id,metric_code,metric_label,metric_value,unit,calculated_at)
+                    VALUES (%s,%s,'Metrica sintetica',%s,%s,CURRENT_TIMESTAMP::text)''',
+                    (assessment_id, code, value, unit))
+        listed = self.h.consulta.get(self.path)
+        self.assertEqual(listed.status_code, 200, listed.text)
+        self.assertEqual(listed.json()['items'][0]['summary']['metrics'],
+                         {'synthetic_value': 42, 'response_time': 0.75})
+        detail = self.h.consulta.get(self.path + '/' + assessment_id)
+        self.assertEqual(detail.status_code, 200, detail.text)
+        self.assertEqual(detail.json()['trials'], [])
+        values = {metric['metric_code']: metric['metric_value'] for metric in detail.json()['metrics']}
+        self.assertEqual(values['response_time'], 0.75)
+        self.assertEqual(self.h.consulta.get(self.path + '/' + assessment_id + '/export').status_code, 422)
+
+    def test_bloqueio_e_expiracao_profissional_sao_revalidados_na_consulta(self):
+        receipt, _ = self.complete()
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute('UPDATE app_users SET active=false WHERE subject=%s', (helpers.CONSULTA,))
+        self.assertEqual(self.h.consulta.get(self.path).status_code, 403)
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute('UPDATE app_users SET active=true WHERE subject=%s', (helpers.CONSULTA,))
+        client = self.h._client(helpers.CONSULTA)
+        self.addCleanup(client.close)
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute('''UPDATE web_professional_sessions
+                SET created_at=CURRENT_TIMESTAMP-INTERVAL '1 hour',
+                    expires_at=CURRENT_TIMESTAMP-INTERVAL '1 second' WHERE subject=%s''', (helpers.CONSULTA,))
+        self.assertEqual(client.get(self.path + '/' + receipt['assessment_id'] + '/export').status_code, 401)
+
+    def test_queries_fechadas_credencial_ausente_e_limite(self):
+        for query in ('?limit=0', '?limit=101', '?limit=2&limit=3', '?visit=a&visit=b',
+                      '?cursor=bad', '?participant_id=', '?visit=%20', '?unknown=1'):
+            self.assertEqual(self.h.consulta.get(self.path + query).status_code, 422, query)
+        self.h.app.state.config = replace(self.h.app.state.config, read_database_url='')
+        response = self.h.consulta.get(self.path)
+        self.assertEqual(response.status_code, 503, response.text)
+        self.h.app.state.config = replace(self.h.app.state.config, read_database_url=self.read_url,
+                                         professional_read_rate_limit=1)
+        # Limite em banco e independente da credencial de consulta SELECT.
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute('DELETE FROM web_professional_request_limits')
+        self.assertEqual(self.h.consulta.get(self.path).status_code, 200)
+        limited = self.h.consulta.get(self.path)
+        self.assertEqual(limited.status_code, 429, limited.text)
+        self.assertIn('retry-after', limited.headers)

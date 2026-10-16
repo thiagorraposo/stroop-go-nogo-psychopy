@@ -60,6 +60,7 @@ stroop-cognifit/
 │   ├── main.py                 # factory e composicao FastAPI
 │   ├── auth.py                 # rotas OIDC, sessao, logout e CSRF
 │   ├── sessions.py             # projetos, convites e ciclo de sessao participante
+│   ├── assessments.py          # consulta profissional e exportacao autorizada
 │   ├── results.py              # conclusao e recibo idempotente
 │   ├── config.py               # configuracao validada por ambiente
 │   ├── transport.py            # limites ASGI e erros de transporte

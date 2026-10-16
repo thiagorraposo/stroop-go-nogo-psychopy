@@ -23,3 +23,11 @@ Herda [as regras da raiz](../AGENTS.md). Contrato canonico em
 - Atualize requirements e lock juntos, respeitando versoes compartilhadas com o
   dashboard; valide com `tests/test_api_base.py`, `tests/test_web_auth.py`,
   `tests/test_web_sessions.py`, `tests/test_web_results.py` e regressao integral.
+
+- Consultas profissionais usam `API_READ_DATABASE_URL` dedicado, sem fallback
+  para escrita; papel SELECT nas colunas necessarias e transacao READ ONLY.
+  Revalidar usuario/vinculo/projeto em cada consulta/download; nome/iniciais
+  nao integram projecoes JSON nem sao lidos pela credencial de consulta.
+  Legado exige mapa operacional explicito, nunca coincidencia de codigos
+  (ADR-003). Metricas Stroop sao recalculadas pelo nucleo; nao reinterpretar
+  metricas de outros instrumentos como resultados desta tarefa.

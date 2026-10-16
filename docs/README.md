@@ -18,7 +18,7 @@ localizar codigo, comandos publicos e contratos.
 
 | Pasta | Conteudo | Fontes principais |
 |---|---|---|
-| [arquitetura/](arquitetura/) | Decisoes e seus motivos | [Monolito modular](arquitetura/ADR-001-evolucao-web.md), [hospedagem na VPS](arquitetura/ADR-002-hospedagem-vps.md) |
+| [arquitetura/](arquitetura/) | Decisoes e seus motivos | [Monolito modular](arquitetura/ADR-001-evolucao-web.md), [hospedagem na VPS](arquitetura/ADR-002-hospedagem-vps.md), [escopo legado WEB](arquitetura/ADR-003-escopo-legado-web.md) |
 | [experimento/](experimento/) | Paradigma, tempos, condicoes, interface e exportacao | [Decisoes](experimento/DECISOES_DO_EXPERIMENTO.md), [protocolo WEB](experimento/PROTOCOLO_WEB.md), [CSV oficial](experimento/CSV_UNIFICADO.md), [UX](experimento/UX_DECISIONS.md) |
 | [dados/](dados/) | Modelo, instrumentos, importacao, migracoes e consulta | [Modelo](dados/MODELO_DE_DADOS.md), [SQLite](dados/IMPORTACAO_SQLITE.md), [PostgreSQL](dados/IMPORTACAO_POSTGRESQL.md), [migrations](dados/MIGRACOES_POSTGRESQL.md) |
 | [seguranca/](seguranca/) | Acesso, ameacas, tratamento de dados e incidentes | [Acesso WEB](seguranca/ACESSO_WEB.md), [autenticacao](seguranca/AUTENTICACAO_E_PERMISSOES.md), [threat model](seguranca/THREAT_MODEL.md), [tratamento](seguranca/TRATAMENTO_DE_DADOS.md) |

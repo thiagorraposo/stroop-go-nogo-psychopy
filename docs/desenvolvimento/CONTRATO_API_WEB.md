@@ -409,6 +409,16 @@ Avaliacoes locais existentes podem ter `platform="psychopy"`, sem
 quadro (`null`); nao inventar proveniencia WEB para essas linhas. Consulta WEB
 de linhas legadas deve ocultar nome/iniciais, inclusive na serializacao interna
 que chega ao navegador. Acesso WEB nao amplia transmissao de dados pessoais.
+Avaliador legado sem correspondencia de identidade WEB recebe
+`evaluator_id=null`; seu CSV usa `LEGADO_NAO_MAPEADO`, sem expor o rotulo antigo.
+Horarios legados sem fuso permanecem sem fuso; nao atribuir UTC implicitamente.
+No legado, a quantidade de tentativas segue o protocolo original; instrumentos
+sem tentativas retornam lista vazia, sem fabricar registros Stroop.
+
+Escopo legado exige vinculo operacional explicito em `web_legacy_project_links`,
+conforme [ADR-003](../arquitetura/ADR-003-escopo-legado-web.md); coincidencia entre
+rotulo legado e codigo de projeto novo nao concede acesso. O mapa inicia vazio,
+nao e escrito pela API e nao altera as coletas existentes.
 
 Exportacao profissional da coleta WEB usa somente as 21 colunas oficiais, sem
 acrescentar IDs tecnicos/versao do aplicativo: metadados fixados no servidor,
@@ -422,6 +432,10 @@ legada via WEB tambem deve mascarar nome/iniciais; isso nao reescreve arquivos
 ou banco locais. `Content-Disposition` usa nome gerado no servidor; CSV deve
 escapar delimitadores e neutralizar campos textuais que iniciem formula em
 planilhas, preservando os rotulos pseudonimizados permitidos.
+
+CSV de 21 colunas e o contrato oficial do Stroop. Outros instrumentos sem
+contrato compativel conservam consulta/detalhe, mas essa exportacao recebe 422;
+nao converter metricas arbitrarias em tentativas desta tarefa.
 
 ## Erros seguros e precedencia
 

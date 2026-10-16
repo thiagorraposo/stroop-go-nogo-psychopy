@@ -204,23 +204,38 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   confirmado/retry em RAM, abortamento e expiracao, integracao real HTTPS/API/DB.
   Finalizacao local e resumo atuais nao comprovam recebimento no servidor.
 
-## W14 — Trabalho paralelo preservado, sem aceite
+## 2026-10-16 — W14 concluida
 
-- Dependencias W06/W08 atendidas. Subagente atingiu cota e deixou somente
-  `stroop/persistence/web_assessments.py`, nao integrado/validado. Principal
-  adicionou `APIConfig.read_database_url`/`API_READ_DATABASE_URL` opcional, sem
-  fallback para escrita. Nenhuma rota nova esta registrada.
-- Revisao encontrou associacao insegura do legado por `a.project=p.code`.
-  Principal substituiu por mapa explicito controlado pela operacao, migration
-  0007 inicialmente vazia, e ADR-003. Ainda falta validar query/migration,
-  colisao de codigo, mapa/desativacao e acesso cruzado com papel PostgreSQL
-  realmente somente leitura. Nao acessar coletas reais nem preencher mapa.
-- Arquivos W14 ainda fora de commit: `api/config.py`, `api/README.md`,
-  `stroop/persistence/web_assessments.py`, migration 0007, ADR-003,
-  contrato API e indice docs. Faltam application/router, serializer W12,
-  integracao create_app e testes PostgreSQL. Application/router foram criados
-  pelo principal, mas ainda nao executados; preservar no checkout.
-- `AGENTS.md` raiz continua alteracao preexistente e fora dos commits.
+- Consulta/lista/detalhe/exportacao integradas em `api/assessments.py`, com
+  application/persistencia dedicadas. Filtros fechados, limite/cursor HMAC
+  vinculados a usuario/projeto/filtros, reautorizacao em cada download e
+  projecoes sem nomes/iniciais. Admin sem vinculo nao acessa dados.
+- `API_READ_DATABASE_URL` separado, sem fallback, papel SELECT nas colunas de
+  REQUIRED_COLUMNS (sem acesso a participant_name/initials/source_file) e
+  transacao REPEATABLE READ READ ONLY. Auth/rate limits usam conexao propria.
+  Ausencia de configuracao/schema produz erro fechado 503.
+- Migration 0007 aditiva inicia mapa legado vazio, sem automapeamento por
+  codigo; somente operacao autorizada vincula. ADR-003 registra a protecao.
+  Desativacao de mapa/projeto/vinculo bloqueia leitura; rotulos historicos longos
+  conservados. Legado sem fuso nao recebe UTC ficticio; avaliador nao associado
+  recebe ID null/CSV LEGADO_NAO_MAPEADO, sem divulgar seu texto original.
+- Stroop recalcula 12 metricas/classificacoes pelo nucleo sobre tentativas,
+  sem modificar banco. Instrumentos genericos mantem metricas/proveniencia
+  propria e nenhuma tentativa inventada; CSV 21 campos restrito ao seu contrato.
+  Parser/serializer W12 compartilham o mesmo caminho da exportacao autorizada.
+- Evidencias: regressao integral 257 testes PostgreSQL/42,181 s, zero skips;
+  apos ajuste do mapa longo/credencial por coluna, 23 focados de consulta e
+  migrations, mais 12 de consulta com grants minimos, aprovados. Teste de cursor
+  entre projetos tambem aprovado. compileall/pip check/diff aprovados.
+  Testes comprovam UPDATE recusado, colunas pessoais inacessiveis, READ ONLY
+  mesmo com DSN privilegiado, reautorizacao, schema ausente, bloqueio/expiracao,
+  isolamento de escopo nas consultas, formulas e paridade com recibo.
+- Subagente inicial atingiu cota; principal concluiu a frente. Container de teste
+  encerrado; nenhuma acao na VPS, push ou deploy. API README/contrato/mapa e
+  AGENTS da API alinhados. Alteracao raiz AGENTS preexistente fora do commit.
+- Proxima acao exata: iniciar W13, cliente participante e integracao real sob
+  HTTPS local sintetico; conectar convite/bootstrap/start/conclusao/abortamento,
+  confirmar recibo e reenvio em RAM, sem usar storage JS ou repetir principal.
 
 ## Decisoes e contexto preservados
 

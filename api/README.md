@@ -103,7 +103,7 @@ servidor; logs proprios contem apenas categoria fixa e request_id.
 Validacoes:
 
 ```bash
-.venv/bin/python -m unittest tests.test_api_base tests.test_web_auth tests.test_web_sessions tests.test_web_results -v
+.venv/bin/python -m unittest tests.test_api_base tests.test_web_auth tests.test_web_sessions tests.test_web_results tests.test_web_assessments tests.test_web_export -v
 .venv/bin/python -m compileall -q api
 .venv/bin/python -m pip check
 git diff --check
@@ -117,3 +117,34 @@ com migrations previamente aplicadas e nao iniciam servicos.
 Referencias primarias: [TestClient](https://fastapi.tiangolo.com/tutorial/testing/),
 [configuracao por ambiente](https://fastapi.tiangolo.com/advanced/settings/) e
 [ADR-001](../docs/arquitetura/ADR-001-evolucao-web.md).
+
+## Consulta profissional
+
+`API_READ_DATABASE_URL` deve apontar para usuario PostgreSQL dedicado com
+SELECT somente nas colunas de `REQUIRED_COLUMNS` em
+[`web_assessments.py`](../stroop/persistence/web_assessments.py), mais USAGE
+no schema e CONNECT no banco. Esse papel nao precisa ler `participant_name`,
+`initials` ou `source_file` e nao deve possuir privilegios de escrita. Nao ha fallback para `API_DATABASE_URL`;
+ausencia da credencial de leitura produz indisponibilidade nas consultas.
+Autenticacao e limites continuam na conexao de operacoes da API.
+
+Coletas legadas somente serao associadas por mapa operacional explicito
+`web_legacy_project_links`, inicialmente vazio. Criar projeto com codigo igual
+a um rotulo legado nao concede acesso; veja [ADR-003](../docs/arquitetura/ADR-003-escopo-legado-web.md).
+Rotas registradas: listagem paginada, detalhe e `/export` sob
+`/api/v1/projects/{project_id}/assessments`. Exigem sessao profissional ativa e
+vinculo inclusive para administracao. Leitura consulta escopo na mesma transacao
+somente leitura; exportacao reautoriza a cada download. Filtros opcionais:
+`participant_id` e `visit`; cursor assinado depende de usuario/projeto/filtros.
+
+Metricas Stroop sao recalculadas pelo nucleo sobre tentativas persistidas;
+metricas de outros instrumentos conservam seu contrato. CSV oficial de 21
+colunas e exclusivo do Stroop; outros instrumentos sem esse contrato recebem
+422 na exportacao, preservando consulta/detalhe. Nome/iniciais nunca chegam ao
+JSON e sao mascarados no CSV. Avaliador legado sem identidade WEB tem ID null
+na consulta e marcador `LEGADO_NAO_MAPEADO` no CSV, sem revelar seu texto antigo.
+Horarios legados sem fuso permanecem sem fuso; nao se presume UTC.
+
+A prontidao existente consulta migrations da conexao de operacoes. Configuracao
+real da credencial de leitura e seus grants pertence a operacao/implantacao;
+nao usar o papel administrativo sintetico dos testes na VPS.

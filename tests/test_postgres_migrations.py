@@ -88,6 +88,7 @@ class PostgresMigrationsTests(unittest.TestCase):
                 "0004_web_professional_auth.sql",
                 "0005_web_participant_sessions.sql",
                 "0006_web_completed_results.sql",
+                "0007_web_legacy_project_links.sql",
             ],
         )
         with psycopg.connect(TEST_DATABASE_URL) as connection:
@@ -136,7 +137,10 @@ class PostgresMigrationsTests(unittest.TestCase):
                 WHERE constraint_schema = 'public' AND constraint_type = 'FOREIGN KEY'
                 """
             ).fetchone()[0]
-            self.assertEqual(foreign_keys, 14)
+            self.assertEqual(foreign_keys, 15)
+            self.assertIn("web_legacy_project_links", tables)
+            self.assertEqual(connection.execute(
+                "SELECT COUNT(*) FROM web_legacy_project_links").fetchone()[0], 0)
 
     def test_migrations_sao_idempotentes(self) -> None:
         apply_migrations(TEST_DATABASE_URL)
@@ -155,6 +159,7 @@ class PostgresMigrationsTests(unittest.TestCase):
         )
         self.assertEqual(apply_migrations(TEST_DATABASE_URL), [
             "0005_web_participant_sessions.sql", "0006_web_completed_results.sql",
+            "0007_web_legacy_project_links.sql",
         ])
         with psycopg.connect(TEST_DATABASE_URL) as connection:
             self.assertEqual(connection.execute("SELECT COUNT(*) FROM assessments").fetchone()[0], 1)
@@ -200,7 +205,8 @@ class PostgresMigrationsTests(unittest.TestCase):
         web_sessions.redeem(TEST_DATABASE_URL, 'a' * 64, 'b' * 64)
         web_sessions.start(TEST_DATABASE_URL, 'b' * 64, 'synthetic-web-0.1.0')
         before = web_sessions.participant_session(TEST_DATABASE_URL, 'b' * 64)
-        self.assertEqual(apply_migrations(TEST_DATABASE_URL), ['0006_web_completed_results.sql'])
+        self.assertEqual(apply_migrations(TEST_DATABASE_URL), [
+            '0006_web_completed_results.sql', '0007_web_legacy_project_links.sql'])
         self.assertEqual(web_sessions.participant_session(TEST_DATABASE_URL, 'b' * 64), before)
 
     def test_migracao_sqlite_preserva_dados_relacionamentos_e_sequences(self) -> None:
@@ -272,6 +278,7 @@ class PostgresMigrationStaticTests(unittest.TestCase):
                 "0004_web_professional_auth.sql",
                 "0005_web_participant_sessions.sql",
                 "0006_web_completed_results.sql",
+                "0007_web_legacy_project_links.sql",
             ],
         )
 

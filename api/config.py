@@ -38,6 +38,7 @@ class APIConfig:
     participant_read_rate_limit: int = 120
     participant_write_rate_limit: int = 60
     participant_rate_window_seconds: int = 60
+    read_database_url: str = field(default="", repr=False)
 
     def __post_init__(self) -> None:
         for value, upper_bound in (
@@ -84,15 +85,21 @@ class APIConfig:
             ):
                 _invalid()
         try:
-            if not isinstance(self.database_url, str) or not self.database_url.startswith(
-                ("postgresql://", "postgres://")
-            ):
+            if not isinstance(self.read_database_url, str):
                 _invalid()
-            if any(character.isspace() for character in self.database_url):
-                _invalid()
-            database = conninfo_to_dict(self.database_url)
-            if not database.get("dbname") or not (database.get("host") or database.get("hostaddr")):
-                _invalid()
+            database_urls = [self.database_url]
+            if self.read_database_url:
+                database_urls.append(self.read_database_url)
+            for database_url in database_urls:
+                if not isinstance(database_url, str) or not database_url.startswith(
+                    ("postgresql://", "postgres://")
+                ):
+                    _invalid()
+                if any(character.isspace() for character in database_url):
+                    _invalid()
+                database = conninfo_to_dict(database_url)
+                if not database.get("dbname") or not (database.get("host") or database.get("hostaddr")):
+                    _invalid()
             if not isinstance(self.public_origin, str) or any(
                 character.isspace() or ord(character) < 32 for character in self.public_origin
             ):
@@ -145,6 +152,7 @@ class APIConfig:
             _invalid()
         return cls(
             database_url=values.get("API_DATABASE_URL", ""),
+            read_database_url=values.get("API_READ_DATABASE_URL", ""),
             public_origin=values.get("API_PUBLIC_ORIGIN", ""),
             app_env=values.get("APP_ENV", ""),
             oidc_client_id=values.get("OIDC_CLIENT_ID", ""),

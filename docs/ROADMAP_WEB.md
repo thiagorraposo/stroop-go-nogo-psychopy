@@ -24,11 +24,11 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W11 | Concluida em 2026-10-16; motor jsPsych, 120 testes logica/DOM e 24 browser aprovados |
 | W12 | Concluida em 2026-10-16; resumo, CSV de 21 campos, paridade Python/TypeScript e importacao real validados |
 | W13, W15–W21, W23 | Nao iniciadas |
-| W14 | Em implementacao paralela; dependencias W06/W08 atendidas, aceite pendente |
+| W14 | Concluida em 2026-10-16; consulta/CSV autorizados, papel SELECT, mapa legado e testes PostgreSQL validados |
 | W22 | Nao iniciada; implantacao futura de responsabilidade do usuario |
 
 Pedido de organizacao documental concluido em commit proprio. W00–W12 estao
-validadas e integradas; W13 e a proxima etapa sequencial, com W14 em paralelo. Retomada detalhada em
+validadas e integradas; W13 e a proxima etapa sequencial; a frente independente W14 tambem foi validada. Retomada detalhada em
 [PROGRESS.md](PROGRESS.md). Evidencias em
 [registro de alteracoes](REGISTRO_DE_ALTERACOES.md).
 Bloqueio de produto/metodo resolvido pela aprovacao explicita na sessao.

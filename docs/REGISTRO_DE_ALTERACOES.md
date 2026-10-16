@@ -6,6 +6,19 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W14: consulta profissional e exportacao autorizada
+
+- `feat`: lista/detalhe/CSV sob projeto e sessao profissional, filtros fechados,
+  cursor HMAC, reautorizacao e recalculo Stroop pelo nucleo. Outros instrumentos
+  mantem metricas/identidade propria; nao recebem tentativas ou CSV ficticios.
+- `security`: credencial SELECT por coluna e transacao READ ONLY, sem fallback;
+  nomes/iniciais inacessiveis a essa credencial e ausentes do JSON. Migration
+  0007/ADR-003 exigem mapa operacional explicito para legado, sem heranca por nome.
+- `test`: 257 testes integrais e validacoes focadas finais de consulta/migrations
+  aprovados no PostgreSQL sintetico; grants minimos, acesso cruzado, colisoes,
+  revogacoes, schema, paginacao e exportacao verificados. Sem alteracao de coletas
+  existentes ou aplicacao de grants/migrations na VPS.
+
 ## 2026-10-16 — W12: resumo e CSV compativel
 
 - `feat`: resumo principal com precisao, mediana dos hits e quatro respostas;
