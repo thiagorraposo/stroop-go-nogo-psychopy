@@ -21,11 +21,13 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W08 | Concluida em 2026-10-16; conclusao atomica, protocolo/tempos, recalculo e replay validados em 240 testes |
 | W09 | Concluida em 2026-10-16; React/TypeScript, cliente HTTP, 36 testes DOM/logica e 10 browser aprovados |
 | W10 | Concluida em 2026-10-16; pratica jsPsych, 77 testes logica/DOM, 18 browser e regressao Python 240 aprovados |
-| W11–W21, W23 | Nao iniciadas |
+| W11 | Concluida em 2026-10-16; motor jsPsych, 120 testes logica/DOM e 24 browser aprovados |
+| W12–W13, W15–W21, W23 | Nao iniciadas |
+| W14 | Em implementacao paralela; dependencias W06/W08 atendidas, aceite pendente |
 | W22 | Nao iniciada; implantacao futura de responsabilidade do usuario |
 
-Pedido de organizacao documental concluido em commit proprio. W00–W10 estao
-validadas e integradas; W11 e a proxima etapa. Retomada detalhada em
+Pedido de organizacao documental concluido em commit proprio. W00–W11 estao
+validadas e integradas; W12 e a proxima etapa sequencial, com W14 em paralelo. Retomada detalhada em
 [PROGRESS.md](PROGRESS.md). Evidencias em
 [registro de alteracoes](REGISTRO_DE_ALTERACOES.md).
 Bloqueio de produto/metodo resolvido pela aprovacao explicita na sessao.

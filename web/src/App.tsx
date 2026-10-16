@@ -138,9 +138,12 @@ export function App() {
       event.preventDefault()
       navigate(path === '/' ? '/instrucoes' : '/pratica')
     }
+    const cancelNavigation = () => { pressed = null }
+    window.addEventListener('blur', cancelNavigation)
     document.addEventListener('keydown', down)
     document.addEventListener('keyup', up)
     return () => {
+      window.removeEventListener('blur', cancelNavigation)
       document.removeEventListener('keydown', down)
       document.removeEventListener('keyup', up)
     }

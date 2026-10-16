@@ -71,7 +71,7 @@ stroop-cognifit/
 │   ├── src/App.tsx             # navegacao e acesso da equipe
 │   ├── src/components/         # preparo e ciclo de pratica
 │   ├── src/api/client.ts       # cliente HTTP da mesma origem
-│   ├── src/experiment/         # host, protocolo e pratica jsPsych
+│   ├── src/experiment/         # host, protocolo e motores jsPsych
 │   ├── e2e/                   # verificacao em Chromium/Firefox
 │   └── package*.json          # dependencias exatas e lockfile
 ├── tests/                      # unittest e fixtures sinteticas
@@ -123,7 +123,7 @@ esta organizada por fronteira de transporte (`api/`), regras reaproveitaveis
 (`stroop/domain` e `stroop/application`) e persistencia (`stroop/persistence`).
 `dashboard/auth.py` preserva a fachada publica do dashboard; SQL e drivers de
 autenticacao ficam na persistencia. A base React em `web/` possui navegacao,
-cliente HTTP, preparo e pratica jsPsych com host experimental isolado;
+cliente HTTP, preparo, pratica e principal jsPsych com host experimental isolado;
 `condicoes/web_protocol.json` e o snapshot comum a API/frontend. O motor segue
 o protocolo/roadmap.
 O mapa localiza arquivos, sem substituir o aceite registrado no roadmap.

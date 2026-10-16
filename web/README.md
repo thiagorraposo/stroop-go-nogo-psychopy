@@ -1,7 +1,7 @@
 # Interface WEB
 
 Base React/TypeScript com navegacao por historico, orientacoes, acesso da equipe,
-estados de carregamento/erro, cliente HTTP e pratica real jsPsych. O estado e o aceite ficam no
+estados de carregamento/erro, cliente HTTP e execucao local jsPsych. O estado e o aceite ficam no
 [roadmap](../docs/ROADMAP_WEB.md); protocolo e unidades seguem o
 [contrato HTTP](../docs/desenvolvimento/CONTRATO_API_WEB.md).
 
@@ -51,10 +51,13 @@ esses testes contra coleta real. `npm run preview` serve o build local em 4173.
   teste de teclado, inicio/repeticao e descarte de treino interrompido.
 - `src/experiment/practice*.ts`: plugin jsPsych e runtime monotono com quatro
   condicoes-fonte, contagem, HUD e feedback; treino fica somente em RAM.
+- `src/experiment/main*.ts`: motor principal e plugin jsPsych; calibracao de
+  quadro na contagem, origem monotona unica, observacoes contiguas, HUD e gates
+  temporais. Resultado completo fica em RAM; interrupcao descarta toda a serie.
 - `src/experiment/protocol.ts`: consome `../condicoes/web_protocol.json`
-  compartilhado com a API e o CSV-fonte de pratica. Nenhum parametro metodologico
-  e derivado de exemplos da interface. O principal e a integracao de sessao
-  permanecem nas proximas etapas.
+  compartilhado com a API e os CSVs-fonte de pratica/principal. Nenhum parametro metodologico
+  e derivado de exemplos da interface. A integracao de sessao sera conectada
+  a API na etapa W13.
 - `src/**/*.test.*` e `e2e/`: testes de logica/DOM e navegador.
 
 Nenhum resultado ou token e persistido por JavaScript. Segredos OIDC permanecem
@@ -72,3 +75,7 @@ fisica nem valida todos os sistemas e equipamentos previstos para a pesquisa.
 O filtro de user-agent e uma verificacao conservadora, sem prova de teclado
 fisico ou homologacao. Ha confirmacao explicita e teste de pressionar/soltar
 Espaco. Nao se exige desempenho minimo; repetir descarta o resumo anterior.
+
+Os testes `@timing` executam em serie e sem traces para reduzir interferencia
+no proprio ensaio de tempo real; os demais testes de navegador podem executar
+em paralelo. Isso nao altera os limites temporais aplicados pelo motor.

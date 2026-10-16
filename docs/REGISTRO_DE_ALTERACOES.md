@@ -6,6 +6,19 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W11: bloco principal WEB
+
+- `feat`: motor jsPsych com 16 condicoes sem reposicao, ordem explicita,
+  calibracao rAF, origem monotona, HUD e registro observado das transicoes e
+  primeira resposta valida. Nenhuma resposta abrevia estimulo; interrupcoes
+  invalidam a serie inteira. UI conecta pratica e principal local em RAM.
+- `fix`: agendamento pelo quadro mais proximo usa tolerancia simetrica aprovada,
+  mantendo gates absolutos/duracao, timestamps reais e RT exclusivo. Ensaios
+  temporais rodam em serie sem trace para reduzir interferencia do proprio teste.
+- `test`: 120 testes logica/DOM; 20 browser gerais e quatro temporais reais
+  Chromium/Firefox aprovados. Typecheck/build/npm ci/diff aprovados; sem alegar
+  homologacao fisica ou envio confirmado pela API, reservado a outras etapas.
+
 ## 2026-10-16 — W10: preparacao e pratica jsPsych
 
 - `feat`: ambiente Windows/Linux e familias aprovadas, confirmacao/teste de

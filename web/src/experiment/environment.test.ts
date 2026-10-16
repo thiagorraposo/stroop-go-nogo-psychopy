@@ -29,3 +29,18 @@ test('pool de pratica vem das quatro linhas-fonte com a paleta efetiva aprovada'
   expect(() => parsePracticeSource(practiceSource.replace('trial_number', 'changed_header'))).toThrow()
   expect(() => parsePracticeSource(practiceSource.replace('1,VERDE', '2,VERDE'))).toThrow()
 })
+
+test('principal conserva todas as 16 fontes, balanceamento e paleta sem alterar o pool', async () => {
+  const { MAIN_CONDITIONS, createMainOrder, parseMainSource } = await import('./protocol')
+  const mainSource = (await import('../../../condicoes/bloco_principal_stroop_go_nogo_ptbr.csv?raw')).default
+  const original = structuredClone(MAIN_CONDITIONS)
+  const order = createMainOrder()
+  expect(order).not.toBe(MAIN_CONDITIONS)
+  expect(order.map(row => row.condition_id).sort((a, b) => a - b)).toEqual(Array.from({ length: 16 }, (_, i) => i + 1))
+  expect(order.filter(row => row.condition === 'congruent')).toHaveLength(8)
+  expect(new Set(order.map(row => row.ink_color)).size).toBe(10)
+  for (const row of order) expect(row.ink_color_display).toBe(PROTOCOL.colors[row.ink_color])
+  expect(MAIN_CONDITIONS).toEqual(original)
+  expect(() => parseMainSource(mainSource.replace('16,LARANJA', '15,LARANJA'))).toThrow()
+  expect(() => parseMainSource(mainSource.replace('16,LARANJA', '17,LARANJA'))).toThrow()
+})

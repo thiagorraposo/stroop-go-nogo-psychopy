@@ -152,6 +152,50 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   de resposta devem satisfazer contrato W02 e politica D2/D5/D6. Integracao de
   ordem persistida/HTTP permanece W13. Preservar alteracao raiz AGENTS preexistente.
 
+## 2026-10-16 — W11 concluida
+
+- Motor principal jsPsych em `web/src/experiment/main{,-engine,.test}.ts`:
+  ordem explicitamente recebida e conferida contra as 16 fontes, 8 Go/8 No-Go,
+  dez cores, contagem, calibracao de 30 intervalos rAF e origem monotona unica.
+  Registra inicio/onset/offset/fim/primeira Space; nao usa rede/relogio civil.
+  Gates D5/D6 validam todos os registros antes do callback completo; foco,
+  ocultacao, Escape, fechamento e falha temporal descartam a serie.
+- UI conecta pratica completa sem limiar ao principal, permite repetir treino,
+  mantem HUD/cronometro sem feedback principal e bloqueia retomada interrompida.
+  Resultado fica em RAM, sem afirmar recebimento no servidor. W13 substituira
+  ordem local pela persistida e conectara metadados/credencial da sessao.
+- Ensaios iniciais com agendamento sempre apos o alvo abortaram no gate,
+  inclusive Firefox isolado. Corrigido para quadro mais proximo do alvo nominal
+  (meio periodo antes), sem relaxar gates ou fabricar/quantizar timestamps.
+  Teste cobre observacao adiantada, continuidade e rejeicao acima da tolerancia.
+- Evidencias finais: npm ci sem vulnerabilidades; 120 testes Vitest,
+  typecheck/build e diff aprovados. 20 browser navegacao/pratica passaram;
+  apos ajuste, quatro @timing seriais sem trace passaram em 3,5 min, incluindo
+  pratica + 60 s reais e Escape em Chromium/Firefox. Mesmos navegadores/SO W09.
+  Nao certifica latencia fisica, Windows ou homologacao W16/W21. Backend nao foi
+  alterado nesta etapa; regressao PostgreSQL 240 testes consta na W10.
+- Proxima acao: W12 — resumo apenas principal, mediana dos hits/ausencia e
+  arredondamentos aprovados; serializer Python CSV 21 campos para uso autorizado
+  W14, fixtures Python/TypeScript e importacao sintetica real. Nao oferecer
+  download participante: W03 reserva exportacao a profissionais vinculados.
+
+## W14 — Trabalho paralelo preservado, sem aceite
+
+- Dependencias W06/W08 atendidas. Subagente atingiu cota e deixou somente
+  `stroop/persistence/web_assessments.py`, nao integrado/validado. Principal
+  adicionou `APIConfig.read_database_url`/`API_READ_DATABASE_URL` opcional, sem
+  fallback para escrita. Nenhuma rota nova esta registrada.
+- Revisao encontrou associacao insegura do legado por `a.project=p.code`.
+  Principal substituiu por mapa explicito controlado pela operacao, migration
+  0007 inicialmente vazia, e ADR-003. Ainda falta validar query/migration,
+  colisao de codigo, mapa/desativacao e acesso cruzado com papel PostgreSQL
+  realmente somente leitura. Nao acessar coletas reais nem preencher mapa.
+- Arquivos W14 ainda fora de commit: `api/config.py`, `api/README.md`,
+  `stroop/persistence/web_assessments.py`, migration 0007, ADR-003,
+  contrato API e indice docs. Faltam application/router, serializer W12,
+  integracao create_app e testes PostgreSQL. Preservar no checkout.
+- `AGENTS.md` raiz continua alteracao preexistente e fora dos commits.
+
 ## Decisoes e contexto preservados
 
 - Usuario aprovou explicitamente itens 1–19 da sessao. Finalidade coleta do
