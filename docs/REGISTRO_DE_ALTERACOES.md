@@ -6,6 +6,25 @@ Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W01 aprovada e retomada da implementacao WEB
+
+- `decision`: usuario aprovou explicitamente os itens 1–19 da proposta da
+  sessao, incluindo D1–D6 do protocolo, acesso Google/projetos, convites de uso
+  unico (24 h), sessoes de 30 min, dados pseudonimizados sem nome/iniciais,
+  exportacao profissional, reenvio apenas em memoria, coexistencia e autonomia
+  com commits locais. Finalidade: coleta por seu grupo de pesquisa; publico
+  participantes da pesquisa sem novo filtro demografico; usuario responsavel.
+- `docs`: consolidadas decisoes em protocolo/metodologia. ADR-002 registra VPS
+  ja adquirida e dominio existente, substituindo OCI como alvo WEB; sem acesso
+  ao host, custos novos, credenciais ou deploy. Backup diario/30 geracoes e
+  objetivos de perda maxima 24 h/recuperacao 4 h serao validados nas suas etapas.
+- `test`: 39 testes focados aprovados (13 condicoes, 15 interface, 11 CSV),
+  sem falhas/erros/skips. Revisao dos dois documentos e 14 links relativos
+  aprovados; `git diff --check` aprovado. Criterio temporal aprovado e distinto
+  de medicao: W16 permanece obrigatoria, sem equivalencia fisica presumida.
+- `scope`: W01 concluida; W02 iniciada em seguida. Nenhuma alteracao do Builder,
+  condicoes, CSV legado, formulas, dados reais ou aceitacao antecipada de W16.
+
 ## 2026-10-16 — W01: protocolo factual e decisoes pendentes
 
 - `docs`: criado `PROTOCOLO_WEB.md` com fluxo realmente configurado no Builder,

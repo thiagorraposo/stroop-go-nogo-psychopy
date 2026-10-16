@@ -1,15 +1,16 @@
 # Protocolo experimental WEB
 
-Referencia factual conferida em 2026-10-16. Este documento distingue o
-experimento local existente das propostas para sua variante web. As propostas
-abaixo exigem decisao explicita do usuario; sua redacao nao constitui aceite
-metodologico, de produto ou temporal. Escopo, dependencias e estado de W01
+Referencia factual conferida e decisoes D1–D6 aprovadas explicitamente pelo
+usuario em 2026-10-16, ao aprovar os itens 1–19 apresentados na sessao. Este
+documento distingue o experimento local existente do protocolo aprovado para
+sua variante web. A aprovacao define requisitos; nao comprova implementacao,
+medicao temporal ou homologacao. Escopo, dependencias e estado de W01
 permanecem exclusivamente no [roadmap WEB](ROADMAP_WEB.md).
 
 ## Fontes e limites
 
 - [Decisoes do experimento](DECISOES_DO_EXPERIMENTO.md): paradigma e regras
-  metodologicas canonicas; nenhuma regra e alterada por este documento.
+  metodologicas canonicas, incluindo as decisoes aprovadas para a variante web.
 - [Validacao de condicoes e tempos](VALIDACAO_CONDICOES.md): balanceamento,
   paleta, duracoes e HUD da versao local `0.2.2`.
 - [Fonte Builder](../stroop_go_nogo_ptbr.psyexp) e CSVs de
@@ -24,8 +25,15 @@ permanecem exclusivamente no [roadmap WEB](ROADMAP_WEB.md).
 - [Especificacao visual e fluxo](ESPECIFICACAO_VISUAL_E_FLUXO.md): proposta
   historica de 2026-07-06, sem precedencia sobre a fonte atual.
 
-A tarefa e original, educacional e de pesquisa exploratoria. Os resultados
-sao descritivos, sem diagnostico, norma, percentil clinico ou equivalencia
+A finalidade WEB aprovada e a coleta de dados pelo grupo de pesquisa do qual
+o usuario faz parte. O publico sao participantes da pesquisa, podendo ser
+qualquer pessoa, sem introduzir filtro demografico no produto. O usuario e o
+responsavel pelo protocolo, elegibilidade, informacao/consentimento aplicaveis,
+validacao e operacao antes do uso real. Publico amplo nao dispensa as regras
+especificas de cada pesquisa. Idade e sexo nao serao coletados pela versao WEB.
+
+A tarefa permanece original e de pesquisa exploratoria, com resultados somente
+descritivos, sem diagnostico, norma, percentil clinico ou equivalencia
 psicometrica. As validacoes deste documento usam somente fontes versionadas;
 nao incluem coletas locais, Pilot grafico ou medicao fisica de latencia.
 
@@ -52,9 +60,12 @@ cores oficiais aparecem no principal, sem garantir igual frequencia em apenas
 16 tentativas. A rotina `fim` existe no XML, mas **nao esta no Flow atual**.
 
 O formulario local exige `project`, `participant_id`, `participant_name`,
-`visit` e `evaluator`; `initials` e opcional. Essa constatacao nao autoriza
-transmitir nome ou iniciais ao servidor web. A selecao e finalidade dos
-metadados remotos dependem de W02/W03.
+`visit` e `evaluator`; `initials` e opcional. Na WEB, o usuario aprovou receber
+somente codigo pseudonimizado, projeto, visita e identificacao tecnica do
+avaliador, sem nome, iniciais, CPF, contato, idade ou sexo. A correspondencia
+entre codigo e pessoa fica fora do sistema. O CSV WEB preservara os 21 campos,
+com `participant_name=NAO_COLETADO` e `initials` vazio. W02/W03 detalham os
+contratos e os controles de dados, sem modificar a coleta local existente.
 
 ### Tempos, resposta e HUD
 
@@ -118,10 +129,11 @@ PsychoPy nem autoriza recuperar execucoes incompletas.
 
 A configuracao local comprova janela, primeira resposta e descarte do buffer;
 ela nao resolve, por si, repeticao automatica do teclado, foco de navegador
-ou instantes fisicos de fronteira. A coluna web abaixo e proposta pendente,
-nao equivalencia ja validada com o PsychoPy.
+ou instantes fisicos de fronteira. A coluna web abaixo registra regras
+aprovadas em D2/D6, cuja implementacao e validacao continuam necessarias;
+nao comprova equivalencia com o PsychoPy.
 
-| Caso | Evidencia / limite atual | Proposta web para validacao |
+| Caso | Evidencia / limite atual | Regra web aprovada |
 |---|---|---|
 | Espaco durante fixacao, intervalo, feedback ou contagem | Teclado experimental inativo; eventos anteriores descartados | Ignorar como resposta; nao transportar evento para outra tentativa |
 | Primeiro Espaco apos inicio e antes do fim da janela | Primeira tecla; RT positivo no exportador | Aceitar se `0 < RT < duracao_da_janela`; ancorar RT ao inicio registrado do estimulo |
@@ -134,23 +146,24 @@ nao equivalencia ja validada com o PsychoPy.
 | Nenhum hit no principal | Resumo mostra `—` | Preservar ausencia de RT; validar contagens e precisao separadamente |
 | Resposta recebida durante atraso da thread principal | Fonte nao especifica fila de eventos web | Conferir timestamp e janela; impedir aceitar evento tardio como se estivesse dentro dela |
 
-## Decisoes propostas para o MVP
+## Decisoes aprovadas para o MVP
 
-Todas as decisoes D1–D6 permanecem **pendentes de resposta explicita do usuario**.
-Nao iniciar dependencias de W01 nem fixar a variante experimental com base
-apenas nestas recomendacoes. Aprovacoes devem ser registradas na fonte tecnica
-pertinente, com referencia a evidencia da decisao; o aceite formal fica no roadmap.
+Todas as decisoes D1–D6 foram **aprovadas explicitamente pelo usuario em
+2026-10-16**, em resposta a proposta de decisoes da sessao. O usuario tambem
+confirmou ser o responsavel pela pesquisa, validacao e operacao. A aprovacao
+remove a pendencia metodologica; a implementacao e as evidencias dos gates
+continuam sob as respectivas etapas do roadmap, que concentra o aceite formal.
 
-| ID | Recomendacao concreta | Motivo e limite |
+| ID | Decisao aprovada | Motivo e limite |
 |---|---|---|
-| D1 — Dispositivos e navegadores | MVP em computador desktop/notebook com teclado fisico; Chrome/Edge Chromium e Firefox estaveis na data da validacao. Verificacao de ambiente antes de iniciar, sem exigir tela cheia. Celular, tablet, toque e Safari ficam fora do MVP ate validacao propria | Preserva Espaco como resposta e limita combinacoes de ambiente; os sistemas operacionais e versoes efetivamente aprovados devem ser enumerados a partir dos testes, sem declarar suporte universal |
-| D2 — Foco e interrupcao | Antes da pratica, aguardar foco/aba visivel. Durante o principal, qualquer `blur`, aba oculta ou interrupcao explicita invalida a execucao; nao pausar/retomar a mesma serie. Novo inicio exige nova sessao e pratica. Durante a pratica, descartar a rodada interrompida e exigir nova rodada completa antes do principal | Evita continuidade silenciosa com exposicao/intervalos alterados; o backend devera representar interrupcao sem metricas finais ou exportacao oficial parcial. Fechamento de aba nao garante entrega de aviso ao servidor; W02 devera prever expiracao |
-| D3 — Repeticao da pratica | Manter rodadas de 4 tentativas, sem limiar de desempenho; permitir repetir opcionalmente antes do principal, com nova ordem aleatoria e descarte das tentativas de treino para o resultado oficial. Manter tempos, contagens principais e HUD atuais | Proposta apresentada ao usuario nesta sessao; repeticao opcional e evolucao prevista, ainda nao implementada. A escolha altera a dose de treino e depende de decisao metodologica explicita |
-| D4 — Identificacao | Propor `test_version=0.2.2-web.1`, mantendo `test_code=stroop_go_nogo_ptbr`; versao do aplicativo e plataforma `web` ficam em metadados separados a especificar em W02 | Identifica a variante de coleta sem prometer equivalencia. Nao adicionar colunas ao CSV oficial de 21 campos nem reutilizar silenciosamente `0.2.2` para tecnologia de medicao diferente |
-| D5 — Criterio temporal | Adotar os ensaios instrumentados e limites abaixo como gate de engenharia, com aprovacao explicita do usuario antes de uso como criterio de aceite | RT do navegador nao mede latencia fisica completa; testes funcionais nao certificam equivalencia psicometrica |
-| D6 — Fronteiras do teclado | Aprovar as regras web da matriz: primeiro Espaco novo, RT estritamente positivo e fim exclusivo; tecla mantida/repeticao automatica nao responde | Torna os casos limite verificaveis e evita transportar respostas de navegacao para estimulos. O XML local sozinho nao comprova paridade de tecla mantida |
+| D1 — Dispositivos e navegadores | MVP em computador desktop/notebook com teclado fisico, Windows ou Linux, usando Chrome/Edge Chromium ou Firefox estaveis na data da validacao. Verificar ambiente antes de iniciar, sem exigir tela cheia. Celular, tablet, toque, Safari e macOS ficam fora do MVP ate validacao propria | Preserva Espaco como resposta e limita combinacoes de ambiente; versoes e combinacoes efetivamente homologadas devem ser enumeradas a partir dos testes, sem declarar suporte universal |
+| D2 — Foco e interrupcao | Antes da pratica, aguardar foco/aba visivel. Durante o principal, perda de foco (`blur`), troca de aba/aba oculta, fechamento, recarga ou Escape invalida a execucao; nao pausar/retomar a mesma serie nem gerar resultado parcial. Novo inicio exige nova sessao e pratica. Durante a pratica, descartar a rodada interrompida e exigir nova rodada completa antes do principal | Evita continuidade silenciosa com exposicao/intervalos alterados; o backend devera representar interrupcao sem metricas finais ou exportacao oficial parcial. Fechamento/recarga nao garantem entrega de aviso ao servidor; W02 devera prever expiracao |
+| D3 — Repeticao da pratica | Manter rodadas de 4 tentativas, sem limiar de desempenho; permitir repetir opcionalmente antes do principal, com nova ordem aleatoria e descarte das tentativas de treino para o resultado oficial. Manter 16 tentativas principais, tempos, contagens, cores e HUD atuais, incluindo precisao ao vivo e cronometro; principal sem feedback por tentativa | A repeticao opcional altera a dose de treino e foi aprovada metodologicamente para a WEB; sua implementacao nao altera o Builder local |
+| D4 — Identificacao | Usar `test_version=0.2.2-web.1`, mantendo `test_code=stroop_go_nogo_ptbr`; versao do aplicativo e plataforma `web` ficam em metadados separados a especificar em W02 | Identifica a variante de coleta sem prometer equivalencia. Nao adicionar colunas ao CSV oficial de 21 campos nem reutilizar silenciosamente `0.2.2` para tecnologia de medicao diferente |
+| D5 — Criterio temporal | Adotar os ensaios instrumentados e limites abaixo como gate de engenharia: 10 execucoes sinteticas por ambiente de referencia, ate um quadro por transicao e ate 100 ms de desvio no bloco principal de 60 s | RT do navegador nao mede latencia fisica completa; aprovacao do criterio nao comprova seu atendimento nem equivalencia psicometrica |
+| D6 — Fronteiras do teclado | Aplicar as regras web da matriz: somente a primeira nova pressao de Espaco, RT estritamente positivo e fim exclusivo; tecla mantida/repeticao automatica nao responde e a resposta nao abrevia estimulo ou tentativa | Torna os casos limite verificaveis e evita transportar respostas de navegacao para estimulos. O XML local sozinho nao comprova paridade de tecla mantida |
 
-### Proposta de verificacao temporal (D5)
+### Verificacao temporal aprovada (D5)
 
 1. Preservar duracoes nominais, contagens, HUD e sequencia atuais. Registrar
    instantes planejados e observados de apresentacao/retirada do estimulo com
@@ -158,14 +171,15 @@ pertinente, com referencia a evidencia da decisao; o aceite formal fica no roadm
    temporal. Data/hora civil identifica a sessao, sem calcular RT.
 2. No equipamento de referencia de cada navegador/sistema aprovado, medir o
    periodo de quadro e executar 10 sessoes sinteticas completas em primeiro
-   plano. Proposta de ambiente inicial: monitor de 60 Hz, sem carga artificial
+   plano. Ambiente de referencia inicial: monitor de 60 Hz, sem carga artificial
    concorrente; registrar navegador/versao, sistema e periodo medido no relatorio.
-3. Proposta de tolerancia de engenharia: desvio absoluto de cada transicao
+3. Tolerancia de engenharia aprovada: desvio absoluto de cada transicao
    observado por software de ate um periodo de quadro medido; erro acumulado
    da duracao principal de ate 100 ms em torno dos 60 s nominais. Sessoes fora
    desses limites devem ser sinalizadas como temporalmente invalidas e nao
    publicadas como resultado valido; nao ajustar RT retrospectivamente para
-   ocultar desvio. Os limites propostos nao foram medidos nem aprovados.
+   ocultar desvio. O criterio foi aprovado; seu atendimento ainda depende das
+   medicoes e evidencias de W16, sem aceite temporal fisico presumido.
 4. Exercitar eventos sinteticos antes, dentro e depois da janela, incluindo
    RT=0, fim exato, pressao repetida, tecla mantida e longas tarefas da thread
    principal. A classificacao deve ser deterministica e o RT deve manter
@@ -192,8 +206,9 @@ foram corrigidos nesta etapa para 21 campos e versao **local** `0.2.2`, usando
 somente dados inequivocamente sinteticos. Os quatro exemplos foram reunidos
 em CSV temporario e validados com o analisador e o nucleo atuais.
 
-Os exemplos ilustram as quatro classificacoes; nao representam uma sessao
-completa de 16 tentativas nem aprovam D4 ou a transmissao de dados pessoais.
+Os exemplos ilustram as quatro classificacoes locais; nao representam uma sessao
+completa de 16 tentativas nem evidenciam implementacao de D4 ou coleta WEB.
 O nome de arquivo segue codigo do teste e timestamp, sem identificadores
-pessoais. Exportacao web, acesso e minimizacao ainda dependem de W02/W03;
-a correcao documental nao altera o CSV oficial nem autoriza nova coleta.
+pessoais. Exportacao web, acesso e minimizacao seguem as decisoes aprovadas e
+dependem dos contratos e controles de W02/W03; a correcao documental nao altera
+o CSV oficial nem autoriza nova coleta real.

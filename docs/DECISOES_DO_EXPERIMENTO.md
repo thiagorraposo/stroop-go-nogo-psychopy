@@ -9,7 +9,8 @@
 - As cores previstas para o experimento sao verde, amarelo, rosa, preto, vermelho, laranja, marrom, roxo, azul e cinza.
 - A lista oficial de palavras futuras e `VERDE`, `AMARELO`, `ROSA`, `PRETO`, `VERMELHO`, `LARANJA`, `MARROM`, `ROXO`, `AZUL` e `CINZA`.
 - O bloco principal deve permanecer sem feedback por tentativa.
-- A pratica podera ser repetida antes do bloco principal em implementacao futura.
+- No Builder local, a pratica tem uma unica rodada. A variante WEB aprovada
+  permite repetir rodadas completas antes do principal conforme o protocolo abaixo.
 - A versao `0.2.2` usa protocolo curto com 4 tentativas de pratica e 16 tentativas principais.
 - A pratica tem 2 tentativas Go/congruentes e 2 tentativas No-Go/incongruentes.
 - O bloco principal tem 8 tentativas Go/congruentes e 8 tentativas No-Go/incongruentes.
@@ -36,7 +37,7 @@
 - `participant_id` e o identificador canonico da pessoa no CSV.
 - Nomes de arquivo de dados nao devem usar `participant_id`, `participant_name`, iniciais, visita ou avaliador.
 - O CSV oficial deve seguir `stroop_go_nogo_ptbr_YYYY-MM-DD_HHhMMmSSs_trials.csv`, permitindo descoberta por `data/*_trials.csv`; metadados pessoais ficam somente no conteudo local.
-- `test_version` atual e `0.2.2`.
+- `test_version` local e `0.2.2`; a variante WEB aprovada usa `0.2.2-web.1`.
 - Cada execucao concluida normalmente deve gerar um unico CSV oficial contendo apenas tentativas do bloco principal.
 - A pratica continua sendo usada para feedback e HUD, mas nao e exportada no CSV oficial.
 - O CSV oficial usa `block` com valor canonico `main` nas execucoes atuais; `practice` permanece aceito apenas para compatibilidade historica de validacao.
@@ -60,8 +61,48 @@
 - Incongruente sem resposta = `correct_rejection`.
 - Incongruente + Espaco = `commission`.
 
+## Variante WEB aprovada em 2026-10-16
+
+O usuario aprovou explicitamente os itens 1–19 apresentados na sessao, incluindo
+as decisoes D1–D6 detalhadas no [protocolo WEB](PROTOCOLO_WEB.md). A finalidade e
+coleta de dados pelo grupo de pesquisa ao qual pertence; o publico sao os
+participantes da pesquisa, podendo ser qualquer pessoa. O usuario assumiu a
+responsabilidade pelo protocolo, elegibilidade, informacao/consentimento
+aplicaveis, validacao e operacao antes de uso real. Nao criar filtros demograficos
+nem coletar idade ou sexo na WEB. Permanecem o carater exploratorio e os
+resultados descritivos, sem alegacoes clinicas ou de equivalencia psicometrica.
+
+- **D1:** MVP em desktop/notebook com teclado fisico, Windows/Linux e
+  Chrome/Edge Chromium ou Firefox; celulares, tablets, toque, Safari e macOS
+  ficam fora do MVP. Homologacao deve enumerar as combinacoes e versoes medidas.
+- **D2:** perda de foco, troca de aba, recarga, fechamento ou Escape durante o
+  principal invalida a execucao, sem resultado oficial parcial; recomeco exige
+  nova sessao e pratica. Na pratica, descartar e reiniciar a rodada interrompida.
+- **D3:** pratica em rodadas de 4 tentativas, repetiveis opcionalmente antes do
+  principal, sem limiar de desempenho. Treino nao entra no resultado oficial.
+  Preservar 16 tentativas principais e todos os tempos, contagens, cores e HUD
+  atuais, com precisao ao vivo e cronometro; principal sem feedback por tentativa.
+- **D4:** `test_code=stroop_go_nogo_ptbr` e `test_version=0.2.2-web.1`;
+  plataforma e versao do aplicativo identificadas separadamente. Preservar o CSV
+  oficial de 21 campos e a versao local.
+- **D5:** gate de engenharia de 10 execucoes sinteticas por ambiente de
+  referencia, com desvio de ate um periodo de quadro medido por transicao e
+  ate 100 ms no bloco nominal de 60 s. A aprovacao define o criterio; as
+  medicoes e evidencias permanecem para W16. Equivalencia temporal fisica com
+  PsychoPy exigiria outro estudo e nao foi afirmada.
+- **D6:** somente a primeira nova pressao de Espaco na janela responde, com
+  `RT > 0` e fim exclusivo. Ignorar repeticao automatica e tecla mantida;
+  exigir soltar e pressionar novamente. A resposta nao abrevia o estimulo.
+
+As escolhas acima sao requisitos aprovados, sem afirmar implementacao ou
+homologacao. Regras de metadados e acesso WEB sao detalhadas nos contratos das
+respectivas etapas; o formulario e os dados locais existentes sao preservados.
+
 ## Historico de decisoes
 
+- 2026-10-16: usuario aprovou os itens 1–19 da proposta da sessao, incluindo
+  D1–D6 do protocolo WEB, finalidade de coleta por seu grupo de pesquisa, publico
+  amplo e responsabilidade propria pelo protocolo, validacao e operacao.
 - 2026-07-09: tela final de resultados definida como resumo descritivo da execucao, calculado em memoria a partir das tentativas `main`, sem leitura de CSV e sem linguagem clinica ou normativa.
 - 2026-07-09: CSV oficial redefinido para exportar apenas tentativas do bloco principal, desconsiderando a pratica.
 - 2026-07-09: versao `0.2.2` definida com bloco principal balanceado em 8 tentativas congruentes e 8 incongruentes, mantendo pratica 2/2 e protocolo curto 4 + 16.

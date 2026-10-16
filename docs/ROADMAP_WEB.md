@@ -11,19 +11,22 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | Etapas | Estado |
 |---|---|
 | W00 | Concluida em 2026-10-16; evidencias no registro de alteracoes |
-| W01 | Bloqueada por decisoes D1–D6 do usuario; protocolo factual e validacao das fontes preparados, sem aceite |
-| W02–W03 | Nao iniciadas; dependem do aceite W01 |
+| W01 | Concluida em 2026-10-16; D1–D6 aprovadas e fontes/39 testes focados validados |
+| W02 | Em andamento; contrato de sessao, resultados e HTTP |
+| W03 | Nao iniciada; depende de W02 e usa as decisoes de acesso/dados ja aprovadas |
 | W04 | Concluida em 2026-10-16; casos de uso/persistencia extraidos, 173 testes e smoke na imagem aprovados |
 | W05–W23 | Nao iniciadas |
 
-Proxima acao: **consolidar W01 apos as decisoes de produto/metodo solicitadas
-ao usuario**; W04 independente concluida. Evidencias em
+Proxima acao: **concluir W02 e avancar para W03/W05**; W04 independente
+concluida. Evidencias em
 [registro de alteracoes](REGISTRO_DE_ALTERACOES.md).
-Pendencias concretas em [protocolo WEB](PROTOCOLO_WEB.md): ambiente desktop e
-teclado, politica de foco/interrupcao, repeticao da pratica, identificacao da
-variante e criterios temporais/limites de resposta. Perguntas enviadas na sessao,
-sem resposta ate este registro. Nenhuma outra etapa possui dependencias
-integralmente concluidas neste ponto; W05 ainda depende de W02.
+Bloqueio de produto/metodo resolvido pela aprovacao explicita na sessao.
+Finalidade: coleta do grupo de pesquisa do usuario; participantes da pesquisa
+sem restricao demografica nova. Usuario responsavel por protocolo, validacao,
+operacao e incidentes. Hospedagem: VPS adquirida e dominio existente, conforme
+[ADR-002](arquitetura/ADR-002-hospedagem-vps.md). Configuracao real, evidencias
+de homologacao, OIDC e backup externo permanecem entregas futuras; nao bloqueiam
+implementacao local com dados sinteticos nem equivalem a aceite antecipado.
 Nao atribuir percentual por quantidade de etapas: elas possuem esforcos distintos.
 
 Comandos para o Codex CLI, a partir da raiz do repositorio:
@@ -451,12 +454,12 @@ Dependencias da fase: evidencias funcionais, temporais, de seguranca e operacao.
   responsaveis, runbook executado e evidencias de smoke publico.
 - **Dependencias:** W21 e autorizacao/configuracao operacional do usuario.
 - **Conclusao:** usuario executa e valida a implantacao; Codex pode preparar ou
-  revisar evidencias quando solicitado. `continue web` nao autoriza acesso OCI,
+  revisar evidencias quando solicitado. `continue web` nao autoriza acesso a VPS,
   custos, publicacao, dados reais ou mudanca do estado por presuncao.
 - **Validacoes:** HTTPS real, login configurado, portas internas fechadas,
   backup/restauracao, reboot e rollback com evidencias do ambiente publicado.
-- **Leitura:** runbook web e `OCI_ETAPA11.md` como referencia historica; verificar
-  limites, disponibilidade e custos atuais antes de qualquer contratacao.
+- **Leitura:** runbook web e ADR-002; `OCI_ETAPA11.md` e somente historico legado.
+  Verificar SO, recursos e dominio da VPS existente antes da implantacao.
 
 ### W23 — Transicao e eventual descontinuacao
 
