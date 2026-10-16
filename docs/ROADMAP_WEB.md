@@ -11,7 +11,7 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | Etapas | Estado |
 |---|---|
 | W00 | Concluida em 2026-10-16; evidencias no registro de alteracoes |
-| W01 | Em andamento; protocolo factual em elaboracao e decisoes de produto/metodo solicitadas ao usuario |
+| W01 | Bloqueada por decisoes D1–D6 do usuario; protocolo factual e validacao das fontes preparados, sem aceite |
 | W02–W03 | Nao iniciadas; dependem do aceite W01 |
 | W04 | Concluida em 2026-10-16; casos de uso/persistencia extraidos, 173 testes e smoke na imagem aprovados |
 | W05–W23 | Nao iniciadas |
@@ -19,6 +19,11 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 Proxima acao: **consolidar W01 apos as decisoes de produto/metodo solicitadas
 ao usuario**; W04 independente concluida. Evidencias em
 [registro de alteracoes](REGISTRO_DE_ALTERACOES.md).
+Pendencias concretas em [protocolo WEB](PROTOCOLO_WEB.md): ambiente desktop e
+teclado, politica de foco/interrupcao, repeticao da pratica, identificacao da
+variante e criterios temporais/limites de resposta. Perguntas enviadas na sessao,
+sem resposta ate este registro. Nenhuma outra etapa possui dependencias
+integralmente concluidas neste ponto; W05 ainda depende de W02.
 Nao atribuir percentual por quantidade de etapas: elas possuem esforcos distintos.
 
 Comandos para o Codex CLI, a partir da raiz do repositorio:

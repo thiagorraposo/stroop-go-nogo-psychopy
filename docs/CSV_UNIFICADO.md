@@ -74,29 +74,33 @@ Campos `_raw` nao fazem parte do contrato oficial e nao devem ser usados como fo
 
 ## Exemplos ficticios
 
+Exemplos integralmente sinteticos, revisados em 2026-10-16 para as 21 colunas
+e a versao local `0.2.2`. As quatro linhas ilustram classificacoes; nao
+representam uma sessao completa de 16 tentativas.
+
 ### Hit
 
 ```csv
-project,participant_id,initials,visit,evaluator,assessment_id,assessment_date,started_at,test_code,test_version,block,trial_number,word,ink_color,condition,correct_response,key_pressed,reaction_time,correct,error_type
-PILOTO_STROOP,P_EXEMPLO,NOME_REDIGIDO,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.1,main,1,VERMELHO,red,congruent,space,space,0.512,1,hit
+project,participant_id,participant_name,initials,visit,evaluator,assessment_id,assessment_date,started_at,test_code,test_version,block,trial_number,word,ink_color,condition,correct_response,key_pressed,reaction_time,correct,error_type
+PROJETO_SINTETICO,P_SINTETICO,PESSOA SINTETICA,,V_SINTETICA,AV_SINTETICO,00000000-0000-0000-0000-000000000000,2026-10-16,2026-10-16T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.2,main,1,VERDE,green,congruent,space,space,0.512,1,hit
 ```
 
 ### Omission
 
 ```csv
-PILOTO_STROOP,P_EXEMPLO,NOME_REDIGIDO,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.1,main,2,AZUL,blue,congruent,space,,,0,omission
+PROJETO_SINTETICO,P_SINTETICO,PESSOA SINTETICA,,V_SINTETICA,AV_SINTETICO,00000000-0000-0000-0000-000000000000,2026-10-16,2026-10-16T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.2,main,2,AMARELO,yellow,congruent,space,,,0,omission
 ```
 
 ### Correct rejection
 
 ```csv
-PILOTO_STROOP,P_EXEMPLO,NOME_REDIGIDO,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.1,main,3,VERDE,yellow,incongruent,,,,1,correct_rejection
+PROJETO_SINTETICO,P_SINTETICO,PESSOA SINTETICA,,V_SINTETICA,AV_SINTETICO,00000000-0000-0000-0000-000000000000,2026-10-16,2026-10-16T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.2,main,3,AZUL,gray,incongruent,,,,1,correct_rejection
 ```
 
 ### Commission
 
 ```csv
-PILOTO_STROOP,P_EXEMPLO,NOME_REDIGIDO,V1,AV01,00000000-0000-0000-0000-000000000000,2026-07-06,2026-07-06T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.1,main,4,AMARELO,blue,incongruent,,space,0.681,0,commission
+PROJETO_SINTETICO,P_SINTETICO,PESSOA SINTETICA,,V_SINTETICA,AV_SINTETICO,00000000-0000-0000-0000-000000000000,2026-10-16,2026-10-16T10:00:00-03:00,stroop_go_nogo_ptbr,0.2.2,main,4,CINZA,green,incongruent,,space,0.681,0,commission
 ```
 
 ## Nome do arquivo
@@ -118,7 +122,7 @@ Nesta fase, execucoes interrompidas antes do encerramento normal nao geram CSV o
 Execute a partir da raiz do projeto:
 
 ```bash
-python3 scripts/analisar_stroop.py data/PARTICIPANT_ID.csv
+python3 scripts/analisar_stroop.py data/stroop_go_nogo_ptbr_2026-10-16_10h00m00s_trials.csv
 ```
 
 O script valida o contrato do CSV e calcula metricas descritivas apenas para o bloco `main`.

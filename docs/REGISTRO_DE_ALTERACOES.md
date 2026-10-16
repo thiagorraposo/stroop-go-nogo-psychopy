@@ -6,6 +6,36 @@ Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W01: protocolo factual e decisoes pendentes
+
+- `docs`: criado `PROTOCOLO_WEB.md` com fluxo realmente configurado no Builder,
+  contagens, balanceamento, tempos/HUD, quatro respostas, casos de fronteira,
+  tecla mantida, abortamento, ausencia de hits e distincao da proposta historica.
+  Matriz D1–D6 apresenta recomendacoes concretas sem presumir aceite.
+- `fix/docs`: exemplos de `CSV_UNIFICADO.md` tinham 20 campos e cabecalho sem
+  `participant_name`; corrigidos para 21 colunas e versao local `0.2.2`, com
+  dados inequivocamente sinteticos. O comando de analise agora usa o padrao
+  seguro de nome com teste/timestamp. Sem alteracao do contrato ou exportador.
+- `test`: 39 testes focados aprovados, zero falhas/erros/skips: 13 de condicoes
+  e tempos, 15 da interface pre-pratica, 11 de CSV. Comandos de descoberta
+  `test_fase3_condicoes_tempos.py`, `test_interface_pre_pratica.py` e
+  `test_csv_unificado.py`; XML/loops/colunas conferidos estaticamente.
+  Quatro exemplos atuais reunidos em CSV temporario foram aceitos pelo nucleo
+  e `scripts/analisar_stroop.py`: quatro classificacoes, precisao 50%, mediana
+  dos hits 0,512 s. Conferidos 29 links relativos nos cinco documentos desta
+  unidade, sem ausencias; `git diff --check` aprovado.
+- `blocker`: W01 exige decisoes explicitas do usuario sobre MVP, foco/aba,
+  pratica e variante. Solicitadas tambem tolerancias temporais e fronteiras
+  de teclado propostas, pois afetam aceite do protocolo. Sem resposta ate este
+  registro; W01 nao concluida. W04 independente foi concluida no commit
+  `cd35d78`; nenhuma outra etapa e elegivel com as dependencias atuais.
+- `scope`: nenhum `.psyexp`, condicao, CSV coletado, formula, schema, versao
+  experimental vigente ou dependencia alterado. Nao houve Pilot grafico,
+  medicao fisica, validacao psicometrica, infraestrutura externa ou coleta real.
+  As propostas WEB continuam pendentes de decisao, sem equivalencia presumida.
+  Auditoria das 24 fichas confirmou ausencia de outra etapa elegivel. Containers
+  sinteticos exclusivos de teste e smoke da W04 encerrados/removidos ao concluir.
+
 ## 2026-10-16 — W04: casos de uso e persistencia reutilizaveis
 
 - `refactor`: importacao SQLite/PostgreSQL extraida para `stroop/application/`
