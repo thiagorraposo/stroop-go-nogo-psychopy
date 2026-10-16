@@ -54,6 +54,9 @@ esses testes contra coleta real. `npm run preview` serve o build local em 4173.
 - `src/experiment/main*.ts`: motor principal e plugin jsPsych; calibracao de
   quadro na contagem, origem monotona unica, observacoes contiguas, HUD e gates
   temporais. Resultado completo fica em RAM; interrupcao descarta toda a serie.
+- `src/experiment/summary.ts` e `src/components/ResultSummary.tsx`: metricas
+  locais, mediana sem quantizacao, exibicao conforme Python e finalizacao com
+  descarte de RAM. Nao oferecem download participante.
 - `src/experiment/protocol.ts`: consome `../condicoes/web_protocol.json`
   compartilhado com a API e os CSVs-fonte de pratica/principal. Nenhum parametro metodologico
   e derivado de exemplos da interface. A integracao de sessao sera conectada
@@ -79,3 +82,9 @@ Espaco. Nao se exige desempenho minimo; repetir descarta o resumo anterior.
 Os testes `@timing` executam em serie e sem traces para reduzir interferencia
 no proprio ensaio de tempo real; os demais testes de navegador podem executar
 em paralelo. Isso nao altera os limites temporais aplicados pelo motor.
+
+Fixtures de paridade ficam em `../tests/fixtures/web_results_summary.json`,
+carregadas apenas nos testes. O servidor de desenvolvimento permite somente
+as pastas explicitas web/condicoes/fixtures; nao expor a raiz do repositorio.
+O serializador CSV de servidor fica em `stroop/domain/web_export.py`; a rota
+profissional autorizada sera conectada em W14.

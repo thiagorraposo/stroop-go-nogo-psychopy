@@ -69,7 +69,7 @@ stroop-cognifit/
 │   └── requirements*.txt       # dependencias e lock da API
 ├── web/                        # interface React/TypeScript
 │   ├── src/App.tsx             # navegacao e acesso da equipe
-│   ├── src/components/         # preparo e ciclo de pratica
+│   ├── src/components/         # preparo, pratica e resumo descritivo
 │   ├── src/api/client.ts       # cliente HTTP da mesma origem
 │   ├── src/experiment/         # host, protocolo e motores jsPsych
 │   ├── e2e/                   # verificacao em Chromium/Firefox

@@ -6,6 +6,18 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W12: resumo e CSV compativel
+
+- `feat`: resumo principal com precisao, mediana dos hits e quatro respostas;
+  ausencia de hits permanece `—`, exibicao segue Python e Finalizar descarta RAM.
+- `feat`: serializer Python de 21 colunas para uso profissional autorizado,
+  mascaramento nome/iniciais, escaping/formulas, RT em segundos sem quantizacao
+  e nome seguro. Sem exportacao participante; rota profissional pertence a W14.
+- `test`: cinco fixtures compartilhadas Python/TypeScript e importacao SQLite
+  real com paridade das 12 metricas. 133 frontend, 24 browser, tipos/build e
+  preview visual aprovados. Regressao PostgreSQL 245 testes sem skips e seis
+  focados CSV aprovados; nao substitui homologacao ou envio real W13.
+
 ## 2026-10-16 — W11: bloco principal WEB
 
 - `feat`: motor jsPsych com 16 condicoes sem reposicao, ordem explicita,

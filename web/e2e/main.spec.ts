@@ -39,13 +39,20 @@ test('principal executa 16 condicoes reais sem feedback nem encurtar resposta', 
       await expect(page.locator('[data-phase="stimulus"]')).toBeVisible()
     }
   }
-  await expect(page.getByRole('heading', { name: 'Bloco concluído.' })).toBeVisible({ timeout: 5_000 })
+  await expect(page.getByRole('heading', { name: 'Resumo da execução' })).toBeVisible({ timeout: 5_000 })
   expect(ids.sort((a, b) => a - b)).toEqual(Array.from({ length: 16 }, (_, i) => i + 1))
   expect(kinds.filter(kind => kind === 'congruent')).toHaveLength(8)
   expect(kinds.filter(kind => kind === 'incongruent')).toHaveLength(8)
-  await expect(page.getByText('Você concluiu as 16 tentativas principais.')).toBeVisible()
+  await expect(page.getByText('Dados descritivos das 16 tentativas principais.', { exact: false })).toBeVisible()
+  await expect(page.getByRole('button', { name: /exportar|baixar|download/i })).toHaveCount(0)
+  await expect(page.getByRole('status')).toContainText('ainda não possui confirmação')
   expect(await page.evaluate(() => ({ local: localStorage.length, session: sessionStorage.length })))
     .toEqual({ local: 0, session: 0 })
+  await page.getByRole('button', { name: 'Finalizar', exact: true }).click()
+  await expect(page).toHaveURL('/instrucoes')
+  await page.goBack()
+  await expect(page.getByRole('heading', { name: 'Resumo da execução' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Começar bloco principal' })).toHaveCount(0)
 })
 
 test('Escape no principal descarta execucao e exige nova sessao com pratica', { tag: '@timing' }, async ({ page }) => {
@@ -57,5 +64,5 @@ test('Escape no principal descarta execucao e exige nova sessao com pratica', { 
   await expect(page.getByRole('heading', { name: 'Execução interrompida.' })).toBeVisible()
   await expect(page.getByRole('alert')).toContainText('nova sessão e fazer a prática novamente')
   await expect(page.getByRole('button', { name: 'Começar bloco principal' })).toHaveCount(0)
-  await expect(page.getByRole('heading', { name: 'Bloco concluído.' })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Resumo da execução' })).toHaveCount(0)
 })

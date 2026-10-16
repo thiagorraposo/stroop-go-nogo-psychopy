@@ -3,6 +3,8 @@ import { ExperimentHost } from '../experiment/ExperimentHost'
 import type { MountExperiment } from '../experiment/ExperimentHost'
 import { checkEnvironment } from '../experiment/environment'
 import { mountPractice } from '../experiment/practice'
+import { ResultSummaryPanel } from './ResultSummary'
+import { summarizeMain } from '../experiment/summary'
 import { mountMain } from '../experiment/main'
 import type { MainResult } from '../experiment/main-engine'
 import { createMainOrder } from '../experiment/protocol'
@@ -106,12 +108,12 @@ export function PracticePreparation({ onBack }: { onBack: () => void }) {
 
   if (phase === 'practice') return <ExperimentHost mount={mount} />
   if (phase === 'main') return <ExperimentHost mount={mountMainBlock} />
-  if (phase === 'main-complete' && mainResult) return <section className="content-card" ref={panel} tabIndex={-1}>
-    <p className="eyebrow">Bloco principal</p><h1>Bloco concluído.</h1>
-    <p className="lead">Você concluiu as {mainResult.trials.length} tentativas principais.</p>
-    <p>Esta execução local ainda não possui confirmação de recebimento pela equipe.</p>
-    <button className="button secondary" onClick={onBack}>Voltar às orientações</button>
-  </section>
+  if (phase === 'main-complete' && mainResult) return <ResultSummaryPanel
+    summary={summarizeMain(mainResult)} onFinish={() => {
+      setMainResult(null)
+      setSummary(null)
+      onBack()
+    }} />
   if (phase === 'main-interrupted') return <section className="content-card" ref={panel} tabIndex={-1}>
     <h1>Execução interrompida.</h1>
     {mainInterruption === 'timing_invalid' && <p>Não foi possível manter os tempos de apresentação necessários nesta execução.</p>}

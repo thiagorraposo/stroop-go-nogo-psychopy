@@ -179,6 +179,31 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   W14, fixtures Python/TypeScript e importacao sintetica real. Nao oferecer
   download participante: W03 reserva exportacao a profissionais vinculados.
 
+## 2026-10-16 — W12 concluida
+
+- `summary.ts` calcula as 12 metricas apenas do principal, mediana dos hits sem
+  quantizacao/ausencia null e exibicao half-even sobre float conforme Python.
+  `ResultSummary.tsx` mostra precisao/RT/quatro contagens, texto descritivo,
+  foco acessivel e Finalizar limpando RAM. Sem download participante/salvo ficticio.
+- `stroop/domain/web_export.py`: CSV 21 colunas, nomes/iniciais mascarados,
+  formulas neutralizadas, escaping, RT ja em segundos sem quantizacao e nome
+  sem IDs/timestamp UTC. Recalcula classificacoes no nucleo, recusa pratica e
+  principal WEB parcial; legado conserva contagem/horario sem inventar fuso.
+  O adaptador profissional W14 deve reautorizar e fornecer metadados do servidor.
+- Cinco fixtures Python/TypeScript verificam quatro respostas, medianas par/impar,
+  sem hits, empate percentual e RT submicrossegundo. Importador real/SQLite
+  descartavel receberam todos os CSVs com 16 linhas/12 metricas identicas.
+- Evidencias: 133 frontend, typecheck/build; npm run test:browser passou com
+  20 gerais e quatro temporais seriais Chromium/Firefox (3,5 min). Finalizar e
+  historico nao restauram resultado. Preview do componente real 1440x1080
+  inspecionado, sem overflow/excecoes JS. Mesmos ambientes W09; sem aceite W16.
+  Regressao PostgreSQL 245 testes/29,376 s passou sem skips; seis focados CSV
+  passaram apos acrescentar compatibilidade legado. compileall/pip check/diff
+  aprovados. Containers/servidor de inspecao encerrados.
+- Proxima acao: W13 — cliente/fluxo convite-bootstrap-start-conclusao, envio
+  confirmado/retry em RAM, abortamento e expiracao, integracao real HTTPS/API/DB.
+  Finalizacao local e resumo atuais nao comprovam recebimento no servidor.
+
 ## W14 — Trabalho paralelo preservado, sem aceite
 
 - Dependencias W06/W08 atendidas. Subagente atingiu cota e deixou somente
@@ -193,7 +218,8 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 - Arquivos W14 ainda fora de commit: `api/config.py`, `api/README.md`,
   `stroop/persistence/web_assessments.py`, migration 0007, ADR-003,
   contrato API e indice docs. Faltam application/router, serializer W12,
-  integracao create_app e testes PostgreSQL. Preservar no checkout.
+  integracao create_app e testes PostgreSQL. Application/router foram criados
+  pelo principal, mas ainda nao executados; preservar no checkout.
 - `AGENTS.md` raiz continua alteracao preexistente e fora dos commits.
 
 ## Decisoes e contexto preservados

@@ -130,3 +130,18 @@ O script valida o contrato do CSV e calcula metricas descritivas apenas para o b
 ## Pratica
 
 As tentativas de pratica nao entram no CSV oficial desta versao. Elas continuam sendo classificadas em memoria para feedback imediato e HUD da pratica, mas sao descartadas da lista exportada antes da gravacao do arquivo.
+
+## Variante WEB
+
+O serializador em `stroop/domain/web_export.py` conserva as 21 colunas, usa
+`test_version=0.2.2-web.1` na coleta WEB, mascara nome/iniciais e recebe
+metadados fixados no servidor. O RT recebido ja esta em segundos; o CSV
+preserva sua precisao, sem converter novamente ou arredondar um valor positivo
+para zero. Isso permite reproduzir as metricas calculadas antes da exibicao.
+O Builder local e sua formatacao existente permanecem preservados.
+
+Horario e data WEB sao UTC; nome do arquivo usa somente codigo do teste e
+timestamp. Delimitadores/aspas/quebras de linha sao escapados pelo writer CSV;
+campos textuais com prefixo de formula recebem apostrofo para uso em planilhas.
+Exportacao exige o [escopo profissional](../seguranca/ACESSO_WEB.md); o resumo
+participante nao oferece download. Fixtures e aceite estao no roadmap.

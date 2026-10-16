@@ -73,3 +73,13 @@ kbd { font: inherit; font-size: .9em; border: 1px solid #b7bfca; border-radius: 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 @media (max-width: 850px) { .page-shell { padding: 0 24px; } .welcome-grid { grid-template-columns: 1fr; } .hero-card { min-height: auto; } h1 { max-width: 20ch; font-size: 43px; } .hero-card, .content-card { padding: 40px 32px; } .guide-card { padding: 32px; } .steps { grid-template-columns: repeat(3, 1fr); gap: 20px; } .steps li { display: block; } .step-number { display: block; margin-bottom: 10px; } }
 @media (max-width: 540px) { .page-shell { padding: 0 16px; } .site-header { min-height: 106px; gap: 15px; } .brand { font-size: 20px; gap: 10px; } .brand-subtitle { font-size: 9px; } nav { gap: 14px; font-size: 12px; } nav > a:first-child { display: none; } nav .team-link { padding: 10px; } .hero-card, .content-card { padding: 32px 24px; } h1 { font-size: 36px; } .lead { font-size: 16px; } .steps { grid-template-columns: 1fr; } .steps li { display: flex; } .examples { grid-template-columns: 1fr; } .word { font-size: 38px; } .site-footer { flex-direction: column; gap: 7px; } }
+
+.result-highlights, .result-counts { display: grid; gap: 1.5rem; margin: 2rem 0; }
+.result-highlights { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.result-counts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.result-highlights > div, .result-counts > div { padding: 1.25rem; border: 1px solid #d8dfe8; border-radius: 1rem; }
+.result-summary dt { color: #475569; font-size: .95rem; }
+.result-summary dd { margin: .5rem 0 0; color: #0f172a; font-weight: 700; }
+.result-highlights dd { font-size: clamp(2rem, 5vw, 3.5rem); }
+.result-counts dd { font-size: 1.7rem; }
+@media (max-width: 700px) { .result-counts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
