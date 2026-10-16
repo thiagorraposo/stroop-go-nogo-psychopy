@@ -26,10 +26,14 @@ jobs:
           --health-cmd "pg_isready -U synthetic -d stroop_etapa4_test_ci"
           --health-interval 2s --health-timeout 5s --health-retries 20
     env:
-      TEST_DATABASE_URL: postgresql://synthetic:synthetic-ci-only@127.0.0.1:${{ job.services.postgres.ports[5432] }}/stroop_etapa4_test_ci
       PYTHONUNBUFFERED: '1'
       PIP_DISABLE_PIP_VERSION_CHECK: '1'
     steps:
+      - name: Banco descartavel do job
+        env:
+          POSTGRES_TEST_PORT: ${{ job.services.postgres.ports['5432'] }}
+        run: |
+          printf 'TEST_DATABASE_URL=postgresql://synthetic:synthetic-ci-only@127.0.0.1:%s/stroop_etapa4_test_ci\n' "$POSTGRES_TEST_PORT" >> "$GITHUB_ENV"
       - name: Checkout somente leitura
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
