@@ -7,6 +7,7 @@ import binascii
 import csv
 import hashlib
 import hmac
+import json
 import secrets
 from datetime import timezone
 from pathlib import Path
@@ -32,38 +33,9 @@ router = APIRouter(prefix="/api/v1", tags=["sessions"])
 PARTICIPANT_COOKIE = "__Host-stroop_participant"
 PARTICIPANT_TOKEN_PATTERN = TOKEN_PATTERN
 CONDITIONS_DIR = Path(__file__).resolve().parents[1] / "condicoes"
-DISPLAY_COLORS = {
-    "green": "#40FF00", "yellow": "#FFF200", "pink": "#FF5CCB",
-    "black": "#000000", "red": "#FF0000", "orange": "#FF9000",
-    "brown": "#965000", "purple": "#9A24FF", "blue": "#0062FF",
-    "gray": "#808080",
-}
-PROTOCOL_SNAPSHOT = {
-    "countdown_segment_ms": 550,
-    "practice": {
-        "trials": 4, "fixation_ms": 300, "stimulus_window_ms": 2000,
-        "blank_interval_ms": 500, "feedback_ms": 500,
-        "feedback_after_each_trial": True,
-    },
-    "main": {
-        "trials": 16, "fixation_ms": 300, "stimulus_window_ms": 2500,
-        "blank_interval_ms": 950, "trial_ms": 3750, "duration_ms": 60000,
-        "feedback_after_each_trial": False,
-    },
-    "response": {
-        "key": "space", "window_start_ms": 300, "end_exclusive": True,
-        "first_press_only": True, "ignore_keyboard_repeat": True,
-        "require_release_before_next_press": True,
-    },
-    "interruption": {
-        "abort_on_focus_loss": True, "abort_on_hidden": True,
-        "abort_on_reload": True, "abort_on_escape": True,
-        "resume_running_session": False,
-    },
-    "practice_repeat_allowed": True,
-    "hud": {"live_accuracy": True, "main_timer": True, "progress": True},
-    "colors": DISPLAY_COLORS,
-}
+with (CONDITIONS_DIR / 'web_protocol.json').open(encoding='utf-8') as _source:
+    PROTOCOL_SNAPSHOT = json.load(_source)
+DISPLAY_COLORS = PROTOCOL_SNAPSHOT['colors']
 
 
 class CreateProject(RequestModel):

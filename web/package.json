@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "engines": { "node": "^24.15.0 || >=26.0.0" },
+  "engines": {
+    "node": "^24.15.0 || >=26.0.0"
+  },
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "typecheck": "tsc --noEmit",
@@ -13,6 +15,7 @@
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
+    "jspsych": "8.3.0",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },

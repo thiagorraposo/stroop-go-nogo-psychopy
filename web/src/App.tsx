@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { MouseEvent, ReactNode } from 'react'
 import { ApiError, apiErrorMessage, getProfessionalProfile, logoutProfessional } from './api/client'
 import type { ProfessionalProfile } from './api/client'
+import { PracticePreparation } from './components/PracticePreparation'
 
 type Navigate = (path: string) => void
 
@@ -48,6 +49,7 @@ function Instructions({ navigate }: { navigate: Navigate }) {
       <article className="example"><p className="example-label">Palavra e cor diferentes</p><strong className="word no-go">VERMELHO</strong><p>Aguarde, sem pressionar.</p></article>
     </div>
     <p>Durante a prática, você receberá feedback após cada tentativa.</p>
+    <LocalLink href="/pratica" navigate={navigate} className="button primary">Começar prática</LocalLink>{' '}
     <LocalLink href="/" navigate={navigate} className="button secondary">Voltar ao início</LocalLink>
   </section>
 }
@@ -122,7 +124,29 @@ export function App() {
     return () => window.removeEventListener('popstate', followHistory)
   }, [])
   useEffect(() => {
-    document.title = `${path === '/equipe' ? 'Área da equipe' : path === '/instrucoes' ? 'Orientações' : 'Participação'} · Tarefa de Correspondência de Cores`
+    if (path !== '/' && path !== '/instrucoes') return
+    let pressed: string | null = null
+    const down = (event: KeyboardEvent) => {
+      if (event.repeat || !['Space', 'Enter'].includes(event.code)) return
+      if (event.target instanceof HTMLElement && event.target.closest('a, button, input, textarea, select, [contenteditable="true"]')) return
+      pressed = event.code
+      event.preventDefault()
+    }
+    const up = (event: KeyboardEvent) => {
+      if (pressed !== event.code) return
+      pressed = null
+      event.preventDefault()
+      navigate(path === '/' ? '/instrucoes' : '/pratica')
+    }
+    document.addEventListener('keydown', down)
+    document.addEventListener('keyup', up)
+    return () => {
+      document.removeEventListener('keydown', down)
+      document.removeEventListener('keyup', up)
+    }
+  }, [path, navigate])
+  useEffect(() => {
+    document.title = `${path === '/equipe' ? 'Área da equipe' : path === '/instrucoes' ? 'Orientações' : path === '/pratica' ? 'Prática' : 'Participação'} · Tarefa de Correspondência de Cores`
     main.current?.focus({ preventScroll: true })
     window.scrollTo(0, 0)
   }, [path])
@@ -138,7 +162,7 @@ export function App() {
         </nav>
       </header>
       <main id="conteudo" ref={main} tabIndex={-1}>
-        {path === '/' ? <Welcome navigate={navigate} /> : path === '/instrucoes' ? <Instructions navigate={navigate} /> : path === '/equipe' ? <ProfessionalAccess /> : <section className="content-card"><p className="eyebrow">Página não encontrada</p><h1>Vamos voltar ao início?</h1><LocalLink href="/" navigate={navigate} className="button primary">Ir para o início</LocalLink></section>}
+        {path === '/' ? <Welcome navigate={navigate} /> : path === '/instrucoes' ? <Instructions navigate={navigate} /> : path === '/pratica' ? <PracticePreparation onBack={() => navigate('/instrucoes')} /> : path === '/equipe' ? <ProfessionalAccess /> : <section className="content-card"><p className="eyebrow">Página não encontrada</p><h1>Vamos voltar ao início?</h1><LocalLink href="/" navigate={navigate} className="button primary">Ir para o início</LocalLink></section>}
       </main>
       <footer className="site-footer"><span>Pesquisa · Atenção às cores</span><span>Siga as orientações da equipe responsável.</span></footer>
     </div>

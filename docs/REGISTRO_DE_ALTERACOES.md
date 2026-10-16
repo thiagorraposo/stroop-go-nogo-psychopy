@@ -6,6 +6,20 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W10: preparacao e pratica jsPsych
+
+- `feat`: ambiente Windows/Linux e familias aprovadas, confirmacao/teste de
+  teclado, contagem e quatro tentativas sem reposicao com feedback, HUD e
+  repeticao opcional. Pressao de navegacao/tecla mantida nao responde; foco,
+  visibilidade, Escape e fechamento descartam treino. Sem limiar de desempenho.
+- `refactor`: snapshot aprovado extraido para `condicoes/web_protocol.json`,
+  consumido pela API/frontend; CSV e Builder preservados. Lembrete de 1500 ms
+  ja aprovado explicitado no snapshot, sem alterar os demais parametros.
+- `test`: 77 testes frontend e 18 Chromium/Firefox; typecheck, build, npm ci,
+  auditoria sem vulnerabilidades e preview visual sem excecoes aprovados.
+  Regressao Python real PostgreSQL: 240 testes, zero skips; compileall/pip check
+  aprovados. Evidencia nao certifica latencia fisica, Windows ou coleta real.
+
 ## 2026-10-16 — W09: base React e cliente HTTP
 
 - `feat`: interface React/TypeScript com navegacao acessivel, historico, orientacoes,

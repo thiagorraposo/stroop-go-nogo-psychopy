@@ -60,6 +60,15 @@ kbd { font: inherit; font-size: .9em; border: 1px solid #b7bfca; border-radius: 
 .role-badge { display: table; color: #31513a; background: #dfe9d9; border: 1px solid #b4c9ac; border-radius: 20px; padding: 7px 14px; font-size: 12px; margin: 0 0 28px; }
 .skip-link { position: absolute; left: 16px; top: -70px; z-index: 20; padding: 12px 18px; color: #142033; background: white; border-radius: 6px; }
 .skip-link:focus { top: 15px; }
+.practice-preparation:focus { outline: none; }
+.preparation-checks { padding: 24px 0 10px; border-top: 1px solid #cdd1d5; }
+.keyboard-confirm { display: flex; align-items: flex-start; gap: 12px; line-height: 1.7; }
+.keyboard-confirm input { width: 18px; height: 18px; margin-top: 5px; flex-shrink: 0; accent-color: #273852; }
+.preparation-checks [role="status"] { color: #476044; font-size: 14px; margin: 20px 0 24px; }
+.preparation-back { margin-top: 28px; }
+.task-active .site-header, .task-active .site-footer, .task-active .skip-link { display: none; }
+.task-active .page-shell { max-width: none; padding: 0; }
+.task-active .experiment-host { min-height: 100vh; width: 100%; cursor: none; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 @media (max-width: 850px) { .page-shell { padding: 0 24px; } .welcome-grid { grid-template-columns: 1fr; } .hero-card { min-height: auto; } h1 { max-width: 20ch; font-size: 43px; } .hero-card, .content-card { padding: 40px 32px; } .guide-card { padding: 32px; } .steps { grid-template-columns: repeat(3, 1fr); gap: 20px; } .steps li { display: block; } .step-number { display: block; margin-bottom: 10px; } }

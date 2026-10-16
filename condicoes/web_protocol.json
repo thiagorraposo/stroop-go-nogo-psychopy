@@ -1,0 +1,54 @@
+{
+  "countdown_segment_ms": 550,
+  "practice": {
+    "reminder_ms": 1500,
+    "trials": 4,
+    "fixation_ms": 300,
+    "stimulus_window_ms": 2000,
+    "blank_interval_ms": 500,
+    "feedback_ms": 500,
+    "feedback_after_each_trial": true
+  },
+  "main": {
+    "trials": 16,
+    "fixation_ms": 300,
+    "stimulus_window_ms": 2500,
+    "blank_interval_ms": 950,
+    "trial_ms": 3750,
+    "duration_ms": 60000,
+    "feedback_after_each_trial": false
+  },
+  "response": {
+    "key": "space",
+    "window_start_ms": 300,
+    "end_exclusive": true,
+    "first_press_only": true,
+    "ignore_keyboard_repeat": true,
+    "require_release_before_next_press": true
+  },
+  "interruption": {
+    "abort_on_focus_loss": true,
+    "abort_on_hidden": true,
+    "abort_on_reload": true,
+    "abort_on_escape": true,
+    "resume_running_session": false
+  },
+  "practice_repeat_allowed": true,
+  "hud": {
+    "live_accuracy": true,
+    "main_timer": true,
+    "progress": true
+  },
+  "colors": {
+    "green": "#40FF00",
+    "yellow": "#FFF200",
+    "pink": "#FF5CCB",
+    "black": "#000000",
+    "red": "#FF0000",
+    "orange": "#FF9000",
+    "brown": "#965000",
+    "purple": "#9A24FF",
+    "blue": "#0062FF",
+    "gray": "#808080"
+  }
+}

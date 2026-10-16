@@ -129,6 +129,29 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   implementar preparo, elegibilidade do ambiente, instrucoes/contagens e pratica
   jsPsych com teclado/foco/feedback, sem gravar treino como resultado oficial.
 
+## 2026-10-16 — W10 concluida
+
+- Pratica real jsPsych 8.3.0: preparo desktop/teclado/foco, regra, contagem,
+  quatro condicoes-fonte aleatorias sem reposicao, HUD, quatro feedbacks e
+  repeticao opcional sem pontuacao minima. Treino nunca integra resultado oficial;
+  interrupcao descarta rodada. Nenhum dado pessoal e solicitado; metadados
+  pseudonimizados da sessao serao conectados ao bootstrap na integracao W13.
+- `condicoes/web_protocol.json` e snapshot unico API/frontend, extraido de W07
+  com lembrete aprovado de 1500 ms. CSVs/Builder intactos. Filtro UA conservador
+  recusa mobile/Safari/macOS e derivados identificados fora do MVP; nao prova
+  hardware ou homologacao. Tecla mantida/repeat e eventos tardios sao ignorados.
+- Evidencias: 77 testes Vitest; 18 Playwright Chromium/Firefox em 36,2 s;
+  typecheck/build/npm ci e audit (zero vulnerabilidades) aprovados. Preview
+  1440x1000 inspecionado, sem excecoes JS. Mesmos navegadores/SO de W09;
+  sem validacao Windows/latencia fisica. Backend: 240 testes PostgreSQL 17.6
+  em 28,934 s, zero skips; compileall/pip check aprovados. Container sintetico
+  removido. Observacao do feedback em e2e usa polling por quadro para nao perder
+  sua fase de 500 ms; duracoes do produto nao foram ampliadas para o teste.
+- Proxima acao exata: W11 — implementar bloco principal monotono de 16 tentativas,
+  duracao nominal de 60 s, sem feedback; ordem/observacoes temporais e filtros
+  de resposta devem satisfazer contrato W02 e politica D2/D5/D6. Integracao de
+  ordem persistida/HTTP permanece W13. Preservar alteracao raiz AGENTS preexistente.
+
 ## Decisoes e contexto preservados
 
 - Usuario aprovou explicitamente itens 1–19 da sessao. Finalidade coleta do

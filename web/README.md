@@ -1,7 +1,7 @@
 # Interface WEB
 
 Base React/TypeScript com navegacao por historico, orientacoes, acesso da equipe,
-estados de carregamento/erro e cliente HTTP. O estado e o aceite ficam no
+estados de carregamento/erro, cliente HTTP e pratica real jsPsych. O estado e o aceite ficam no
 [roadmap](../docs/ROADMAP_WEB.md); protocolo e unidades seguem o
 [contrato HTTP](../docs/desenvolvimento/CONTRATO_API_WEB.md).
 
@@ -32,9 +32,9 @@ npx --no-install playwright install --no-remove chromium firefox
 npm run test:browser
 ```
 
-`npm test` executa Vitest: cliente HTTP em Node e ciclo de vida do host em DOM.
+`npm test` executa Vitest: cliente HTTP, ambiente, ciclo de vida e pratica com relogio controlado.
 Playwright executa navegacao, historico/foco, loading/login, erro/retry e logout
-em Chromium e Firefox. Somente a rede desses testes e interceptada, com fixtures
+em Chromium e Firefox, alem de quatro feedbacks, tecla mantida, repeticao e interrupcao da pratica. Somente a rede dos testes HTTP e interceptada, com fixtures
 inequivocamente sinteticas; producao nao possui respostas simuladas. Nao executar
 esses testes contra coleta real. `npm run preview` serve o build local em 4173.
 `dist/`, `node_modules/`, traces e resultados de teste nao sao versionados.
@@ -46,8 +46,15 @@ esses testes contra coleta real. `npm run preview` serve o build local em 4173.
 - `src/api/client.ts`: endpoints fixos, cookies same-origin, no-store, CSRF
   em RAM, validacao de resposta, timeout/cancelamento e erros sanitizados.
 - `src/experiment/ExperimentHost.tsx`: recipiente de DOM imperativo com montagem
-  e limpeza; o motor nao depende de renderizacoes React por quadro. Pratica e
-  bloco principal sao entregas seguintes, conforme o protocolo aprovado.
+  e limpeza; o motor nao depende de renderizacoes React por quadro.
+- `src/components/PracticePreparation.tsx`: filtro de ambiente, confirmacao e
+  teste de teclado, inicio/repeticao e descarte de treino interrompido.
+- `src/experiment/practice*.ts`: plugin jsPsych e runtime monotono com quatro
+  condicoes-fonte, contagem, HUD e feedback; treino fica somente em RAM.
+- `src/experiment/protocol.ts`: consome `../condicoes/web_protocol.json`
+  compartilhado com a API e o CSV-fonte de pratica. Nenhum parametro metodologico
+  e derivado de exemplos da interface. O principal e a integracao de sessao
+  permanecem nas proximas etapas.
 - `src/**/*.test.*` e `e2e/`: testes de logica/DOM e navegador.
 
 Nenhum resultado ou token e persistido por JavaScript. Segredos OIDC permanecem
@@ -61,3 +68,7 @@ Referencias primarias: [React](https://react.dev/learn/build-a-react-app-from-sc
 Resultados observados e limites de validacao ficam em
 [PROGRESS.md](../docs/PROGRESS.md); o teste da interface nao certifica latencia
 fisica nem valida todos os sistemas e equipamentos previstos para a pesquisa.
+
+O filtro de user-agent e uma verificacao conservadora, sem prova de teclado
+fisico ou homologacao. Ha confirmacao explicita e teste de pressionar/soltar
+Espaco. Nao se exige desempenho minimo; repetir descarta o resumo anterior.
