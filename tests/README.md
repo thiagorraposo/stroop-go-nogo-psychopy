@@ -6,6 +6,12 @@ Operacao do desenvolvimento: [protocolo Codex CLI](../docs/WORKFLOW_CODEX_CLI.md
 
 Esta pasta contem testes de consistencia do experimento e da exportacao unificada.
 
+`test_nucleo_compartilhado.py` protege os imports anteriores, a normalizacao
+sem banco/Streamlit/site-packages e a execucao das CLIs por caminho fora da
+raiz e como modulo. Usa somente fixtures sinteticas e SQLite temporario.
+Os testes existentes continuam no mesmo local e com o mesmo comando de
+descoberta. A evolucao dos testes web esta no [roadmap WEB](../docs/ROADMAP_WEB.md).
+
 Validacoes implementadas ou esperadas:
 
 - colunas exigidas em CSVs de condicoes;
