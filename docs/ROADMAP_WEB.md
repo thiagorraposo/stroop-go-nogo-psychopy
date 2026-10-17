@@ -25,7 +25,7 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W12 | Concluida em 2026-10-16; resumo, CSV de 21 campos, paridade Python/TypeScript e importacao real validados |
 | W13 | Concluida; fluxo HTTPS real, reenvio e finalizacao validados |
 | W15 | Concluida; painel autorizado, metricas/graficos/CSV e perfis validados em HTTPS real |
-| W16 | Bloqueada; faltam equipamento de referencia e evidencias dos pilotos temporais |
+| W16 | Pacote de referencia aprovado; bloqueada por disponibilidade dos equipamentos e evidencias dos pilotos |
 | W17 | Concluida; hardening, CSP, 284 testes Python, HTTPS e auditorias aprovados |
 | W18 | Concluida; pipeline completo em checkout sparse limpo, testes e auditorias aprovados |
 | W19 | Concluida; imagens nao-root, Compose isolado e smoke HTTPS/coleta/reinicio aprovados |

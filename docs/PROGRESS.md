@@ -382,6 +382,12 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   W21 depende disso e ambiente alvo autorizado com capacidade medida. W22 e
   execucao do usuario; W23 depende da implantacao/aceite. Perguntas sobre hardware
   e ambiente de homologacao enviadas; nao presumir autorizacao VPS ou resultados.
+- Usuario aprovou o pacote W16 integralmente: configuracao canonica em
+  VALIDACAO_WEB.md (Windows11/LinuxMint22.2, Chrome/Edge/Firefox, 60sessoes,
+  monitor1080p60Hz e tecladoUSB). Nao pedir novamente decisoes desse pacote.
+  A aprovacao nao confirma existencia/acesso aos equipamentos nem execucao das
+  replicas. Falta disponibilidade/inventario real e evidencias presenciais;
+  preservar tolerancias D5 e nao substituir por headless/VM.
 - W20 commit37fd066 concluido. Bloqueio revalidado em tres turnos consecutivos:
   nao chegaram equipamento/evidencias W16 nem ambiente autorizado W21. Nao ha
   outra etapa independente com dependencias atendidas. Goal bloqueado aguardando

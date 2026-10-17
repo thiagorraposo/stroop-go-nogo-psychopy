@@ -42,13 +42,13 @@ profissional nao e evidencia temporal do experimento.
 
 ## Procedimento de piloto de referencia
 
-### Proposta de configuracao — aguardando aprovacao
+### Configuracao de referencia aprovada
 
-Proposta solicitada pelo responsavel para decidir o pacote sem escolher cada
-parametro separadamente. Sao alvos de ensaio, nao equipamentos existentes
-confirmados nem resultados medidos. Nao altera D1/D5 nem concede aceite W16.
+Pacote aprovado explicitamente pelo responsavel na sessao em 2026-10-16
+("eu aprovo este pacote"). Sao alvos de ensaio, nao equipamentos existentes
+confirmados nem resultados medidos. Preserva D1/D5 e nao concede aceite W16.
 
-| Item | Proposta |
+| Item | Configuracao aprovada |
 |---|---|
 | Equipamento | Computador fisico desktop/notebook, CPU com pelo menos quatro processadores logicos, 8 GB de RAM; registrar modelo/CPU/GPU reais antes do ensaio. Esta configuracao de referencia nao constitui requisito minimo comprovado para participantes |
 | Sistemas | Windows 11 e Linux Mint 22.2; equipamento por sistema identificado, preservando o mesmo monitor/teclado quando possivel |
@@ -59,7 +59,7 @@ confirmados nem resultados medidos. Nao altera D1/D5 nem concede aceite W16.
 | Criterios | Aplicar D5 sem alterar tolerancias: ate um quadro medido por transicao e ate 100 ms de desvio do bloco de 60 s; preservar tambem replicas invalidas e investigar falhas antes de homologar a combinacao |
 | Evidencias e alcance | Artefatos brutos planejados/observados e relatorio por replica, testes de interrupcao separados; homologacao de engenharia por software, sem alegar equivalencia temporal/psicometrica com PsychoPy |
 
-Aprovacao autoriza preparar e executar o plano com recursos disponiveis; nao
+A aprovacao autoriza preparar e executar o plano com recursos disponiveis; nao
 substitui acesso ao Windows, monitor/teclado fisicos ou realizacao dos pilotos.
 O Codex prepara instrumentacao, automacao e analise; o responsavel disponibiliza
 os equipamentos e executa os passos presenciais que nao puderem ser automatizados.
@@ -103,7 +103,9 @@ Faltam inventario do equipamento de referencia, execucao presencial das dez
 replicas por ambiente e evidencias fisicas/comparativas quando exigidas pelo
 estudo. O Codex pode preparar software e analisar artefatos sinteticos, mas nao
 atestar monitor/teclado fisicos a partir de um navegador headless. W16 continua
-pendente de aceite; essa pendencia localizada nao impede W17/W18.
+pendente de aceite. A configuracao do pacote esta decidida; a pendencia e a
+disponibilidade/verificacao dos equipamentos e a execucao dos ensaios, sem nova
+aprovacao tecnica rotineira. W17–W20 ja foram executadas independentemente.
 
 A [documentacao primaria de temporizacao do jsPsych](https://www.jspsych.org/v8/overview/timing-accuracy/)
 distingue limitacoes de apresentacao em navegador e alerta que resultados de

@@ -6,6 +6,14 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W16: pacote de referencia aprovado
+
+- Responsavel aprovou integralmente o pacote registrado em VALIDACAO_WEB.md:
+  duas plataformas, tres navegadores e dez replicas por combinacao; parametros
+  de equipamento e criterios D5 preservados. Sem medicoes ou aceite inferidos.
+- Pendencia passou de escolha da configuracao para disponibilidade/inventario
+  dos equipamentos e execucao dos pilotos fisicos. Nenhuma alteracao do motor.
+
 ## 2026-10-16 — W20: observabilidade e recuperacao WEB
 
 - Monitor local somente leitura com saude/contagens e alerta fechado, sem dados
