@@ -163,3 +163,21 @@ paginacao descartam totais, tabela e graficos; recuperacao e explicita.
 Participantes sao identificados por projeto+codigo. A evolucao individual
 anterior so aparece num unico projeto, evitando fundir pseudonimos coincidentes.
 A tabela mostra projeto e encaminha detalhe/exportacao ao contexto da linha.
+
+
+## WEB — apresentacao dos resultados por instrumento (W15B)
+
+A tabela mostra metadados e metricas aplicaveis ao instrumento selecionado,
+sem colunas Stroop preenchidas ficticiamente para outros instrumentos.
+O detalhe identifica avaliacao/sessao/projeto, avaliador tecnico, horarios,
+versoes, protocolo, aplicativo e quatro contagens de resposta do principal.
+Ausencias legadas ficam explicitas; arquivo fonte e campos nominais nao entram
+na apresentacao. Resultados descritivos nao possuem norma, ranking ou score.
+
+A comparacao de erros distingue projetos e oferece tabela alternativa.
+A evolucao seleciona projeto+codigo, conserva visitas repetidas e usa ordem
+inicio+ID. Precisao e tempo mediano recebem figuras separadas, com unidades
+explicitas e ausencia sem barra/zero ficticio. A demonstracao sintetica registrada
+recebe cards, figuras e tabela com suas metricas/unidades; codigos desconhecidos
+ficam em tabela neutra. Os componentes usam somente o conjunto filtrado carregado,
+sem requisicao de detalhe por linha nem mistura entre instrumentos.

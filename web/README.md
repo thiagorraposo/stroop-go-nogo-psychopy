@@ -119,7 +119,8 @@ zero. Graficos mostram datas de inicio, precisao por visita, distribuicao de
 RTs medianos e erros. Filtrar um participante num unico projeto mostra evolucao por visita. O detalhe
 conserva metricas/tentativas e proveniencia, inclusive campos ausentes do legado.
 Datas sem fuso nao recebem conversao implicita. Instrumentos adicionais exibem
-suas proprias metricas no detalhe, sem graficos Stroop ou CSV inventado.
+suas proprias metricas no detalhe; a demonstracao sintetica registrada tem
+cards/graficos/tabela proprios, sem graficos Stroop ou CSV inventado.
 
 O download explicito usa CSV oficial W14, reautorizado no servidor em cada
 clique. Apenas essa acao solicitada pelo profissional cria arquivo; consultas
@@ -193,3 +194,25 @@ falha de acesso em qualquer projeto limpa o agregado; use `Atualizar consultas`.
 A consistencia e verificada por projeto, sem snapshot global entre projetos.
 CSV agregado da visao filtrada permanece no complemento proprio do roadmap;
 o CSV oficial individual continua disponivel no detalhe autorizado.
+
+
+## Tabela, detalhe e evolucao descritiva
+
+A tabela Stroop apresenta projeto, avaliador tecnico, precisao total/Go/No-Go,
+contagens das quatro respostas e RT mediano. O detalhe inclui IDs de sessao e
+avaliacao, projeto, avaliador, inicio/conclusao, versoes/protocolo e tempos
+observados quando disponiveis. Dados historicos ausentes ficam identificados,
+sem criar fuso, identificacao de avaliador ou proveniencia WEB.
+
+A comparacao de omissoes/comissoes identifica cada projeto. `Participante para
+evolucao` seleciona a dupla projeto+codigo; visitas repetidas permanecem como
+avaliacoes distintas em ordem de inicio e ID. Precisao (%) e RT mediano (s)
+ficam em figuras separadas, com tabela alternativa. Ausencia de hits nao e RT
+zero; precisao com denominador ausente aparece como ausencia.
+
+O instrumento demonstrativo sintetico possui visao propria de `demo_total`
+(count) e `demo_mean` (unit), por avaliacao, mantendo valores negativos quando
+existirem e sem transformar unidades em percentuais. Outros codigos conservam
+tabela neutra das metricas disponiveis. Selecionar instrumento preserva a
+separacao de conjuntos; a UI nao consulta detalhe de cada linha para montar
+cards, tabelas ou graficos. CSV agregado permanece no complemento W15C.

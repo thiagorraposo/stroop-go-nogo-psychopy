@@ -11,7 +11,7 @@ function row(id: string, platform: 'web' | 'psychopy' = 'web'): Assessment {
     created_at: '2026-10-16T12:00:00Z', started_at: '2026-10-16T12:00:00Z', platform,
     test_code: 'stroop_go_nogo_ptbr', test_version: '1.0.0', protocol_id: platform === 'web' ? 'synthetic-v1' : null,
     app_version: platform === 'web' ? 'web-0.1.0' : null,
-    summary: { accuracy: 75, response_time_seconds: 0.625, total_trials: 16, hits: 6, correct_rejections: 6, omission_errors: 2, commission_errors: 2 } }
+    summary: { accuracy: 75, accuracy_go_trials: 75, accuracy_no_go_trials: 75, total_go_trials: 8, total_no_go_trials: 8, response_time_seconds: 0.625, total_trials: 16, hits: 6, correct_rejections: 6, omission_errors: 2, commission_errors: 2 } }
 }
 const first = row('web1'), second = row('local2', 'psychopy')
 const generic: Assessment = { ...row('generic3'), test_code: 'teste_sintetico', summary: { metrics: { pontos: 999 } } }

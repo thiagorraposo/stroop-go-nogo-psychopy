@@ -104,7 +104,11 @@ class WebAssessmentsTests(unittest.TestCase):
             self.assertEqual(response.status_code, 200, response.text)
             self.assertEqual(len(response.json()['items']), 1)
             item = response.json()['items'][0]
-            self.assertEqual(item['summary'], receipt['summary'])
+            self.assertEqual({key: item['summary'][key] for key in receipt['summary']}, receipt['summary'])
+            self.assertEqual(item['summary']['total_go_trials'], 8)
+            self.assertEqual(item['summary']['total_no_go_trials'], 8)
+            self.assertEqual(item['summary']['accuracy_go_trials'], 100 * receipt['summary']['hits'] / 8)
+            self.assertEqual(item['summary']['accuracy_no_go_trials'], 100 * receipt['summary']['correct_rejections'] / 8)
             self.assertEqual(item['platform'], 'web')
             self.assertNotIn('participant_name', response.text)
             detail = client.get(self.path + '/' + receipt['assessment_id'])
@@ -203,7 +207,9 @@ class WebAssessmentsTests(unittest.TestCase):
             connection.execute("UPDATE trial_results SET correct=0,error_type='commission'")
         listed = self.h.consulta.get(self.path)
         self.assertEqual(listed.status_code, 200, listed.text)
-        self.assertEqual(listed.json()['items'][0]['summary'], receipt['summary'])
+        self.assertEqual({key: listed.json()['items'][0]['summary'][key] for key in receipt['summary']}, receipt['summary'])
+        self.assertEqual(listed.json()['items'][0]['summary']['accuracy_go_trials'], 0)
+        self.assertEqual(listed.json()['items'][0]['summary']['accuracy_no_go_trials'], 100)
         detail = self.h.consulta.get(self.path + '/' + receipt['assessment_id'])
         self.assertEqual(detail.status_code, 200, detail.text)
         metrics = {metric['metric_code']: metric['metric_value'] for metric in detail.json()['metrics']}
@@ -213,6 +219,56 @@ class WebAssessmentsTests(unittest.TestCase):
         with psycopg.connect(self.database_url) as connection:
             self.assertEqual(connection.execute(
                 "SELECT metric_value FROM assessment_metrics WHERE metric_code='accuracy'").fetchone()[0], 1)
+
+    def _assert_condition_absence(self, absent):
+        assessment_id = self.legacy()
+        self.link_legacy()
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute('DELETE FROM trial_results WHERE assessment_id=%s AND condition=%s', (assessment_id, absent))
+            if absent == 'congruent':
+                connection.execute('UPDATE trial_results SET trial_number=trial_number-2 WHERE assessment_id=%s', (assessment_id,))
+        listed = self.h.consulta.get(self.path)
+        self.assertEqual(listed.status_code, 200, listed.text)
+        summary = listed.json()['items'][0]['summary']
+        detail_response = self.h.consulta.get(self.path + '/' + assessment_id)
+        self.assertEqual(detail_response.status_code, 200, detail_response.text)
+        self.assertEqual(summary, detail_response.json()['summary'])
+        detail_metrics = {metric['metric_code']: metric['metric_value'] for metric in detail_response.json()['metrics']}
+        missing = 'go' if absent == 'congruent' else 'no_go'
+        present = 'no_go' if absent == 'congruent' else 'go'
+        self.assertEqual(summary[f'total_{missing}_trials'], 0)
+        self.assertIsNone(summary[f'accuracy_{missing}_trials'])
+        self.assertIsNone(detail_metrics[f'accuracy_{missing}_trials'])
+        self.assertEqual(summary[f'total_{present}_trials'], 2)
+        self.assertEqual(summary[f'accuracy_{present}_trials'], 50)
+        self.assertEqual(summary['total_trials'], 2)
+        if absent == 'congruent':
+            self.assertIsNone(summary['response_time_seconds'])
+            self.assertIsNone(detail_metrics['omission_errors_percentage'])
+
+    def test_w15b_sem_tentativas_go_e_ausencia_nao_zero(self):
+        self._assert_condition_absence('congruent')
+
+    def test_w15b_sem_tentativas_nogo_e_ausencia_nao_zero(self):
+        self._assert_condition_absence('incongruent')
+
+    def test_w15b_summary_profissional_recalculado_e_recibo_preservado(self):
+        receipt, participant = self.complete()
+        original_keys = {'accuracy', 'response_time_seconds', 'total_trials', 'hits',
+                         'omission_errors', 'commission_errors', 'correct_rejections'}
+        self.assertEqual(set(receipt['summary']), original_keys)
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute("UPDATE assessment_metrics SET metric_value=1 WHERE metric_code IN ('accuracy_go_trials','accuracy_no_go_trials','total_go_trials','total_no_go_trials')")
+        listed = self.h.consulta.get(self.path).json()['items'][0]['summary']
+        detail = self.h.consulta.get(self.path + '/' + receipt['assessment_id']).json()
+        metrics = {metric['metric_code']: metric['metric_value'] for metric in detail['metrics']}
+        self.assertEqual(set(listed), original_keys | {'accuracy_go_trials', 'accuracy_no_go_trials', 'total_go_trials', 'total_no_go_trials'})
+        self.assertEqual(detail['summary'], listed)
+        for key in ('accuracy_go_trials', 'accuracy_no_go_trials', 'total_go_trials', 'total_no_go_trials'):
+            self.assertEqual(listed[key], metrics[key])
+        recovered = participant.get('/api/v1/participant/session').json()
+        self.assertEqual(recovered, receipt)
+        self.assertEqual(set(recovered['summary']), original_keys)
 
     def test_schema_incompleto_falha_fechado_sem_sql_e_projeto_inativo_e404(self):
         receipt, _ = self.complete()

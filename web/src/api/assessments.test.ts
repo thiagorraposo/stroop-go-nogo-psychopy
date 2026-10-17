@@ -5,6 +5,7 @@ const projectId = '00000000-0000-4000-8000-000000000001';
 const project = { id: projectId, code: 'P_SINTETICO', name: 'Pesquisa sintética', active: true,
   created_at: '2026-10-16T12:00:00+00:00' };
 const summary = { accuracy: 50, response_time_seconds: 0.5, total_trials: 16,
+  accuracy_go_trials: 50, accuracy_no_go_trials: 50, total_go_trials: 8, total_no_go_trials: 8,
   hits: 4, omission_errors: 4, commission_errors: 4, correct_rejections: 4 };
 const item = { assessment_id: 'A_SINTETICA', participant_id: 'P_SINTETICO', visit: 'V1',
   evaluator_id: null, created_at: '2026-10-16T12:00:00Z', started_at: '2026-10-16T11:00:00',
@@ -144,7 +145,7 @@ describe('filtros completos e facetas autorizadas W15A', () => {
   it.each([
     { start_date: '2026-02-30' }, { end_date: '2026-10-17T00:00:00Z' },
     { start_date: '2026-10-18', end_date: '2026-10-17' }, { participant_id: ['P'.repeat(513)] },
-    { participant_id: ['P_1', 'P_1'] }, { visit: ['codigo\ncontrole'] }, { evaluator_id: ['../privado'] },
+    { participant_id: ['P_1', 'P_1'] }, { participant_id: ['   '] }, { visit: ['  '] }, { visit: ['codigo\ncontrole'] }, { evaluator_id: ['../privado'] },
     { test_version: ['v'.repeat(65)] }, { platform: ['externa'] }, { test_code: '../privado' },
     { visit: Array.from({ length: 101 }, (_, i) => `V${i}`) },
   ])('rejeita filtro invalido antes da rede %#', options => {
@@ -159,7 +160,7 @@ describe('filtros completos e facetas autorizadas W15A', () => {
     expect(fetchMock.mock.calls[0]?.[0]).toBe(`/api/v1/projects/${projectId}/assessments/options?start_date=2026-10-01&end_date=2026-10-17&test_code=stroop_go_nogo_ptbr`);
   });
   it.each([
-    { ...facets, participant_name: ['SINTETICO'] }, { ...facets, visit: ['V1', 'V1'] },
+    { ...facets, participant_name: ['SINTETICO'] }, { ...facets, participant_id: ['   '] }, { ...facets, visit: ['  '] }, { ...facets, visit: ['V1', 'V1'] },
     { ...facets, platform: ['externa'] }, { ...facets, evaluator_id: ['pessoa@example.invalid'] },
     { ...facets, test_version: ['segredo\n'] }, { ...facets, test_code: [null] },
     { ...facets, participant_id: Array.from({ length: 201 }, (_, i) => `P_${i}`) },
@@ -183,3 +184,39 @@ describe('filtros completos e facetas autorizadas W15A', () => {
  expect(String(fetchMock.mock.calls[0]?.[0])).toContain('participant_id=P+sintetico+legado');
  expect(String(fetchMock.mock.calls[0]?.[0])).not.toContain('visit=');
  });
+
+describe('summary profissional Go/No-Go W15B', () => {
+  it('exige os onze campos e aceita proporcoes distintas por condicao', async () => {
+    const values = { ...summary, accuracy: 62.5, hits: 6, omission_errors: 2,
+      correct_rejections: 4, commission_errors: 4, accuracy_go_trials: 75, accuracy_no_go_trials: 50 };
+    fetchMock.mockResolvedValue(json({ items: [{ ...item, summary: values }], next_cursor: null }));
+    await expect(listAssessments(projectId)).resolves.toMatchObject({ items: [{ summary: values }] });
+  });
+  it.each([
+    { ...summary, total_go_trials: 7 }, { ...summary, total_no_go_trials: 7 },
+    { ...summary, accuracy_go_trials: 51 }, { ...summary, accuracy_no_go_trials: 49 },
+    { ...summary, accuracy_go_trials: null }, { ...summary, accuracy_no_go_trials: null },
+    { ...summary, accuracy_go_trials: -1 }, { ...summary, accuracy_no_go_trials: 101 },
+    { ...summary, accuracy_go_trials: '50' }, { ...summary, total_go_trials: 8.5 },
+    { ...summary, total_no_go_trials: -1 },
+    { accuracy: 50, response_time_seconds: 0.5, total_trials: 16,
+      hits: 4, omission_errors: 4, commission_errors: 4, correct_rejections: 4 },
+  ])('recusa shape antigo ou projecao Go/No-Go inconsistente %#', async values => {
+    fetchMock.mockResolvedValue(json({ items: [{ ...item, summary: values }], next_cursor: null }));
+    await expect(listAssessments(projectId)).rejects.toMatchObject({ code: 'invalid_response' });
+  });
+  it.each([
+    { ...summary, accuracy: 50, total_trials: 8, total_go_trials: 0, total_no_go_trials: 8,
+      hits: 0, omission_errors: 0, commission_errors: 4, correct_rejections: 4,
+      accuracy_go_trials: null, accuracy_no_go_trials: 50, response_time_seconds: null },
+    { ...summary, accuracy: 50, total_trials: 8, total_go_trials: 8, total_no_go_trials: 0,
+      hits: 4, omission_errors: 4, commission_errors: 0, correct_rejections: 0,
+      accuracy_go_trials: 50, accuracy_no_go_trials: null, response_time_seconds: 0.5 },
+  ])('preserva precisao ausente quando nao ha tentativas da condicao %#', async values => {
+    fetchMock.mockResolvedValue(json({ items: [{ ...item, summary: values }], next_cursor: null }));
+    await expect(listAssessments(projectId)).resolves.toMatchObject({ items: [{ summary: values }] });
+    const incorrect = { ...values, ...(values.total_go_trials === 0 ? { accuracy_go_trials: 0 } : { accuracy_no_go_trials: 0 }) };
+    fetchMock.mockResolvedValue(json({ items: [{ ...item, summary: incorrect }], next_cursor: null }));
+    await expect(listAssessments(projectId)).rejects.toMatchObject({ code: 'invalid_response' });
+  });
+});

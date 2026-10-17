@@ -3,27 +3,27 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
-## Atual — W15A validada; proxima W15B
+## Atual — W15B validada; proxima W15C
 
-- Retomada autonoma pelo arquivo anexado; branch prep-web. AGENTS.md raiz
-  preexistente preservado fora dos commits. Nenhuma acao remota nesta retomada.
-- W13A salva em bff6982: cliente/formulario integrado de emissao/revogacao,
-  metadados/CSRF RAM e limpeza; validacao tecnica no registro. Aceite do operador
-  pendente, sem declarar etapa concluida. W16/homologacao/coleta real pendentes.
-- W15A validada: filtros combinados/periodo, facetas SELECT autorizadas e cursor
-  com fingerprint/409; interface ate20projetos/5000avaliacoes sem agregado parcial,
-  participantes por projeto+codigo e detalhe/CSV no projeto da linha. Contrato,
-  UX/README alinhados; captura sintetica form/cards inspecionada.
-- Evidencias:326Python/54,018s sem skips,236frontend, typecheck/build/pipcheck;
-  browser70gerais/1min+4temporais/3,5min; HTTPS2/2 com105avaliacoes/limites/
-  revogacao, regressao consultaW13A2/2. Viewport390/zoomdesktop200% aprovados.
-  Scanner sources e diff aprovados. Detalhes/falhas de fixture no registro.
-- PostgreSQL descartavel proprio stroop-w13a-test/32768, database
-  stroop_etapa4_test_w13a; nenhum container operacional alterado. PortasHTTPS
-  liberadas. Containerbackend32769 criado/removido pelo agente.
-- Proxima acao: commit local W15A preservando AGENTS raiz; iniciar W15B:
-  ampliar summary profissional Go/No-Go, tabela/detalhe, comparacao de erros
-  e evolucao por identidade projeto+codigo; demo sintetica com visao propria.
+- Branch prep-web; AGENTS.md raiz preexistente permanece fora dos commits.
+  W13A em bff6982, aceite de operacao pendente. W15A em451e43e. Nenhum acesso
+  remoto/publicacao nesta retomada; W16/homologacao/coleta real pendentes.
+- W15B validada: summary profissional11campos estrito, null denominadores
+  ausentes, recibo7 preservado; ResultsTable/metadata detalhe; visuais de erros
+  por projeto/evolucao por projeto+codigo e demo registrada com metricas proprias.
+  Sem N+1/novos dados nominais; contratos/UX/README alinhados.
+- Evidencias no registro:329Python/51,984s sem skips,261frontend,72browsergerais,
+  HTTPS4/4 novos+8/8 regressao perfis/CSV reais. CSS scroll local ajustado e
+  comprobadoChromium1/1; screenshots sinteticos inspecionados. Viewport390/zoom200,
+  build/typecheck/npmci/audit/pipcheck/compileall/diff aprovados. Motor inalterado,
+  quatro testes temporais W15A conservam evidencia de regressao relevante.
+- Banco descartavel proprio stroop-w13a-test/32768, database
+  stroop_etapa4_test_w13a disponivel; portasHTTPS livres. Backend proprio32770
+  criado/removido pelo agente. Nenhum container operacional alterado.
+- Proxima acao: commit local W15B e iniciar W15C. Proposta tecnica em revisao:
+  header snapshot HMAC emRAM e exportacao com reautorizacao/snapshot numa unica
+  transacaoRO, cap20projetos/5000linhas. Snapshot deve incluir valores das metricas/
+  tentativas alem de metadata, validar filtros originais antes da view final.
 
 ## Historico — relatorio tecnico para leitores externos
 

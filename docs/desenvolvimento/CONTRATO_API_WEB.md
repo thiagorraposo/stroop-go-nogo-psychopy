@@ -477,6 +477,25 @@ Horarios legados sem fuso permanecem sem fuso; nao atribuir UTC implicitamente.
 No legado, a quantidade de tentativas segue o protocolo original; instrumentos
 sem tentativas retornam lista vazia, sem fabricar registros Stroop.
 
+O `summary` profissional Stroop e fechado com onze campos: `accuracy`,
+`accuracy_go_trials`, `accuracy_no_go_trials`, `total_go_trials`,
+`total_no_go_trials`, `response_time_seconds`, `total_trials`, `hits`,
+`omission_errors`, `commission_errors`, `correct_rejections`. As precisões
+profissionais Go/No-Go sao percentuais do nucleo recalculado por pagina, sem
+consulta de detalhe por linha. Cada precisao e `null` quando nao ha tentativas
+do respectivo tipo; RT e `null` sem hits. Contagens conservam zero quando zero
+foi observado. O detalhe preserva a mesma ausencia para as metricas com
+denominador zero, inclusive percentual de omissoes sem Go. Isso nao altera
+formulas do nucleo, CSV, nem o recibo do participante de sete campos.
+
+Instrumentos adicionais conservam `summary: {"metrics": {codigo: numero}}`
+e unidades/rotulos no detalhe. A demonstracao registrada
+`instrumento_sintetico_demo` usa `demo_total` (`count`) e `demo_mean` (`unit`),
+sem classificacoes Stroop ou tentativas inventadas. A apresentacao WEB mostra
+cada instrumento separadamente; valores ausentes nao recebem zero nem unidade
+presumida para codigos desconhecidos. A listagem e o detalhe nao divulgam
+caminho/nome de arquivo fonte ou campos nominais de participantes.
+
 Escopo legado exige vinculo operacional explicito em `web_legacy_project_links`,
 conforme [ADR-003](../arquitetura/ADR-003-escopo-legado-web.md); coincidencia entre
 rotulo legado e codigo de projeto novo nao concede acesso. O mapa inicia vazio,

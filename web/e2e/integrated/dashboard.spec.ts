@@ -24,7 +24,7 @@ for (const [role, label] of [['consulta', 'Consulta'], ['importacao', 'Coleta e 
     await expect(page.locator('.dashboard-cards')).toContainText('0,512 s')
     const table = page.getByRole('table', { name: 'Avaliações filtradas' })
     await expect(table).toContainText('P_SINTETICO_W15')
-    await expect(table).toContainText('psychopy')
+    await expect(table).toContainText('PsychoPy local')
     await page.getByRole('button', { name: 'Ver avaliação P_SINTETICO_W15, visita V_SINTETICA' }).focus()
     await page.keyboard.press('Enter')
     const panel = page.getByRole('region', { name: 'Detalhe da avaliação' })
@@ -50,7 +50,7 @@ for (const [role, label] of [['consulta', 'Consulta'], ['importacao', 'Coleta e 
     await page.reload()
     if (role === 'administracao') {
       await page.getByRole('combobox', { name: 'Projeto', exact: true }).selectOption(prepared.project_id)
-      await expect(page.getByRole('alert')).toHaveText('O recurso solicitado não está disponível.')
+      await expect(page.locator('.professional-dashboard > p[role=alert]')).toHaveText('O recurso solicitado não está disponível.')
     } else await expect(page.getByRole('status')).toHaveText('Nenhum projeto disponível para sua conta.')
     await expect(page.getByRole('table')).toHaveCount(0)
     expect(errors).toEqual([])

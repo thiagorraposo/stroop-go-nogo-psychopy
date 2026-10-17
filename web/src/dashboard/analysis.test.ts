@@ -7,6 +7,8 @@ const rows: Assessment[] = cases.cases.map((item, index) => ({
   created_at: '2026-10-16T00:00:00Z', started_at: '2026-10-16T00:00:00Z', platform: 'web',
   test_code: 'stroop_go_nogo_ptbr', test_version: '0.2.2-web.1', protocol_id: null, app_version: null,
   summary: { accuracy: item.expected_summary.accuracy, response_time_seconds: item.expected_summary.response_time,
+    accuracy_go_trials: item.expected_summary.accuracy_go_trials, accuracy_no_go_trials: item.expected_summary.accuracy_no_go_trials,
+    total_go_trials: item.expected_summary.total_go_trials, total_no_go_trials: item.expected_summary.total_no_go_trials,
     total_trials: item.expected_summary.total_trials, hits: item.expected_summary.hits,
     omission_errors: item.expected_summary.omission_errors, commission_errors: item.expected_summary.commission_errors,
     correct_rejections: item.expected_summary.correct_rejections },

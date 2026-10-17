@@ -6,6 +6,36 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-17 — Tabela, detalhe e visualizacoes por instrumento W15B
+
+- Summary profissional fechado de onze campos acrescenta precisao e totais
+  Go/No-Go recalculados pelo nucleo; denominador ausente gera null em summary
+  e metricas do detalhe, incluindo percentual de omissoes sem Go. Recibo do
+  participante de sete campos, formulas e CSV oficial inalterados. Cliente
+  rejeita shape antigo/incompleto; consultas/facetas rejeitam whitespace puro.
+- ResultsTable apresenta colunas permitidas, avaliador tecnico e quatro
+  contagens; detalhe identifica IDs/projeto, inicio/conclusao, versoes, protocolo,
+  aplicativo e observacoes. Nenhum path/arquivo fonte/nome/iniciais acrescentado.
+- ResearchVisualizations compara erros por projeto e seleciona participante
+  por projeto+codigo, mantendo visitas repetidas e ordem inicio+ID; precisao
+  e RT mediano em figuras separadas com tabela alternativa. Rotulo inicial
+  indevido de tempo medio corrigido antes da validacao. Demo registrada possui
+  cards/graficos/tabela de demo_total/count e demo_mean/unit; desconhecidos
+  permanecem tabela neutra. Valores negativos/ausentes preservados, sem N+1.
+- Evidencias:329 testes Python/51,984s sem skips;261 frontend (incluindo6DOM
+  novos/69cliente), typecheck/build/npm ci/audit sem achados, compileall/pipcheck
+  e diff aprovados. Browser geral72/1,1min aprovado; quatro temporais W15A
+  permanecem evidencia do motor/fluxo participante nao alterados nesta unidade.
+- HTTPS real:W15B+W15A4/4 em28,6s; revalidacao perfis/detalhe/CSV individual e
+  visuais8/8 em29,6s, Chromium/Firefox, sem erros JS. Importacao pelo nucleo de
+  Stroop e demo, Go/No-Go/sem hits,16tentativas, ausenciaRT, metadados, repeticao
+  de visita, identidades por projeto e valores demo comprovados sem mocks.
+- Capturas sinteticas /tmp/stroop-w15b-*.png inspecionadas. Ajustada especificidade
+  CSS para scroll local da tabela ampla; nova assercao comprovou scroll local
+  e ausencia de overflow de pagina,390px e desktop/zoom200% (Chromium1/1 em6,1s).
+  Contrato/UX/README atualizados. Sem schema/dependencias/deploy/push/dados reais.
+  Proxima elegivel W15C, CSV agregado com reautorizacao e consistencia do conjunto.
+
 ## 2026-10-17 — Filtros combinados e agregado autorizado W15A
 
 - Listagem profissional recebe periodo inclusivo sobre assessment_date e listas

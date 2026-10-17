@@ -5,7 +5,7 @@ const first = '11111111-1111-4111-8111-111111111111', second = '22222222-2222-42
 const facets = { participant_id: ['P_SINTETICO'], visit: ['V1', 'V2'], evaluator_id: ['LEGADO_NAO_MAPEADO'], test_version: ['1.0.0'], platform: ['web'], test_code: ['stroop_go_nogo_ptbr'] }
 const row = (id: string) => ({ assessment_id: id, participant_id: 'P_SINTETICO', visit: 'V1', evaluator_id: null,
   created_at: '2026-10-16T12:00:00Z', started_at: '2026-10-16T12:00:00Z', platform: 'web', test_code: 'stroop_go_nogo_ptbr', test_version: '1.0.0', protocol_id: 'synthetic-v1', app_version: 'web-0.1.0',
-  summary: { accuracy: 75, response_time_seconds: 0.625, total_trials: 16, hits: 6, correct_rejections: 6, omission_errors: 2, commission_errors: 2 } })
+  summary: { accuracy: 75, accuracy_go_trials: 75, accuracy_no_go_trials: 75, total_go_trials: 8, total_no_go_trials: 8, response_time_seconds: 0.625, total_trials: 16, hits: 6, correct_rejections: 6, omission_errors: 2, commission_errors: 2 } })
 const card = (page: Page, title: string) => page.locator('.dashboard-cards > div').filter({ has: page.getByText(title, { exact: true }) }).locator('dd')
 async function access(page: Page) {
   await page.route('**/api/v1/auth/me', r => r.fulfill({ json: { user_id: 'sintetico', role: 'consulta', csrf_token: 's'.repeat(43), expires_at: new Date(Date.now() + 3600000).toISOString() } }))

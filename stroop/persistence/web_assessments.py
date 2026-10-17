@@ -274,6 +274,10 @@ def _summary(test_code: str, metrics: dict[str, float]) -> dict[str, Any]:
     hits = int(metrics.get("hits", 0))
     return {
         "accuracy": metrics.get("accuracy"),
+        "accuracy_go_trials": metrics.get("accuracy_go_trials") if metrics.get("total_go_trials", 0) else None,
+        "accuracy_no_go_trials": metrics.get("accuracy_no_go_trials") if metrics.get("total_no_go_trials", 0) else None,
+        "total_go_trials": int(metrics.get("total_go_trials", 0)),
+        "total_no_go_trials": int(metrics.get("total_no_go_trials", 0)),
         "response_time_seconds": metrics.get("response_time") if hits else None,
         "total_trials": int(metrics.get("total_trials", 0)),
         "hits": hits,
@@ -329,8 +333,11 @@ def get_assessment(database_url: str, project_id: UUID, assessment_id: str,
                 metric_values = {metric["metric_code"]: metric["metric_value"] for metric in recalculated}
                 hits = int(metric_values["hits"])
                 item["metrics"] = [
-                    {**metric, "metric_value": (None if metric["metric_code"] == "response_time" and not hits
-                                                else metric["metric_value"])} for metric in recalculated
+                    {**metric, "metric_value": (None if (
+                        metric["metric_code"] == "response_time" and not hits
+                        or metric["metric_code"] in ("accuracy_go_trials", "omission_errors_percentage") and not metric_values["total_go_trials"]
+                        or metric["metric_code"] == "accuracy_no_go_trials" and not metric_values["total_no_go_trials"]
+                    ) else metric["metric_value"])} for metric in recalculated
                 ]
                 item["summary"] = _summary(item["test_code"], metric_values)
                 for trial in trial_rows:

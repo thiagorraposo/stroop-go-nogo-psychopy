@@ -5,6 +5,7 @@ import type { ApiPath } from './client';
 export type Project = { id: string; code: string; name: string; active: boolean; created_at: string };
 export type Page<T> = { items: T[]; next_cursor: string | null };
 export type StroopSummary = { accuracy: number | null; response_time_seconds: number | null;
+  accuracy_go_trials: number | null; accuracy_no_go_trials: number | null; total_go_trials: number; total_no_go_trials: number;
   total_trials: number; hits: number; omission_errors: number; commission_errors: number;
   correct_rejections: number };
 export type Assessment = { assessment_id: string; participant_id: string; visit: string;
@@ -54,11 +55,21 @@ function project(x: unknown): Project {
     || typeof x.active !== 'boolean' || !date(x.created_at)) return invalid();
   return x as Project;
 }
+/** Confere a projecao recebida; nao calcula metricas para apresentar resultados. */
+function consistentPercentage(value: unknown, correct: number, total: number): boolean {
+  return total === 0 ? value === null
+    : finite(value) && value >= 0 && value <= 100 && Math.abs(value - 100 * correct / total) < 1e-8;
+}
 function stroopSummary(x: unknown): x is StroopSummary {
-  if (!closed(x, 'accuracy response_time_seconds total_trials hits omission_errors commission_errors correct_rejections')) return false;
-  const counts = ['total_trials', 'hits', 'omission_errors', 'commission_errors', 'correct_rejections'];
+  if (!closed(x, 'accuracy accuracy_go_trials accuracy_no_go_trials total_go_trials total_no_go_trials response_time_seconds total_trials hits omission_errors commission_errors correct_rejections')) return false;
+  const counts = ['total_trials', 'total_go_trials', 'total_no_go_trials', 'hits', 'omission_errors', 'commission_errors', 'correct_rejections'];
   return counts.every((k) => Number.isSafeInteger(x[k]) && Number(x[k]) >= 0)
     && nullableNumber(x.accuracy) && (x.accuracy === null || x.accuracy >= 0 && x.accuracy <= 100)
+    && Number(x.total_go_trials) + Number(x.total_no_go_trials) === x.total_trials
+    && Number(x.hits) + Number(x.omission_errors) === x.total_go_trials
+    && Number(x.correct_rejections) + Number(x.commission_errors) === x.total_no_go_trials
+    && consistentPercentage(x.accuracy_go_trials, Number(x.hits), Number(x.total_go_trials))
+    && consistentPercentage(x.accuracy_no_go_trials, Number(x.correct_rejections), Number(x.total_no_go_trials))
     && nullableNumber(x.response_time_seconds) && (x.response_time_seconds === null || x.response_time_seconds > 0)
     && Number(x.total_trials) > 0
     && Number(x.hits) + Number(x.omission_errors) + Number(x.commission_errors) + Number(x.correct_rejections) === x.total_trials
@@ -159,7 +170,8 @@ export function listAssessments(projectId: string, options: AssessmentOptions = 
     if (value === undefined) continue;
     const values = typeof value === 'string' ? [value] : value;
     input(Array.isArray(values) && values.length <= 100
-      && values.every(item => typeof item === 'string' && filterPatterns[key].test(item))
+      && values.every(item => typeof item === 'string' && filterPatterns[key].test(item)
+        && (!(key === 'participant_id' || key === 'visit') || item.trim().length > 0))
       && new Set(values).size === values.length);
     for (const item of values) params.append(key, item);
   }
@@ -172,7 +184,8 @@ export function getAssessmentOptions(projectId: string, options: AssessmentFacet
       const values = x[key];
       const pattern = key === 'test_code' ? labelPattern : filterPatterns[key];
       if (!Array.isArray(values) || values.length > 200
-        || !values.every(value => typeof value === 'string' && pattern.test(value))
+        || !values.every(value => typeof value === 'string' && pattern.test(value)
+          && (!(key === 'participant_id' || key === 'visit') || value.trim().length > 0))
         || new Set(values).size !== values.length) return invalid();
     }
     return x as AssessmentFacets;

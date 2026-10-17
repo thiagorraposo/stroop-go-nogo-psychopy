@@ -26,9 +26,9 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W12 | Concluida em 2026-10-16; resumo, CSV de 21 campos, paridade Python/TypeScript e importacao real validados |
 | W13 | Integracao anterior validada; fluxo completo de cadastro pela interface pendente em W13A |
 | W13A | Implementada e validada tecnicamente; aceite de operacao pelo responsavel pendente |
-| W15 | Painel inicial validado; paridade funcional com legado pendente em W15A–W15E |
+| W15 | Painel inicial e complementos W15A/W15B validados; paridade restante em W15C–W15E |
 | W15A | Concluida tecnicamente em 2026-10-17; filtros/facetas, agregado completo limitado e HTTPS reais validados |
-| W15B | Planejada; completar tabela, detalhe, graficos e visoes por instrumento |
+| W15B | Concluida tecnicamente em 2026-10-17; tabela/detalhe, evolucao e demo validados com API/DB reais |
 | W15C | Planejada; exportar a visao filtrada em CSV agregado |
 | W15D | Planejada; administrar usuarios, projetos e vinculos pela interface |
 | W15E | Planejada; importar CSV pela WEB com escopo, minimizacao e auditoria |
@@ -45,8 +45,8 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 As evidencias anteriores de W00–W15 e W17–W20 permanecem validas para os escopos
 testados; W09A planeja a experiencia revisada do participante e permanece
 pendente de implementacao/aceite visual. W13A e W15A–W15E impedem considerar completos o cadastro, o dashboard
-e a substituicao funcional do legado pelo navegador. W13A e a proxima prioridade
-de implementacao, seguida dos complementos W15 conforme dependencias, antes
+e a substituicao funcional do legado pelo navegador. W13A aguarda aceite de operacao; a implementacao segue W15C e demais
+complementos elegiveis conforme dependencias, antes
 do aceite funcional W21/W22. A instrucao atual retoma a implementacao autonoma local; publicacao e aceite
 operacional permanecem sujeitos aos gates e autorizacoes especificos.
 A publicacao de testes W22 foi explicitamente
@@ -662,7 +662,8 @@ Fontes WEB: [painel atual](../web/src/components/ProfessionalDashboard.tsx),
 
 ### W15B — Tabela, detalhe e visualizacoes completas
 
-- **Estado/objetivo:** planejada; completar apresentacao dos resultados sem
+- **Estado/objetivo:** concluida tecnicamente em 2026-10-17, com evidencias no
+  registro; apresentacao dos resultados sem
   mudar formulas, inventar interpretacao clinica ou exigir visual identico ao
   Streamlit. Reutilizar recursos presentes, sem reimplementacao desnecessaria.
 - **Dependencias:** W15A para o conjunto filtrado final; W14/W15 como base.

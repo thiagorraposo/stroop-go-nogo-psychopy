@@ -2,14 +2,16 @@ import { useEffect, useRef, useState } from 'react'
 import type { ProfessionalProfile } from '../api/client'
 import { SessionInvitation } from './SessionInvitation'
 import { ResearchFilters } from './ResearchFilters'
+import { ResultsTable } from './ResultsTable'
+import { ResearchVisualizations, GenericInstrumentResults } from './ResearchVisualizations'
+import type { ScopedAssessment } from './ResultsTable'
 import type { ResearchQuery } from './ResearchFilters'
 import { ApiError, apiErrorMessage } from '../api/client'
 import { listProjects, listAssessments, getAssessment, exportAssessment } from '../api/assessments'
-import type { Assessment, AssessmentDetail, Project } from '../api/assessments'
+import type { AssessmentDetail, Project } from '../api/assessments'
 import { accuracyByVisit, countByDate, formatMetric as number, responseDistribution, summarize } from '../dashboard/analysis'
 
 const filterLabels: Record<string, string> = { start_date: 'Data inicial', end_date: 'Data final', participant_id: 'Participantes', visit: 'Visitas', evaluator_id: 'Avaliadores', test_version: 'Versões', platform: 'Plataformas', test_code: 'Instrumento' }
-type ScopedAssessment = Assessment & { project_id: string }
 
 export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfile }) {
   const [projects, setProjects] = useState<Project[]>([])
@@ -163,20 +165,39 @@ export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfil
           {selectedInstrument === 'stroop_go_nogo_ptbr' && <>
             <figure className="dashboard-chart"><figcaption>Precisão média por visita (%)</figcaption><ul>{accuracyByVisit(visible).map(([visit, accuracy]) => <li key={visit}><span>{visit}</span><meter min={0} max={100} value={accuracy} aria-label={`${visit}: ${number(accuracy, 1)}%`} /><strong>{number(accuracy, 1)}</strong></li>)}</ul></figure>
             <figure className="dashboard-chart"><figcaption>Distribuição dos tempos medianos por avaliação</figcaption><ul>{responseDistribution(visible).map(([range, count]) => <li key={range}><span>{range}</span><meter min={0} max={Math.max(1, visible.length)} value={count} aria-label={`${range}: ${count} avaliações`} /><strong>{count}</strong></li>)}</ul><p className="quiet">Avaliações sem acertos não possuem tempo mediano e ficam fora desta distribuição.</p></figure>
-            <figure className="dashboard-chart"><figcaption>Erros no projeto filtrado</figcaption><ul>{([['Omissões', totals.omissions], ['Comissões', totals.commissions]] as const).map(([kind, count]) => <li key={kind}><span>{kind}</span><meter min={0} max={Math.max(1, totals.omissions, totals.commissions)} value={count} aria-label={`${kind}: ${count}`} /><strong>{count}</strong></li>)}</ul></figure>
-            {query?.projects.length === 1 && query.filters.participant_id?.length === 1 && <div className="table-scroll"><table><caption>Evolução descritiva do participante por visita</caption><thead><tr><th>Visita</th><th>Início</th><th>Precisão (%)</th><th>RT mediano (s)</th></tr></thead><tbody>{[...visible].sort((a, b) => a.started_at.localeCompare(b.started_at)).map(row => <tr key={`${row.project_id}:${row.assessment_id}`}><td>{row.visit}</td><td>{row.started_at}</td><td>{'accuracy' in row.summary ? number(row.summary.accuracy, 1) : '—'}</td><td>{'response_time_seconds' in row.summary ? number(row.summary.response_time_seconds, 3) : '—'}</td></tr>)}</tbody></table></div>}
+            <ResearchVisualizations rows={visible} projects={projects} />
           </>}
-          <div className="table-scroll"><table><caption>Avaliações filtradas</caption><thead><tr><th>Projeto</th><th>Participante</th><th>Visita</th><th>Início</th><th>Plataforma</th><th>Versão</th><th>Precisão</th><th>RT mediano (s)</th><th>Detalhe</th></tr></thead>
-            <tbody>{visible.map(row => <tr key={`${row.project_id}:${row.assessment_id}`}><td>{projects.find(item => item.id === row.project_id)?.code}</td><td>{row.participant_id}</td><td>{row.visit}</td><td>{row.started_at}</td><td>{row.platform}</td><td>{row.test_version}</td><td>{'accuracy' in row.summary ? number(row.summary.accuracy, 1) : '—'}</td><td>{'response_time_seconds' in row.summary ? number(row.summary.response_time_seconds, 3) : '—'}</td><td><button className="button secondary" onClick={() => { setDetailProject(row.project_id); setDetailId(row.assessment_id) }} aria-label={`Ver avaliação ${row.participant_id}, visita ${row.visit}`} title={projects.find(item => item.id === row.project_id)?.code}>Ver</button></td></tr>)}</tbody>
-          </table></div>
+          {selectedInstrument !== 'stroop_go_nogo_ptbr' && <GenericInstrumentResults rows={visible} projects={projects} />}
+          <ResultsTable rows={visible} projects={projects} onDetail={row => { setDetailProject(row.project_id); setDetailId(row.assessment_id) }} />
         </>}
       </>}
     </>}
     {detailId && !detail && !detailError && <p role="status">Carregando detalhe…</p>}
     {detailError && <p role="alert">{detailError}</p>}
     {detail && <section ref={detailPanel} tabIndex={-1} className="assessment-detail" aria-label="Detalhe da avaliação">
-      <h3>Detalhe da avaliação</h3><p>{detail.participant_id} · {detail.visit} · {detail.platform} · {detail.test_code} · {detail.test_version}</p>
-      <p>Início: {detail.started_at}. Protocolo: {detail.protocol_id ?? 'Legado sem protocolo WEB'}. Aplicativo: {detail.app_version ?? 'Não registrado'}.</p>
+      <h3>Detalhe da avaliação</h3>
+      <dl className="assessment-metadata">
+        <div><dt>Avaliação</dt><dd>{detail.assessment_id}</dd></div>
+        <div><dt>Sessão</dt><dd>{detail.session_id ?? 'Legado sem sessão WEB'}</dd></div>
+        <div><dt>Projeto</dt><dd>{projects.find(item => item.id === detail.project_id)?.code ?? detail.project_id} ({detail.project_id})</dd></div>
+        <div><dt>Participante</dt><dd>{detail.participant_id}</dd></div><div><dt>Visita</dt><dd>{detail.visit}</dd></div>
+        <div><dt>Avaliador</dt><dd>{detail.evaluator_id ?? 'Legado sem identificação técnica'}</dd></div>
+        <div><dt>Início</dt><dd>{detail.started_at}</dd></div><div><dt>Conclusão</dt><dd>{detail.completed_at ?? 'Não registrada no legado'}</dd></div>
+        <div><dt>Plataforma</dt><dd>{detail.platform === 'web' ? 'WEB' : 'PsychoPy local (importado)'}</dd></div>
+        <div><dt>Instrumento</dt><dd>{detail.test_code}</dd></div><div><dt>Versão</dt><dd>{detail.test_version}</dd></div>
+        <div><dt>Protocolo</dt><dd>{detail.protocol_id ?? 'Legado sem protocolo WEB'}</dd></div>
+        <div><dt>Aplicativo</dt><dd>{detail.app_version ?? 'Não registrado'}</dd></div>
+        <div><dt>Período de quadro observado (ms)</dt><dd>{number(detail.frame_period_ms, 3)}</dd></div>
+      </dl>
+      {'accuracy' in detail.summary && <section aria-label="Contagens das respostas">
+        <h4>Contagens das respostas principais</h4>
+        <dl className="dashboard-cards">
+          <div><dt>Acertos (hit)</dt><dd>{detail.summary.hits}</dd></div>
+          <div><dt>Omissões (omission)</dt><dd>{detail.summary.omission_errors}</dd></div>
+          <div><dt>Rejeições corretas (correct_rejection)</dt><dd>{detail.summary.correct_rejections}</dd></div>
+          <div><dt>Comissões (commission)</dt><dd>{detail.summary.commission_errors}</dd></div>
+        </dl>
+      </section>}
       <dl>{detail.metrics.map(metric => <div key={metric.metric_code}><dt>{metric.metric_label}</dt><dd>{number(metric.metric_value, 3)} {metric.unit}</dd></div>)}</dl>
       {detail.trials.length > 0 && <div className="table-scroll"><table><caption>Tentativas registradas</caption><thead><tr><th>Tentativa</th><th>Palavra</th><th>Cor</th><th>Condição</th><th>Resposta</th><th>Classificação</th><th>RT (s)</th></tr></thead><tbody>{detail.trials.map(trial => <tr key={trial.trial_number}><td>{trial.trial_number}</td><td>{trial.word}</td><td>{trial.ink_color}</td><td>{trial.condition}</td><td>{trial.key_pressed ?? '—'}</td><td>{trial.error_type}</td><td>{number(trial.reaction_time_seconds, 3)}</td></tr>)}</tbody></table></div>}
       {detail.test_code === 'stroop_go_nogo_ptbr' && <button className="button primary" disabled={exporting} onClick={() => void download()}>{exporting ? 'Preparando arquivo…' : 'Exportar CSV oficial'}</button>}

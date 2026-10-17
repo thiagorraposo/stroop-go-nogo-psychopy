@@ -126,3 +126,15 @@ kbd { font: inherit; font-size: .9em; border: 1px solid #b7bfca; border-radius: 
 
 .research-filters .project-filter { grid-column: 1 / -1; }
 .research-filters .quiet { max-width: 80ch; }
+
+.assessment-metadata { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+.assessment-metadata dd { margin: .35rem 0 0; overflow-wrap: anywhere; }
+.assessment-metadata dt { font-weight: 600; }
+
+.professional-dashboard { overflow-wrap: anywhere; }
+.dashboard-cards > div { min-width: 0; }
+
+.table-scroll .results-table { min-width: 1100px; }
+.table-scroll .stroop-results { min-width: 1800px; }
+.results-table .button { white-space: nowrap; }
+.assessment-detail .assessment-metadata { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
