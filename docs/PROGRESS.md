@@ -10,17 +10,22 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   por UUID. Original fica local; a rota aceita ate 5 MiB/10.000 registros e as
   demais mantem 64 KiB. Transacao grava avaliacao e estado auditado atomicamente.
 - Validacao concluida: 347 testes Python sem skips; 271 Vitest; typecheck e
-  build; Playwright browser geral e temporal; integracao HTTPS+PostgreSQL
-  importacao->consulta->detalhe->exportacao em Chromium/Firefox (2/2); papeis
-  reais limitados e leitor SELECT; `git diff --check`.
+  build; Playwright geral 98/98 e temporal 4/4. Na primeira suite combinada,
+  Chromium acionou o gate de tempo uma vez; o teste isolado e a repeticao serial
+  completa passaram.
+  Integracao HTTPS+PostgreSQL importacao->consulta->detalhe->exportacao em
+  Chromium/Firefox (2/2); papeis reais limitados e leitor SELECT; diff limpo.
 - O responsavel instruiu “pressuponha todos os aceites”. W09A e W13A foram
   aceitas formalmente por essa instrucao. Isso nao substitui evidencia de piloto
   em equipamento real nem medicao de capacidade/homologacao.
-- Branch `prep-web`; manter a alteracao preexistente em `AGENTS.md` fora do
-  commit. Nenhum dado real, VPS, deploy, push ou producao foi acessado.
-- Proxima acao: registrar resultados finais, verificar roadmap/dependencias,
-  validar diff e commitar somente arquivos W15E/documentacao; depois avaliar
-  impedimentos factuais de W16/W21.
+- Commits locais: `e0e2adb` (W15E) e documentacao de retomada a seguir.
+  Alteracao preexistente em `AGENTS.md` permanece fora dos commits; nesta
+  unidade nao houve dado real, acesso VPS, deploy ou push.
+- Proxima acao elegivel: W16 requer inventario/disponibilidade do equipamento
+  de referencia e 60 sessoes sinteticas presenciais conforme pacote aprovado;
+  W21 requer ambiente de homologacao autorizado e capacidade medida. Os testes
+  automatizados/headless nao suprem essas evidencias, e nenhuma outra etapa do
+  roadmap tem dependencia atendida neste momento.
 
 ## Historico — W15D validada; W15E depende de contrato/minimizacao
 
