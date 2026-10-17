@@ -226,6 +226,8 @@ class WebAuthPostgresTests(unittest.TestCase):
         failed, _ = self._callback(state, subject="synthetic-not-registered")
         self.assertEqual(failed.status_code, 401)
         self.assertEqual(failed.json()["error"]["code"], "authentication_required")
+        self.assertEqual(failed.json()["registration_request"], {"issuer": ISSUER, "subject": "synthetic-not-registered"})
+        self.assertNotIn("email", failed.json()["registration_request"])
         self.assertNotIn("__Host-stroop_professional", failed.headers.get("set-cookie", ""))
         with psycopg.connect(self.database_url) as connection:
             self.assertEqual(connection.execute("SELECT COUNT(*) FROM web_professional_sessions").fetchone()[0], 0)

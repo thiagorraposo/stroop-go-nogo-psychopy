@@ -18,10 +18,12 @@ from stroop.persistence import web_auth, web_sessions
 def execute(action, value):
     database = database_url()
     if action == 'professional':
+        issuer = value.get('issuer', ISSUER)
+        subject = value.get('subject', SUBJECT)
         expires = int((datetime.now(timezone.utc) + timedelta(hours=1)).timestamp())
-        user = auth.authorize(database, {'iss': ISSUER, 'sub': SUBJECT, 'exp': expires}, 'view_dashboard')
+        user = auth.authorize(database, {'iss': issuer, 'sub': subject, 'exp': expires}, 'view_dashboard')
         token = secrets.token_urlsafe(32)
-        web_auth.create_professional_session(database, sha256(token.encode()).hexdigest(), ISSUER, SUBJECT, expires)
+        web_auth.create_professional_session(database, sha256(token.encode()).hexdigest(), issuer, subject, expires)
         return {'cookie_name': PROFESSIONAL_COOKIE, 'token': token,
                 'csrf': _csrf_token(APIConfig.from_env(environment()), token),
                 'user_id': opaque_user_id(user.issuer, user.subject)}

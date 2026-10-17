@@ -12,6 +12,7 @@ from api.auth import callback as auth_callback, router as auth_router
 from api.sessions import router as sessions_router
 from api.results import router as results_router
 from api.assessments import router as assessments_router, export_router as assessment_export_router
+from api.administration import router as administration_router
 
 
 def create_app(config: APIConfig | None = None) -> FastAPI:
@@ -28,6 +29,7 @@ def create_app(config: APIConfig | None = None) -> FastAPI:
     app.include_router(results_router)
     app.include_router(assessments_router)
     app.include_router(assessment_export_router)
+    app.include_router(administration_router)
     app.add_exception_handler(HTTPException, http_exception_handler)
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_middleware(RequestBoundary, config=config)

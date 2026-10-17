@@ -6,6 +6,32 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-17 — Administracao de contas/projetos W15D
+
+- Area WEB exclusiva do perfil `administracao` lista contas paginadas, cadastra
+  identidade Google `iss` + `sub`, altera perfil/estado/e-mail auxiliar e
+  confirma mudancas. Callback OIDC de identidade verificada nao cadastrada
+  apresenta somente seus proprios identificadores para solicitacao institucional,
+  sem criar sessao/autocadastro. API tem schemas fechados, CSRF/origem,
+  autorizacao por operacao, auditoria sem claims/e-mail e lock transacional que
+  preserva pelo menos um admin ativo sob concorrencia.
+- Administracao de projetos/membros reaproveita as rotas existentes; nao ha
+  acesso automatico a resultados, exclusao, alteracao de projeto ou mapa legado.
+  UI explicita vinculos, mostra e-mail somente no contexto admin e revalida
+  bloqueio/revogacao no servidor sem apagar coletas.
+- Evidencias:341 testes Python sem skips;268 frontend;build/typecheck aprovados;
+  browser geral90/90 e temporal4/4 Chromium/Firefox, com seletor de perfil ajustado apos a
+  navegacao administrativa adicionar um segundo texto homonimo. HTTPS/PostgreSQL
+  reais2/2 Chromium/Firefox cobrem cadastro, criacao/vinculo, convite via UI W13A,
+  resultado sintetico pelo endpoint real, consulta, revogacao e bloqueio. Testes
+  PostgreSQL comprovam pagina de contas/membros, CSRF, perfil negativo, email
+  omitido da resposta de membros, ultimo admin e corrida concorrente. `git diff
+  --check` aprovado. Sem migration/dependencias, dados/coletas identificaveis,
+  deploy, push ou acesso remoto; `AGENTS.md` preexistente preservado.
+- Roadmap, contrato API, autenticacao/permissoes, UX, README e PROGRESS
+  sincronizados. Proxima W15E depende da decisao de contrato/minimizacao; W13A
+  permanece implementada com aceite operacional pendente.
+
 ## 2026-10-17 — Exportacao agregada autorizada W15C
 
 - Adicionado contrato de CSV agregado por instrumento, uma linha por avaliacao,

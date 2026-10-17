@@ -192,3 +192,15 @@ como formula e protegido, valores ausentes permanecem vazios e metricas nao sao
 arredondadas. O token de consistencia fica apenas em RAM, expira em 15 minutos
 e o download so inicia depois da reautorizacao integral no servidor. Este arquivo
 agregado nao substitui o CSV oficial individual de tentativas.
+
+## WEB — administracao de contas e projetos (W15D)
+
+A area **Administracao** e exclusiva do perfil correspondente; **Resultados**
+continua separado. O cadastro solicita o `sub` que a propria pessoa obteve ao
+entrar com Google sem cadastro WEB e encaminha por canal institucional. O
+e-mail e opcional, auxiliar e visivel somente a administradores. Antes de
+cadastrar, alterar perfil/e-mail/estado ou mudar um vinculo, a interface informa
+o alvo e o efeito e pede confirmacao. Projetos nao concedem acesso por criacao:
+cada profissional precisa de vinculo explicito. Bloqueio e revogacao preservam
+coletas e o servidor revalida cada operacao. Nao ha autocadastro, exclusao nem
+edicao de mapa legado nessa tela.

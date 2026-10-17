@@ -17,6 +17,7 @@ from stroop.domain.auth import (
     IMPORT_STATUSES,
     Identity,
     InvalidIdentityError,
+    LastAdminProtectionError,
     PERMISSIONS,
     RateLimitedError,
     ROLES,
@@ -114,6 +115,13 @@ def list_users(database_url: str) -> list[AppUser]:
         raise AuthDatabaseError("Falha ao consultar usuarios.") from None
 
 
+def list_users_page(database_url: str, limit: int, offset: int) -> list[AppUser]:
+    try:
+        return auth_persistence.list_users_page(database_url, limit, offset)
+    except PersistenceError:
+        raise AuthDatabaseError("Falha ao consultar usuarios.") from None
+
+
 def _management_identity(issuer: str, subject: str) -> Identity:
     return parse_identity({"iss": issuer, "sub": subject, "exp": 2**62})
 
@@ -169,7 +177,7 @@ def update_user(
     except PersistenceError:
         raise AuthDatabaseError("Falha ao atualizar usuario.") from None
     if result == "last_admin":
-        raise InvalidIdentityError(
+        raise LastAdminProtectionError(
             "A ultima conta administrativa ativa deve ser preservada."
         )
     if result == "missing":
@@ -219,6 +227,8 @@ __all__ = [
     "create_user",
     "ensure_not_expired",
     "list_users",
+    "list_users_page",
+    "LastAdminProtectionError",
     "parse_identity",
     "record_import_result",
     "record_operation",

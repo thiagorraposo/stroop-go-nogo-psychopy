@@ -26,11 +26,11 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W12 | Concluida em 2026-10-16; resumo, CSV de 21 campos, paridade Python/TypeScript e importacao real validados |
 | W13 | Integracao anterior validada; fluxo completo de cadastro pela interface pendente em W13A |
 | W13A | Implementada e validada tecnicamente; aceite de operacao pelo responsavel pendente |
-| W15 | Painel e complementos W15A/W15B/W15C validados; paridade restante em W15D–W15E |
+| W15 | Painel e complementos W15A–W15D validados; W15E pendente |
 | W15A | Concluida tecnicamente em 2026-10-17; filtros/facetas, agregado completo limitado e HTTPS reais validados |
 | W15B | Concluida tecnicamente em 2026-10-17; tabela/detalhe, evolucao e demo validados com API/DB reais |
 | W15C | Concluida tecnicamente em 2026-10-17; CSV agregado autorizado e consistente |
-| W15D | Planejada; administrar usuarios, projetos e vinculos pela interface |
+| W15D | Concluida tecnicamente em 2026-10-17; contas, projetos e vinculos pela interface |
 | W15E | Planejada; importar CSV pela WEB com escopo, minimizacao e auditoria |
 | W16 | Pacote de referencia aprovado; bloqueada por disponibilidade dos equipamentos e evidencias dos pilotos |
 | W17 | Concluida; hardening, CSP, 284 testes Python, HTTPS e auditorias aprovados |
@@ -721,7 +721,7 @@ Fontes WEB: [painel atual](../web/src/components/ProfessionalDashboard.tsx),
 
 ### W15D — Administracao de usuarios, projetos e vinculos
 
-- **Estado/objetivo:** planejada; permitir operacao profissional pelo navegador.
+- **Estado/objetivo:** concluida tecnicamente em 2026-10-17; permitir operacao profissional pelo navegador.
   Usuarios/perfis sao paridade do legado; projetos/vinculos sao complemento do
   modelo WEB. Nenhuma dessas telas existe atualmente na nova interface.
 - **Dependencias:** W06/W07, W15; nao depende dos novos graficos/exportacao.
@@ -731,6 +731,10 @@ Fontes WEB: [painel atual](../web/src/components/ProfessionalDashboard.tsx),
   Criar contratos/rotas de usuarios reutilizando casos de uso legados e
   protecoes transacionais; documentar como obter/fornecer a propria identidade
   Google verificada para solicitar cadastro, sem autocadastro ou senha nova.
+- **Implementacao:** APIs fechadas/paginadas e area Administracao; callback de
+  identidade Google verificada sem cadastro devolve somente os proprios
+  `iss`/`sub` para encaminhamento institucional. Alteracoes usam os casos de
+  uso existentes e lock transacional para proteger o ultimo administrador.
 - **Criterios de aceite:** somente administracao gere contas/projetos/vinculos;
   proteger ultimo administrador ativo, inclusive sob concorrencia; impedir
   elevacao de privilegios por payload. Identidade permanece iss+sub; e-mail
@@ -744,8 +748,15 @@ Fontes WEB: [painel atual](../web/src/components/ProfessionalDashboard.tsx),
   alteracao/desativacao de projeto como se estivesse implementada.
 - **Validacoes:** perfis/contas nao cadastradas, ultimo admin, concorrencia,
   CSRF, alteracao indevida de alvo, revogacao/bloqueio, acesso cruzado,
-  paginacao de usuarios/membros e cadastro->vinculo->W13A->consulta com backend
+  paginacao de usuarios/membros e cadastro->vinculo->consulta/revogacao com backend
   real sintetico. Auditar efeitos e erros fechados sem imprimir e-mail/claims.
+  Resultado: 341 testes Python sem skips, 268 frontend, build/typecheck,
+  navegacao geral 90/90 Chromium/Firefox, fluxo integrado HTTPS/PostgreSQL 2/2,
+  corrida concorrente real da ultima conta admin, CSRF, bloqueio, revogacao e
+  `git diff --check` aprovados. Fluxo sintetico real validou cadastro, vinculo,
+  convite pela interface W13A, conclusao de resultado no PostgreSQL e consulta
+  do resultado, antes de revogacao/bloqueio. Isso nao substitui o aceite
+  operacional de W13A, ainda pendente.
 
 ### W15E — Importacao CSV autenticada na WEB
 

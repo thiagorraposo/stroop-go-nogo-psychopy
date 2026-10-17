@@ -102,7 +102,7 @@ Referencia: [resposta de autorizacao Google](https://developers.google.com/ident
 | Metodo e caminho | Entrada / resultado de sucesso | Autorizacao |
 |---|---|---|
 | `GET /auth/login` | Sem corpo/query; 303 para Google, cria transacao OIDC de 10 min | Publica, com rate limit |
-| `GET /auth/callback` | Query OIDC `code` e `state`, ou `error` e `state`; metadados Google opcionais `scope`, `authuser`, `prompt`, `hd`, `iss`; apos validar, 303 para aplicacao e cookie profissional novo | Transacao OIDC valida; cadastro previo ativo |
+| `GET /auth/callback` | Query OIDC `code` e `state`, ou `error` e `state`; metadados Google opcionais `scope`, `authuser`, `prompt`, `hd`, `iss`; apos validar, 303 para aplicacao e cookie profissional novo. Identidade verificada sem cadastro recebe 401 sem sessao, mostrando somente seu proprio `iss`/`sub` | Transacao OIDC valida; cadastro previo ativo |
 | `POST /auth/logout` | Corpo `{}`; 204 e remocao do cookie/sessao profissional | Sessao profissional e CSRF; repeticao sem cookie continua 204 apos validar origem |
 | `GET /auth/me` | 200 com `user_id` opaco (`iss` + `sub`), `role`, `expires_at`, `csrf_token` | Profissional ativo |
 | `GET /projects` | Lista paginada de `id`, `code`, `name`, `active`, `created_at`; sem corpo | Profissional; somente projetos vinculados, admin pode listar todos |
@@ -116,6 +116,18 @@ Referencia: [resposta de autorizacao Google](https://developers.google.com/ident
 | `GET /projects/{project_id}/assessments/{assessment_id}` | 200 com detalhe/metricas recalculadas e tentativas, no formato abaixo | Mesmo escopo da lista |
 | `GET /projects/{project_id}/assessments/{assessment_id}/export` | 200 `text/csv; charset=utf-8`, 21 colunas oficiais, 16 linhas principais | Mesmo escopo da lista; revalidar antes do download |
 | `POST /assessments/export` | CSV agregado de uma linha por avaliacao, contrato fechado por instrumento | Qualquer perfil vinculado aos projetos; CSRF/origem e reautorizacao no clique |
+| `GET /admin/users` | Lista paginada de `{user_id,issuer,subject,email,role,active}`; acesso exclusivo da area de administracao | `administracao`; e-mail auxiliar restrito a admins |
+| `POST /admin/users` | Corpo fechado `{issuer,subject,role,email?}`; 201 cadastra identidade Google, sem senha/autocadastro | `administracao` + CSRF/origem; `iss`/`sub` sao a identidade |
+| `PUT /admin/users/{user_id}` | Corpo fechado `{role,active,email}`; atualiza perfil, estado e e-mail auxiliar | `administracao` + CSRF/origem; 409 protege a ultima conta admin |
+
+`GET /admin/users` usa os parametros paginados assinados `limit`/`cursor` e
+ordena por perfil e identidade. As escritas de conta reutilizam os casos de uso
+autorizados e registram o resultado sem e-mail nem claims no log/auditoria.
+Nao ha exclusao ou autocadastro. Um profissional autenticado sem cadastro pode
+encaminhar seu proprio `iss` e `sub` por canal institucional; e-mail nao concede
+acesso. Administradores criam projetos pelas operacoes existentes e concedem
+vinculos explicitamente; a administracao global nao herda acesso a resultados.
+Bloqueio e revogacao preservam dados e sao revalidados em cada operacao.
 
 ### Filtros profissionais combinados (W15A)
 

@@ -325,6 +325,14 @@ async def callback(request: Request):
             config.database_url, claims, "view_dashboard"
         )
     except AuthError as exc:
+        if isinstance(exc, UnregisteredUserError):
+            response = JSONResponse({
+                "error": {"code": "authentication_required", "message": "Solicite cadastro ao responsavel pela pesquisa."},
+                "registration_request": {"issuer": claims["iss"], "subject": claims["sub"]},
+                "request_id": request.state.request_id,
+            }, status_code=401, headers={"Cache-Control": "no-store"})
+            _clear_state(response)
+            return response
         response = error_response(_auth_error(exc).code, request.state.request_id)
         _clear_state(response)
         return response

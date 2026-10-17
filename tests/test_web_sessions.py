@@ -539,6 +539,70 @@ class WebSessionsPostgresTests(unittest.TestCase):
         self.assertEqual(members.status_code, 200)
         self.assertIsNotNone(members.json()["next_cursor"])
 
+    def test_administracao_web_usuarios_perfis_email_e_ultimo_admin(self):
+        path = "/api/v1/admin/users"
+        self.assertEqual(self.importer.get(path).status_code, 403)
+        self.assertEqual(self.consulta.get(path).status_code, 403)
+        first = self.admin.get(path, params={"limit": 1})
+        self.assertEqual(first.status_code, 200, first.text)
+        self.assertEqual(set(first.json()), {"items", "next_cursor"})
+        self.assertIsNotNone(first.json()["next_cursor"])
+        next_page = self.admin.get(path, params={"limit": 1, "cursor": first.json()["next_cursor"]})
+        self.assertEqual(next_page.status_code, 200, next_page.text)
+        self.assertNotEqual(first.json()["items"][0]["user_id"], next_page.json()["items"][0]["user_id"])
+
+        created = self.admin.post(path, json={"issuer": ISSUER, "subject": "synthetic-new-user",
+            "role": "importacao", "email": "auxiliary@example.invalid"})
+        self.assertEqual(created.status_code, 201, created.text)
+        self.assertEqual(created.json()["role"], "importacao")
+        self.assertTrue(created.json()["active"])
+        self.assertEqual(created.json()["email"], "auxiliary@example.invalid")
+        denied = self.importer.post(path, json={"issuer": ISSUER, "subject": "synthetic-escalation",
+            "role": "administracao", "email": None})
+        self.assertEqual(denied.status_code, 403)
+        bad_csrf = self.admin.put(f"{path}/{created.json()['user_id']}", json={
+            "role": "administracao", "active": True, "email": "auxiliary@example.invalid"},
+            headers={"X-CSRF-Token": "invalid"})
+        self.assertEqual(bad_csrf.status_code, 403)
+
+        user_id = created.json()["user_id"]
+        updated = self.admin.put(f"{path}/{user_id}", json={
+            "role": "consulta", "active": False, "email": None})
+        self.assertEqual(updated.status_code, 200, updated.text)
+        self.assertEqual(updated.json(), {"user_id": user_id, "role": "consulta", "active": False, "email": None})
+        self.assertEqual(self.admin.put(f"/api/v1/projects/{self.project_id}/members/{user_id}",
+            json={"active": True}).status_code, 200)
+        member_page = self.admin.get(f"/api/v1/projects/{self.project_id}/members")
+        member = next(item for item in member_page.json()["items"] if item["user_id"] == user_id)
+        self.assertEqual(member, {"user_id": user_id, "active": True})
+        self.assertNotIn("email", member)
+
+        last_admin = self.admin.put(f"{path}/{opaque_user_id(ISSUER, ADMIN)}", json={
+            "role": "consulta", "active": True, "email": None})
+        self.assertEqual(last_admin.status_code, 409, last_admin.text)
+        self.assertEqual(last_admin.json()["error"]["code"], "state_conflict")
+        invalid = self.admin.post(path, json={"issuer": ISSUER, "subject": "synthetic-invalid-role",
+            "role": "proprietario", "email": None})
+        self.assertEqual(invalid.status_code, 422)
+
+    def test_concorrencia_nao_remove_as_ultimas_contas_administrativas(self):
+        auth_application.create_user(self.database_url, ISSUER, "synthetic-second-admin",
+                                     "administracao", None,
+                                     auth_application.authorize(self.database_url, self._claims(ADMIN), "manage_users"))
+        second = self._client("synthetic-second-admin")
+        self.addCleanup(second.close)
+        path = "/api/v1/admin/users/"
+        requests = ((self.admin, opaque_user_id(ISSUER, ADMIN)),
+                    (second, opaque_user_id(ISSUER, "synthetic-second-admin")))
+        def demote(pair):
+            client, target = pair
+            return client.put(path + target, json={"role": "consulta", "active": True, "email": None})
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            responses = list(pool.map(demote, requests))
+        self.assertEqual(sorted(response.status_code for response in responses), [200, 409])
+        with psycopg.connect(self.database_url) as connection:
+            self.assertEqual(connection.execute("SELECT COUNT(*) FROM app_users WHERE role='administracao' AND active").fetchone()[0], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

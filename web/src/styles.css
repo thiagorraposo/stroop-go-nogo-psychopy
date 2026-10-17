@@ -110,6 +110,16 @@ kbd { font: inherit; font-size: .9em; border: 1px solid #b7bfca; border-radius: 
 .assessment-detail dd { margin: 6px 0; }
 .access-card:has(.professional-dashboard) { max-width: none; }
 .professional-dashboard { min-width: 0; }
+.professional-areas { display: flex; gap: 8px; margin-top: 24px; flex-wrap: wrap; }
+.professional-areas [aria-pressed="true"] { outline: 2px solid #7350c7; outline-offset: 2px; }
+.administration-panel { margin-top: 28px; border-top: 1px solid #b9c0ca; padding-top: 24px; min-width: 0; }
+.administration-panel > section { margin: 28px 0; padding-top: 16px; border-top: 1px solid #d4d9e1; }
+.administration-panel form { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; align-items: end; margin: 16px 0; }
+.administration-panel label { display: block; font-weight: 650; }
+.administration-panel input:not([type="checkbox"]), .administration-panel select { display: block; width: 100%; padding: 10px; border: 1px solid #8793a6; border-radius: 5px; background: white; color: #172139; font: inherit; margin-top: 6px; }
+.administration-panel input:focus-visible, .administration-panel select:focus-visible { outline: 3px solid #7350c7; outline-offset: 2px; }
+.administration-panel .table-scroll table { min-width: 900px; }
+.administration-panel > button, .administration-panel form button { justify-self: start; }
 .dashboard-chart li > span { overflow-wrap: anywhere; min-width: 0; }
 .professional-dashboard select { max-width: 100%; }
 .professional-dashboard input:focus-visible, .professional-dashboard select:focus-visible { outline: 3px solid #7350c7; outline-offset: 2px; }

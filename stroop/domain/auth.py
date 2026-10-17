@@ -44,6 +44,10 @@ class InvalidIdentityError(AuthError):
     """Claims obrigatorias ausentes ou invalidas."""
 
 
+class LastAdminProtectionError(InvalidIdentityError):
+    """Alteracao impediria a existencia de administrador ativo."""
+
+
 class ExpiredIdentityError(AuthError):
     """Token OIDC expirado."""
 

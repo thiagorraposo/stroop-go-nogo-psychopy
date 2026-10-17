@@ -37,7 +37,7 @@ for (const [role, label] of [['consulta', 'Consulta'], ['importacao', 'Coleta e 
     await access(page, role)
     await page.route(`**${base}?*`, route => route.fulfill({ json: { items: [first, second], next_cursor: null } }))
     await page.goto('/equipe')
-    await expect(page.getByText(label!, { exact: true })).toBeVisible()
+    await expect(page.locator('.role-badge')).toHaveText(label!)
     await expect(card(page, 'Avaliações')).toHaveText('2')
     await expect(card(page, 'Participantes únicos')).toHaveText('2')
     await expect(card(page, 'Precisão média')).toHaveText('75,0%')

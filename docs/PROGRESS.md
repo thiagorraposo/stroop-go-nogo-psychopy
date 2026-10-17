@@ -3,34 +3,30 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
-## Atual — W15C validada; proxima W15D
+## Atual — W15D validada; proxima W15E depende de contrato/minimizacao
 
-- Branch prep-web; AGENTS.md raiz preexistente permanece fora dos commits.
-  W13A em bff6982, aceite de operacao pendente. W15A em451e43e. Nenhum acesso
-  remoto/publicacao nesta retomada; W16/homologacao/coleta real pendentes.
-- W15B validada: summary profissional11campos estrito, null denominadores
-  ausentes, recibo7 preservado; ResultsTable/metadata detalhe; visuais de erros
-  por projeto/evolucao por projeto+codigo e demo registrada com metricas proprias.
-  Sem N+1/novos dados nominais; contratos/UX/README alinhados.
-- Evidencias no registro:329Python/51,984s sem skips,261frontend,72browsergerais,
-  HTTPS4/4 novos+8/8 regressao perfis/CSV reais. CSS scroll local ajustado e
-  comprobadoChromium1/1; screenshots sinteticos inspecionados. Viewport390/zoom200,
-  build/typecheck/npmci/audit/pipcheck/compileall/diff aprovados. Motor inalterado,
-  quatro testes temporais W15A conservam evidencia de regressao relevante.
-- W15C: exportacao agregada manual por instrumento/plataforma, snapshots HMAC
-  em RAM vinculados a ator/projeto/filtros e expiracao15min; fingerprint inclui
-  metadados, tentativas Stroop e metricas genericas. Reautorizacao e comparacao
-  de todos os projetos numa transacao READ ONLY/REPEATABLE READ; limite20/5.000,
-  colunas fixas, protecao de formulas, unidades, no-store e nome estatico.
-  CSV oficial individual preservado. Suite completa:339Python/62,766s sem skips;
-  264 frontend; browser86/86 gerais e14/14 exportacao em Chromium/Firefox;
-  HTTPS4/4 real PostgreSQL em19,3s para Stroop paginado/filtrado, demo e
-  revogacao. Build/typecheck, audit de producao0, source scanner303 e pip check
-  aprovados. Contratos, UX, README, roadmap e registro atualizados.
-- Banco descartavel proprio stroop-w13a-test/32768, database
-  stroop_etapa4_test_w13a. Nenhum container operacional alterado.
-- Proxima acao: concluir integracao real apos os ultimos ajustes, executar
-  diff --check e commit local W15C. Iniciar W15D; W13A continua pendente de
+- Branch `prep-web`; `AGENTS.md` raiz preexistente permanece fora dos commits.
+  W13A esta implementada, mas aguarda aceite operacional. W16 e homologacao/
+  coleta real permanecem pendentes. Sem publicacao, push ou acesso remoto.
+- W15D adiciona gestao administrativa WEB de contas (`iss` + `sub`), perfil,
+  estado e e-mail auxiliar; identidade nao cadastrada recebe apenas seus
+  identificadores OIDC verificados para solicitacao institucional. Area Admin
+  separada de Resultados; CRUD sem exclusao, confirmacao de mudancas, CSRF,
+  auditoria sem claims/e-mail e lock do ultimo administrador. Projetos e
+  membros reutilizam operacoes existentes; nenhum acesso a resultados sem
+  vinculo explicito. Bloqueio/revogacao revalidam acessos sem excluir coletas.
+- Validacao W15D: 341 testes Python sem skips, 268 frontend, build/typecheck,
+  browser geral 90/90 e temporal 4/4 Chromium/Firefox, integracao
+  HTTPS+PostgreSQL 2/2,
+  testes de API/corrida PostgreSQL para ultima conta admin, callback OIDC sem
+  cadastro e CSRF. Primeira regressao de browser achou seletor ambiguo causado
+  pelo novo botao; seletor corrigido e validado em ambos navegadores.
+- W15A–W15C mantem evidencias registradas abaixo/historico. Banco descartavel
+  `stroop-w13a-test` na porta 32768/database `stroop_etapa4_test_w13a`; nenhum
+  container operacional alterado.
+- Proxima acao: finalizar `git diff --check`, atualizar roadmap/registro e
+  commit local W15D, preservando `AGENTS.md`; depois avaliar W15E apenas conforme
+  minimizacao/contrato ja autorizado no roadmap. W13A permanece pendente de
   aceite operacional.
 
 ## Historico — relatorio tecnico para leitores externos

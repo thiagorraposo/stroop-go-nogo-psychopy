@@ -17,7 +17,7 @@ for (const [role, label] of [['consulta', 'Consulta'], ['importacao', 'Coleta e 
     const errors: string[] = []
     page.on('pageerror', error => errors.push(error.name))
     await page.goto('/equipe')
-    await expect(page.getByText(label!, { exact: true })).toBeVisible()
+    await expect(page.locator('.role-badge')).toHaveText(label!)
     await page.getByRole('combobox', { name: 'Projeto', exact: true }).selectOption(prepared.project_id)
     await expect(page.locator('.dashboard-cards').getByText('1', { exact: true })).toHaveCount(2)
     await expect(page.locator('.dashboard-cards')).toContainText('56,2%')

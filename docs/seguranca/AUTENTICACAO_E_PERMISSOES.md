@@ -18,6 +18,12 @@ e nao acessa dados, upload, exportacao ou administracao. A referencia do Google
 tambem determina o uso de `sub`, e nao do e-mail, como identificador:
 [OpenID Connect do Google](https://developers.google.com/identity/openid-connect/openid-connect).
 
+Na WEB, apos validar OIDC, uma identidade ainda nao cadastrada recebe somente
+seus proprios `iss` e `sub` numa resposta sem sessao; a tela orienta solicitar
+cadastro ao responsavel por canal institucional. Somente a area **Administracao**
+WEB cadastra ou altera contas. E-mail auxiliar aparece apenas nesse contexto e
+nao e aceito como identidade nem como autorizacao.
+
 ## Configuracao sem versionar secrets
 
 O Streamlit exige Authlib para OIDC; a dependencia fica declarada em

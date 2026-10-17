@@ -219,3 +219,12 @@ tabela neutra das metricas disponiveis. Selecionar instrumento preserva a
 separacao de conjuntos; a UI nao consulta detalhe de cada linha para montar
 cards, tabelas ou graficos. A exportacao agrega somente o instrumento e a
 plataforma selecionados, com uma linha por avaliacao autorizada.
+
+O perfil `administracao` tambem recebe a area **Administracao** para cadastrar
+identidades Google verificadas, atualizar perfil/e-mail auxiliar/estado e
+criar projetos e vinculos explicitos. Identidade usa `iss` + `sub`; e-mail nao
+autoriza. Uma pessoa sem cadastro solicita acesso pelo canal institucional com
+os proprios identificadores apresentados no retorno OIDC, sem autocadastro. O
+ultimo admin ativo e protegido sob concorrencia; bloqueios e revogacoes sao
+revalidados pelo backend e nao removem resultados. A area de resultados continua
+exigindo vinculo de projeto inclusive para administradores globais.

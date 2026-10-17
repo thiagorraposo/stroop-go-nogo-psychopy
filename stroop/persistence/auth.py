@@ -145,6 +145,19 @@ def list_users(database_url: str) -> list[AppUser]:
         raise PersistenceError from exc
 
 
+def list_users_page(database_url: str, limit: int, offset: int) -> list[AppUser]:
+    try:
+        with psycopg.connect(database_url) as connection:
+            rows = connection.execute(
+                """SELECT issuer, subject, email, role, active FROM app_users
+                   ORDER BY role, subject, issuer LIMIT %s OFFSET %s""",
+                (limit, offset),
+            ).fetchall()
+        return [AppUser(*row) for row in rows]
+    except psycopg.Error as exc:
+        raise PersistenceError from exc
+
+
 def create_user(
     database_url: str,
     identity: Identity,
