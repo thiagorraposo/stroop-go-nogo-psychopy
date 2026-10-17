@@ -382,8 +382,12 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   W21 depende disso e ambiente alvo autorizado com capacidade medida. W22 e
   execucao do usuario; W23 depende da implantacao/aceite. Perguntas sobre hardware
   e ambiente de homologacao enviadas; nao presumir autorizacao VPS ou resultados.
-- Proxima acao: commitW20 isolado, aguardar informacoes/artefatos necessarios e
-  executar proxima validacao viavel sem antecipar aceite. ContainerCI
+- W20 commit37fd066 concluido. Bloqueio revalidado em tres turnos consecutivos:
+  nao chegaram equipamento/evidencias W16 nem ambiente autorizado W21. Nao ha
+  outra etapa independente com dependencias atendidas. Goal bloqueado aguardando
+  informacoes externas, sem conclusao geral nem alteracao do escopo.
+- Proxima acao: receber configuracao de referencia e ambiente de homologacao,
+  executar/analisar pilotos e seguir W21 apos aceite W16. ContainerCI
   stroop-web-ci-721c86c ativo32783/banco stroop_etapa4_test_ci; DBw13/32781 intocado.
   Preservar pilha de acesso manual e preview4173; convite sem consumo peloCodex.
 

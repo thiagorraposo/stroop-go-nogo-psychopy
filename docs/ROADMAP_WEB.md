@@ -25,17 +25,19 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W12 | Concluida em 2026-10-16; resumo, CSV de 21 campos, paridade Python/TypeScript e importacao real validados |
 | W13 | Concluida; fluxo HTTPS real, reenvio e finalizacao validados |
 | W15 | Concluida; painel autorizado, metricas/graficos/CSV e perfis validados em HTTPS real |
-| W16 | Em preparacao; matriz/protocolo registrados, piloto no equipamento de referencia pendente |
+| W16 | Bloqueada; faltam equipamento de referencia e evidencias dos pilotos temporais |
 | W17 | Concluida; hardening, CSP, 284 testes Python, HTTPS e auditorias aprovados |
 | W18 | Concluida; pipeline completo em checkout sparse limpo, testes e auditorias aprovados |
 | W19 | Concluida; imagens nao-root, Compose isolado e smoke HTTPS/coleta/reinicio aprovados |
 | W20 | Concluida; monitor, backup criptografado/restauracao isolada, alerta e rollback validados |
-| W21, W23 | Nao iniciadas |
+| W21 | Bloqueada por W16 e definicao do ambiente de homologacao autorizado |
+| W23 | Nao iniciada; depende da implantacao/aceite W22 |
 | W14 | Concluida em 2026-10-16; consulta/CSV autorizados, papel SELECT, mapa legado e testes PostgreSQL validados |
 | W22 | Nao iniciada; implantacao futura de responsabilidade do usuario |
 
-Pedido de organizacao documental concluido em commit proprio. W00–W12 estao
-validadas e integradas; W13 tambem validada; W15 validada; W16 e a proxima etapa sequencial; a frente independente W14 tambem foi validada. Retomada detalhada em
+W00–W15 e W17–W20 estao validadas. A continuidade aguarda equipamento/evidencias
+da W16 e ambiente autorizado para W21; W22 permanece com o usuario. Nenhuma
+dessas pendencias concede conclusao geral. Retomada detalhada em
 [PROGRESS.md](PROGRESS.md). Evidencias em
 [registro de alteracoes](REGISTRO_DE_ALTERACOES.md).
 Bloqueio de produto/metodo resolvido pela aprovacao explicita na sessao.
