@@ -21,11 +21,14 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 - Commits locais: `e0e2adb` (W15E) e documentacao de retomada a seguir.
   Alteracao preexistente em `AGENTS.md` permanece fora dos commits; nesta
   unidade nao houve dado real, acesso VPS, deploy ou push.
-- Proxima acao elegivel: W16 requer inventario/disponibilidade do equipamento
-  de referencia e 60 sessoes sinteticas presenciais conforme pacote aprovado;
-  W21 requer ambiente de homologacao autorizado e capacidade medida. Os testes
-  automatizados/headless nao suprem essas evidencias, e nenhuma outra etapa do
-  roadmap tem dependencia atendida neste momento.
+- Inventario local parcial registrado: host Linux Mint 22.2, painel eDP
+  1920x1080/60 Hz, Chrome 155 e Firefox 158; nao foram identificados teclado
+  USB com fio ou Edge, e Windows 11 nao esta disponivel neste host. Nenhum
+  piloto fisico foi executado.
+- Proxima acao elegivel: W16 requer os itens de referencia restantes e 60 sessoes
+  sinteticas presenciais conforme pacote aprovado; W21 requer ambiente de
+  homologacao autorizado e capacidade medida. Testes automatizados/headless nao
+  suprem essas evidencias, e nao ha outra etapa com dependencias satisfeitas.
 
 ## Historico — W15D validada; W15E depende de contrato/minimizacao
 

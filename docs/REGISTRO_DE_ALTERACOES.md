@@ -19,13 +19,16 @@ O estado da nova versao web e mantido separadamente no
   identidade e lock consultivo por assessment ID, sem privilégio de tabela amplo.
 - Evidencias: suite Python completa 347/347 sem skips; Vitest 271/271,
   TypeScript/build; Playwright geral e temporal; upload real HTTPS/API/PostgreSQL
-  ate consulta, detalhe e exportacao em Chromium/Firefox 2/2; teste real com
-  papeis provisionados writer/reader; `git diff --check`. Somente dados
+  ate consulta, detalhe e exportacao em Chromium/Firefox 2/2; suite de integracao
+  completa 36/36 em Chromium/Firefox; teste com papeis provisionados writer/reader;
+  `git diff --check`. Somente dados
   sinteticos e banco descartavel. Sem dependencia nova, deploy, VPS ou push.
 - O responsavel instruiu explicitamente presumir todos os aceites; W09A visual
   e W13A operacional foram aceitas por essa instrucao. A instrucao nao cria
   evidencias de piloto fisico ou capacidade. W16/W21 permanecem limitadas por
-  evidencia real indisponivel.
+  evidencia real indisponivel. Inventario local parcial W16: Linux Mint 22.2,
+  painel eDP 1920x1080/60 Hz, Chrome 155/Firefox 158; teclado USB com fio e Edge
+  nao identificados; Windows 11 indisponivel. Nenhuma replica fisica executada.
 
 ## 2026-10-17 — Percurso do participante WEB W09A
 

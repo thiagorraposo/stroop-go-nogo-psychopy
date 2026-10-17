@@ -20,6 +20,17 @@ frequencia fisica, teclado, GPU ou atraso de apresentacao. Celular/macOS/Safari
 permanecem fora do MVP experimental conforme D1; o painel profissional responsivo
 nao amplia o suporte do motor experimental.
 
+### Inventario parcial do host atual — 2026-10-17
+
+Leitura local de `/etc/os-release`, `xrandr`, `xinput`, `lsusb` e binarios
+instalados identificou Linux Mint 22.2, 12 processadores logicos, cerca de
+15 GiB de memoria, painel eDP em 1920x1080/60 Hz e Google Chrome 155.0.8059.84
+e Firefox 158.0. O teclado visivel ao sistema e interno AT; nenhum teclado USB
+com fio foi identificado. Microsoft Edge e Windows 11 nao estao disponiveis
+neste host. Isso torna parcialmente disponivel um ambiente Linux da matriz,
+mas nao executa nem aprova qualquer replica W16. Nenhuma sessao fisica foi
+realizada; as versoes headless acima permanecem evidencias separadas.
+
 ## Evidencias existentes
 
 - W11: 42 testes do motor principal, incluindo limites de quadro, origem unica,
@@ -99,10 +110,11 @@ Modelo de registro por replica (sem valores preenchidos artificialmente):
 
 ## Limite atual
 
-Faltam inventario do equipamento de referencia, execucao presencial das dez
-replicas por ambiente e evidencias fisicas/comparativas quando exigidas pelo
-estudo. O Codex pode preparar software e analisar artefatos sinteticos, mas nao
-atestar monitor/teclado fisicos a partir de um navegador headless. W16 continua
+Faltam teclado USB com fio para o host Linux, Edge, ambiente Windows 11,
+execucao presencial das dez replicas por combinacao e evidencias fisicas/
+comparativas quando exigidas pelo estudo. O inventario parcial acima nao e
+resultado de piloto. O Codex pode preparar software e analisar artefatos
+sinteticos, mas nao atestar ensaios fisicos sem os equipamentos. W16 continua
 pendente de aceite. A configuracao do pacote esta decidida; a pendencia e a
 disponibilidade/verificacao dos equipamentos e a execucao dos ensaios, sem nova
 aprovacao tecnica rotineira. W17–W20 ja foram executadas independentemente.
