@@ -2,7 +2,13 @@
 
 ## Evolucao para WEB
 
-O repositorio prepara uma versao web no mesmo projeto, com arquitetura de
+A versao WEB esta publicada para testes sinteticos em
+[strooptest.thiagorraposo.dev](https://strooptest.thiagorraposo.dev).
+Participantes precisam de convite; a equipe usa Google com cadastro previo.
+Homologacao temporal e liberacao para coleta real continuam pendentes.
+Implantacao, manutencao e recuperacao: [runbook da VPS](docs/operacao/DEPLOY_WEB_VPS.md).
+
+O repositorio desenvolve a versao web no mesmo projeto, com arquitetura de
 monolito modular. O nucleo Python em `stroop/` concentra contratos, validacao,
 metricas e adaptadores CSV reutilizados pelo fluxo atual. `api/` concentra a
 autenticacao, sessoes e resultados HTTP; `web/` contem a base React/TypeScript,

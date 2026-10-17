@@ -1,0 +1,16 @@
+# Overlay especifico da VPS; nao contem credenciais.
+x-bounded-logging: &bounded-logging
+  driver: json-file
+  options:
+    max-size: '10m'
+    max-file: '3'
+
+services:
+  web-postgres:
+    logging: *bounded-logging
+  web-api:
+    logging: *bounded-logging
+  web-proxy:
+    logging: *bounded-logging
+    volumes:
+      - /home/raposo/stroop-web/acme:/var/www/acme:ro

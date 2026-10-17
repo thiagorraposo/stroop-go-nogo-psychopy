@@ -3,6 +3,69 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
+## Atual — deploy delegado explicitamente pelo usuario
+
+- Usuario autorizou substituir a aplicacao publicada na VPS, preservar dados/
+  credenciais, realizar backups e agir autonomamente. Essa instrucao substitui
+  nesta implantacao a atribuicao anterior W22 exclusivamente ao usuario.
+  W16 continua pendente; somente fluxos sinteticos permitidos.
+- SSH raposo@108.174.145.177:22022, chave/hostkey locais existentes. Hostname
+  informado nao resolve DNS, mas o IP do dominio foi confirmado pelo hostname
+  remoto. Ubuntu22.04.5/x86_64, 2vCPU/~4GBRAM, DockerCompose5.6. UsuarioDocker;
+  sudo exige senha. Operacoes administrativas especificas realizadas por Docker,
+  com mounts limitados, sem montar raiz do host nem expor credenciais.
+- Original /opt/stroop-go-nogo-psychopy e volume stroop-production_postgres_data
+  preservados: schema3, 0avaliacoes, 1conta. Backup PostgreSQL restaurado em
+  container isolado e conferido; configuracoes/segredos/Certbot criptografados
+  e autenticados. Copias externas neste computador em
+  /home/raposo/.local/share/stroop-web-vps-backups, chaves em diretorio separado
+  /home/raposo/.local/share/stroop-web-vps-keys. Nao imprimir nem versionar.
+- Novo runtime /home/raposo/stroop-web; current aponta releases/aa6c844.
+  Config web.env externa600; compose.vps.yaml adiciona apenas webroot ACME.
+  Secrets /home/raposo/.local/share/stroop-web/secrets, arquivos600 com UIDs
+  especificos10001(API)/101(TLS)/999(PG). Originais legados inalterados.
+- Novo PG separado, backup legado restaurado e migrations0004–8/grants aplicados.
+  Conta original preservada; fixtures administrativas sinteticas desativadas.
+  Administrador original vinculado aos projetos sinteticos e projeto proprio
+  SYNTHETIC_HOMOLOGATION. Convite manual novo em /tmp/stroop-vps-manual-invite.json
+  neste computador, protegido600; nao copiar codigo para docs/logs.
+- Imagens: APIdeploy-20261017 ID40c71ee1922d..., proxydeploy-20261017 ID51b05c773ecc...
+  Transferidas prontas, contextos de fonte permitidos, sem data/database/secrets.
+  Commits d2e765e(callbackoptin), befaf88(ACME), aa6c844(hook). Python317/49,987s,
+  callback5/proxy6 aprovados. OIDC/TLS existentes reutilizados; alias legado
+  /oauth2callback chama handler original, sem redirect intermediario.
+- Cutover aprovado em 2026-10-17T01:11:40Z, operacao6,444s. NovaWEB publica80/443;
+  API/PG sem portas. Proxy antigo parado, dashboard/PGlegados privados mantidos
+  para rollback. Deployment.json no runtime. HTTPS/publicready aprovados.
+- Preflight privado e publico: convite/conclusao/retry/consulta/CSV reais
+  aprovados. Navegador Chromium executou pratica+principal60s no dominio real,
+  gravou1vez/16tentativas/12metricas, sem erroJS/storage e logoutcookie confirmado.
+  Total3coletas sinteticas/48tentativas/36metricas. Artefatos /tmp/stroop-vps-
+  browser-{result,timing,fixture}.json; nao inferir W16 fisica desses ensaios.
+- Certbot alterado para webroot; timer existente preservado. Backup completo
+  /etc/letsencrypt autenticado antes de alterar renewal/hook. DryrunACME0 e
+  hookreal0, incluindo recriacao proxy para renovar inode dos binds. Certificado
+  publico valido ate2027-01-05. Sem nova dependencia instalada na VPS.
+- Cron usuario preservado e ampliado: monitor/minuto, backup02:15 diario,
+  restore03:30domingo. Scripts tools/vps-maintenance.sh e vps-rollback.sh;
+  rotina backup/restore90984 terminou0, snapshot atualizado com3coletas.
+  Overlay de logs limitados aplicado nos3servicos; recriacao preservou dados.
+- Perguntas assincronas pendentes: usuario confirmar login Google pessoal e
+  destino externo estavel para automatizar replicas. HandoffGoogle real passou
+  no browser sem redirect_uri_mismatch/invalid_client; login pessoal nao presumido.
+- Validacao final: todos saudaveis,3coletas/48tentativas/36metricas preservadas
+  apos recriacao; banco original0avaliacoes/1conta intacto. Roles writersemDDL/
+  UPDATEusuarios e readersemPII; logsproxy6registros so camposfechados, APIvazio.
+  Seis copias criptografadas externas comSHA256 conferido, incluindo configuracao
+  WEB/credenciais autenticada em web-config-20261017T011949Z.tar.enc; chavesseparadas.
+- Rollback reforcado: confirma HTTPS do legado e reinicia proxyWEB se falhar;
+  dois testes de controle de falha aprovados, sem trocar trafego real novamente.
+- Proxima acao: conferir docs/secretsscan e commit operacional isolado, receber
+  confirmacao Googlepessoal e destino de replica externa automatica. Nao afirmar
+  validacao pessoal sem resposta. Publicacao tecnica e fluxos sinteticos feitos;
+  W16/W21 permanecem pendentes. Preservar previa local34647/4173 e AGENTS raiz
+  preexistente. TunelSSH19443 encerrado apos cutover.
+
 ## 2026-10-16 — Organizacao documental validada
 
 - Pedido atual: organizar arquivos preservando funcionamento. Documentos

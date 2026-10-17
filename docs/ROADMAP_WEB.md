@@ -30,14 +30,14 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W18 | Concluida; pipeline completo em checkout sparse limpo, testes e auditorias aprovados |
 | W19 | Concluida; imagens nao-root, Compose isolado e smoke HTTPS/coleta/reinicio aprovados |
 | W20 | Concluida; monitor, backup criptografado/restauracao isolada, alerta e rollback validados |
-| W21 | Bloqueada por W16 e definicao do ambiente de homologacao autorizado |
+| W21 | VPS definida/inventariada; pendentes W16, capacidade e aceite de homologacao |
 | W23 | Nao iniciada; depende da implantacao/aceite W22 |
 | W14 | Concluida em 2026-10-16; consulta/CSV autorizados, papel SELECT, mapa legado e testes PostgreSQL validados |
-| W22 | Nao iniciada; implantacao futura de responsabilidade do usuario |
+| W22 | Publicada na VPS por delegacao explicita, somente testes sinteticos; confirmacao Google pessoal pendente |
 
-W00–W15 e W17–W20 estao validadas. A continuidade aguarda equipamento/evidencias
-da W16 e ambiente autorizado para W21; W22 permanece com o usuario. Nenhuma
-dessas pendencias concede conclusao geral. Retomada detalhada em
+W00–W15 e W17–W20 estao validadas. A publicacao de testes W22 foi explicitamente
+delegada e executada; W16 e W21 continuam pendentes. Nenhuma dessas pendencias
+concede conclusao geral ou autoriza coleta real. Retomada detalhada em
 [PROGRESS.md](PROGRESS.md). Evidencias em
 [registro de alteracoes](REGISTRO_DE_ALTERACOES.md).
 Bloqueio de produto/metodo resolvido pela aprovacao explicita na sessao.
@@ -471,6 +471,12 @@ Dependencias da fase: evidencias funcionais, temporais, de seguranca e operacao.
 - **Leitura:** runbook web, validacao web e contratos de acesso/protocolo.
 
 ### W22 — Implantacao em producao pelo usuario
+
+Autorizacao posterior nesta sessao: responsavel delegou explicitamente ao Codex
+a substituicao da aplicacao na VPS existente, mantendo dominio e infraestrutura.
+Publicacao exclusivamente sintetica permitida antes do aceite W16/W21; isso
+nao conclui essas etapas. Evidencias e manutencao em
+[DEPLOY_WEB_VPS](operacao/DEPLOY_WEB_VPS.md); confirmacao Google pessoal solicitada.
 
 - **Objetivo:** publicar a versao homologada com decisao operacional explicita.
 - **Entregaveis:** dominio/TLS, credenciais externas, backup externo,

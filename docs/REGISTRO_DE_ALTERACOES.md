@@ -6,6 +6,23 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — Publicacao WEB explicitamente delegada na VPS
+
+- Responsavel autorizou substituir o site mantendo dominio/TLS/OIDC e dados.
+  Pilha anterior, volume e conta preservados; backups banco/configuracoes/
+  Certbot criptografados/autenticados, restore real e copias externas conferidas.
+- Nova pilha paralela validada antes do cutover de6,444s em01:11:40Z/17outUTC.
+  Novo banco isolado recebeu copia e migrations0004–8/grants; nada apagado no
+  original. API/proxy nao-root/RO, somente proxy80/443, logs limitados no overlay.
+- OIDCcallback legado opt-in preservado, Python317/317 e proxy6/6 aprovados.
+  Preflight e dominio publico: convite/conclusao/retry/consulta/CSV; navegador
+  executou pratica+principal60s, gravacao16tentativas/12metricas e logout.
+- Certbot passou awebroot; dryrun e hook reais aprovados. Rotinas de monitor,
+  backup diario e restore semanal instaladas e verificadas; rollback preserva
+  ambos os bancos. Runbook operacional DEPLOY_WEB_VPS publicado.
+- Confirmacao da sessao Google pessoal solicitada; replica externa automatica
+  depende de destino estavel. W16/W21 nao homologadas; somente testes sinteticos.
+
 ## 2026-10-16 — W16: pacote de referencia aprovado
 
 - Responsavel aprovou integralmente o pacote registrado em VALIDACAO_WEB.md:

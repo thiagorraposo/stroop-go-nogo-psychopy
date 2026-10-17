@@ -2,7 +2,9 @@
 
 Pacote da W19 validado localmente com dados sinteticos. O aceite permanece no
 [roadmap](../ROADMAP_WEB.md). Este procedimento prepara uma pilha independente;
-a publicacao na VPS pertence a W22 e sera executada pelo responsavel.
+a publicacao na VPS pertence a W22, sob responsabilidade do responsavel ou
+execucao explicitamente delegada. A implantacao atual esta registrada em
+[DEPLOY_WEB_VPS](DEPLOY_WEB_VPS.md), exclusivamente para testes sinteticos.
 O [ambiente legado](INFRAESTRUTURA_DOCKER.md) conserva seus comandos.
 
 ## Configuracao explicita
