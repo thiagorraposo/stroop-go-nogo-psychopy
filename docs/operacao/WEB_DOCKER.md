@@ -43,8 +43,8 @@ Exemplo com arquivo externo; substitua o caminho antes da execucao:
 docker compose --project-name stroop-web --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web config --quiet
 docker compose --project-name stroop-web --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web build
 docker compose --project-name stroop-web --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web up -d --wait web-postgres
-docker compose --project-name stroop-web --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web-tools run --rm web-migrate
-docker compose --project-name stroop-web --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web-tools run --rm web-provision
+docker compose --project-name stroop-web --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web --profile web-tools run --rm web-migrate
+docker compose --project-name stroop-web --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web --profile web-tools run --rm web-provision
 docker compose --project-name stroop-web --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web up -d --wait
 ```
 
