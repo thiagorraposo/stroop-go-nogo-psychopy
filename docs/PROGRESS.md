@@ -3,7 +3,21 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
-## Atual — comparacao do dashboard e planejamento documental
+## Atual — relatorio tecnico para leitores externos
+
+- Criada sintese em desenvolvimento/RELATORIO_TECNICO.md, com fluxo local/WEB,
+  tempos, classificacao das respostas, formulas/exemplo sintetico, arquitetura,
+  persistencia, acesso e limites. Fontes canonicas vinculadas; sem substituir
+  contratos nem duplicar o estado/criterios do roadmap.
+- Indice docs/README.md aponta para a leitura introdutoria. Relatorio distingue
+  APIs existentes de telas pendentes e testes de software de homologacao fisica.
+- Validacao:83links locais e diff conferidos; seis valores do exemplo
+  sintetico comparados com o nucleo Python. Revisao independente de formulas/
+  escopo concluida; diagrama representa acesso ao banco exclusivamente pela API.
+- Somente documentacao; nenhum codigo, servico, coleta ou deploy alterado.
+  Desenvolvimento permanece no escopo futuro ja definido pelo roadmap.
+
+## Historico — comparacao do dashboard e planejamento documental
 
 - Usuario solicitou comparar dashboard legado/WEB e documentar complementos,
   como no cadastro da sessao. Inspecionados codigo, guias, contratos de dados,

@@ -6,6 +6,14 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — Relatorio tecnico de funcionamento
+
+- Criado desenvolvimento/RELATORIO_TECNICO.md para leitores externos, reunindo
+  experimento, tempos, metricas com exemplo sintetico, arquitetura, percurso dos
+  dados, autorizacao e limites de validacao; referencias mantidas nas fontes.
+- Adicionada entrada no indice documental. Nenhuma formula, contrato ou
+  funcionalidade alterada; etapas futuras nao sao descritas como concluidas.
+
 ## 2026-10-16 — Comparacao e planejamento de paridade do dashboard
 
 - Comparados Streamlit e WEB por codigo/contratos, incluindo filtros, cards,

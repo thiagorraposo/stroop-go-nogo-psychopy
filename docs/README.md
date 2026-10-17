@@ -4,6 +4,10 @@ Comece pelo [guia do usuario](operacao/GUIA_DO_USUARIO.md) para executar o
 fluxo existente, ou pelo [mapa do projeto](ESTRUTURA_DO_PROJETO.md) para
 localizar codigo, comandos publicos e contratos.
 
+Para entender o projeto sem conhecer o codigo, leia o
+[relatorio tecnico de funcionamento](desenvolvimento/RELATORIO_TECNICO.md):
+experimento, calculos, arquitetura, dados, acesso e limites de validacao.
+
 ## Desenvolvimento e retomada
 
 - [Roadmap WEB](ROADMAP_WEB.md): escopo, dependencias, criterios e estado.
