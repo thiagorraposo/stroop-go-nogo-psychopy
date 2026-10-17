@@ -6,6 +6,17 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — Planejamento do cadastro WEB da sessao
+
+- Apos apontamento do responsavel e consulta ao formulario legado, registrada
+  W13A no roadmap: cadastro pela equipe, campos permitidos, avaliador vinculado
+  a conta autenticada, emissao/revogacao de convite e aceite ponta a ponta real.
+- Corrigida a leitura do estado: integracao anterior preservada, mas cadastro
+  completo pelo navegador ainda pendente. Incluido W13A no gate funcional W21
+  e no aceite da publicacao W22. W16 e coleta real nao sao liberadas por isso.
+- Atendido o limite documental solicitado; nenhum codigo, teste funcional ou
+  deploy executado. Validacao desta unidade limitada aos documentos/links/diff.
+
 ## 2026-10-16 — Correcao de compatibilidade do retorno Google em producao
 
 - Relato de invalid_oidc_state reproduzido: callback rejeitava metadados

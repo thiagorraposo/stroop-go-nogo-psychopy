@@ -3,7 +3,21 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
-## Atual — correcao do callback Google apos relato de falha
+## Atual — planejamento documental do cadastro da sessao
+
+- Responsavel identificou ausencia da tela de cadastro e pediu documentar
+  primeiro o trabalho no roadmap. Implementacao/deploy suspensos nesta unidade;
+  delegacao de testes interrompida antes de qualquer arquivo entregue.
+- Escopo, dependencias, fluxo, criterios de aceite e verificacoes previstos
+  registrados em W13A do [roadmap](ROADMAP_WEB.md). A API existente nao supre a
+  falta do formulario; evidencia anterior de integracao nao concede esse aceite.
+- Preservadas as decisoes WEB: projeto/codigo/visita e avaliador autenticado,
+  sem nome/iniciais do participante. W16/W21 e coleta real continuam pendentes.
+- Proxima acao de desenvolvimento: implementar W13A conforme sua ficha quando
+  esse escopo for retomado. Nesta solicitacao, somente documentos e validacao
+  de links/diff; nenhuma mudanca funcional ou acesso a VPS.
+
+## Historico — correcao do callback Google apos relato de falha
 
 - Usuario encontrou `invalid_oidc_state` no login pessoal. Reproduzido no
   dominio publico com cookie/state validos e metadados Google sinteticos:

@@ -23,7 +23,8 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W10 | Concluida em 2026-10-16; pratica jsPsych, 77 testes logica/DOM, 18 browser e regressao Python 240 aprovados |
 | W11 | Concluida em 2026-10-16; motor jsPsych, 120 testes logica/DOM e 24 browser aprovados |
 | W12 | Concluida em 2026-10-16; resumo, CSV de 21 campos, paridade Python/TypeScript e importacao real validados |
-| W13 | Concluida; fluxo HTTPS real, reenvio e finalizacao validados |
+| W13 | Integracao anterior validada; fluxo completo de cadastro pela interface pendente em W13A |
+| W13A | Planejada; cadastro da sessao pela equipe e gestao do convite ainda nao implementados na interface |
 | W15 | Concluida; painel autorizado, metricas/graficos/CSV e perfis validados em HTTPS real |
 | W16 | Pacote de referencia aprovado; bloqueada por disponibilidade dos equipamentos e evidencias dos pilotos |
 | W17 | Concluida; hardening, CSP, 284 testes Python, HTTPS e auditorias aprovados |
@@ -35,7 +36,12 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W14 | Concluida em 2026-10-16; consulta/CSV autorizados, papel SELECT, mapa legado e testes PostgreSQL validados |
 | W22 | Publicada na VPS por delegacao explicita, somente testes sinteticos; confirmacao Google pessoal pendente |
 
-W00–W15 e W17–W20 estao validadas. A publicacao de testes W22 foi explicitamente
+As evidencias anteriores de W00–W15 e W17–W20 permanecem validas para os escopos
+testados; a lacuna funcional W13A impede considerar completo o fluxo de cadastro
+e execucao pelo navegador. W13A e a proxima prioridade de implementacao, antes
+do aceite funcional W21/W22. Por instrucao mais recente, esta unidade se limita
+ao planejamento documental; nao inicia codigo, testes funcionais ou publicacao.
+A publicacao de testes W22 foi explicitamente
 delegada e executada; W16 e W21 continuam pendentes. Nenhuma dessas pendencias
 concede conclusao geral ou autoriza coleta real. Retomada detalhada em
 [PROGRESS.md](PROGRESS.md). Evidencias em
@@ -353,6 +359,94 @@ Dependencias da fase: backend e execucao local aprovados.
   refresh, expiracao da sessao e limpeza de dados temporarios conforme contrato.
 - **Leitura:** contratos web e casos de uso de conclusao.
 
+### W13A — Cadastro da sessao pela equipe e emissao de convite
+
+- **Estado:** planejada, sem implementacao ou aceite. Complemento corretivo de
+  W13/W15 identificado pelo responsavel apos testar a versao publicada; preserva
+  os IDs existentes e nao transforma testes anteriores em evidencia deste fluxo.
+- **Problema:** o participante consegue informar um convite, mas a equipe nao
+  dispoe de formulario web para preparar uma sessao. A API ja recebe projeto,
+  codigo do participante e visita, vinculando o avaliador autenticado. Convites
+  preparados por scripts nao satisfazem a operacao completa pelo navegador.
+- **Referencias de origem:** [Fase 1 do plano legado](legado/PLANO_DE_IMPLEMENTACAO_DASHBOARD.md),
+  [formulario de sessao](experimento/FORMULARIO_DE_SESSAO.md), adaptacao aprovada
+  no [protocolo WEB](experimento/PROTOCOLO_WEB.md) e
+  [contrato HTTP](desenvolvimento/CONTRATO_API_WEB.md). O formulario legado inclui
+  nome/iniciais; a WEB conserva a decisao de nao coleta-los.
+- **Dependencias:** W06/W07 (autenticacao, projetos, vinculos e convites),
+  W09 (interface), W13 (execucao integrada) e W15 (area da equipe).
+- **Fluxo previsto:** entrar em `/equipe` com Google -> selecionar projeto
+  autorizado -> cadastrar codigo pseudonimizado e visita -> conferir avaliador
+  e dados da sessao -> gerar convite -> entregar codigo ao participante -> abrir
+  `/pratica`, validar convite e executar -> conferir resultado na area da equipe.
+- **Campos e regras:**
+
+  | Informacao | Comportamento planejado |
+  |---|---|
+  | Projeto/protocolo | Selecao entre projetos existentes acessiveis; somente projeto ativo e vinculo valido permitem emitir convite |
+  | Codigo do participante | Obrigatorio, pseudonimizado; entrada manual com validacao do contrato WEB, sem cadastro nominal de pacientes |
+  | Numero ou codigo da visita | Obrigatorio; aceita identificador de visita, sem restringir a numeros |
+  | Avaliador responsavel | Exibido como a conta autenticada e sua identificacao tecnica; fixado pelo servidor, sem atribuir a outra pessoa pelo formulario |
+  | Datas, identificadores e protocolo | Gerados/vinculados pelo sistema conforme contrato; nao digitados pelo operador |
+
+- **Entregaveis:** formulario acessivel na area autenticada, cliente HTTP para
+  criar/revogar convite e confirmacao com projeto, participante, visita,
+  avaliador, codigo de uso unico e expiracao. Disponibilizar acesso a `/pratica`
+  sem incluir o convite na URL. Permitir revogar o convite enquanto o contrato
+  permitir; nova emissao deve ser uma acao explicita e criar sessao distinta.
+  Codigo permanece apenas em memoria durante sua exibicao; nao e recuperavel
+  apos sair/recarregar. Explicar como proceder se a resposta/codigo for perdido,
+  sem simular revogacao de convite cujo identificador nao foi recebido.
+- **Limites:** reutilizar as rotas e a persistencia existentes, sem presumir
+  necessidade de migration. Sem nome, iniciais do participante, CPF, contato,
+  idade, sexo, texto livre ou novo prontuario. Cadastro de projetos, usuarios e
+  selecao de avaliador diferente do emissor nao integram esta correcao. Nao
+  alterar tempos, estimulos, metricas, CSV ou gates W16/W21. Somente dados
+  sinteticos enquanto a coleta real nao estiver autorizada/habilitada.
+- **Criterios de aceite:**
+  1. Operador com perfil `importacao`/`administracao` e vinculo ativo consegue
+     preparar a sessao e gerar convite pela interface, sem CLI ou acesso ao banco.
+     Perfil `consulta` nao recebe controles de escrita; servidor continua
+     recusando escrita indevida, inclusive para administrador sem vinculo.
+  2. Campos obrigatorios e limites seguem o contrato WEB; remover espacos nas
+     extremidades, indicar erros por campo e preservar valores para correcao.
+     Nenhum convite e emitido quando a validacao falha.
+  3. Projeto, codigo, visita e avaliador corretos persistem do convite ao
+     resultado/CSV; identidade do avaliador vem do servidor. Dados de outra
+     sessao/projeto nao podem ser reaproveitados acidentalmente.
+  4. Bloquear duplo envio; nao repetir POST automaticamente apos timeout/falha
+     de rede. Diferenciar sucesso confirmado de resultado desconhecido da
+     solicitacao, sem declarar criacao ou revogacao sem resposta valida.
+  5. Revogacao confirmada impede resgate/continuidade conforme contrato.
+     Expiracao, reutilizacao, sessao vencida, bloqueio de conta, perda de vinculo,
+     CSRF/origem e indisponibilidade possuem mensagens fechadas e operacao segura.
+  6. Trocar projeto, sair da conta ou desmontar a tela cancela operacoes locais
+     pendentes e limpa dados/codigo exibidos, sem aplicar respostas atrasadas ao
+     novo contexto. Cancelamento local nao presume desfazer uma escrita remota.
+  7. Fluxo integral validado em HTTPS real: cadastro pela tela -> convite ->
+     pratica -> principal -> recibo -> consulta/CSV com metadados conferidos.
+     Mocks isolados e geracao por scripts nao substituem este aceite.
+  8. Interface funciona por teclado, com labels, foco e estados de espera/erro;
+     sem metadados/convites em logs, URLs ou armazenamento persistente do browser.
+- **Sequencia de execucao futura:** conferir contratos e registrar a UX ->
+  implementar cliente/formulario -> testar componentes e navegador -> validar
+  com API/PostgreSQL reais sinteticos -> atualizar guias e evidencias -> preparar
+  imagem e retorno seguro -> publicar conforme autorizacao vigente e executar
+  smoke sintetico publico -> solicitar aceite do operador. Nesta unidade apenas
+  se documenta a sequencia; nenhuma publicacao e executada.
+- **Validacoes previstas:** testes de cliente/DOM para entrada e respostas;
+  Playwright para perfis, cadastro, revogacao, falhas e troca de projeto; HTTPS
+  real e PostgreSQL descartavel para persistencia/autorizacao/ponta a ponta;
+  `npm ci`, `npm test`, `npm run typecheck`, `npm run build`,
+  `npm run test:browser` e integracao conforme ambiente documentado. Executar
+  regressao Python se houver mudanca no backend e build/smoke de imagem quando
+  houver nova imagem. Sempre conferir links e `git diff --check`. Registrar
+  limites/skips como pendencias; estes ensaios nao homologam timing fisico W16.
+- **Conclusao:** somente apos os criterios acima terem evidencia e o responsavel
+  conseguir operar o cadastro pela interface. Atualizar guias da equipe e
+  participante, registro/progresso e matriz de cobertura W23; W21/W22 devem
+  incluir esse fluxo em seu aceite funcional.
+
 ### W14 — Consulta autorizada e exportacao via API
 
 - **Objetivo:** disponibilizar resultados com filtros e paginacao.
@@ -463,7 +557,7 @@ Dependencias da fase: evidencias funcionais, temporais, de seguranca e operacao.
 - **Objetivo:** validar o pacote completo no ambiente de homologacao autorizado.
 - **Entregaveis:** relatorio de aceite, limite de concorrencia medido, roteiro
   operacional e lista fechada de pendencias; dados sempre sinteticos.
-- **Dependencias:** W16, W17, W18, W20.
+- **Dependencias:** W13A, W16, W17, W18, W20.
 - **Conclusao:** fluxos por perfil, protocolo e recuperacao aprovados;
   capacidade e limites medidos no ambiente alvo, sem estimativas como evidencia.
 - **Validacoes:** ponta a ponta, carga controlada fora do motor experimental,
@@ -477,6 +571,8 @@ a substituicao da aplicacao na VPS existente, mantendo dominio e infraestrutura.
 Publicacao exclusivamente sintetica permitida antes do aceite W16/W21; isso
 nao conclui essas etapas. Evidencias e manutencao em
 [DEPLOY_WEB_VPS](operacao/DEPLOY_WEB_VPS.md); confirmacao Google pessoal solicitada.
+O aceite funcional da interface publicada tambem depende de W13A; a publicacao
+ja realizada nao comprova o cadastro de sessao pela equipe no navegador.
 
 - **Objetivo:** publicar a versao homologada com decisao operacional explicita.
 - **Entregaveis:** dominio/TLS, credenciais externas, backup externo,
