@@ -42,7 +42,12 @@ http {
         include /etc/nginx/web/error-headers.conf;
         include /etc/nginx/web/closed-errors.conf;
         # Destino fixo, independente de Host/Forwarded fornecidos pelo cliente.
-        return 308 ${WEB_PUBLIC_ORIGIN}$request_uri;
+        location ^~ /.well-known/acme-challenge/ {
+            root /var/www/acme;
+            default_type text/plain;
+            try_files $uri =404;
+        }
+        location / { return 308 ${WEB_PUBLIC_ORIGIN}$request_uri; }
     }
     server {
         listen 8443 ssl default_server;

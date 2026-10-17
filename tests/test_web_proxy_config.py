@@ -68,6 +68,20 @@ class WebProxyConfigTests(unittest.TestCase):
         self.assertIn('if ($http_host != "${WEB_AUTHORITY}")', config)
         self.assertIn('location ^~ /api/', config)
 
+    def test_http_acme_webroot_exclusivo_preserva_redirect_e_tls_fechado(self):
+        config = (DEPLOY / 'nginx.conf.template').read_text()
+        http = config.split('listen 8080 default_server;', 1)[1].split('listen 8443 ssl default_server;', 1)[0]
+        challenge = re.search(r'location \^~ /\.well-known/acme-challenge/ \{([^}]+)\}', http).group(1)
+        self.assertIn('root /var/www/acme;', challenge)
+        self.assertIn('default_type text/plain;', challenge)
+        self.assertIn('try_files $uri =404;', challenge)
+        self.assertNotIn('proxy_pass', challenge)
+        self.assertEqual(http.count('location '), 2)
+        self.assertIn('location / { return 308 ${WEB_PUBLIC_ORIGIN}$request_uri; }', http)
+        tls = config.split('listen 8443 ssl default_server;', 1)[1]
+        self.assertNotIn('/var/www/acme', tls)
+        self.assertIn('location ~ (^|/)\\. { return 404; }', tls)
+
     def test_build_context_e_runtime_excluem_fontes_secrets_e_dependencias_node(self):
         ignore = (ROOT / 'Dockerfile.web.dockerignore').read_text().splitlines()
         self.assertEqual(ignore[0], '**')
