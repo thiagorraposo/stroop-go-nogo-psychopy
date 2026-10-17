@@ -147,6 +147,21 @@ revogacao sem identificador confirmado. Nova emissao e uma nova sessao,
 explicitamente solicitada. Revogacao so e declarada apos resposta204; uma
 falha pede confirmacao novamente e orienta a nao entregar o codigo.
 
+## WEB — importacao de CSV pela equipe (W15E)
+
+O painel de importacao fica no projeto ativo selecionado e somente para perfis
+de coleta/importacao ou administracao com vinculo. A pessoa escolhe um CSV
+registrado; o navegador cria uma copia em memoria, substitui `participant_name`
+por `NAO_COLETADO` e limpa `initials`. O arquivo original nao e alterado, e a
+tela mostra destino e limites sem exibir nome ou conteudo do arquivo.
+
+Durante a operacao, a tela informa envio e estado recebido/validado/importado/
+rejeitado. Se a resposta se perder, oferece consulta pelo UUID e reenvio
+explicitamente solicitado da mesma copia; nunca repete POST automaticamente.
+Concluido o upload, limpa selecao e copia e atualiza os resultados do projeto.
+O CSV continua sendo dado local de origem; a importacao nao equivale a coleta
+WEB nem habilita pesquisa real.
+
 ## WEB — consulta combinada da equipe (W15A)
 
 `Projeto` mantem o contexto de preparacao da sessao; `Projetos da consulta`

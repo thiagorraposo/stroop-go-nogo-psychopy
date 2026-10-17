@@ -31,6 +31,7 @@ REQUIRED_COLUMNS = {
     },
     "web_projects": {"project_id", "code", "active"},
     "web_legacy_project_links": {"legacy_project", "project_id", "active"},
+    "web_csv_imports": {"operation_id", "project_id", "status", "assessment_id"},
     "web_project_members": {"project_id", "issuer", "subject", "active"},
     "app_users": {"issuer", "subject", "role", "active"},
     "web_assessments": {
@@ -108,9 +109,11 @@ def _base_query(where_clause: str) -> str:
                       a.assessment_date, a.import_status
                FROM assessments a
                LEFT JOIN web_assessments wa ON wa.assessment_id=a.assessment_id
+               LEFT JOIN web_csv_imports wi ON wi.assessment_id=a.assessment_id AND wi.status='importado'
                JOIN web_projects p ON p.project_id=%s
                  AND ((wa.assessment_id IS NOT NULL AND wa.project_id=p.project_id)
-                   OR (wa.assessment_id IS NULL AND EXISTS (
+                   OR (wi.assessment_id IS NOT NULL AND wi.project_id=p.project_id)
+                   OR (wa.assessment_id IS NULL AND wi.assessment_id IS NULL AND EXISTS (
                      SELECT 1 FROM web_legacy_project_links lp
                      WHERE lp.project_id=p.project_id AND lp.legacy_project=a.project AND lp.active
                    )))

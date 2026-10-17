@@ -13,7 +13,7 @@ nao o corpo HTTP. Estado e aceite ficam no [roadmap](../ROADMAP_WEB.md).
 - Aplicacao e API compartilham origem HTTPS. API em `/api/v1`; somente
   `/health/live` e `/health/ready` ficam fora desse prefixo. Nao permitir CORS
   arbitrario. Cookies nao sao credenciais Bearer reutilizaveis por JavaScript.
-- JSON em UTF-8, `Content-Type: application/json`, com no maximo 65536 bytes
+- Corpos JSON em UTF-8, `Content-Type: application/json`, com no maximo 65536 bytes
   descomprimidos por requisicao. Recusar tipo incorreto com 415 e corpo grande
   com 413 antes de processar seus campos. JSON malformado e 400.
 - Objetos de entrada tem campos fechados: campo adicional, campo ausente,
@@ -115,6 +115,8 @@ Referencia: [resposta de autorizacao Google](https://developers.google.com/ident
 | `GET /projects/{project_id}/assessments/options` | Facetas autorizadas por projeto, periodo e instrumento; sem nomes/iniciais | Qualquer perfil com vinculo ativo |
 | `GET /projects/{project_id}/assessments/{assessment_id}` | 200 com detalhe/metricas recalculadas e tentativas, no formato abaixo | Mesmo escopo da lista |
 | `GET /projects/{project_id}/assessments/{assessment_id}/export` | 200 `text/csv; charset=utf-8`, 21 colunas oficiais, 16 linhas principais | Mesmo escopo da lista; revalidar antes do download |
+| `POST /projects/{project_id}/imports/{operation_id}` | CSV UTF-8 minimizado em `text/csv`; 200 com estado da operacao | Perfil `importacao`/`administracao`, projeto ativo e vinculo; CSRF/origem |
+| `GET /projects/{project_id}/imports/{operation_id}` | Sem corpo/query; 200 com estado auditado | Mesmo perfil e vinculo ativo; reautoriza projeto |
 | `POST /assessments/export` | CSV agregado de uma linha por avaliacao, contrato fechado por instrumento | Qualquer perfil vinculado aos projetos; CSRF/origem e reautorizacao no clique |
 | `GET /admin/users` | Lista paginada de `{user_id,issuer,subject,email,role,active}`; acesso exclusivo da area de administracao | `administracao`; e-mail auxiliar restrito a admins |
 | `POST /admin/users` | Corpo fechado `{issuer,subject,role,email?}`; 201 cadastra identidade Google, sem senha/autocadastro | `administracao` + CSRF/origem; `iss`/`sub` sao a identidade |
@@ -128,6 +130,38 @@ encaminhar seu proprio `iss` e `sub` por canal institucional; e-mail nao concede
 acesso. Administradores criam projetos pelas operacoes existentes e concedem
 vinculos explicitamente; a administracao global nao herda acesso a resultados.
 Bloqueio e revogacao preservam dados e sao revalidados em cada operacao.
+
+### Importacao CSV WEB (W15E)
+
+O `operation_id` e UUID aleatorio criado pelo navegador. O cliente envia a
+copia minimizada do CSV oficial registrado ou do instrumento demo registrado;
+`participant_name` deve ser exatamente `NAO_COLETADO` e `initials` vazio. A
+interface cria essa copia em memoria, preserva o arquivo selecionado e nao envia
+nome de arquivo. Clientes alternativos que transmitam nome ou iniciais sao
+recusados pela API. Projeto no caminho e a unica associacao; o rotulo legado da
+coluna `project` nunca cria vinculo nem mapa.
+
+O endpoint dedicado aceita somente `text/csv` opcionalmente com
+`charset=utf-8`, corpo de 1 a 5 MiB e ate 10.000 registros de dados. Os outros
+endpoints mantem o limite JSON de 65.536 bytes. O servidor grava temporariamente
+com permissao `0600`, valida pelo mesmo ingestao de instrumento do fluxo Python,
+remove temporarios em sucesso/erro e nao registra payload, nome, caminho local
+ou dados nominais. NUL, UTF-8 invalido, CSV vazio, formato/schema invalidos ou
+arquivo nao minimizado resultam em estado `rejeitado` (`invalid_csv`).
+
+Resposta de sucesso ou reconsulta:
+
+```json
+{"operation_id":"UUID","status":"recebido|validado|importado|rejeitado","error_code":null,"assessment_id":"UUID ou null","created_at":"ISO-8601 UTC","updated_at":"ISO-8601 UTC"}
+```
+
+Uma repeticao com o mesmo UUID e hash e idempotente; UUID reutilizado com outro
+projeto, identidade ou conteudo retorna `409 state_conflict`. Duplicata global
+de `assessment_id` fica `rejeitado` com `duplicate_assessment`, sem sobrescrita.
+Estado e hash SHA-256 ficam na auditoria restrita. A gravacao da avaliacao e a
+mudanca para `importado` compartilham transacao. Se houver falha antes do commit,
+a reconsulta pode mostrar `validado`; o cliente deve consultar ou solicitar
+explicitamente reenvio da mesma copia e UUID, nunca repetir automaticamente.
 
 ### Filtros profissionais combinados (W15A)
 

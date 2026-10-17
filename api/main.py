@@ -1,5 +1,7 @@
 """Factory HTTP; regras do experimento permanecem no pacote stroop."""
 
+import asyncio
+
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
@@ -13,6 +15,7 @@ from api.sessions import router as sessions_router
 from api.results import router as results_router
 from api.assessments import router as assessments_router, export_router as assessment_export_router
 from api.administration import router as administration_router
+from api.imports import router as imports_router
 
 
 def create_app(config: APIConfig | None = None) -> FastAPI:
@@ -22,6 +25,7 @@ def create_app(config: APIConfig | None = None) -> FastAPI:
         debug=False, redirect_slashes=False,
     )
     app.state.config = config
+    app.state.csv_import_semaphore = asyncio.Semaphore(2)
     app.include_router(auth_router)
     if config.oidc_callback_path == "/oauth2callback":
         app.add_api_route("/oauth2callback", auth_callback, methods=["GET"], include_in_schema=False)
@@ -30,6 +34,7 @@ def create_app(config: APIConfig | None = None) -> FastAPI:
     app.include_router(assessments_router)
     app.include_router(assessment_export_router)
     app.include_router(administration_router)
+    app.include_router(imports_router)
     app.add_exception_handler(HTTPException, http_exception_handler)
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_middleware(RequestBoundary, config=config)

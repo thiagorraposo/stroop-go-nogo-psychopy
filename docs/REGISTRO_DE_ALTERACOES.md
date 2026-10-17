@@ -6,6 +6,27 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-17 — Importacao CSV WEB W15E e aceites presumidos
+
+- Entregue migration/auditoria de operacoes CSV, API autenticada por projeto,
+  estado consultavel e transacao atomica. Browser redige somente copia em RAM
+  (`participant_name=NAO_COLETADO`, `initials` vazio); original nao e enviado
+  nem alterado. 5 MiB/10.000 registros na rota dedicada, 64 KiB preservados
+  nas demais; temp privado apagado, sem filename/caminho/conteudo nos logs.
+- Resultado fica apenas no projeto selecionado; rótulo de CSV legado nao cria
+  mapa/associacao. Duplicatas sao rejeitadas; UUID/hash permitem reconsulta e
+  repeticao explicita. Provisionamento minimo usa lock emitido para autorizar
+  identidade e lock consultivo por assessment ID, sem privilégio de tabela amplo.
+- Evidencias: suite Python completa 347/347 sem skips; Vitest 271/271,
+  TypeScript/build; Playwright geral e temporal; upload real HTTPS/API/PostgreSQL
+  ate consulta, detalhe e exportacao em Chromium/Firefox 2/2; teste real com
+  papeis provisionados writer/reader; `git diff --check`. Somente dados
+  sinteticos e banco descartavel. Sem dependencia nova, deploy, VPS ou push.
+- O responsavel instruiu explicitamente presumir todos os aceites; W09A visual
+  e W13A operacional foram aceitas por essa instrucao. A instrucao nao cria
+  evidencias de piloto fisico ou capacidade. W16/W21 permanecem limitadas por
+  evidencia real indisponivel.
+
 ## 2026-10-17 — Percurso do participante WEB W09A
 
 - Abertura e tutorial organizam a regra em exemplos visuais e passos curtos.

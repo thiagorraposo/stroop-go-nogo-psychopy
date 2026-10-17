@@ -5,7 +5,10 @@ import hashlib
 import io
 import os
 import secrets
+import tempfile
 import unittest
+from pathlib import Path
+from types import SimpleNamespace
 from urllib.parse import quote, urlsplit, urlunsplit
 from uuid import uuid4
 
@@ -15,6 +18,8 @@ from psycopg import sql
 from scripts.migrations import apply_migrations
 from scripts.provision_web_database import ProvisionError, configuration, provision
 from stroop.application import web_results
+from stroop.ingestion.instruments import load_instrument_csv
+from stroop.persistence import web_imports, web_assessments
 from stroop.persistence import web_sessions
 from tests.test_web_results import ORDER, synthetic_conditions, synthetic_payload
 
@@ -87,6 +92,7 @@ class ProvisionPostgresTests(unittest.TestCase):
         provision(self.values)
         with psycopg.connect(self.reader_dsn) as connection:
             connection.execute('SELECT assessment_id,participant_id FROM assessments').fetchall()
+            connection.execute('SELECT operation_id,project_id,status,assessment_id FROM web_csv_imports').fetchall()
         for statement in ('SELECT participant_name FROM assessments', 'SELECT initials FROM assessments',
                           'UPDATE web_projects SET active=false', 'SELECT * FROM app_users',
                           "SELECT * FROM public.web_lock_emitter('https://accounts.google.com','synthetic')"):
@@ -94,7 +100,8 @@ class ProvisionPostgresTests(unittest.TestCase):
         for statement in ('CREATE TABLE public.synthetic_forbidden(id integer)',
                           "UPDATE app_users SET role='administracao'", 'DELETE FROM app_users',
                           "INSERT INTO web_legacy_project_links(legacy_project,project_id) VALUES ('SINTETICO',gen_random_uuid())",
-                          'UPDATE assessments SET participant_id=participant_id'):
+                          'UPDATE assessments SET participant_id=participant_id',
+                          'DELETE FROM web_csv_imports'):
             self.denied(self.writer_dsn, statement)
         with psycopg.connect(self.owner_dsn) as connection:
             self.assertEqual(connection.execute("SELECT count(*) FROM pg_auth_members WHERE member=(SELECT oid FROM pg_roles WHERE rolname=%s)", (self.writer,)).fetchone()[0], 0)
@@ -118,6 +125,41 @@ class ProvisionPostgresTests(unittest.TestCase):
         with psycopg.connect(self.reader_dsn) as connection:
             self.assertEqual(connection.execute('SELECT count(*) FROM trial_results WHERE assessment_id=%s', (receipt['assessment_id'],)).fetchone()[0], 16)
             self.assertEqual(connection.execute('SELECT count(*) FROM assessment_metrics WHERE assessment_id=%s', (receipt['assessment_id'],)).fetchone()[0], 12)
+
+    def test_papeis_provisionados_importam_e_consultam_csv_web(self):
+        issuer, subject = 'https://accounts.google.com', f'synthetic-import-{uuid4().hex[:8]}'
+        with psycopg.connect(self.owner_dsn) as connection:
+            connection.execute("INSERT INTO app_users(issuer,subject,role) VALUES(%s,%s,'importacao')", (issuer, subject))
+        project = uuid4()
+        project_code = f'SYNTHETIC_{uuid4().hex[:8]}'
+        web_sessions.create_project(self.writer_dsn, project, project_code, 'Sintetico', issuer, subject)
+        self.assertTrue(web_sessions.set_member(self.writer_dsn, project, issuer, subject, True, issuer, subject))
+
+        source = Path(__file__).parent / 'fixtures/csv/valido_minimo.csv'
+        csv_text = source.read_text(encoding='utf-8')
+        csv_text = csv_text.replace('Pessoa Ficticia,,', 'NAO_COLETADO,,')
+        csv_text = csv_text.replace('00000000-0000-4000-8000-000000000001', str(uuid4()))
+        csv_text = csv_text.replace('PROJETO_SINTETICO', 'SYNTHETIC_UNMAPPED_SOURCE')
+        operation, assessment = uuid4(), None
+        content_hash = hashlib.sha256(csv_text.encode('utf-8')).hexdigest()
+        with tempfile.TemporaryDirectory(prefix='stroop-synthetic-import-') as directory:
+            csv_path = Path(directory) / 'input.csv'
+            csv_path.write_text(csv_text, encoding='utf-8')
+            web_imports.begin(self.writer_dsn, operation, project, issuer, subject, content_hash)
+            web_imports.mark_validated(self.writer_dsn, operation, project, issuer, subject)
+            normalized = load_instrument_csv(csv_path)
+            event = web_imports.import_normalized(self.writer_dsn, operation, project, issuer,
+                                                 subject, content_hash, normalized,
+                                                 '2026-10-17T00:00:00+00:00')
+            self.assertEqual(event['status'], 'importado')
+            assessment = normalized.metadata['assessment_id']
+
+        allowed, items, _ = web_assessments.list_assessments(
+            self.reader_dsn, project, issuer, subject, limit=10, offset=0,
+            filters={}, include_snapshot=True)
+        self.assertTrue(allowed)
+        self.assertEqual([item['assessment_id'] for item in items], [assessment])
+        self.assertEqual(items[0]['project_code'], project_code)
 
     def test_baseline_public_create_recusado_sem_modificar_public(self):
         with psycopg.connect(self.owner_dsn) as connection:

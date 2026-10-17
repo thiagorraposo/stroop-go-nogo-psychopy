@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import math
+import re
 from urllib.parse import urlsplit
 from uuid import uuid4
 
@@ -15,6 +17,10 @@ from api.errors import APIError, error_response
 
 
 MAX_BODY_BYTES = 65536
+MAX_CSV_UPLOAD_BYTES = 5 * 1024 * 1024
+CSV_UPLOAD_PATH = re.compile(
+    r"^/api/v1/projects/[0-9a-fA-F-]{36}/imports/[0-9a-fA-F-]{36}$"
+)
 # Defesa do proprio adaptador, inclusive quando o proxy nao participou do teste.
 # Sao respostas de dados/redirecionamento, nunca paginas executaveis.
 RESPONSE_HEADERS = {
@@ -90,6 +96,10 @@ class RequestBoundary:
         request_id = str(uuid4())
         scope.setdefault("state", {})["request_id"] = request_id
         started = False
+        path = scope.get("path", "")
+        is_csv_upload = scope["method"] == "POST" and CSV_UPLOAD_PATH.fullmatch(path) is not None
+        upload_semaphore = getattr(getattr(self.app, "state", None), "csv_import_semaphore", None)
+        upload_acquired = False
 
         async def safe_send(message: Message) -> None:
             nonlocal started
@@ -106,6 +116,12 @@ class RequestBoundary:
             await send(message)
 
         try:
+            if is_csv_upload and upload_semaphore is not None:
+                try:
+                    await asyncio.wait_for(upload_semaphore.acquire(), timeout=5)
+                    upload_acquired = True
+                except TimeoutError:
+                    raise APIError("rate_limited", headers={"Retry-After": "5"}) from None
             headers: dict[bytes, list[bytes]] = {}
             for key, value in scope.get("headers", []):
                 headers.setdefault(key.lower(), []).append(value)
@@ -118,11 +134,12 @@ class RequestBoundary:
             if transfers and (declared_lengths or len(transfers) != 1
                               or transfers[0].strip().lower() != b"chunked"):
                 raise APIError("invalid_json")
+            body_limit = MAX_CSV_UPLOAD_BYTES if is_csv_upload else MAX_BODY_BYTES
             if declared_lengths:
                 if len(declared_lengths) != 1 or not declared_lengths[0].isdigit():
                     raise APIError("invalid_json")
                 size = declared_lengths[0].lstrip(b"0") or b"0"
-                if len(size) > 5 or int(size) > MAX_BODY_BYTES:
+                if len(size) > len(str(body_limit)) or int(size) > body_limit:
                     raise APIError("body_too_large")
             encodings = headers.get(b"content-encoding", [])
             if encodings and (len(encodings) != 1 or encodings[0].strip().lower() != b"identity"):
@@ -134,7 +151,7 @@ class RequestBoundary:
                 if message["type"] == "http.disconnect":
                     return
                 chunk = message.get("body", b"")
-                if len(chunks) + len(chunk) > MAX_BODY_BYTES:
+                if len(chunks) + len(chunk) > body_limit:
                     raise APIError("body_too_large")
                 chunks.extend(chunk)
                 if not message.get("more_body", False):
@@ -142,7 +159,13 @@ class RequestBoundary:
             body = bytes(chunks)
             if declared_lengths and len(body) != int(size):
                 raise APIError("invalid_json")
-            requires_json = scope["method"] in {"POST", "PUT", "PATCH", "DELETE"} or bool(body)
+            requires_json = (scope["method"] in {"POST", "PUT", "PATCH", "DELETE"} or bool(body)) and not is_csv_upload
+            if is_csv_upload:
+                media_types = headers.get(b"content-type", [])
+                media = media_types[0].decode("latin-1") if len(media_types) == 1 else ""
+                parts = [part.strip().lower() for part in media.split(";")]
+                if parts[0] != "text/csv" or (len(parts) > 1 and parts[1:] not in (["charset=utf-8"], ['charset="utf-8"'])):
+                    raise APIError("unsupported_media_type")
             if requires_json:
                 media_types = headers.get(b"content-type", [])
                 if len(media_types) != 1 or not _json_media_type(media_types[0].decode("latin-1")):
@@ -173,3 +196,6 @@ class RequestBoundary:
             logger.warning("request_failed request_id=%s", request_id)
             if not started:
                 await error_response("internal_error", request_id)(scope, receive, safe_send)
+        finally:
+            if upload_acquired:
+                upload_semaphore.release()

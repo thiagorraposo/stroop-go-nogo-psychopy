@@ -90,6 +90,7 @@ class PostgresMigrationsTests(unittest.TestCase):
                 "0006_web_completed_results.sql",
                 "0007_web_legacy_project_links.sql",
                 "0008_web_user_lock.sql",
+                "0009_web_csv_imports.sql",
             ],
         )
         with psycopg.connect(TEST_DATABASE_URL) as connection:
@@ -121,6 +122,7 @@ class PostgresMigrationsTests(unittest.TestCase):
                     "web_assessments",
                     "web_trial_observations",
                     "web_participant_request_limits",
+                    "web_csv_imports",
                 }
                 .issubset(tables)
             )
@@ -132,13 +134,14 @@ class PostgresMigrationsTests(unittest.TestCase):
             }
             self.assertIn("idx_assessment_metrics_assessment_metric", indices)
             self.assertIn("idx_trial_results_assessment_block", indices)
+            self.assertIn("idx_web_csv_imports_project_updated", indices)
             foreign_keys = connection.execute(
                 """
                 SELECT COUNT(*) FROM information_schema.table_constraints
                 WHERE constraint_schema = 'public' AND constraint_type = 'FOREIGN KEY'
                 """
             ).fetchone()[0]
-            self.assertEqual(foreign_keys, 15)
+            self.assertEqual(foreign_keys, 18)
             self.assertIn("web_legacy_project_links", tables)
             self.assertEqual(connection.execute(
                 "SELECT COUNT(*) FROM web_legacy_project_links").fetchone()[0], 0)
@@ -162,6 +165,7 @@ class PostgresMigrationsTests(unittest.TestCase):
             "0005_web_participant_sessions.sql", "0006_web_completed_results.sql",
             "0007_web_legacy_project_links.sql",
             "0008_web_user_lock.sql",
+            "0009_web_csv_imports.sql",
         ])
         with psycopg.connect(TEST_DATABASE_URL) as connection:
             self.assertEqual(connection.execute("SELECT COUNT(*) FROM assessments").fetchone()[0], 1)
@@ -218,7 +222,8 @@ class PostgresMigrationsTests(unittest.TestCase):
                       connection.execute(order_query, (session_id,)).fetchall(),
                       connection.execute(invitation_query, (session_id,)).fetchall())
         self.assertEqual(apply_migrations(TEST_DATABASE_URL), [
-            '0006_web_completed_results.sql', '0007_web_legacy_project_links.sql', '0008_web_user_lock.sql'])
+            '0006_web_completed_results.sql', '0007_web_legacy_project_links.sql', '0008_web_user_lock.sql',
+            '0009_web_csv_imports.sql'])
         with psycopg.connect(TEST_DATABASE_URL) as connection:
             after = (connection.execute(session_query, (session_id,)).fetchall(),
                      connection.execute(order_query, (session_id,)).fetchall(),
@@ -299,6 +304,7 @@ class PostgresMigrationStaticTests(unittest.TestCase):
                 "0006_web_completed_results.sql",
                 "0007_web_legacy_project_links.sql",
                 "0008_web_user_lock.sql",
+                "0009_web_csv_imports.sql",
             ],
         )
 

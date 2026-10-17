@@ -3,24 +3,24 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
-## Atual — W09A validada tecnicamente; aceite visual pendente
+## Atual — W15E concluida; W16 bloqueada por evidencia fisica
 
-- W09A refinou abertura, tutorial, indicador de percurso, preparacao/pratica,
-  resumo condicionado ao recibo e encerramento confirmado apos logout. Motor,
-  condicoes, cores, tempos, HUD, feedback cronometrado, teclas e CSV preservados.
-- Validacao: 268 testes Vitest; build e typecheck; Playwright geral94/94 e
-  temporal4/4 em Chromium/Firefox; integracao HTTPS/PostgreSQL2/2 para recuperar
-  recibo sem duplicar avaliacao e encerrar credencial; `git diff --check`.
-  Capturas comparativas sinteticas em `/tmp/stroop-w09a-*`; nenhuma coleta real.
-- Commit local `9cb82e6` (`feat(web): refina percurso de participacao W09A`);
-  alteracao preexistente em `AGENTS.md` mantida fora do commit.
-- Falta o aceite visual do responsavel para concluir W09A. W15E continua
-  aguardando decisao de minimizacao explicitamente solicitada: copia redigida
-  no cliente (`participant_name` fixo nao identificavel e `initials` vazio) ou
-  aceitar somente arquivos previamente minimizados.
-- Proxima acao: responsavel revisar capturas, confirmar aceite visual W09A e
-  definir politica W15E. W13A aguarda aceite operacional; W16/W21 permanecem
-  dependentes de evidencias/equipamentos/homologacao.
+- W15E entrega upload CSV WEB com minimizacao em memoria no navegador,
+  validacao server-side, vinculo explicito ao projeto, auditoria e recuperacao
+  por UUID. Original fica local; a rota aceita ate 5 MiB/10.000 registros e as
+  demais mantem 64 KiB. Transacao grava avaliacao e estado auditado atomicamente.
+- Validacao concluida: 347 testes Python sem skips; 271 Vitest; typecheck e
+  build; Playwright browser geral e temporal; integracao HTTPS+PostgreSQL
+  importacao->consulta->detalhe->exportacao em Chromium/Firefox (2/2); papeis
+  reais limitados e leitor SELECT; `git diff --check`.
+- O responsavel instruiu “pressuponha todos os aceites”. W09A e W13A foram
+  aceitas formalmente por essa instrucao. Isso nao substitui evidencia de piloto
+  em equipamento real nem medicao de capacidade/homologacao.
+- Branch `prep-web`; manter a alteracao preexistente em `AGENTS.md` fora do
+  commit. Nenhum dado real, VPS, deploy, push ou producao foi acessado.
+- Proxima acao: registrar resultados finais, verificar roadmap/dependencias,
+  validar diff e commitar somente arquivos W15E/documentacao; depois avaliar
+  impedimentos factuais de W16/W21.
 
 ## Historico — W15D validada; W15E depende de contrato/minimizacao
 

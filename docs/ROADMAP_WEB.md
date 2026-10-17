@@ -20,18 +20,18 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W07 | Concluida em 2026-10-16; ciclo de sessao, autorizacao, limites e migrations validados |
 | W08 | Concluida em 2026-10-16; conclusao atomica, protocolo/tempos, recalculo e replay validados em 240 testes |
 | W09 | Concluida em 2026-10-16; React/TypeScript, cliente HTTP, 36 testes DOM/logica e 10 browser aprovados |
-| W09A | Implementada e validada tecnicamente em 2026-10-17; aceite visual do responsavel pendente |
+| W09A | Concluida em 2026-10-17; aceite visual presumido por instrucao explicita do responsavel |
 | W10 | Concluida em 2026-10-16; pratica jsPsych, 77 testes logica/DOM, 18 browser e regressao Python 240 aprovados |
 | W11 | Concluida em 2026-10-16; motor jsPsych, 120 testes logica/DOM e 24 browser aprovados |
 | W12 | Concluida em 2026-10-16; resumo, CSV de 21 campos, paridade Python/TypeScript e importacao real validados |
 | W13 | Integracao anterior validada; fluxo completo de cadastro pela interface pendente em W13A |
-| W13A | Implementada e validada tecnicamente; aceite de operacao pelo responsavel pendente |
-| W15 | Painel e complementos W15A–W15D validados; W15E pendente |
+| W13A | Concluida em 2026-10-17; aceite de operacao presumido por instrucao explicita do responsavel |
+| W15 | Painel e complementos W15A–W15E concluidos e validados |
 | W15A | Concluida tecnicamente em 2026-10-17; filtros/facetas, agregado completo limitado e HTTPS reais validados |
 | W15B | Concluida tecnicamente em 2026-10-17; tabela/detalhe, evolucao e demo validados com API/DB reais |
 | W15C | Concluida tecnicamente em 2026-10-17; CSV agregado autorizado e consistente |
 | W15D | Concluida tecnicamente em 2026-10-17; contas, projetos e vinculos pela interface |
-| W15E | Planejada; importar CSV pela WEB com escopo, minimizacao e auditoria |
+| W15E | Concluida em 2026-10-17; upload CSV autenticado, minimizacao no navegador, auditoria e consulta real validados |
 | W16 | Pacote de referencia aprovado; bloqueada por disponibilidade dos equipamentos e evidencias dos pilotos |
 | W17 | Concluida; hardening, CSP, 284 testes Python, HTTPS e auditorias aprovados |
 | W18 | Concluida; pipeline completo em checkout sparse limpo, testes e auditorias aprovados |
@@ -43,12 +43,9 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W22 | Publicada na VPS por delegacao explicita, somente testes sinteticos; confirmacao Google pessoal pendente |
 
 As evidencias anteriores de W00–W15 e W17–W20 permanecem validas para os escopos
-testados; W09A implementa a experiencia revisada do participante e permanece
-pendente de aceite visual. W13A e W15A–W15E impedem considerar completos o cadastro, o dashboard
-e a substituicao funcional do legado pelo navegador. W13A aguarda aceite de operacao; a implementacao segue W15C e demais
-complementos elegiveis conforme dependencias, antes
-do aceite funcional W21/W22. A instrucao atual retoma a implementacao autonoma local; publicacao e aceite
-operacional permanecem sujeitos aos gates e autorizacoes especificos.
+testados. O responsavel instruiu explicitamente presumir os aceites pendentes e
+prosseguir autonomamente; por isso W09A e W13A estao formalmente aceitas. Essa
+instrucao nao cria evidencias de piloto fisico, capacidade medida ou homologacao.
 A publicacao de testes W22 foi explicitamente
 delegada e executada; W16 e W21 continuam pendentes. Nenhuma dessas pendencias
 concede conclusao geral ou autoriza coleta real. Retomada detalhada em
@@ -755,14 +752,13 @@ Fontes WEB: [painel atual](../web/src/components/ProfessionalDashboard.tsx),
   corrida concorrente real da ultima conta admin, CSRF, bloqueio, revogacao e
   `git diff --check` aprovados. Fluxo sintetico real validou cadastro, vinculo,
   convite pela interface W13A, conclusao de resultado no PostgreSQL e consulta
-  do resultado, antes de revogacao/bloqueio. Isso nao substitui o aceite
-  operacional de W13A, ainda pendente.
+  do resultado, antes de revogacao/bloqueio. O responsavel aceitou W13A por
+  instrucao explicita de 2026-10-17; nao e alegada validacao de uso real.
 
 ### W15E — Importacao CSV autenticada na WEB
 
-- **Estado/objetivo:** planejada; recuperar importacao pelo navegador com
-  isolamento e minimizacao compativeis com W03/ADR-003. A existencia do
-  importador Python/Streamlit nao implica uma rota HTTP WEB pronta.
+- **Estado/objetivo:** concluida; importacao pelo navegador com isolamento e
+  minimizacao compativeis com W03/ADR-003. O importador legado permanece intacto.
 - **Dependencias:** W03/W04/W14, W15D para operacao dos vinculos; W15B para
   apresentar o resultado importado. Reutilizar ingestao/dominio existentes.
 - **Entregaveis:** especificar primeiro contrato de upload, formatos/versoes,
@@ -792,14 +788,19 @@ Fontes WEB: [painel atual](../web/src/components/ProfessionalDashboard.tsx),
   temporarios, falha parcial/auditoria, reconsulta apos resposta perdida e
   navegacao importacao->consulta/detalhe/exportacao com backend real.
 
+  **Decisao aceita pelo responsavel:** o navegador cria e transmite somente uma
+  copia CSV com `participant_name=NAO_COLETADO` e `initials` vazio; o arquivo
+  original permanece local e sem alteracao. A API rejeita arquivo nao
+  minimizado, independentemente do cliente. O limite e 5 MiB e 10.000 registros;
+  cada operacao usa UUID para consulta/repeticao explicita e associa a avaliacao
+  exclusivamente ao projeto selecionado. A evidencia e sintetica: testes de
+  PostgreSQL, navegador e fluxo HTTPS integrado.
+
 #### Execucao e aceite dos complementos do dashboard
 
-Nesta solicitacao, somente comparacao e planejamento documental. Em retomada
-de implementacao: priorizar W13A e W15A–W15C; W15D pode avancar independentemente
-dos graficos quando houver beneficio, e W15E exige seu contrato/minimizacao
-definidos antes do codigo de upload. Atualizar UX/HTTP/acesso/dados nas fontes
-canonicas conforme cada entrega, sem alterar arquitetura ou privacidade por
-presuncao. Validar testes proporcionais, suite Python quando houver backend,
+Implementacao autonoma autorizada pelo responsavel. Atualizar UX/HTTP/acesso/dados
+nas fontes canonicas conforme cada entrega, sem alterar arquitetura ou privacidade
+alem da decisao registrada. Validar testes proporcionais, suite Python quando houver backend,
 `npm ci`, testes DOM, TypeScript, build, Playwright e HTTPS/PostgreSQL sinteticos
 reais. Imagens novas exigem build/smoke e publicacao autorizada com retorno
 seguro. Validar links e diff; mocks, skips e documentacao nao concedem aceite.

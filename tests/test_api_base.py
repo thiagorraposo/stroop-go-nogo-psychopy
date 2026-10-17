@@ -221,6 +221,19 @@ class APIBaseTests(unittest.TestCase):
                 self.assert_error(response, status, code)
                 self.assertNotIn("x-secret", response.headers)
 
+    def test_limite_csv_de_5_mib_so_se_aplica_a_rota_dedicada(self):
+        from api.transport import MAX_CSV_UPLOAD_BYTES
+        path = ('/api/v1/projects/00000000-0000-4000-8000-000000000001/imports/'
+                '00000000-0000-4000-8000-000000000002')
+        headers = {'Content-Type': 'text/csv; charset=utf-8'}
+        oversized = self.client.post(path, content=b'x' * (MAX_CSV_UPLOAD_BYTES + 1), headers=headers)
+        self.assert_error(oversized, 413, 'body_too_large')
+        accepted_by_boundary = self.client.post(path, content=b'x' * MAX_CSV_UPLOAD_BYTES, headers=headers)
+        self.assert_error(accepted_by_boundary, 401, 'authentication_required')
+        regular = self.client.post('/api/v1/synthetic', content=b'x' * 65537,
+                                   headers={'Content-Type': 'application/json'})
+        self.assert_error(regular, 413, 'body_too_large')
+
     def test_falha_inesperada_nao_propaga_excecao_ou_log_sensivel(self):
         with self.assertLogs("stroop.api", logging.WARNING) as logs:
             response = self.client.get("/api/v1/synthetic-unexpected-error")

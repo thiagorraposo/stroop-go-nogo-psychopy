@@ -21,10 +21,11 @@ software.
 | Acesso sem cadastro ou privilegio excessivo | OIDC, chave `iss` + `sub`, perfis no PostgreSQL e revalidacao de expiracao/bloqueio em cada operacao | Comprometimento da conta Google; administrador deve bloquear e responder ao incidente |
 | Exposicao direta do banco ou Streamlit | somente Nginx publica 80/443; redes separadas e backend interno | Firewall e regras OCI devem ser confirmados na Etapa 11 |
 | Interceptacao de sessao | TLS obrigatorio, HSTS, CORS/XSRF do Streamlit, cookies OIDC e secrets externos | Certificado, hostname e redirect URI reais ainda nao existem |
-| Abuso de requisicoes e upload | rate/connection limits, 5 MiB, UTF-8/CSV, validacao antes da escrita e temporario descartado | Limite por IP nao impede botnet; monitorar sem capturar payload |
-| CSV malicioso | extensao, tamanho, encoding, estrutura, nome aleatorio, `0600`, sem execucao e transacao | Conteudo valido ainda pode conter dados excessivos; protocolo deve minimizar campos |
+| Abuso de requisicoes e upload | rota CSV dedicada 5 MiB/10.000 registros, concorrencia limitada, validacao UTF-8/CSV e temporario `0600` descartado | Limite por IP nao impede botnet; monitorar sem capturar payload |
+| CSV malicioso ou identificavel | copia minimizada no navegador; API rejeita nome/iniciais, valida esquema, nome/path fornecido nao e usado, sem execucao e transacao atomica | Cliente alternativo pode transmitir dados antes da rejeicao; limite de transporte e minimizacao nao substituem governanca de coleta |
 | Vazamento por erros e logs | detalhes ocultos, mensagens fechadas e log Nginx sem URI/query/cookies/body | Bibliotecas e host precisam de revisao apos atualizacoes |
 | Vazamento por auditoria de rejeicao | somente SHA-256, status e codigo fechado; expurgo em 30 dias | Hash pode permitir correlacao de arquivos identicos; acesso deve ser restrito |
+| Falha de resposta/duplicacao de upload WEB | UUID idempotente, estado/hash auditados, avaliacao e auditoria na mesma transacao, consulta explicita e sem retry automatico | Reenvio explicito depende de manter a copia minimizada somente em RAM durante a sessao |
 | Escalada no container | UIDs dedicados, raiz somente leitura, capabilities removidas, `no-new-privileges`, PIDs/CPU/memoria limitados | Kernel e daemon Docker continuam parte da base confiavel |
 | Ransomware/perda do banco | backup diario AES-256-GCM, checksum, 30 geracoes e restore mensal isolado | Destino externo so sera definido na Etapa 11 |
 | Roubo da chave junto ao backup | ferramenta recusa chave dentro da arvore de backups | Custodia institucional e rotacao da chave continuam operacionais |

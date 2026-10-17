@@ -143,6 +143,15 @@ sao restritos a mesma origem, sem unsafe-inline ou unsafe-eval. Os motores usam
 propriedades CSS diretas; testes verificam pratica e principal sem violacoes.
 A previa Vite e destinada a desenvolvimento e nao atesta headers de producao.
 
+## Importar CSV pela equipe
+
+Em `/equipe`, perfis `importacao` e `administracao` vinculados podem importar
+um CSV registrado no projeto ativo selecionado. O navegador envia uma copia
+com nome substituido por `NAO_COLETADO` e iniciais vazias; o original nao muda.
+Limite de 5 MiB/10.000 registros. Em caso de resposta perdida, consulte o
+estado ou reenvie explicitamente a mesma operacao. Contrato, estados e erros em
+[CONTRATO_API_WEB.md](../docs/desenvolvimento/CONTRATO_API_WEB.md).
+
 ## Preparar uma sessao pela equipe
 
 Em `/equipe`, entre com sua conta previamente cadastrada, selecione um projeto

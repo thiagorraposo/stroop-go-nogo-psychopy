@@ -114,6 +114,13 @@ O processamento continua limitado a um CSV UTF-8 de ate 5 MiB, sem
 sobrescrever duplicatas. O nome recebido nao vira caminho; o arquivo usa nome
 aleatorio em diretorio temporario privado e e removido ao finalizar.
 
+Esse comando continua no fluxo legado local. Na WEB, `/equipe` oferece upload
+dedicado somente a perfis `importacao`/`administracao` com vinculo ativo ao
+projeto escolhido. O navegador envia uma copia com `participant_name` fixo
+`NAO_COLETADO` e `initials` vazio; a API rejeita arquivo nao minimizado, limita
+10.000 registros, audita UUID/hash/estado e permite reconsulta sem repeticao
+automatica. O contrato HTTP e a fonte canonica dos limites e respostas.
+
 ## Expiracao, recusas e recuperacao
 
 O Streamlit valida assinatura, emissor, audiencia e fluxo OIDC. Como sua sessao

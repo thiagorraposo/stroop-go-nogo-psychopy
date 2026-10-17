@@ -39,9 +39,10 @@ WRITER = {
     'web_participant_redeem_limits': ('SELECT', 'INSERT', 'UPDATE', 'DELETE'),
     'web_professional_request_limits': ('SELECT', 'INSERT', 'UPDATE', 'DELETE'),
     'web_participant_request_limits': ('SELECT', 'INSERT', 'UPDATE', 'DELETE'),
-    'assessments': ('INSERT',), 'trial_results': ('INSERT',),
+    'assessments': ('SELECT (assessment_id)', 'INSERT'), 'trial_results': ('INSERT',),
     'assessment_metrics': ('INSERT',), 'web_assessments': ('SELECT', 'INSERT'),
     'web_trial_observations': ('INSERT',),
+    'web_csv_imports': ('SELECT', 'INSERT', 'UPDATE'),
 }
 
 

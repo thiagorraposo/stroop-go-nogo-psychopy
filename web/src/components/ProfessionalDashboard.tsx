@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ProfessionalProfile } from '../api/client'
 import { SessionInvitation } from './SessionInvitation'
+import { CsvImportPanel } from './CsvImportPanel'
 import { ResearchFilters } from './ResearchFilters'
 import { ResultsTable } from './ResultsTable'
 import { ResearchVisualizations, GenericInstrumentResults } from './ResearchVisualizations'
@@ -178,6 +179,9 @@ export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfil
       <select id="research-project" value={project} onChange={event => { if (event.target.value !== project) { aggregateIO.current?.abort(); setAggregateContext(null); setAggregateBusy(false); setRows([]); setDetail(null); setProject(event.target.value); setQuery(null) } }}>
         {projects.map(item => <option key={item.id} value={item.id}>{item.code} — {item.name}{item.active ? '' : ' (inativo)'}</option>)}
       </select>
+      {projects.find(item => item.id === project)?.active && profile.role !== 'consulta'
+        && <CsvImportPanel project={projects.find(item => item.id === project)!} profile={profile}
+          onImported={() => setRevision(value => value + 1)} />}
       {projects.find(item => item.id === project)?.active && profile.role !== 'consulta' && <SessionInvitation key={`invitation:${project}`} project={projects.find(item => item.id === project)!} profile={profile} />}
       <ResearchFilters key={`filters:${project}`} projects={projects} initialProject={project} loading={loading} onApply={value => { aggregateIO.current?.abort(); setAggregateContext(null); setAggregateBusy(false); setRows([]); setQuery(value) }} />
       {query && <p className="quiet" role="status">Filtros aplicados: {query.projects.length} projeto(s); {Object.entries(query.filters).filter(([, value]) => Array.isArray(value) ? value.length : !!value).map(([key, value]) => `${filterLabels[key] ?? key}: ${Array.isArray(value) ? value.join(', ') : value}`).join(' · ') || 'sem restrições adicionais'}.</p>}

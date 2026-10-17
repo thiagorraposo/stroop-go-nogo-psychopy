@@ -108,6 +108,7 @@ async function responseError(response: Response): Promise<ApiError> {
 }
 
 export type ApiPath = '/api/v1/assessments/export' | '/api/v1/admin/users' | `/api/v1/admin/users?${string}` | `/api/v1/admin/users/${string}` |
+  `/api/v1/projects/${string}/imports/${string}` |
   `/api/v1/projects/${string}/members${string}` | `/api/v1/projects/${string}/members/${string}` |
   `/api/v1/projects/${string}/invitations${string}` | '/api/v1/projects' | `/api/v1/projects?${string}` |
   `/api/v1/projects/${string}/assessments${string}` | '/api/v1/auth/me' | '/api/v1/auth/logout' |
@@ -116,7 +117,8 @@ export type ApiPath = '/api/v1/assessments/export' | '/api/v1/admin/users' | `/a
   '/api/v1/participant/logout';
 
 export async function request<T>(path: ApiPath,
-  init: RequestInit, decode: (response: Response) => Promise<T>, signal?: AbortSignal): Promise<T> {
+  init: RequestInit, decode: (response: Response) => Promise<T>, signal?: AbortSignal,
+  timeoutMs = 10_000): Promise<T> {
   if (signal?.aborted) throw new ApiError('request_cancelled', 0);
   const controller = new AbortController();
   let interrupted: ApiError | undefined;
@@ -130,7 +132,7 @@ export async function request<T>(path: ApiPath,
   };
   const onAbort = () => cancel('request_cancelled');
   signal?.addEventListener('abort', onAbort, { once: true });
-  const timer = globalThis.setTimeout(() => cancel('request_timeout'), 10_000);
+  const timer = globalThis.setTimeout(() => cancel('request_timeout'), timeoutMs);
   try {
     const operation = (async () => {
       const response = await fetch(path, {
