@@ -3,7 +3,7 @@ import { ApiError, record, request } from './client';
 import type { ApiPath } from './client';
 
 export type Project = { id: string; code: string; name: string; active: boolean; created_at: string };
-export type Page<T> = { items: T[]; next_cursor: string | null };
+export type Page<T> = { items: T[]; next_cursor: string | null; snapshot?: string };
 export type StroopSummary = { accuracy: number | null; response_time_seconds: number | null;
   accuracy_go_trials: number | null; accuracy_no_go_trials: number | null; total_go_trials: number; total_no_go_trials: number;
   total_trials: number; hits: number; omission_errors: number; commission_errors: number;
@@ -130,12 +130,12 @@ function query(options: PageOptions): URLSearchParams {
 function path(base: string, params: URLSearchParams): ApiPath {
   return (base + (params.size ? `?${params}` : '')) as ApiPath;
 }
-async function json<T>(url: ApiPath, decode: (x: unknown) => T, signal?: AbortSignal): Promise<T> {
+async function json<T>(url: ApiPath, decode: (x: unknown, response: Response) => T, signal?: AbortSignal): Promise<T> {
   return request(url, { method: 'GET', headers: { Accept: 'application/json' } }, async (response) => {
     if (response.status !== 200) throw new ApiError('invalid_response', response.status);
     let value: unknown;
     try { value = await response.json(); } catch { return invalid(); }
-    return decode(value);
+    return decode(value, response);
   }, signal);
 }
 function assessmentPath(projectId: string, assessmentId?: string): string {
@@ -163,7 +163,7 @@ function contextQuery(options: AssessmentFacetOptions, params = new URLSearchPar
   if (options.test_code !== undefined) { input(labelPattern.test(options.test_code)); params.set('test_code', options.test_code); }
   return params;
 }
-export function listAssessments(projectId: string, options: AssessmentOptions = {}): Promise<Page<Assessment>> {
+export function assessmentFilterParams(options: AssessmentOptions = {}): URLSearchParams {
   const params = contextQuery(options, query(options));
   for (const key of Object.keys(filterPatterns) as (keyof typeof filterPatterns)[]) {
     const value = options[key];
@@ -175,7 +175,17 @@ export function listAssessments(projectId: string, options: AssessmentOptions = 
       && new Set(values).size === values.length);
     for (const item of values) params.append(key, item);
   }
-  return json(path(assessmentPath(projectId), params), (x) => page(x, (item) => assessment(item)), options.signal);
+  return params;
+}
+export function listAssessments(projectId: string, options: AssessmentOptions = {}): Promise<Page<Assessment>> {
+  const params = assessmentFilterParams(options);
+  return json(path(assessmentPath(projectId), params), (x, response) => {
+    const result = page(x, (item) => assessment(item));
+    const snapshot = response.headers.get('X-Assessment-Snapshot');
+    if (snapshot === null) return result;
+    if (!/^[A-Za-z0-9_-]{1,1024}$/.test(snapshot)) return invalid();
+    return { ...result, snapshot };
+  }, options.signal);
 }
 export function getAssessmentOptions(projectId: string, options: AssessmentFacetOptions = {}): Promise<AssessmentFacets> {
   return json(path(`${assessmentPath(projectId)}/options`, contextQuery(options)), x => {

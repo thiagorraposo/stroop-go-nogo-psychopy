@@ -181,3 +181,14 @@ explicitas e ausencia sem barra/zero ficticio. A demonstracao sintetica registra
 recebe cards, figuras e tabela com suas metricas/unidades; codigos desconhecidos
 ficam em tabela neutra. Os componentes usam somente o conjunto filtrado carregado,
 sem requisicao de detalhe por linha nem mistura entre instrumentos.
+
+## WEB — exportacao agregada manual (W15C)
+
+`Exportar visao filtrada` acompanha os filtros e projetos aplicados e tambem a
+selecao local de instrumento/plataforma. O arquivo tem uma linha por avaliacao,
+colunas permitidas e unidades explicitas; metadados nominais, nomes de arquivo
+fonte e identificadores de sessao nao entram. Texto que possa ser interpretado
+como formula e protegido, valores ausentes permanecem vazios e metricas nao sao
+arredondadas. O token de consistencia fica apenas em RAM, expira em 15 minutos
+e o download so inicia depois da reautorizacao integral no servidor. Este arquivo
+agregado nao substitui o CSV oficial individual de tentativas.

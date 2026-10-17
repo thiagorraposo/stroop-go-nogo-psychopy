@@ -122,8 +122,9 @@ Datas sem fuso nao recebem conversao implicita. Instrumentos adicionais exibem
 suas proprias metricas no detalhe; a demonstracao sintetica registrada tem
 cards/graficos/tabela proprios, sem graficos Stroop ou CSV inventado.
 
-O download explicito usa CSV oficial W14, reautorizado no servidor em cada
-clique. Apenas essa acao solicitada pelo profissional cria arquivo; consultas
+O download individual explicito usa CSV oficial W14; o botao `Exportar visao
+filtrada` gera separadamente o CSV agregado W15C, ambos reautorizados no servidor
+em cada clique. Apenas essas acoes solicitadas pelo profissional criam arquivo; consultas
 ficam em RAM e sao descartadas na saida, expiracao, troca de projeto ou logout.
 O navegador nao guarda dados em storage JavaScript. A area e limpa em pagehide;
 restauracao de BFCache exige revalidar o acesso por recarga.
@@ -131,11 +132,10 @@ restauracao de BFCache exige revalidar o acesso por recarga.
 Coexistencia do MVP: Streamlit e seus launchers permanecem disponiveis para
 importacao local autenticada, administracao operacional e exportacao agregada
 historica. Esses recursos nao sao removidos nem implicitamente migrados ao
-painel WEB. O painel WEB oferece detalhe e CSV oficial por avaliacao; nao
-transmite nomes/iniciais pessoais do legado, nao oferece exportacao agregada,
+painel WEB. O painel WEB oferece detalhe, CSV oficial por avaliacao e CSV
+agregado da visao filtrada; nao transmite nomes/iniciais pessoais do legado,
 filtros por nome de participante/avaliador ou personalizacao de instrumentos.
-Filtros por periodo/versao estao na WEB; exportacao agregada continua no
-Streamlit enquanto o complemento proprio nao for implementado. Nao ha interpretacao clinica, normativa ou comparacao entre instrumentos.
+Nao ha interpretacao clinica, normativa ou comparacao entre instrumentos.
 
 Seguranca da pagina (W17): `security-headers.json` e a baseline testada no proxy
 HTTPS sintetico, a ser consumida no empacotamento W19. Scripts/estilos/conexoes
@@ -191,9 +191,11 @@ avaliacoes por consulta. Acima disso, restrinja o periodo/projetos. Cada faceta
 possui limite 200 por projeto; excesso pede periodo/instrumento mais restrito,
 sem esconder opcoes por truncamento. Mudanca no conjunto durante paginacao ou
 falha de acesso em qualquer projeto limpa o agregado; use `Atualizar consultas`.
-A consistencia e verificada por projeto, sem snapshot global entre projetos.
-CSV agregado da visao filtrada permanece no complemento proprio do roadmap;
-o CSV oficial individual continua disponivel no detalhe autorizado.
+A consistencia do CSV agregado e verificada para todos os projetos numa unica
+transacao de leitura; snapshots expiram em 15 minutos. Falha ou expiracao exige
+recarregar a consulta completa. O CSV agregado possui esquema proprio por
+instrumento, nao e importavel como tentativas e permanece separado do CSV
+oficial individual disponivel no detalhe autorizado.
 
 
 ## Tabela, detalhe e evolucao descritiva
@@ -215,4 +217,5 @@ O instrumento demonstrativo sintetico possui visao propria de `demo_total`
 existirem e sem transformar unidades em percentuais. Outros codigos conservam
 tabela neutra das metricas disponiveis. Selecionar instrumento preserva a
 separacao de conjuntos; a UI nao consulta detalhe de cada linha para montar
-cards, tabelas ou graficos. CSV agregado permanece no complemento W15C.
+cards, tabelas ou graficos. A exportacao agrega somente o instrumento e a
+plataforma selecionados, com uma linha por avaliacao autorizada.

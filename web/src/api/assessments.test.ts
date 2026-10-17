@@ -35,10 +35,16 @@ describe('consulta profissional paginada', () => {
     }));
   });
   it('envia somente filtros canonicos e cursor opaco junto ao mesmo projeto', async () => {
-    fetchMock.mockResolvedValue(json({ items: [item], next_cursor: null }));
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ items: [item], next_cursor: null }), { headers: { 'X-Assessment-Snapshot': 'snapshot_sintetico' } }));
     await expect(listAssessments(projectId, { participant_id: 'P_1', visit: 'V.1', cursor: 'opaco_1', limit: 100 }))
-      .resolves.toEqual({ items: [item], next_cursor: null });
+      .resolves.toEqual({ items: [item], next_cursor: null, snapshot: 'snapshot_sintetico' });
     expect(fetchMock.mock.calls[0]?.[0]).toBe(`/api/v1/projects/${projectId}/assessments?limit=100&cursor=opaco_1&participant_id=P_1&visit=V.1`);
+  });
+  it('recusa snapshot malformado e preserva paginas antigas sem cabecalho', async () => {
+    fetchMock.mockResolvedValue(json({ items: [], next_cursor: null }));
+    await expect(listAssessments(projectId)).resolves.toEqual({ items: [], next_cursor: null });
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ items: [], next_cursor: null }), { headers: { 'X-Assessment-Snapshot': 'https://externo.invalid' } }));
+    await expect(listAssessments(projectId)).rejects.toMatchObject({ code: 'invalid_response' });
   });
   it('conserva metricas genericas sem fabricar resumo Stroop', async () => {
     const generic = { ...item, test_code: 'outro_teste', summary: { metrics: { response_time: 12, items: 3 } } };

@@ -8,7 +8,9 @@ import type { ScopedAssessment } from './ResultsTable'
 import type { ResearchQuery } from './ResearchFilters'
 import { ApiError, apiErrorMessage } from '../api/client'
 import { listProjects, listAssessments, getAssessment, exportAssessment } from '../api/assessments'
-import type { AssessmentDetail, Project } from '../api/assessments'
+import type { AssessmentDetail, AssessmentOptions, Project } from '../api/assessments'
+import { exportAssessmentView } from '../api/aggregate'
+import type { ExportContext } from '../api/aggregate'
 import { accuracyByVisit, countByDate, formatMetric as number, responseDistribution, summarize } from '../dashboard/analysis'
 
 const filterLabels: Record<string, string> = { start_date: 'Data inicial', end_date: 'Data final', participant_id: 'Participantes', visit: 'Visitas', evaluator_id: 'Avaliadores', test_version: 'Versões', platform: 'Plataformas', test_code: 'Instrumento' }
@@ -31,6 +33,9 @@ export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfil
   const [detailError, setDetailError] = useState<string | null>(null)
   const [exporting, setExporting] = useState(false)
   const [downloadMessage, setDownloadMessage] = useState<string | null>(null)
+  const [aggregateContext, setAggregateContext] = useState<ExportContext | null>(null)
+  const [aggregateBusy, setAggregateBusy] = useState(false)
+  const [aggregateMessage, setAggregateMessage] = useState<string | null>(null)
   const detailPanel = useRef<HTMLElement>(null)
   const downloadIO = useRef<AbortController | null>(null)
 
@@ -60,21 +65,30 @@ export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfil
 
   useEffect(() => {
     const io = new AbortController()
-    setRows([]); setDetail(null); setDetailId(''); setDetailError(null); setDownloadMessage(null)
+    setRows([]); setAggregateContext(null); setAggregateMessage(null); setDetail(null); setDetailId(''); setDetailError(null); setDownloadMessage(null)
     setInstrument(''); setPlatform(''); setLoaded(0)
     downloadIO.current?.abort(); setExporting(false)
+    aggregateIO.current?.abort(); setAggregateBusy(false)
     const selected = query?.projects ?? (project ? [project] : [])
     if (!selected.length) { setLoading(false); return () => io.abort() }
     setLoading(true); setError(null)
     void (async () => {
       try {
         const items: ScopedAssessment[] = []
+        const snapshots: ExportContext['projects'] = []
+        const appliedFilters = { ...(query?.filters ?? {}) } as AssessmentOptions
+        delete appliedFilters.cursor; delete appliedFilters.limit; delete appliedFilters.signal
         if (selected.length > 20) throw new ApiError('invalid_request', 422)
         for (const projectId of selected) {
           const cursors = new Set<string>(), ids = new Set<string>()
-          let cursor: string | undefined
+          let cursor: string | undefined, projectSnapshot: string | undefined
+          let snapshotsComplete = true
           do {
             const page = await listAssessments(projectId, { ...query?.filters, cursor, limit: 100, signal: io.signal })
+            if (page.snapshot) {
+              if (projectSnapshot && projectSnapshot !== page.snapshot) throw new ApiError('invalid_response', 200)
+              projectSnapshot = page.snapshot
+            } else snapshotsComplete = false
             for (const item of page.items) {
               if (ids.has(item.assessment_id)) throw new ApiError('invalid_response', 200)
               ids.add(item.assessment_id); items.push({ ...item, project_id: projectId })
@@ -86,12 +100,16 @@ export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfil
             if (io.signal.aborted) return
             setLoaded(items.length)
           } while (cursor)
+          if (projectSnapshot && snapshotsComplete) snapshots.push({ project_id: projectId, snapshot: projectSnapshot })
         }
-        if (!io.signal.aborted) setRows(items)
+        if (!io.signal.aborted) {
+          setRows(items)
+          setAggregateContext(snapshots.length === selected.length ? { projects: snapshots, filters: appliedFilters } : null)
+        }
       } catch (cause) { if (!io.signal.aborted) { setRows([]); setError(cause instanceof ApiError && cause.status === 422 ? 'A consulta não pôde ser concluída com estes filtros. Restrinja o período ou os projetos (até 5.000 avaliações); nenhum total parcial foi exibido.' : cause instanceof ApiError && cause.code === 'state_conflict' ? 'O conjunto mudou durante a consulta. Atualize para carregar todas as páginas novamente; nenhum total parcial foi exibido.' : apiErrorMessage(cause)) } }
       finally { if (!io.signal.aborted) setLoading(false) }
     })()
-    return () => { io.abort(); downloadIO.current?.abort() }
+    return () => { io.abort(); downloadIO.current?.abort(); aggregateIO.current?.abort() }
   }, [project, query, revision])
 
   useEffect(() => {
@@ -105,6 +123,26 @@ export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfil
   }, [detailProject, detailId])
   useEffect(() => { if (detail) detailPanel.current?.focus() }, [detail])
   useEffect(() => () => downloadIO.current?.abort(), [])
+  const aggregateIO = useRef<AbortController | null>(null)
+  useEffect(() => () => aggregateIO.current?.abort(), [])
+
+  async function downloadAggregate() {
+    if (!aggregateContext || aggregateBusy || !['stroop_go_nogo_ptbr', 'instrumento_sintetico_demo'].includes(selectedInstrument)) return
+    const io = new AbortController(); aggregateIO.current = io
+    setAggregateBusy(true); setAggregateMessage(null)
+    try {
+      const result = await exportAssessmentView(aggregateContext,
+        { test_code: selectedInstrument, ...(platform ? { platform: platform as 'web' | 'psychopy' } : {}) }, profile.csrf_token, io.signal)
+      if (io.signal.aborted) return
+      const url = URL.createObjectURL(result.blob)
+      try { const link = document.createElement('a'); link.href = url; link.download = result.filename; document.body.append(link); link.click(); link.remove() }
+      finally { setTimeout(() => URL.revokeObjectURL(url), 1000) }
+      setAggregateMessage('Arquivo agregado preparado para download.')
+    } catch (cause) { if (!io.signal.aborted) setAggregateMessage(cause instanceof ApiError && cause.status === 409
+      ? 'Os dados mudaram desde a consulta. Atualize os filtros para recarregar todas as páginas antes de exportar.'
+      : apiErrorMessage(cause)) }
+    finally { if (!io.signal.aborted) setAggregateBusy(false) }
+  }
 
   async function download() {
     if (!detail || exporting) return
@@ -137,19 +175,21 @@ export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfil
     {!projectsLoading && !projects.length && !error && <p role="status">Nenhum projeto disponível para sua conta.</p>}
     {projects.length > 0 && <>
       <label htmlFor="research-project">Projeto</label>
-      <select id="research-project" value={project} onChange={event => { if (event.target.value !== project) { setRows([]); setDetail(null); setProject(event.target.value); setQuery(null) } }}>
+      <select id="research-project" value={project} onChange={event => { if (event.target.value !== project) { aggregateIO.current?.abort(); setAggregateContext(null); setAggregateBusy(false); setRows([]); setDetail(null); setProject(event.target.value); setQuery(null) } }}>
         {projects.map(item => <option key={item.id} value={item.id}>{item.code} — {item.name}{item.active ? '' : ' (inativo)'}</option>)}
       </select>
       {projects.find(item => item.id === project)?.active && profile.role !== 'consulta' && <SessionInvitation key={`invitation:${project}`} project={projects.find(item => item.id === project)!} profile={profile} />}
-      <ResearchFilters key={`filters:${project}`} projects={projects} initialProject={project} loading={loading} onApply={value => { setRows([]); setQuery(value) }} />
+      <ResearchFilters key={`filters:${project}`} projects={projects} initialProject={project} loading={loading} onApply={value => { aggregateIO.current?.abort(); setAggregateContext(null); setAggregateBusy(false); setRows([]); setQuery(value) }} />
       {query && <p className="quiet" role="status">Filtros aplicados: {query.projects.length} projeto(s); {Object.entries(query.filters).filter(([, value]) => Array.isArray(value) ? value.length : !!value).map(([key, value]) => `${filterLabels[key] ?? key}: ${Array.isArray(value) ? value.join(', ') : value}`).join(' · ') || 'sem restrições adicionais'}.</p>}
       {loading && <p role="status">Carregando avaliações… {loaded} recebidas.</p>}
       {!loading && !error && <>
         {!rows.length ? <p role="status">Nenhuma avaliação corresponde aos filtros.</p> : <>
           <div className="dashboard-filters">
-            <label>Instrumento<select value={selectedInstrument} onChange={event => { setInstrument(event.target.value); setDetailId('') }}>{instruments.map(code => <option key={code}>{code}</option>)}</select></label>
-            <label>Plataforma<select value={platform} onChange={event => { setPlatform(event.target.value); setDetailId('') }}><option value="">Todas</option><option value="web">WEB</option><option value="psychopy">PsychoPy local</option></select></label>
+            <label>Instrumento<select value={selectedInstrument} onChange={event => { aggregateIO.current?.abort(); setAggregateBusy(false); setAggregateMessage(null); setInstrument(event.target.value); setDetailId('') }}>{instruments.map(code => <option key={code}>{code}</option>)}</select></label>
+            <label>Plataforma<select value={platform} onChange={event => { aggregateIO.current?.abort(); setAggregateBusy(false); setAggregateMessage(null); setPlatform(event.target.value); setDetailId('') }}><option value="">Todas</option><option value="web">WEB</option><option value="psychopy">PsychoPy local</option></select></label>
           </div>
+          <button className="button secondary" disabled={aggregateBusy || !aggregateContext || !['stroop_go_nogo_ptbr', 'instrumento_sintetico_demo'].includes(selectedInstrument)} onClick={() => void downloadAggregate()}>{aggregateBusy ? 'Preparando arquivo agregado…' : 'Exportar visão filtrada'}</button>
+          {aggregateMessage && <p role="status">{aggregateMessage}</p>}
           <p className="quiet">Os totais consideram todas as páginas do projeto e os filtros aplicados. Um instrumento por vez. Datas seguem o início registrado; horários legados sem fuso conservam sua referência original.</p>
           <dl className="dashboard-cards">
             <div><dt>Avaliações</dt><dd>{totals.assessments}</dd></div><div><dt>Participantes únicos</dt><dd>{totals.participants}</dd></div>
@@ -168,7 +208,7 @@ export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfil
             <ResearchVisualizations rows={visible} projects={projects} />
           </>}
           {selectedInstrument !== 'stroop_go_nogo_ptbr' && <GenericInstrumentResults rows={visible} projects={projects} />}
-          <ResultsTable rows={visible} projects={projects} onDetail={row => { setDetailProject(row.project_id); setDetailId(row.assessment_id) }} />
+          <ResultsTable rows={visible} projects={projects} onDetail={row => { aggregateIO.current?.abort(); setAggregateBusy(false); setDetailProject(row.project_id); setDetailId(row.assessment_id) }} />
         </>}
       </>}
     </>}

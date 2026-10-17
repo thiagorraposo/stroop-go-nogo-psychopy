@@ -249,6 +249,35 @@ class WebAssessmentsTests(unittest.TestCase):
     def test_w15b_sem_tentativas_go_e_ausencia_nao_zero(self):
         self._assert_condition_absence('congruent')
 
+    def test_w15c_exportacao_agregada_revalida_snapshot_metadados_e_permissao(self):
+        receipt, _ = self.complete()
+        listed = self.h.consulta.get(self.path, params={'limit': 1})
+        self.assertEqual(listed.status_code, 200, listed.text)
+        snapshot = listed.headers.get('x-assessment-snapshot')
+        self.assertTrue(snapshot)
+        self.assertNotIn('=', snapshot)
+        body = {'projects': [{'project_id': str(self.h.project_id), 'snapshot': snapshot}],
+                'filters': {}, 'view': {'test_code': 'stroop_go_nogo_ptbr'}}
+        exported = self.h.consulta.post('/api/v1/assessments/export', json=body)
+        self.assertEqual(exported.status_code, 200, exported.text)
+        self.assertEqual(exported.headers['cache-control'], 'no-store')
+        self.assertEqual(exported.headers['content-disposition'],
+                         'attachment; filename="stroop_go_nogo_ptbr_avaliacoes.csv"')
+        rows = list(csv.DictReader(io.StringIO(exported.text)))
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]['assessment_id'], receipt['assessment_id'])
+        self.assertIn('accuracy_go_trials_percent', rows[0])
+        self.assertNotIn('participant_name', rows[0])
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute("UPDATE assessments SET visit='V_SINTETICA_ALTERADA'")
+        changed = self.h.consulta.post('/api/v1/assessments/export', json=body)
+        self.assertEqual(changed.status_code, 409, changed.text)
+        self.assertEqual(changed.json()['error']['code'], 'state_conflict')
+        self.h._set_member(self.h.admin, helpers.CONSULTA, False)
+        self.assertEqual(self.h.consulta.post('/api/v1/assessments/export', json=body).status_code, 404)
+        malformed = {**body, 'extra': 'SINTETICO'}
+        self.assertEqual(self.h.consulta.post('/api/v1/assessments/export', json=malformed).status_code, 422)
+
     def test_w15b_sem_tentativas_nogo_e_ausencia_nao_zero(self):
         self._assert_condition_absence('incongruent')
 

@@ -80,6 +80,25 @@ def assessment(database_url: str, project_id: UUID, assessment_id: str, actor: A
     }
 
 
+def export_aggregate(database_url, projects, actor, *, filters, view):
+    from stroop.domain.web_aggregate_export import aggregate_filename, serialize_aggregate_csv
+    try:
+        filename = aggregate_filename(view['test_code'])
+    except ValueError:
+        raise UnsupportedExportError from None
+    allowed, rows = persistence.aggregate_assessments(database_url, projects, actor.issuer, actor.subject,
+                                                       filters=filters, view=view)
+    if not allowed:
+        raise MissingError
+    projected = [{**_base(row), 'project_id': str(row['project_id']),
+                  'project_code': row['project_code']} for row in rows]
+    try:
+        content = serialize_aggregate_csv(projected, test_code=view['test_code'])
+    except (ValueError, TypeError, KeyError):
+        raise PersistenceError from None
+    return filename, content
+
+
 def export_assessment(database_url: str, project_id: UUID, assessment_id: str,
                       actor: AppUser) -> tuple[str, str]:
     # Reconsulta e reautoriza a cada download, mesmo apos visualizar o detalhe.

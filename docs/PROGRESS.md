@@ -3,7 +3,7 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
-## Atual — W15B validada; proxima W15C
+## Atual — W15C validada; proxima W15D
 
 - Branch prep-web; AGENTS.md raiz preexistente permanece fora dos commits.
   W13A em bff6982, aceite de operacao pendente. W15A em451e43e. Nenhum acesso
@@ -17,13 +17,21 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   comprobadoChromium1/1; screenshots sinteticos inspecionados. Viewport390/zoom200,
   build/typecheck/npmci/audit/pipcheck/compileall/diff aprovados. Motor inalterado,
   quatro testes temporais W15A conservam evidencia de regressao relevante.
+- W15C: exportacao agregada manual por instrumento/plataforma, snapshots HMAC
+  em RAM vinculados a ator/projeto/filtros e expiracao15min; fingerprint inclui
+  metadados, tentativas Stroop e metricas genericas. Reautorizacao e comparacao
+  de todos os projetos numa transacao READ ONLY/REPEATABLE READ; limite20/5.000,
+  colunas fixas, protecao de formulas, unidades, no-store e nome estatico.
+  CSV oficial individual preservado. Suite completa:339Python/62,766s sem skips;
+  264 frontend; browser86/86 gerais e14/14 exportacao em Chromium/Firefox;
+  HTTPS4/4 real PostgreSQL em19,3s para Stroop paginado/filtrado, demo e
+  revogacao. Build/typecheck, audit de producao0, source scanner303 e pip check
+  aprovados. Contratos, UX, README, roadmap e registro atualizados.
 - Banco descartavel proprio stroop-w13a-test/32768, database
-  stroop_etapa4_test_w13a disponivel; portasHTTPS livres. Backend proprio32770
-  criado/removido pelo agente. Nenhum container operacional alterado.
-- Proxima acao: commit local W15B e iniciar W15C. Proposta tecnica em revisao:
-  header snapshot HMAC emRAM e exportacao com reautorizacao/snapshot numa unica
-  transacaoRO, cap20projetos/5000linhas. Snapshot deve incluir valores das metricas/
-  tentativas alem de metadata, validar filtros originais antes da view final.
+  stroop_etapa4_test_w13a. Nenhum container operacional alterado.
+- Proxima acao: concluir integracao real apos os ultimos ajustes, executar
+  diff --check e commit local W15C. Iniciar W15D; W13A continua pendente de
+  aceite operacional.
 
 ## Historico — relatorio tecnico para leitores externos
 

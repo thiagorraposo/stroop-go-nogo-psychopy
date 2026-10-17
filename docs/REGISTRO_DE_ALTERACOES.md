@@ -6,6 +6,35 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-17 — Exportacao agregada autorizada W15C
+
+- Adicionado contrato de CSV agregado por instrumento, uma linha por avaliacao,
+  com metadados tecnicos permitidos, unidades explicitas e sem nomes/iniciais,
+  paths, IDs de sessao ou metricas nao registradas. UTF-8 sem BOM, CSV padrao
+  com CRLF, protecao de formulas em celulas textuais, ausencias vazias e numeros
+  preservados sem arredondamento. Arquivo e rota separados do CSV oficial de
+  tentativas e nao sao aceitos pelo importador.
+- Listagem entrega snapshot HMAC opaco, vinculado a ator/projeto/filtros e valido
+  por15min. Fingerprint inclui dados usados na tabela e nos summaries (tentativas
+  principais Stroop e metricas genericas). Exportacao POST valida CSRF/origem,
+  reautoriza todos os projetos, compara os snapshots e limita20projetos/5000
+  avaliacoes numa transacao READ ONLY/REPEATABLE READ. Revogacao/alteracao/erro
+  nao retorna arquivo; resposta usa nome fixo/no-store e nao persiste no servidor.
+- Interface so habilita a acao com todas as paginas/projetos e snapshots
+  consistentes; instrumento e plataforma seguem a visao selecionada. Tokens e
+  blob ficam em memoria local apenas durante a acao, com cancelamento em troca
+  de consulta, detalhe, instrumento, plataforma ou desmontagem. CSV individual
+  continua disponivel no detalhe.
+- Evidencias:339 testes Python/62,766s sem skips;264 testes frontend;browser
+  geral86/86 e focado14/14 em Chromium/Firefox. HTTPS real/PostgreSQL4/4 em19,3s:
+  105 avaliacoes em multiplas paginas e dois projetos, filtros combinados,
+  valores Stroop, metricas demonstrativas isoladas e revogacao impedindo arquivo.
+  `npm audit --omit=dev --audit-level=high` sem vulnerabilidades, build/typecheck,
+  pip check e scanner303 fontes aprovados. Nenhuma dependencia, migration, dado
+  real, deploy ou push.
+- Roadmap, contrato HTTP, UX, README e PROGRESS sincronizados. Proxima etapa
+  elegivel W15D; W13A permanece pendente de aceite operacional.
+
 ## 2026-10-17 — Tabela, detalhe e visualizacoes por instrumento W15B
 
 - Summary profissional fechado de onze campos acrescenta precisao e totais

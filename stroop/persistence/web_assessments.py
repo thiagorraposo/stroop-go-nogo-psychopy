@@ -169,76 +169,130 @@ def assessment_options(database_url, project_id, issuer, subject, *, filters):
         raise PersistenceError from exc
 
 
+def _scoped_query(project_id, issuer, subject, filters, participant_id=None, visit=None):
+    clauses, params = [], [project_id, issuer, subject]
+    for column, value in (('participant_id', participant_id), ('visit', visit)):
+        if value is not None:
+            clauses.append(f'AND a.{column}=%s')
+            params.append(value)
+    where, values = _filters(filters)
+    return _base_query(' '.join(clauses) + ' ' + where), [*params, *values]
+
+
+def _snapshot(connection, base, params):
+    entries = connection.execute('SELECT * FROM (' + base + ') scoped ORDER BY assessment_id LIMIT 5001', params).fetchall()
+    if len(entries) > 5000:
+        raise FacetLimitError
+    digest = hashlib.sha256()
+    def update(value):
+        digest.update(json.dumps(value, sort_keys=True, default=str, separators=(',', ':')).encode())
+        digest.update(b'\n')
+    update(entries)
+    # Hash exactly the source values used by professional summaries, never names.
+    stroop = [row['assessment_id'] for row in entries if row['test_code'] == 'stroop_go_nogo_ptbr']
+    generic = [row['assessment_id'] for row in entries if row['test_code'] != 'stroop_go_nogo_ptbr']
+    if stroop:
+        cursor = connection.execute("""SELECT assessment_id,trial_number,condition,key_pressed,reaction_time
+            FROM trial_results WHERE assessment_id=ANY(%s) AND block='main'
+            ORDER BY assessment_id,trial_number""", (stroop,))
+        for row in cursor:
+            update(row)
+    update('generic-metrics')
+    if generic:
+        cursor = connection.execute("""SELECT assessment_id,metric_code,metric_value FROM assessment_metrics
+            WHERE assessment_id=ANY(%s) ORDER BY assessment_id,metric_code""", (generic,))
+        for row in cursor:
+            update(row)
+    return entries, digest.hexdigest()
+
+
+def _hydrate(connection, rows, project_id):
+    if not rows:
+        return []
+    ids = [row["assessment_id"] for row in rows]
+    metrics = connection.execute(
+        """SELECT assessment_id, metric_code, metric_value
+           FROM assessment_metrics WHERE assessment_id = ANY(%s)
+           ORDER BY assessment_id, metric_code""", (ids,),
+    ).fetchall()
+    metrics_by_id: dict[str, dict[str, float]] = {}
+    for metric in metrics:
+        metrics_by_id.setdefault(metric["assessment_id"], {})[
+            metric["metric_code"]
+        ] = float(metric["metric_value"])
+    stroop_ids = [row["assessment_id"] for row in rows if row["test_code"] == "stroop_go_nogo_ptbr"]
+    trials_by_id: dict[str, list[dict]] = {}
+    if stroop_ids:
+        source_trials = connection.execute(
+            """SELECT assessment_id,condition,key_pressed,reaction_time FROM trial_results
+               WHERE assessment_id=ANY(%s) AND block='main' ORDER BY assessment_id,trial_number""",
+            (stroop_ids,),
+        ).fetchall()
+        for trial in source_trials:
+            trials_by_id.setdefault(trial["assessment_id"], []).append(trial)
+    result = []
+    for row in rows:
+        item = dict(row)
+        item["project_id"] = project_id
+        values = metrics_by_id.get(item["assessment_id"], {})
+        if item["test_code"] == "stroop_go_nogo_ptbr":
+            values = {metric["metric_code"]: metric["metric_value"]
+                      for metric in _recalculate(trials_by_id.get(item["assessment_id"], []))}
+        item["summary"] = _summary(item["test_code"], values)
+        item.pop("import_status", None)
+        result.append(item)
+    return result
+
+
 def list_assessments(database_url: str, project_id: UUID, issuer: str, subject: str,
                      *, participant_id: str | None = None, visit: str | None = None,
-                     limit: int, offset: int, filters=None, snapshot=None, include_snapshot=False) -> tuple[bool, list[dict[str, Any]]] | tuple[bool, list[dict[str, Any]], str | None]:
+                     limit: int, offset: int, filters=None, snapshot=None, include_snapshot=False):
     try:
         with _connect(database_url) as connection:
             _validate_schema(connection)
             if not _authorized_project(connection, project_id, issuer, subject):
                 return (False, [], None) if include_snapshot else (False, [])
-            clauses: list[str] = []
-            params: list[Any] = [project_id, issuer, subject]
-            if participant_id is not None:
-                clauses.append("AND a.participant_id=%s")
-                params.append(participant_id)
-            if visit is not None:
-                clauses.append("AND a.visit=%s")
-                params.append(visit)
-            where, values = _filters(filters or {})
-            params.extend(values)
-            base = _base_query(" ".join(clauses) + ' ' + where)
+            base, params = _scoped_query(project_id, issuer, subject, filters or {}, participant_id, visit)
             fingerprint = None
             if include_snapshot:
-                entries = connection.execute('SELECT * FROM (' + base + ') scoped ORDER BY assessment_id LIMIT 5001', params).fetchall()
-                if len(entries) > 5000:
-                    raise FacetLimitError
-                fingerprint = hashlib.sha256(json.dumps(entries, sort_keys=True, default=str).encode()).hexdigest()
+                _, fingerprint = _snapshot(connection, base, params)
                 if snapshot is not None and snapshot != fingerprint:
                     raise SnapshotConflict
-            query = base + """
+            rows = connection.execute(base + """
                 ORDER BY COALESCE(wa.completed_at, a.imported_at::timestamptz), a.assessment_id
-                LIMIT %s OFFSET %s"""
-            rows = connection.execute(query, (*params, limit, offset)).fetchall()
-            if not rows:
-                return (True, [], fingerprint) if include_snapshot else (True, [])
-            ids = [row["assessment_id"] for row in rows]
-            metrics = connection.execute(
-                """SELECT assessment_id, metric_code, metric_value
-                   FROM assessment_metrics WHERE assessment_id = ANY(%s)
-                   ORDER BY assessment_id, metric_code""", (ids,),
-            ).fetchall()
-            metrics_by_id: dict[str, dict[str, float]] = {}
-            for metric in metrics:
-                metrics_by_id.setdefault(metric["assessment_id"], {})[
-                    metric["metric_code"]
-                ] = float(metric["metric_value"])
-            stroop_ids = [row["assessment_id"] for row in rows if row["test_code"] == "stroop_go_nogo_ptbr"]
-            trials_by_id: dict[str, list[dict]] = {}
-            if stroop_ids:
-                source_trials = connection.execute(
-                    """SELECT assessment_id,condition,key_pressed,reaction_time FROM trial_results
-                       WHERE assessment_id=ANY(%s) AND block='main' ORDER BY assessment_id,trial_number""",
-                    (stroop_ids,),
-                ).fetchall()
-                for trial in source_trials:
-                    trials_by_id.setdefault(trial["assessment_id"], []).append(trial)
-            result = []
-            for row in rows:
-                item = dict(row)
-                item["project_id"] = project_id
-                values = metrics_by_id.get(item["assessment_id"], {})
-                if item["test_code"] == "stroop_go_nogo_ptbr":
-                    values = {metric["metric_code"]: metric["metric_value"]
-                              for metric in _recalculate(trials_by_id.get(item["assessment_id"], []))}
-                item["summary"] = _summary(item["test_code"], values)
-                # Internal fields are not part of the list contract.
-                item.pop("assessment_date", None)
-                item.pop("import_status", None)
-                result.append(item)
+                LIMIT %s OFFSET %s""", (*params, limit, offset)).fetchall()
+            result = _hydrate(connection, rows, project_id)
             return (True, result, fingerprint) if include_snapshot else (True, result)
-    except (SchemaError, PersistenceError):
-        raise
+    except psycopg.Error as exc:
+        raise PersistenceError from exc
+
+
+def aggregate_assessments(database_url, projects, issuer, subject, *, filters, view):
+    """Reautoriza todos e compara os conjuntos originais em uma unica transacao RO."""
+    if not 1 <= len(projects) <= 20:
+        raise FacetLimitError
+    try:
+        with _connect(database_url) as connection:
+            _validate_schema(connection)
+            selected = []
+            count = 0
+            for project_id, expected in projects:
+                if not _authorized_project(connection, project_id, issuer, subject):
+                    return False, []
+                base, params = _scoped_query(project_id, issuer, subject, filters)
+                rows, fingerprint = _snapshot(connection, base, params)
+                if fingerprint != expected:
+                    raise SnapshotConflict
+                count += len(rows)
+                if count > 5000:
+                    raise FacetLimitError
+                selected.append((project_id, rows))
+            result = []
+            for project_id, rows in selected:
+                visible = [row for row in rows if row['test_code'] == view['test_code']
+                           and (not view.get('platform') or row['platform'] == view['platform'])]
+                result.extend(_hydrate(connection, visible, project_id))
+            return True, result
     except psycopg.Error as exc:
         raise PersistenceError from exc
 
@@ -377,4 +431,4 @@ def iso_utc(value: Any) -> str | None:
 
 
 __all__ = ["PersistenceError", "SchemaError", "SnapshotConflict", "FacetLimitError",
-           "list_assessments", "assessment_options", "get_assessment", "iso_utc"]
+           "list_assessments", "assessment_options", "aggregate_assessments", "get_assessment", "iso_utc"]

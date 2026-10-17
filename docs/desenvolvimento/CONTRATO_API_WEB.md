@@ -115,6 +115,7 @@ Referencia: [resposta de autorizacao Google](https://developers.google.com/ident
 | `GET /projects/{project_id}/assessments/options` | Facetas autorizadas por projeto, periodo e instrumento; sem nomes/iniciais | Qualquer perfil com vinculo ativo |
 | `GET /projects/{project_id}/assessments/{assessment_id}` | 200 com detalhe/metricas recalculadas e tentativas, no formato abaixo | Mesmo escopo da lista |
 | `GET /projects/{project_id}/assessments/{assessment_id}/export` | 200 `text/csv; charset=utf-8`, 21 colunas oficiais, 16 linhas principais | Mesmo escopo da lista; revalidar antes do download |
+| `POST /assessments/export` | CSV agregado de uma linha por avaliacao, contrato fechado por instrumento | Qualquer perfil vinculado aos projetos; CSRF/origem e reautorizacao no clique |
 
 ### Filtros profissionais combinados (W15A)
 
@@ -142,9 +143,31 @@ integral. Tokens anteriores a este contrato nao sao reutilizaveis (422), sem
 alteracao do formato de resposta `items`/`next_cursor`. Limite de 100 por pagina e
 5.000 avaliacoes no conjunto de cada projeto; exceder retorna422, sem truncar.
 O navegador limita o agregado a20projetos/5.000 avaliacoes; falha em qualquer
-pagina/projeto descarta o agregado e pede recuperacao explicita. A consistencia
-e verificada por projeto, sem afirmar snapshot transacional entre projetos.
-Resultados concluidos nao sao alterados pela interface.
+pagina/projeto descarta o agregado e pede recuperacao explicita. A leitura de
+listagem e paginada por projeto; a exportacao agregada compara snapshots de todos
+os projetos numa unica transacao antes de gerar o arquivo. Resultados concluidos
+nao sao alterados pela interface.
+
+Cada pagina tambem retorna `X-Assessment-Snapshot`, token opaco HMAC vinculado
+ao profissional, projeto, filtros e fingerprint completo (metadados, tentativas
+principais Stroop e metricas genericas), valido por 15 minutos. O navegador
+mantem o token apenas em RAM e exige consistencia entre todas as paginas antes
+de habilitar exportacao. `POST /assessments/export` recebe corpo fechado
+`{projects:[{project_id,snapshot}],filters,view:{test_code,platform?}}`;
+`projects` aceita 1–20 projetos distintos e filtros seguem o contrato acima.
+`view` registra somente `stroop_go_nogo_ptbr` ou `instrumento_sintetico_demo` e,
+opcionalmente, `web`/`psychopy`. A API valida os tokens e, numa unica transacao
+READ ONLY/REPEATABLE READ, reautoriza cada vinculo, reconta ate 5.000 avaliacoes
+e compara os fingerprints antes de selecionar instrumento/plataforma. Mudanca
+retorna409 `state_conflict`; acesso revogado retorna404. O CSV usa esquema fixo
+por instrumento, UTF-8 sem BOM, virgulas, aspas CSV e CRLF; metadados sao
+limitados a IDs tecnicos, projeto, visita, avaliador tecnico, inicio, plataforma,
+instrumento e versoes. Texto de celula potencialmente formulavel e escapado;
+metricas ausentes ficam vazias e valores numericos nao sao arredondados. Nome
+estatico termina em `_avaliacoes.csv`, resposta usa `no-store` e nao persiste no
+servidor. Este CSV agregado nao pertence ao contrato oficial de tentativas,
+nao e aceito pelo importador oficial e nao altera o download individual de 21
+colunas.
 
 `GET .../assessments/options` aceita somente os parametros unicos `start_date`,
 `end_date`, `test_code`. Responde objeto fechado com arrays de strings

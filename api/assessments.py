@@ -4,19 +4,20 @@ import base64
 import hashlib
 import hmac
 import json
-from datetime import date
+from datetime import date, datetime, timezone
 from uuid import UUID
 
 from fastapi import APIRouter, Request
-from fastapi.responses import Response
+from fastapi.responses import JSONResponse, Response
 
 from api.errors import APIError
 from api.sessions import (
-    _professional_read, _reject_empty_body, _reject_query,
+    _professional_read, _professional_write, _reject_empty_body, _reject_query,
 )
 from stroop.application import web_assessments as application
 
 router = APIRouter(prefix='/api/v1/projects/{project_id}/assessments', tags=['assessments'])
+export_router = APIRouter(prefix='/api/v1/assessments', tags=['assessments'])
 MULTI = frozenset({'participant_id', 'visit', 'evaluator_id', 'test_version', 'platform'})
 SINGLE = frozenset({'start_date', 'end_date', 'test_code'})
 FILTERS = MULTI | SINGLE
@@ -65,10 +66,24 @@ def _filters(request, *, options=False):
     return result
 
 
-def _cursor(config, scope, offset, snapshot):
-    data = json.dumps([offset, snapshot], separators=(',', ':')).encode()
+def _signed(config, scope, payload):
+    data = json.dumps(payload, separators=(',', ':')).encode()
     signature = hmac.new(config.session_secret.encode(), scope.encode() + b'\0' + data, hashlib.sha256).hexdigest().encode()
     return base64.urlsafe_b64encode(data + b'.' + signature).rstrip(b'=').decode()
+
+
+def _verified(config, scope, token):
+    try:
+        data, signature = base64.urlsafe_b64decode(token + '=' * (-len(token) % 4)).rsplit(b'.', 1)
+        expected = hmac.new(config.session_secret.encode(), scope.encode() + b'\0' + data, hashlib.sha256).hexdigest().encode()
+        if not hmac.compare_digest(signature, expected): raise ValueError
+        return json.loads(data)
+    except (ValueError, TypeError, UnicodeError):
+        raise APIError('invalid_request') from None
+
+
+def _cursor(config, scope, offset, snapshot, expires):
+    return _signed(config, scope, [offset, snapshot, expires])
 
 
 def _pagination(request, config, scope):
@@ -77,7 +92,7 @@ def _pagination(request, config, scope):
         raise APIError('invalid_request')
     cursor = request.query_params.get('cursor')
     if cursor is None:
-        return int(raw), 0, None
+        return int(raw), 0, None, None
     try:
         if not re.fullmatch(r'[A-Za-z0-9_-]{1,512}', cursor):
             raise ValueError
@@ -85,10 +100,11 @@ def _pagination(request, config, scope):
         expected = hmac.new(config.session_secret.encode(), scope.encode() + b'\0' + data, hashlib.sha256).hexdigest().encode()
         if not hmac.compare_digest(signature, expected):
             raise ValueError
-        offset, snapshot = json.loads(data)
-        if type(offset) is not int or not 0 <= offset <= 5000 or not re.fullmatch(r'[a-f0-9]{64}', snapshot):
+        offset, snapshot, expires = json.loads(data)
+        if type(offset) is not int or not 0 <= offset <= 5000 or not re.fullmatch(r'[a-f0-9]{64}', snapshot) or type(expires) is not int:
             raise ValueError
-        return int(raw), offset, snapshot
+        if expires < int(datetime.now(timezone.utc).timestamp()): raise APIError('state_conflict')
+        return int(raw), offset, snapshot, expires
     except (ValueError, TypeError, UnicodeError):
         raise APIError('invalid_request') from None
 
@@ -105,7 +121,8 @@ async def list_assessments(request: Request, project_id: UUID):
     config = request.app.state.config
     filters = _filters(request)
     scope = json.dumps(['assessments-v2', str(project_id), actor.issuer, actor.subject, filters], sort_keys=True)
-    limit, offset, snapshot = _pagination(request, config, scope)
+    limit, offset, snapshot, expires = _pagination(request, config, scope)
+    if expires is None: expires = int(datetime.now(timezone.utc).timestamp()) + 900
     try:
         items, fingerprint = application.assessments_page(config.read_database_url, project_id, actor,
             filters=filters, limit=limit + 1, offset=offset, snapshot=snapshot)
@@ -117,7 +134,10 @@ async def list_assessments(request: Request, project_id: UUID):
         raise APIError('invalid_request') from None
     except (application.SchemaError, application.PersistenceError):
         raise APIError('service_unavailable') from None
-    return {'items': items[:limit], 'next_cursor': _cursor(config, scope, offset + limit, fingerprint) if len(items) > limit else None}
+    token_scope = json.dumps(['assessment-snapshot-v1', str(project_id), actor.issuer, actor.subject, filters], sort_keys=True)
+    token = _signed(config, token_scope, [fingerprint, expires])
+    return JSONResponse({'items': items[:limit], 'next_cursor': _cursor(config, scope, offset + limit, fingerprint, expires) if len(items) > limit else None},
+                        headers={'X-Assessment-Snapshot': token, 'Cache-Control': 'no-store'})
 
 
 @router.get('/options')
@@ -167,3 +187,72 @@ async def export_assessment(request: Request, project_id: UUID, assessment_id: s
         raise APIError('service_unavailable') from None
     return Response(content, media_type='text/csv; charset=utf-8',
                     headers={'Content-Disposition': f'attachment; filename="{filename}"'})
+
+
+@export_router.post('/export')
+async def export_assessment_view(request: Request):
+    actor = _professional_write(request, 'export_dashboard')
+    try:
+        body = await request.json()
+    except Exception:
+        raise APIError('invalid_request') from None
+    if not isinstance(body, dict) or set(body) != {'projects', 'filters', 'view'}:
+        raise APIError('invalid_request')
+    projects_raw, filters_raw, view = body['projects'], body['filters'], body['view']
+    if not isinstance(projects_raw, list) or not 1 <= len(projects_raw) <= 20 or not isinstance(filters_raw, dict):
+        raise APIError('invalid_request')
+    try:
+        filters = {}
+        for key, value in filters_raw.items():
+            if key in MULTI:
+                if not isinstance(value, list): raise ValueError
+                filters[key] = value
+            elif key in SINGLE:
+                filters[key] = value
+            else: raise ValueError
+        encoded = []
+        for key, value in filters.items():
+            for item in value if isinstance(value, list) else [value]:
+                from urllib.parse import quote
+                encoded.append(f'{quote(key)}={quote(item)}')
+        scope_request = Request({**request.scope, 'query_string': '&'.join(encoded).encode()})
+        filters = _filters(scope_request)
+        if not isinstance(view, dict) or set(view) - {'test_code', 'platform'} or 'test_code' not in view:
+            raise ValueError
+        if not isinstance(view['test_code'], str) or view['test_code'] not in ('stroop_go_nogo_ptbr', 'instrumento_sintetico_demo'):
+            raise ValueError
+        if 'platform' in view and view['platform'] not in ('web', 'psychopy'): raise ValueError
+        projects = []
+        expiry_now = int(datetime.now(timezone.utc).timestamp())
+        for entry in projects_raw:
+            if not isinstance(entry, dict) or set(entry) != {'project_id', 'snapshot'}: raise ValueError
+            project_id = UUID(entry['project_id'])
+            token = entry['snapshot']
+            if not isinstance(token, str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,1024}', token): raise ValueError
+            token_scope = json.dumps(['assessment-snapshot-v1', str(project_id), actor.issuer, actor.subject, filters], sort_keys=True)
+            claims = _verified(request.app.state.config, token_scope, token)
+            if not isinstance(claims, list) or len(claims) != 2 or not re.fullmatch(r'[a-f0-9]{64}', claims[0]) or type(claims[1]) is not int:
+                raise ValueError
+            if claims[1] < expiry_now: raise APIError('state_conflict')
+            projects.append((project_id, claims[0]))
+        if len({project_id for project_id, _ in projects}) != len(projects): raise ValueError
+    except APIError:
+        raise
+    except (ValueError, TypeError, AttributeError):
+        raise APIError('invalid_request') from None
+    try:
+        filename, content = application.export_aggregate(request.app.state.config.read_database_url,
+            projects, actor, filters=filters, view=view)
+    except application.MissingError:
+        raise APIError('not_found') from None
+    except application.SnapshotConflict:
+        raise APIError('state_conflict') from None
+    except application.FacetLimitError:
+        raise APIError('invalid_request') from None
+    except application.UnsupportedExportError:
+        raise APIError('invalid_request') from None
+    except (application.SchemaError, application.PersistenceError):
+        raise APIError('service_unavailable') from None
+    return Response(content, media_type='text/csv; charset=utf-8', headers={
+        'Content-Disposition': f'attachment; filename="{filename}"', 'Cache-Control': 'no-store',
+    })

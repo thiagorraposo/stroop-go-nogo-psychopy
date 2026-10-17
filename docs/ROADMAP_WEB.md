@@ -26,10 +26,10 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W12 | Concluida em 2026-10-16; resumo, CSV de 21 campos, paridade Python/TypeScript e importacao real validados |
 | W13 | Integracao anterior validada; fluxo completo de cadastro pela interface pendente em W13A |
 | W13A | Implementada e validada tecnicamente; aceite de operacao pelo responsavel pendente |
-| W15 | Painel inicial e complementos W15A/W15B validados; paridade restante em W15C–W15E |
+| W15 | Painel e complementos W15A/W15B/W15C validados; paridade restante em W15D–W15E |
 | W15A | Concluida tecnicamente em 2026-10-17; filtros/facetas, agregado completo limitado e HTTPS reais validados |
 | W15B | Concluida tecnicamente em 2026-10-17; tabela/detalhe, evolucao e demo validados com API/DB reais |
-| W15C | Planejada; exportar a visao filtrada em CSV agregado |
+| W15C | Concluida tecnicamente em 2026-10-17; CSV agregado autorizado e consistente |
 | W15D | Planejada; administrar usuarios, projetos e vinculos pela interface |
 | W15E | Planejada; importar CSV pela WEB com escopo, minimizacao e auditoria |
 | W16 | Pacote de referencia aprovado; bloqueada por disponibilidade dos equipamentos e evidencias dos pilotos |
@@ -623,7 +623,7 @@ Fontes WEB: [painel atual](../web/src/components/ProfessionalDashboard.tsx),
 | Evolucao de participante | Seletor proprio e grafico por visita | WEB oferece apenas tabela quando ha filtro de participante; completar seletor/grafico, W15B |
 | Tabela agregada | Data, projeto, participante, visita, avaliador, versao, precisao total/Go/No-Go, omissoes, comissoes e RT, alem de nome local | WEB mostra participante, visita, inicio, plataforma, versao, precisao e RT; completar colunas permitidas/metricas, W15B |
 | Detalhe e rastreabilidade | Metadados, metricas completas, contagem das quatro respostas e tentativas | WEB tem metricas/tentativas e parte dos metadados; falta apresentar IDs/avaliador/conclusao e contagens dedicadas. Paths/nome de arquivo fonte nao devem ser copiados; W15B |
-| Instrumentos adicionais | Visao demonstrativa tem cards, graficos, tabela e exportacao proprios | WEB consulta summaries.metrics/detalhe, mas nao renderiza cards/graficos especificos e nao exporta agregado; W15B/W15C. Nao criar novos testes clinicos |
+| Instrumentos adicionais | Visao demonstrativa tem cards, graficos, tabela e exportacao proprios | WEB apresenta e exporta metricas registradas; W15B/W15C. Nao criar novos testes clinicos |
 | Exportacao agregada filtrada | CSV manual com uma linha por avaliacao da visao filtrada | Ausente; W15C. CSV individual de tentativas existente deve continuar separado |
 | Exportacao oficial Stroop individual | Formato oficial existe no fluxo de dados, distinto do CSV agregado do painel | Presente na WEB; preservar 21 colunas, mascaramento e autorizacao |
 | Importacao CSV | Area autenticada, UTF-8 ate5MiB, validacao, rejeicao de duplicatas e auditoria | Nao ha tela nem rota WEB de importacao; W15E |
@@ -691,7 +691,7 @@ Fontes WEB: [painel atual](../web/src/components/ProfessionalDashboard.tsx),
 
 ### W15C — CSV agregado da visao filtrada
 
-- **Estado/objetivo:** planejada; recuperar o download manual de uma linha
+- **Estado/objetivo:** concluida tecnicamente em 2026-10-17; recuperar o download manual de uma linha
   por avaliacao filtrada, distinto do CSV oficial Stroop de21colunas.
 - **Dependencias:** W15A/W15B para contrato de filtros e colunas.
 - **Entregaveis:** acao de exportar visao filtrada, contrato/rota profissional
@@ -710,6 +710,14 @@ Fontes WEB: [painel atual](../web/src/components/ProfessionalDashboard.tsx),
   incluindo multiplas paginas, filtros combinados, caracteres especiais,
   formula injection, permissao revogada e erro durante download. Testar
   instrumentos distintos separadamente e preservar o CSV individual/importador.
+- **Evidencias:** serializer de contrato fechado com colunas/unidades por
+  instrumento, UTF-8 sem BOM, CRLF, celulas textuais seguras e metricas sem
+  arredondamento; API em transacao READ ONLY/REPEATABLE READ reautoriza todos
+  os projetos e confere fingerprint de metadados, tentativas Stroop e metricas
+  genericas. Snapshots HMAC vinculados a ator/projeto/filtros expiram em 15 min;
+  exportacao POST usa CSRF, `no-store` e nome estatico. Cliente mantem tokens em
+  RAM e somente libera arquivo manual apos contexto completo e resposta valida.
+  Evidencias de aceite documentadas em `docs/REGISTRO_DE_ALTERACOES.md`.
 
 ### W15D — Administracao de usuarios, projetos e vinculos
 
