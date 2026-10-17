@@ -12,6 +12,8 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   temporal4/4 em Chromium/Firefox; integracao HTTPS/PostgreSQL2/2 para recuperar
   recibo sem duplicar avaliacao e encerrar credencial; `git diff --check`.
   Capturas comparativas sinteticas em `/tmp/stroop-w09a-*`; nenhuma coleta real.
+- Commit local `9cb82e6` (`feat(web): refina percurso de participacao W09A`);
+  alteracao preexistente em `AGENTS.md` mantida fora do commit.
 - Falta o aceite visual do responsavel para concluir W09A. W15E continua
   aguardando decisao de minimizacao explicitamente solicitada: copia redigida
   no cliente (`participant_name` fixo nao identificavel e `initials` vazio) ou
