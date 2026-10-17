@@ -6,7 +6,7 @@ import { checkEnvironment } from '../experiment/environment'
 import { mountPractice } from '../experiment/practice'
 import { mountMain } from '../experiment/main'
 import { JourneyIndicator } from './JourneyIndicator'
-import type { MainResult } from '../experiment/main-engine'
+import type { MainResult, MainTimingTrace } from '../experiment/main-engine'
 import type { Condition, InterruptionReason, PracticeSummary } from '../experiment/protocol'
 
 type Phase = 'preparing' | 'practice' | 'summary' | 'interrupted' | 'starting' | 'start-error' | 'main'
@@ -16,6 +16,8 @@ type Props = {
   onMainStart: () => Promise<void>
   onMainComplete: (result: MainResult) => void
   onMainInterrupted: (reason: InterruptionReason) => void
+  captureTiming?: boolean
+  onMainTimingTrace?: (trace: MainTimingTrace) => void
 }
 
 export function PracticePreparation(props: Props) {
@@ -64,6 +66,8 @@ export function PracticePreparation(props: Props) {
     order: integration.current.mainOrder, initiallyHeldKeys: [...held.current],
     onComplete: result => integration.current.onMainComplete(result),
     onInterrupted: reason => integration.current.onMainInterrupted(reason),
+    onTimingTrace: integration.current.captureTiming
+      ? trace => integration.current.onMainTimingTrace?.(trace) : undefined,
   }), [])
   const mount = useCallback<MountExperiment>(container => mountPractice(container, {
     initiallyHeldKeys: [...held.current],

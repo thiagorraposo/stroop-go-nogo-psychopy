@@ -2,6 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMainRuntime, validMainResult } from './main-engine'
 import type { MainClock, MainOptions, MainResult } from './main-engine'
+import { w16CaptureEnabled } from './w16-capture'
 import { mountMain } from './main'
 import { MAIN_CONDITIONS } from './protocol'
 import type { Condition } from './protocol'
@@ -101,6 +102,47 @@ function syntheticResult(): MainResult {
 }
 
 describe('bloco principal imperativo', () => {
+  it('captura tempos sinteticos completos e tentativas interrompidas somente quando habilitado', () => {
+    const onTimingTrace = vi.fn<NonNullable<MainOptions['onTimingTrace']>>()
+    start({ onTimingTrace })
+    const origin = mainStart()
+    finish(origin)
+    expect(onTimingTrace).toHaveBeenCalledOnce()
+    const trace = onTimingTrace.mock.calls[0]![0]
+    expect(trace.outcome).toBe('completed')
+    expect(trace.frame_period_ms).toBe(10)
+    expect(trace.countdown_frame_intervals_ms).toHaveLength(30)
+    expect(trace.transitions).toHaveLength(64)
+    expect(trace.transitions[0]).toMatchObject({ type: 'trial_start', planned_elapsed_ms: 0, observed_elapsed_ms: 0 })
+
+    onTimingTrace.mockClear()
+    start({ onTimingTrace })
+    mainStart()
+    clock.tickAt(clock.time + 10)
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', cancelable: true }))
+    expect(onInterrupted).toHaveBeenLastCalledWith('escape')
+    expect(onTimingTrace).toHaveBeenCalledOnce()
+    expect(onTimingTrace.mock.calls[0]![0]).toMatchObject({ outcome: 'interrupted', interruption_reason: 'escape' })
+    expect(onTimingTrace.mock.calls[0]![0].transitions.length).toBeGreaterThan(0)
+    expect(onTimingTrace.mock.calls[0]![0].keyboard_events.at(-1)).toMatchObject({ type: 'keydown', key: 'Escape' })
+
+    onTimingTrace.mockClear()
+    start({ onTimingTrace })
+    mainStart()
+    clock.advance(300)
+    clock.tickAt(clock.time - 1, clock.time + 20)
+    expect(onInterrupted).toHaveBeenLastCalledWith('timing_invalid')
+    expect(onTimingTrace.mock.calls[0]![0]).toMatchObject({ outcome: 'interrupted', interruption_reason: 'timing_invalid' })
+    expect(onTimingTrace.mock.calls[0]![0].transitions).toHaveLength(2)
+  })
+
+  it('habilita captura W16 somente com flag de build e parametro explicito', () => {
+    expect(w16CaptureEnabled('synthetic-only', '?w16=1')).toBe(true)
+    expect(w16CaptureEnabled('synthetic-only', '')).toBe(false)
+    expect(w16CaptureEnabled(undefined, '?w16=1')).toBe(false)
+    expect(w16CaptureEnabled('true', '?w16=1')).toBe(false)
+  })
+
   it('mede rAF durante cinco segmentos de contagem sem iniciar o cronometro', () => {
     start()
     for (const message of ['Prepare-se', '3', '2', '1', 'Começar']) {

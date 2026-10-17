@@ -5,6 +5,9 @@ import { ParticipantRun } from '../participant/ParticipantRun'
 import { PracticePreparation } from './PracticePreparation'
 import { ResultSummaryPanel } from './ResultSummary'
 import { JourneyIndicator } from './JourneyIndicator'
+import { W16TimingCapturePanel } from './W16TimingCapturePanel'
+import { w16CaptureEnabled } from '../experiment/w16-capture'
+import type { MainTimingTrace } from '../experiment/main-engine'
 
 // Coordena montagens consecutivas/StrictMode na mesma pagina. A trava nativa
 // coordena abas diferentes sem gravar credenciais ou resultados em storage.
@@ -17,6 +20,8 @@ export function ParticipantFlow({ onBack }: { onBack: () => void }) {
   const [code, setCode] = useState('')
   const [codeError, setCodeError] = useState<string | null>(null)
   const [closed, setClosed] = useState(false)
+  const [timingTraces, setTimingTraces] = useState<MainTimingTrace[]>([])
+  const captureTiming = w16CaptureEnabled(import.meta.env.VITE_W16_TIMING_CAPTURE, window.location.search)
   const panel = useRef<HTMLElement>(null)
   const codeInput = useRef<HTMLInputElement>(null)
 
@@ -77,24 +82,27 @@ export function ParticipantFlow({ onBack }: { onBack: () => void }) {
       if (leave) setClosed(true)
     }
   }
+  const capturePanel = captureTiming
+    ? <W16TimingCapturePanel traces={timingTraces} onClear={() => setTimingTraces([])} /> : null
 
-  if (closed) return <section className="content-card closing-card" ref={panel} tabIndex={-1} aria-labelledby="closed-title">
+  if (closed) return <><section className="content-card closing-card" ref={panel} tabIndex={-1} aria-labelledby="closed-title">
     <JourneyIndicator current={4} />
     <p className="eyebrow">Acesso encerrado</p>
     <h1 id="closed-title">Participação encerrada.</h1>
     <p className="lead">O acesso desta sessão foi finalizado. Você pode fechar esta página.</p>
     <button className="button primary" onClick={onBack}>Voltar às orientações</button>{' '}
     <button className="button secondary" onClick={() => setClosed(false)}>Usar outro convite</button>
-  </section>
+  </section>{capturePanel}</>
 
-  if (view.phase === 'preparing') return <PracticePreparation key={view.session.session_id}
+  if (view.phase === 'preparing') return <><PracticePreparation key={view.session.session_id}
     onBack={onBack} mainOrder={view.session.main_conditions} onMainStart={() => run.start()}
-    onMainComplete={result => run.complete(result)} onMainInterrupted={reason => run.interrupt(reason)} />
-  if (view.phase === 'result') return <ResultSummaryPanel summary={view.summary}
+    onMainComplete={result => run.complete(result)} onMainInterrupted={reason => run.interrupt(reason)}
+    captureTiming={captureTiming} onMainTimingTrace={trace => setTimingTraces(rows => [...rows, trace])} />{capturePanel}</>
+  if (view.phase === 'result') return <><ResultSummaryPanel summary={view.summary}
     delivery={view.delivery} message={view.message} canRetry={view.canRetry}
     busy={view.finishing} onRetry={() => void run.send()} onFinish={() => void finish(true)}
-    onNewInvitation={() => void finish(false)} />
-  return <section className="content-card" ref={panel} tabIndex={-1}>
+    onNewInvitation={() => void finish(false)} />{capturePanel}</>
+  return <><section className="content-card" ref={panel} tabIndex={-1}>
     <JourneyIndicator current={2} />
     <p className="eyebrow">Participação em pesquisa</p>
     {view.phase === 'loading' ? <>
@@ -119,5 +127,5 @@ export function ParticipantFlow({ onBack }: { onBack: () => void }) {
       </form>
     </>}
     <div className="preparation-back"><button className="button secondary" disabled={busy} onClick={onBack}>Voltar às orientações</button></div>
-  </section>
+  </section>{capturePanel}</>
 }

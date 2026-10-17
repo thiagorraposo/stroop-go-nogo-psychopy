@@ -32,7 +32,7 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W15C | Concluida tecnicamente em 2026-10-17; CSV agregado autorizado e consistente |
 | W15D | Concluida tecnicamente em 2026-10-17; contas, projetos e vinculos pela interface |
 | W15E | Concluida em 2026-10-17; upload CSV autenticado, minimizacao no navegador, auditoria e consulta real validados |
-| W16 | Pacote aprovado; inventario parcial Linux Mint 22.2, mas faltam teclado USB com fio, Edge, Windows 11 e 60 replicas presenciais |
+| W16 | Instrumentacao local opt-in pronta; inventario parcial Linux Mint 22.2, mas faltam teclado USB com fio, Edge, Windows 11 e 60 replicas presenciais |
 | W17 | Concluida; hardening, CSP, 284 testes Python, HTTPS e auditorias aprovados |
 | W18 | Concluida; pipeline completo em checkout sparse limpo, testes e auditorias aprovados |
 | W19 | Concluida; imagens nao-root, Compose isolado e smoke HTTPS/coleta/reinicio aprovados |
@@ -818,7 +818,8 @@ Dependencias da fase: fluxo integrado; seguranca basica ja e obrigatoria desde W
 
 - **Objetivo:** medir o comportamento real nos ambientes suportados.
 - **Entregaveis:** `docs/VALIDACAO_WEB.md` com matriz navegador/SO/tela/teclado,
-  protocolo de piloto, evidencias sinteticas e limites conhecidos.
+  protocolo de piloto, evidencias sinteticas e limites conhecidos; captura local
+  opt-in preserva trilhas de execucoes completas/interrompidas.
 - **Dependencias:** W13.
 - **Conclusao:** criterios de temporizacao W01 comprovados, interrupcoes
   detectadas e formulas verificadas. Sem evidencias manuais necessarias,

@@ -31,6 +31,22 @@ neste host. Isso torna parcialmente disponivel um ambiente Linux da matriz,
 mas nao executa nem aprova qualquer replica W16. Nenhuma sessao fisica foi
 realizada; as versoes headless acima permanecem evidencias separadas.
 
+### Captura local de tempos para coleta W16
+
+O motor pode preservar quadros da contagem, transicoes planejadas/observadas e
+eventos Space/Escape em execucoes completas ou interrompidas. A captura so e
+ativada em build local configurada com `VITE_W16_TIMING_CAPTURE=synthetic-only`
+e rota `/pratica?w16=1`; sem ambos o callback e a interface ficam desligados.
+Use exclusivamente convite e execucao sinteticos, sem participante. O painel
+mantem replicas apenas em memoria da aba e exporta sob acao explicita
+`w16_timing_traces.json`; nao envia artefato ao servidor. O JSON inclui agente
+de usuario, plataforma, viewport, tela, densidade de pixels e horario de
+captura, alem das transicoes. Nao inclui convite, nome, iniciais ou identificador
+de sessao. Mantenha os arquivos localmente e revise-os antes de compartilhar.
+A captura facilita produzir evidencias brutas e preservar tentativas invalidas,
+mas nao aprova replica nem substitui o procedimento fisico, a analise D5 ou os
+seis ambientes/60 sessoes exigidos.
+
 ## Evidencias existentes
 
 - W11: 42 testes do motor principal, incluindo limites de quadro, origem unica,

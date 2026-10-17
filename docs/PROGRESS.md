@@ -3,7 +3,7 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
-## Atual — W15E concluida; W16 bloqueada por evidencia fisica
+## Atual — W15E concluida; instrumentacao W16 pronta; pilotos fisicos pendentes
 
 - W15E entrega upload CSV WEB com minimizacao em memoria no navegador,
   validacao server-side, vinculo explicito ao projeto, auditoria e recuperacao
@@ -25,8 +25,14 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   1920x1080/60 Hz, Chrome 155 e Firefox 158; nao foram identificados teclado
   USB com fio ou Edge, e Windows 11 nao esta disponivel neste host. Nenhum
   piloto fisico foi executado.
-- Proxima acao elegivel: W16 requer os itens de referencia restantes e 60 sessoes
-  sinteticas presenciais conforme pacote aprovado; W21 requer ambiente de
+- Lacuna de instrumentacao resolvida: captura temporal local, opt-in por flag de
+  build e query string, preserva trilhas completas e interrompidas somente em
+  memoria e exporta JSON explicitamente. Validacao: Vitest 273/273, browser
+  geral 98/98 e temporal 4/4, typecheck/build e `git diff --check` aprovados.
+  Isso prepara a coleta, sem homologar W16.
+- Proxima acao elegivel: realizar a campanha W16 quando os itens de referencia
+  restantes estiverem disponiveis, executando 60 sessoes sinteticas presenciais
+  conforme pacote aprovado; W21 requer ambiente de
   homologacao autorizado e capacidade medida. Testes automatizados/headless nao
   suprem essas evidencias, e nao ha outra etapa com dependencias satisfeitas.
 

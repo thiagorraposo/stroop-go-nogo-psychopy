@@ -13,11 +13,39 @@ export type MainTrial = {
   key_at_ms: number | null
 }
 export type MainResult = { frame_period_ms: number; trials: MainTrial[]; order: readonly Condition[] }
+export type MainTimingTransition = {
+  type: 'trial_start' | 'stimulus_onset' | 'stimulus_offset' | 'trial_end'
+  trial_number: number
+  condition_id: number
+  planned_elapsed_ms: number
+  observed_elapsed_ms: number
+  raf_elapsed_ms: number | null
+}
+export type MainTimingKeyEvent = {
+  type: 'keydown' | 'keyup'
+  key: 'Space' | 'Escape'
+  phase: Phase
+  elapsed_since_runtime_start_ms: number | null
+  elapsed_since_main_origin_ms: number | null
+  repeat: boolean
+  held_before_event: boolean
+}
+export type MainTimingTrace = {
+  schema: 'stroop-w16-timing-trace-v1'
+  outcome: 'completed' | 'interrupted'
+  interruption_reason: InterruptionReason | null
+  countdown_frame_intervals_ms: number[]
+  frame_period_ms: number | null
+  main_origin_since_runtime_start_ms: number | null
+  transitions: MainTimingTransition[]
+  keyboard_events: MainTimingKeyEvent[]
+}
 export type MainOptions = {
   order: readonly Condition[]
   initiallyHeldKeys?: readonly string[]
   onComplete(result: MainResult): void
   onInterrupted(reason: InterruptionReason): void
+  onTimingTrace?(trace: MainTimingTrace): void
 }
 export type MainClock = {
   now(): number
@@ -120,6 +148,8 @@ export function createMainRuntime(container: HTMLElement, options: MainOptions,
   let lastFrameStamp: number | undefined
   const frameIntervals: number[] = []
   const trials: MainTrial[] = []
+  const timingTransitions = options.onTimingTrace ? [] as MainTimingTransition[] : undefined
+  const timingKeys = options.onTimingTrace ? [] as MainTimingKeyEvent[] : undefined
   const held = new Set(options.initiallyHeldKeys?.map(keyId))
   const previousCursor = container.style.cursor
   const surface = document.createElement('section')
@@ -214,8 +244,38 @@ export function createMainRuntime(container: HTMLElement, options: MainOptions,
     delete container.dataset.trialNumber
     surface.remove()
   }
+  function emitTimingTrace(outcome: MainTimingTrace['outcome'], reason: InterruptionReason | null) {
+    if (!options.onTimingTrace || !timingTransitions || !timingKeys) return
+    options.onTimingTrace({
+      schema: 'stroop-w16-timing-trace-v1', outcome, interruption_reason: reason,
+      countdown_frame_intervals_ms: [...frameIntervals],
+      frame_period_ms: Number.isFinite(framePeriod) ? framePeriod! : null,
+      main_origin_since_runtime_start_ms: origin === undefined ? null : origin - countdownStart,
+      transitions: [...timingTransitions], keyboard_events: [...timingKeys],
+    })
+  }
+  function recordTransition(type: MainTimingTransition['type'], planned: number,
+    observed: number, stamp?: number) {
+    if (!timingTransitions || origin === undefined || !current) return
+    const rafElapsed = stamp === undefined ? null : stamp - origin
+    timingTransitions.push({ type, trial_number: current.trial_number,
+      condition_id: current.condition_id, planned_elapsed_ms: planned,
+      observed_elapsed_ms: observed,
+      raf_elapsed_ms: rafElapsed !== null && Number.isFinite(rafElapsed) ? rafElapsed : null })
+  }
+  function recordKey(event: KeyboardEvent, type: MainTimingKeyEvent['type'],
+    key: MainTimingKeyEvent['key'], heldBefore: boolean) {
+    if (!timingKeys) return
+    const runtimeElapsed = event.timeStamp - countdownStart
+    const mainElapsed = origin === undefined ? null : event.timeStamp - origin
+    timingKeys.push({ type, key, phase,
+      elapsed_since_runtime_start_ms: Number.isFinite(runtimeElapsed) ? runtimeElapsed : null,
+      elapsed_since_main_origin_ms: mainElapsed !== null && Number.isFinite(mainElapsed) ? mainElapsed : null,
+      repeat: event.repeat, held_before_event: heldBefore })
+  }
   function interrupt(reason: InterruptionReason) {
     if (!active) return
+    emitTimingTrace('interrupted', reason)
     cleanup()
     options.onInterrupted(reason)
   }
@@ -227,11 +287,15 @@ export function createMainRuntime(container: HTMLElement, options: MainOptions,
   }
   function keydown(event: KeyboardEvent) {
     if (!active) return
-    if (event.key === 'Escape') { event.preventDefault(); interrupt('escape'); return }
+    if (event.key === 'Escape') {
+      recordKey(event, 'keydown', 'Escape', held.has('Escape'))
+      event.preventDefault(); interrupt('escape'); return
+    }
     const key = keyId(event.code || event.key)
     const alreadyHeld = held.has(key)
     held.add(key)
     if (key !== 'Space') return
+    recordKey(event, 'keydown', 'Space', alreadyHeld)
     event.preventDefault()
     const delivered = now()
     if (delivered === undefined || origin === undefined || !current || phase !== 'stimulus'
@@ -247,14 +311,20 @@ export function createMainRuntime(container: HTMLElement, options: MainOptions,
       current.reaction_time_ms = rt
     }
   }
-  function keyup(event: KeyboardEvent) { held.delete(keyId(event.code || event.key)) }
+  function keyup(event: KeyboardEvent) {
+    const key = keyId(event.code || event.key)
+    const heldBefore = held.has(key)
+    held.delete(key)
+    if (key === 'Space' || key === 'Escape') recordKey(event, 'keyup', key, heldBefore)
+  }
   function blur() { interrupt('focus_lost') }
   function pagehide() { interrupt('page_closed') }
   function visibility() { if (document.visibilityState !== 'visible') interrupt('visibility_hidden') }
-  function startTrial(start: number) {
+  function startTrial(start: number, stamp?: number) {
     current = { trial_number: index + 1, condition_id: order[index]!.condition_id,
       key_pressed: null, reaction_time_ms: null, key_at_ms: null,
       trial_start_ms: start, stimulus_onset_ms: NaN, stimulus_offset_ms: NaN, trial_end_ms: NaN }
+    recordTransition('trial_start', index * 3750, start, stamp)
     phase = 'fixation'
     render(start)
   }
@@ -281,7 +351,7 @@ export function createMainRuntime(container: HTMLElement, options: MainOptions,
             interrupt('timing_invalid'); return
           }
           origin = observed
-          startTrial(0)
+          startTrial(0, stamp)
         }
       }
     } else {
@@ -294,6 +364,7 @@ export function createMainRuntime(container: HTMLElement, options: MainOptions,
       const trial = current!
       if (phase === 'fixation' && due(nominal + 300)) {
         trial.stimulus_onset_ms = elapsed
+        recordTransition('stimulus_onset', nominal + 300, elapsed, stamp)
         if (!(trial.trial_start_ms < elapsed) || !within([elapsed, -trial.trial_start_ms, -300], framePeriod!)) {
           interrupt('timing_invalid'); return
         }
@@ -301,6 +372,7 @@ export function createMainRuntime(container: HTMLElement, options: MainOptions,
         render(elapsed)
       } else if (phase === 'stimulus' && due(nominal + 2800)) {
         trial.stimulus_offset_ms = elapsed
+        recordTransition('stimulus_offset', nominal + 2800, elapsed, stamp)
         if (!(trial.stimulus_onset_ms < elapsed)
           || !within([elapsed, -trial.trial_start_ms, -2800], framePeriod!)
           || !within([elapsed, -trial.stimulus_onset_ms, -2500], framePeriod!)) {
@@ -310,6 +382,7 @@ export function createMainRuntime(container: HTMLElement, options: MainOptions,
         render(elapsed)
       } else if (phase === 'blank' && due(nominal + 3750)) {
         trial.trial_end_ms = elapsed
+        recordTransition('trial_end', nominal + 3750, elapsed, stamp)
         if (!(trial.stimulus_offset_ms < elapsed) || elapsed > 60100
           || !within([elapsed, -trial.trial_start_ms, -3750], framePeriod!)) {
           interrupt('timing_invalid'); return
@@ -320,13 +393,14 @@ export function createMainRuntime(container: HTMLElement, options: MainOptions,
         if (completed === 16) {
           const result: MainResult = { frame_period_ms: framePeriod!, trials: trials.map(row => ({ ...row })), order }
           if (!validMainResult(result)) { interrupt('timing_invalid'); return }
+          emitTimingTrace('completed', null)
           cleanup()
           options.onComplete(result)
           return
         }
         index += 1
         if (!within([elapsed, -index * 3750], framePeriod!)) { interrupt('timing_invalid'); return }
-        startTrial(elapsed)
+        startTrial(elapsed, stamp)
       } else updateHud(elapsed)
     }
     if (active) handle = clock.requestFrame(tick)

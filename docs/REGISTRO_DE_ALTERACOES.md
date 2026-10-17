@@ -6,6 +6,17 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-17 — Instrumentacao local opt-in para pilotos W16
+
+- Motor do bloco principal oferece trilha opcional de transicoes, intervalo de
+  quadros e eventos de teclado, inclusive quando uma execucao termina invalida
+  ou e interrompida. Captura requer build local `VITE_W16_TIMING_CAPTURE=synthetic-only`
+  e query `?w16=1`; o painel guarda em memoria e exporta apenas sob acao explicita.
+- Artefato registra ambiente tecnico e nao recebe identificador de participante,
+  convite ou dados de resultado. Testes sinteticos cobrem conclusao,
+  interrupcao e opt-in. Esta ferramenta nao constitui evidencia nem aceite W16;
+  pilotos fisicos nos seis ambientes continuam pendentes.
+
 ## 2026-10-17 — Importacao CSV WEB W15E e aceites presumidos
 
 - Entregue migration/auditoria de operacoes CSV, API autenticada por projeto,
