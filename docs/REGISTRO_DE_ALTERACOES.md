@@ -6,6 +6,21 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — Comparacao e planejamento de paridade do dashboard
+
+- Comparados Streamlit e WEB por codigo/contratos, incluindo filtros, cards,
+  graficos, tabela, detalhe, instrumentos, exportacoes, importacao e administracao.
+  Revisao independente confirmou diferenca entre API pronta e interface ausente
+  em projetos/vinculos e falta de API/interface de contas/upload.
+- Roadmap recebeu matriz com fontes e complementos W15A–W15E, dependencias,
+  criterios de aceite e validacoes previstas. Atualizado estado W15 para
+  distinguir painel inicial validado de paridade ainda pendente; aceite W21/W22
+  e transicao W23 devem cobrir os recursos novos.
+- Mantidas minimizacao WEB, identidade tecnica, mapa explicito ADR-003,
+  exclusao de dados identificaveis das novas superficies e coexistencia legada.
+  CSV agregado planejado nao altera CSV oficial individual de21colunas.
+- Somente documentacao; nenhuma implementacao, publicacao ou coleta executada.
+
 ## 2026-10-16 — Planejamento do cadastro WEB da sessao
 
 - Apos apontamento do responsavel e consulta ao formulario legado, registrada

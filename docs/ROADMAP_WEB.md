@@ -25,7 +25,12 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W12 | Concluida em 2026-10-16; resumo, CSV de 21 campos, paridade Python/TypeScript e importacao real validados |
 | W13 | Integracao anterior validada; fluxo completo de cadastro pela interface pendente em W13A |
 | W13A | Planejada; cadastro da sessao pela equipe e gestao do convite ainda nao implementados na interface |
-| W15 | Concluida; painel autorizado, metricas/graficos/CSV e perfis validados em HTTPS real |
+| W15 | Painel inicial validado; paridade funcional com legado pendente em W15A–W15E |
+| W15A | Planejada; completar filtros combinados e consulta entre projetos autorizados |
+| W15B | Planejada; completar tabela, detalhe, graficos e visoes por instrumento |
+| W15C | Planejada; exportar a visao filtrada em CSV agregado |
+| W15D | Planejada; administrar usuarios, projetos e vinculos pela interface |
+| W15E | Planejada; importar CSV pela WEB com escopo, minimizacao e auditoria |
 | W16 | Pacote de referencia aprovado; bloqueada por disponibilidade dos equipamentos e evidencias dos pilotos |
 | W17 | Concluida; hardening, CSP, 284 testes Python, HTTPS e auditorias aprovados |
 | W18 | Concluida; pipeline completo em checkout sparse limpo, testes e auditorias aprovados |
@@ -37,8 +42,9 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W22 | Publicada na VPS por delegacao explicita, somente testes sinteticos; confirmacao Google pessoal pendente |
 
 As evidencias anteriores de W00–W15 e W17–W20 permanecem validas para os escopos
-testados; a lacuna funcional W13A impede considerar completo o fluxo de cadastro
-e execucao pelo navegador. W13A e a proxima prioridade de implementacao, antes
+testados; W13A e W15A–W15E impedem considerar completos o cadastro, o dashboard
+e a substituicao funcional do legado pelo navegador. W13A e a proxima prioridade
+de implementacao, seguida dos complementos W15 conforme dependencias, antes
 do aceite funcional W21/W22. Por instrucao mais recente, esta unidade se limita
 ao planejamento documental; nao inicia codigo, testes funcionais ou publicacao.
 A publicacao de testes W22 foi explicitamente
@@ -461,6 +467,11 @@ Dependencias da fase: backend e execucao local aprovados.
 
 ### W15 — Painel web e coexistencia com Streamlit
 
+O painel inicial foi validado no escopo implementado. A comparacao abaixo
+identificou cobertura parcial do legado; seus complementos W15A–W15E ainda
+nao foram implementados nem aceitos. O CSV oficial individual existente nao
+substitui a exportacao agregada da visao filtrada.
+
 - **Objetivo:** oferecer consulta na nova interface sem retirar o painel atual.
 - **Entregaveis:** filtros, cards, graficos, detalhe e exportacao consumindo a
   API; documentar recursos cuja migracao fica explicitamente fora do MVP.
@@ -470,6 +481,205 @@ Dependencias da fase: backend e execucao local aprovados.
 - **Validacoes:** componentes e ponta a ponta por perfil, paridade de valores,
   filtros sem resultados, teclado e regressao do Streamlit.
 - **Leitura:** `dashboard/README.md`, contrato HTTP e acesso web.
+
+#### Comparacao funcional com o legado — inspecao de 2026-10-16
+
+Comparacao estatica do codigo e dos contratos, sem abrir dados reais, executar
+coletas ou acessar a VPS. As descricoes abaixo sao capacidades observadas,
+nao evidencia de testes executados nesta unidade. Em caso de texto historico
+desatualizado, o comportamento do codigo inspecionado fundamenta a comparacao.
+
+Fontes legadas: [composicao e areas](../dashboard/app.py),
+[cards, graficos, tabela e detalhe](../dashboard/components.py),
+[filtros e exportacao agregada](../dashboard/transformations.py),
+[visoes por instrumento](../dashboard/instrumentos.py),
+[guia do dashboard](../dashboard/README.md) e
+[upload autenticado](dados/UPLOAD_LOCAL.md).
+Fontes WEB: [painel atual](../web/src/components/ProfessionalDashboard.tsx),
+[agregacoes](../web/src/dashboard/analysis.ts),
+[acesso profissional](../web/src/App.tsx),
+[consultas/CSV](../api/assessments.py),
+[projetos/vinculos/convites](../api/sessions.py) e
+[projecoes profissionais](../stroop/application/web_assessments.py).
+
+| Recurso | Legado observado | WEB observada e tratamento planejado |
+|---|---|---|
+| Login, perfil, logout e aviso descritivo | Google, cadastro previo, areas por perfil e aviso nao clinico | Base presente; manter e revalidar nos novos fluxos |
+| Periodo inicial/final | Filtro por assessment_date | Ausente na interface e na API de listagem; W15A |
+| Projetos | Multisselecao de rotulos no conjunto carregado | Um projeto por consulta; completar comparacao autorizada entre projetos em W15A |
+| Participantes e visitas | Multisselecao entre opcoes disponiveis | Campos de igualdade para um codigo/visita; completar selecao combinada em W15A |
+| Avaliador | Filtro por rotulo do avaliador | evaluator_id chega ao cliente, mas nao ha filtro; W15A, somente identificacao tecnica |
+| Instrumento, versao e plataforma | Instrumento unico e multisselecao de versoes | Instrumento unico/plataforma presentes; versao ausente; W15A |
+| Nome do participante | Filtro/coluna presentes no legado | Ausencia intencional: nao migrar nome/iniciais para a WEB nem ampliar grants |
+| Sete cards Stroop | Avaliacoes, participantes, precisao media/mediana, RT mediano, omissoes e comissoes | Presentes no escopo de um projeto; preservar formulas/ausencias e conferir no conjunto ampliado, W15A/W15B |
+| Avaliacoes por data e precisao por visita | Graficos descritivos | Presentes como barras/meter; validar coerencia com os filtros ampliados, W15B |
+| Distribuicao de RT | Barras dos valores por avaliacao | WEB agrupa em faixas de0,5s; representacao diferente, nao ausencia de dados. Documentar faixas/unidades e conservar ausencia de hits, W15B |
+| Omissoes/comissoes por projeto | Series agrupadas por projeto | WEB mostra totais do projeto selecionado; falta comparacao por projeto, W15B |
+| Evolucao de participante | Seletor proprio e grafico por visita | WEB oferece apenas tabela quando ha filtro de participante; completar seletor/grafico, W15B |
+| Tabela agregada | Data, projeto, participante, visita, avaliador, versao, precisao total/Go/No-Go, omissoes, comissoes e RT, alem de nome local | WEB mostra participante, visita, inicio, plataforma, versao, precisao e RT; completar colunas permitidas/metricas, W15B |
+| Detalhe e rastreabilidade | Metadados, metricas completas, contagem das quatro respostas e tentativas | WEB tem metricas/tentativas e parte dos metadados; falta apresentar IDs/avaliador/conclusao e contagens dedicadas. Paths/nome de arquivo fonte nao devem ser copiados; W15B |
+| Instrumentos adicionais | Visao demonstrativa tem cards, graficos, tabela e exportacao proprios | WEB consulta summaries.metrics/detalhe, mas nao renderiza cards/graficos especificos e nao exporta agregado; W15B/W15C. Nao criar novos testes clinicos |
+| Exportacao agregada filtrada | CSV manual com uma linha por avaliacao da visao filtrada | Ausente; W15C. CSV individual de tentativas existente deve continuar separado |
+| Exportacao oficial Stroop individual | Formato oficial existe no fluxo de dados, distinto do CSV agregado do painel | Presente na WEB; preservar 21 colunas, mascaramento e autorizacao |
+| Importacao CSV | Area autenticada, UTF-8 ate5MiB, validacao, rejeicao de duplicatas e auditoria | Nao ha tela nem rota WEB de importacao; W15E |
+| Usuarios e permissoes | Listar, cadastrar, mudar perfil/e-mail auxiliar e ativar/bloquear, protegendo ultimo administrador | Nao ha tela nem rotas WEB de gestao de usuarios; W15D. Identidade continua iss+sub |
+| Projetos e vinculos | Modelo de escopo de projetos da WEB nao possui tela equivalente no Streamlit | API WEB existe, mas falta interface; W15D, requisito operacional WEB adicional |
+| Dados historicos | Consulta dos registros do banco legado | API WEB exige mapa explicito ADR-003; manter essa barreira e testar coexistencia, sem associar rotulos automaticamente |
+
+### W15A — Filtros completos e conjunto autorizado coerente
+
+- **Estado/objetivo:** planejada; completar filtros do dashboard mantendo a
+  autorizacao por projeto, com W14/W15 anteriores como base.
+- **Entregaveis:** periodo, projetos, participantes, visitas, avaliadores
+  tecnicos, versoes, instrumento unico e plataforma; opcoes a partir de dados
+  autorizados, resumo dos filtros, aplicar/limpar e estado sem resultados.
+  Atualizar contrato HTTP, cursores, cliente e consultas para os filtros novos;
+  nao basta acrescentar controles que a API atual rejeitaria.
+- **Dependencias:** W14/W15. Pode ser preparada independentemente de W13A;
+  seu aceite integrado deve incluir sessoes criadas pelo formulario W13A.
+- **Criterios de aceite:** filtros combinados produzem o mesmo conjunto na
+  tabela/cards/graficos/exportacao; todas as paginas sao consideradas sem
+  duplicatas e sem apresentar totais parciais como completos. Falha em um
+  projeto/pagina invalida o agregado e permite recuperacao explicita. Periodo
+  tem limites inclusivos, campo de data/fuso documentados e tratamento de
+  horarios legados sem fuso sem inventar UTC. Selecionar projetos nunca concede
+  acesso sem vinculo, mesmo para admin. Identificar participantes pela dupla
+  projeto+codigo nos totais/comparacoes; nao fundir pessoas de estudos distintos
+  por coincidencia de pseudonimo. Manter instrumento unico e nenhuma consulta
+  por nome/iniciais. Definir limites e estrategia de paginacao/agregacao para
+  volume esperado sem carregar historico ilimitado ou agregar apenas uma pagina.
+- **Validacoes:** fixtures com projetos/codigos coincidentes, varios avaliadores,
+  versoes, datas-limite e multiplas paginas; contrato/cursor vinculado a filtros,
+  SQL parametrizado, acesso cruzado, perda de vinculo durante leitura, falha
+  parcial, vazio, teclado e cancelamento de respostas antigas. Comprovar API,
+  PostgreSQL e navegador reais sinteticos, alem de testes isolados.
+
+### W15B — Tabela, detalhe e visualizacoes completas
+
+- **Estado/objetivo:** planejada; completar apresentacao dos resultados sem
+  mudar formulas, inventar interpretacao clinica ou exigir visual identico ao
+  Streamlit. Reutilizar recursos presentes, sem reimplementacao desnecessaria.
+- **Dependencias:** W15A para o conjunto filtrado final; W14/W15 como base.
+- **Entregaveis:** colunas permitidas do legado, com projeto, avaliador tecnico,
+  precisao Go/No-Go e contagens de erros; detalhe com IDs de avaliacao/sessao,
+  projeto, avaliador, inicio/conclusao, versoes/protocolo e metadados aplicaveis;
+  contagens de hit/omission/correct_rejection/commission e tentativas. Exibir
+  proveniencia importada somente quando minimizada e prevista em contrato,
+  sem path/nome de arquivo original. Acrescentar comparacao de erros por projeto,
+  seletor de participante e grafico longitudinal; cards/graficos/tabela proprios
+  para instrumentos ja registrados, incluindo a demonstracao sintetica.
+- **Criterios de aceite:** unidades e rotulos explicitos; precisao e RT em
+  escalas separadas para nao comparar unidades diferentes no mesmo eixo.
+  Ordenacao longitudinal deterministica, visitas repetidas visiveis e nenhuma
+  fusao de codigos entre projetos. Metricas ausentes aparecem como ausencia,
+  nao zero medido; preservar RT sem hits e regras do nucleo. Nao somar metricas
+  de instrumentos distintos. Tabela/detalhe/graficos concordam com o conjunto
+  W15A e o CSV. Completar projecoes HTTP quando necessario, sem disparar uma
+  consulta de detalhe por linha apenas para montar a tabela agregada. Graficos
+  possuem alternativa textual/tabular e mantem resultados descritivos.
+- **Validacoes:** paridade numerica com nucleo/fixtures legadas, Go/No-Go,
+  ausencias, multiplas visitas/projetos, instrumentos sem tentativas, dataset
+  vazio, teclado/labels e regressao do que ja funciona. Validar apresentacao
+  e dados com backend real; grafico por si nao comprova paridade estatistica.
+
+### W15C — CSV agregado da visao filtrada
+
+- **Estado/objetivo:** planejada; recuperar o download manual de uma linha
+  por avaliacao filtrada, distinto do CSV oficial Stroop de21colunas.
+- **Dependencias:** W15A/W15B para contrato de filtros e colunas.
+- **Entregaveis:** acao de exportar visao filtrada, contrato/rota profissional
+  com esquema tabular permitido por instrumento e nome de arquivo seguro;
+  manter exportacao oficial individual existente sem alterar seu contrato.
+- **Criterios de aceite:** arquivo reflete exatamente filtros, projetos,
+  instrumento, colunas e conjunto completo autorizado; registrar criterio de
+  consistencia se houver alteracoes durante geracao/paginacao. Reautorizar no
+  clique/servidor e nao permitir download por conta bloqueada ou vinculo
+  revogado. Todos os tres perfis profissionais vinculados conservam exportacao
+  permitida. Sem nomes/iniciais, credenciais ou paths; avaliar seguranca de
+  celulas de planilha, encoding, separadores, unidades e valores ausentes.
+  Download manual, no-store, sem persistir exportacao no servidor. Nao declarar
+  CSV agregado importavel como tentativas pelo importador oficial.
+- **Validacoes:** comparar linhas/valores com tabela e consulta autorizada,
+  incluindo multiplas paginas, filtros combinados, caracteres especiais,
+  formula injection, permissao revogada e erro durante download. Testar
+  instrumentos distintos separadamente e preservar o CSV individual/importador.
+
+### W15D — Administracao de usuarios, projetos e vinculos
+
+- **Estado/objetivo:** planejada; permitir operacao profissional pelo navegador.
+  Usuarios/perfis sao paridade do legado; projetos/vinculos sao complemento do
+  modelo WEB. Nenhuma dessas telas existe atualmente na nova interface.
+- **Dependencias:** W06/W07, W15; nao depende dos novos graficos/exportacao.
+- **Entregaveis:** navegacao por areas/perfil; listar/cadastrar usuarios,
+  alterar perfil, e-mail auxiliar opcional e estado ativo/bloqueado; interface
+  para listar/criar projetos e gerir seus membros com as rotas existentes.
+  Criar contratos/rotas de usuarios reutilizando casos de uso legados e
+  protecoes transacionais; documentar como obter/fornecer a propria identidade
+  Google verificada para solicitar cadastro, sem autocadastro ou senha nova.
+- **Criterios de aceite:** somente administracao gere contas/projetos/vinculos;
+  proteger ultimo administrador ativo, inclusive sob concorrencia; impedir
+  elevacao de privilegios por payload. Identidade permanece iss+sub; e-mail
+  auxiliar nao autoriza e so aparece no contexto administrativo permitido.
+  Mudancas sensiveis mostram alvo/efeito e exigem acao explicita, CSRF/origem,
+  reautorizacao e auditoria sem dados sensiveis. Admin global nao herda acesso
+  aos resultados: requer vinculo explicito. Bloqueio/revogacao preserva coletas
+  e invalida operacoes/convites ativos conforme contrato. Sem exclusao de contas
+  ou resultados e sem interface para preencher mapa legado por coincidencia.
+  Reutilizar apenas operacoes de projeto ja suportadas; nao inventar API de
+  alteracao/desativacao de projeto como se estivesse implementada.
+- **Validacoes:** perfis/contas nao cadastradas, ultimo admin, concorrencia,
+  CSRF, alteracao indevida de alvo, revogacao/bloqueio, acesso cruzado,
+  paginacao de usuarios/membros e cadastro->vinculo->W13A->consulta com backend
+  real sintetico. Auditar efeitos e erros fechados sem imprimir e-mail/claims.
+
+### W15E — Importacao CSV autenticada na WEB
+
+- **Estado/objetivo:** planejada; recuperar importacao pelo navegador com
+  isolamento e minimizacao compativeis com W03/ADR-003. A existencia do
+  importador Python/Streamlit nao implica uma rota HTTP WEB pronta.
+- **Dependencias:** W03/W04/W14, W15D para operacao dos vinculos; W15B para
+  apresentar o resultado importado. Reutilizar ingestao/dominio existentes.
+- **Entregaveis:** especificar primeiro contrato de upload, formatos/versoes,
+  minimizacao dos arquivos e destino de projeto explicitamente autorizado;
+  implementar depois rota dedicada, cliente/tela, estados recebido/validado/
+  importado/rejeitado e consulta do resultado da operacao. Preservar suporte aos
+  instrumentos ja registrados sem adicionar instrumentos novos por presuncao.
+- **Criterios de aceite:** importacao/administracao com vinculo valido;
+  transacao atomica, duplicata rejeitada sem sobrescrever dados, auditoria e
+  estado verificavel apos timeout ou falha de auditoria, sem repeticao cega.
+  Legado suporta um CSV UTF-8 ate5MiB; planejar limite equivalente apenas na
+  rota dedicada, com limites de memoria/tempo/concorrencia e streaming quando
+  necessario. Preservar64KiB nas demais rotas; nao elevar limite global.
+  Rejeitar arquivo vazio, NUL, encoding/extensao/schema invalidos e tamanho
+  excedido; descartar temporarios privados e nunca renderizar/logar conteudo
+  bruto ou usar nome fornecido como path. Definir e validar politica que impeça
+  transmissao de nomes/iniciais para a WEB antes de habilitar upload: CSV
+  minimizado aceito, arquivos identificaveis permanecem no fluxo local seguro.
+  Nao habilitar envio de CSV nominal apenas porque o legado o aceitava.
+  Especificar compatibilidade dessa politica com os validadores existentes.
+  Importar nao deve vincular rotulo legado a projeto por coincidencia nem
+  escrever mapa ADR-003 pela API; provisionamento explicito continua separado.
+  Importacao nao converte linha PsychoPy em coleta WEB nem libera pesquisa real.
+- **Validacoes:** fixtures integralmente sinteticas de formatos aceitos e
+  rejeitados, minimizacao, permissao/projeto cruzado, duplicatas/concorrencia,
+  rollback transacional, limite dedicado sem regressao64KiB, limpeza de
+  temporarios, falha parcial/auditoria, reconsulta apos resposta perdida e
+  navegacao importacao->consulta/detalhe/exportacao com backend real.
+
+#### Execucao e aceite dos complementos do dashboard
+
+Nesta solicitacao, somente comparacao e planejamento documental. Em retomada
+de implementacao: priorizar W13A e W15A–W15C; W15D pode avancar independentemente
+dos graficos quando houver beneficio, e W15E exige seu contrato/minimizacao
+definidos antes do codigo de upload. Atualizar UX/HTTP/acesso/dados nas fontes
+canonicas conforme cada entrega, sem alterar arquitetura ou privacidade por
+presuncao. Validar testes proporcionais, suite Python quando houver backend,
+`npm ci`, testes DOM, TypeScript, build, Playwright e HTTPS/PostgreSQL sinteticos
+reais. Imagens novas exigem build/smoke e publicacao autorizada com retorno
+seguro. Validar links e diff; mocks, skips e documentacao nao concedem aceite.
+W21/W22 precisam cobrir os novos fluxos por perfil; W23 deve apresentar matriz
+final de cobertura e eventuais diferimentos explicitamente aceitos pelo usuario.
+Nao descontinuar Streamlit enquanto os recursos substitutos nao forem aceitos.
 
 ## Fase 6 — Qualidade, seguranca e automacao
 
@@ -557,7 +767,7 @@ Dependencias da fase: evidencias funcionais, temporais, de seguranca e operacao.
 - **Objetivo:** validar o pacote completo no ambiente de homologacao autorizado.
 - **Entregaveis:** relatorio de aceite, limite de concorrencia medido, roteiro
   operacional e lista fechada de pendencias; dados sempre sinteticos.
-- **Dependencias:** W13A, W16, W17, W18, W20.
+- **Dependencias:** W13A, W15A–W15E, W16, W17, W18, W20.
 - **Conclusao:** fluxos por perfil, protocolo e recuperacao aprovados;
   capacidade e limites medidos no ambiente alvo, sem estimativas como evidencia.
 - **Validacoes:** ponta a ponta, carga controlada fora do motor experimental,
@@ -571,8 +781,9 @@ a substituicao da aplicacao na VPS existente, mantendo dominio e infraestrutura.
 Publicacao exclusivamente sintetica permitida antes do aceite W16/W21; isso
 nao conclui essas etapas. Evidencias e manutencao em
 [DEPLOY_WEB_VPS](operacao/DEPLOY_WEB_VPS.md); confirmacao Google pessoal solicitada.
-O aceite funcional da interface publicada tambem depende de W13A; a publicacao
-ja realizada nao comprova o cadastro de sessao pela equipe no navegador.
+O aceite funcional da interface publicada tambem depende de W13A e W15A–W15E;
+a publicacao ja realizada nao comprova cadastro de sessao, dashboard completo
+ou substituicao das areas operacionais do legado pelo navegador.
 
 - **Objetivo:** publicar a versao homologada com decisao operacional explicita.
 - **Entregaveis:** dominio/TLS, credenciais externas, backup externo,

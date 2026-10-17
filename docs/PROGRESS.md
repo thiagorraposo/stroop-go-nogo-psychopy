@@ -3,7 +3,27 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
-## Atual — planejamento documental do cadastro da sessao
+## Atual — comparacao do dashboard e planejamento documental
+
+- Usuario solicitou comparar dashboard legado/WEB e documentar complementos,
+  como no cadastro da sessao. Inspecionados codigo, guias, contratos de dados,
+  acesso e mapa legado; revisao independente das areas administrativas/upload.
+- Matriz de capacidades observadas incorporada a W15 no [roadmap](ROADMAP_WEB.md),
+  com fontes de codigo. W15A–W15E planejam filtros, apresentacao analitica,
+  exportacao agregada, administracao e importacao; estado/criterios so no roadmap.
+- Diferenciados CSV agregado e CSV oficial individual; API pronta de projetos/
+  vinculos versus API ausente de contas/upload; recursos ja presentes versus
+  parciais e exclusoes intencionais de nome/iniciais do participante. Nao copiar
+  paths, fundir pseudonimos entre projetos ou associar legado por coincidencia.
+- Evidencias anteriores preservadas para seus escopos; paridade funcional
+  W15/W21/W22 e transicao W23 dependem dos complementos. Streamlit mantido.
+- Unidade somente documental, sem codigo, testes funcionais, banco ou VPS.
+  Conferidos38links locais, unicidade das fichas/estados e git diff --check;
+  revisao independente do planejamento sem achados materiais.
+  Proxima acao quando retomado desenvolvimento: W13A, depois complementos W15
+  conforme dependencias; definir contrato/minimizacao antes de implementar upload.
+
+## Historico — planejamento documental do cadastro da sessao
 
 - Responsavel identificou ausencia da tela de cadastro e pediu documentar
   primeiro o trabalho no roadmap. Implementacao/deploy suspensos nesta unidade;
