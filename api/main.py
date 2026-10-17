@@ -8,7 +8,7 @@ from api.config import APIConfig
 from api.errors import APIError, error_response, http_exception_handler, validation_exception_handler
 from api.health import database_ready
 from api.transport import RequestBoundary
-from api.auth import router as auth_router
+from api.auth import callback as auth_callback, router as auth_router
 from api.sessions import router as sessions_router
 from api.results import router as results_router
 from api.assessments import router as assessments_router
@@ -22,6 +22,8 @@ def create_app(config: APIConfig | None = None) -> FastAPI:
     )
     app.state.config = config
     app.include_router(auth_router)
+    if config.oidc_callback_path == "/oauth2callback":
+        app.add_api_route("/oauth2callback", auth_callback, methods=["GET"], include_in_schema=False)
     app.include_router(sessions_router)
     app.include_router(results_router)
     app.include_router(assessments_router)

@@ -107,7 +107,7 @@ def authorization_url(
     _endpoint(metadata, "jwks_uri", "www.googleapis.com", "/oauth2/v3/certs")
     parameters = urlencode({
         "client_id": config.oidc_client_id,
-        "redirect_uri": f"{config.public_origin}/api/v1/auth/callback",
+        "redirect_uri": f"{config.public_origin}{config.oidc_callback_path}",
         "response_type": "code",
         "scope": "openid email",
         "state": state,
@@ -140,7 +140,7 @@ def exchange_code(
         "code": code,
         "client_id": config.oidc_client_id,
         "client_secret": config.oidc_client_secret,
-        "redirect_uri": f"{config.public_origin}/api/v1/auth/callback",
+        "redirect_uri": f"{config.public_origin}{config.oidc_callback_path}",
         "grant_type": "authorization_code",
         "code_verifier": code_verifier,
     })

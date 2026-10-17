@@ -59,6 +59,7 @@ http {
         root /usr/share/nginx/html;
         include /etc/nginx/web/web-headers.conf;
         include /etc/nginx/web/closed-errors.conf;
+        location = /oauth2callback { include /etc/nginx/web/proxy.conf; }
         location = /api { include /etc/nginx/web/proxy.conf; }
         location ^~ /api/ { include /etc/nginx/web/proxy.conf; }
         location = /health/live { include /etc/nginx/web/proxy.conf; }

@@ -35,6 +35,7 @@ services:
     environment:
       APP_ENV: ${WEB_APP_ENV:-production}
       API_PUBLIC_ORIGIN: ${WEB_PUBLIC_ORIGIN:?Informe origem HTTPS}
+      OIDC_CALLBACK_PATH: ${WEB_OIDC_CALLBACK_PATH:-/api/v1/auth/callback}
       API_DATABASE_URL_FILE: /run/secrets/api_database_url
       API_READ_DATABASE_URL_FILE: /run/secrets/api_read_database_url
       OIDC_CLIENT_ID_FILE: /run/secrets/oidc_client_id

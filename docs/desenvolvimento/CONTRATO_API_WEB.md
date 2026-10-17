@@ -86,6 +86,12 @@ o destino apos login e fixo e local.
 
 Todos os caminhos desta tabela tem prefixo `/api/v1`.
 
+Compatibilidade operacional opt-in: `OIDC_CALLBACK_PATH=/oauth2callback` usa
+esse caminho absoluto no login e na troca do codigo, ativando um alias para
+o mesmo handler de callback. Somente esse caminho legado e o padrao
+`/api/v1/auth/callback` sao aceitos; nenhuma URL arbitraria ou redirecionamento
+intermediario e permitido. Sem a opcao, o alias retorna404.
+
 | Metodo e caminho | Entrada / resultado de sucesso | Autorizacao |
 |---|---|---|
 | `GET /auth/login` | Sem corpo/query; 303 para Google, cria transacao OIDC de 10 min | Publica, com rate limit |

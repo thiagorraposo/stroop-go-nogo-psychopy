@@ -92,6 +92,7 @@ class APIConfig:
     participant_write_rate_limit: int = 60
     participant_rate_window_seconds: int = 60
     read_database_url: str = field(default="", repr=False)
+    oidc_callback_path: str = "/api/v1/auth/callback"
 
     def __post_init__(self) -> None:
         for value, upper_bound in (
@@ -101,6 +102,8 @@ class APIConfig:
         ):
             if type(value) is not int or not 1 <= value <= upper_bound:
                 _invalid()
+        if self.oidc_callback_path not in ("/api/v1/auth/callback", "/oauth2callback"):
+            _invalid()
         if self.app_env not in {"development", "test", "production"}:
             _invalid()
         if (
@@ -198,6 +201,7 @@ class APIConfig:
         return cls(
             database_url=secret_value(values, "API_DATABASE_URL"),
             read_database_url=secret_value(values, "API_READ_DATABASE_URL"),
+            oidc_callback_path=values.get("OIDC_CALLBACK_PATH", "/api/v1/auth/callback"),
             public_origin=values.get("API_PUBLIC_ORIGIN", ""),
             app_env=values.get("APP_ENV", ""),
             oidc_client_id=secret_value(values, "OIDC_CLIENT_ID"),
