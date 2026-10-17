@@ -276,11 +276,16 @@ async def callback(request: Request):
     config: APIConfig = request.app.state.config
     parameters = request.query_params.multi_items()
     keys = [key for key, _ in parameters]
-    if len(keys) != len(set(keys)) or set(keys) not in (
+    # Google also returns authorization metadata. These fields never authorize
+    # a user: only the verified ID token supplies identity and permissions.
+    metadata = {"scope", "authuser", "prompt", "hd", "iss"}
+    if len(keys) != len(set(keys)) or set(keys) - metadata not in (
         {"state", "code"}, {"state", "error"}, {"state", "error", "error_description"}
     ):
         return _oidc_error(request)
     values = dict(parameters)
+    if "iss" in values and values["iss"] != "https://accounts.google.com":
+        return _oidc_error(request)
     state = values.get("state", "")
     state_cookie = _cookie(request, OIDC_STATE_COOKIE)
     if (

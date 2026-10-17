@@ -135,16 +135,46 @@ class WebAuthPostgresTests(unittest.TestCase):
         self.assertIn("path=/", response.headers["set-cookie"].lower())
         return state_cookie, build_url.call_args.kwargs
 
-    def _callback(self, state_cookie, *, subject=SUBJECT, force_state_cookie=False):
+    def _callback(self, state_cookie, *, subject=SUBJECT, force_state_cookie=False, extra=None):
         claims = verified_claims(subject)
         headers = {"Cookie": f"__Host-stroop_oidc_state={state_cookie}"} if force_state_cookie else None
         with patch("api.auth.exchange_code", return_value=claims) as exchange:
             response = self.client.get(
                 "/api/v1/auth/callback",
-                params={"state": state_cookie, "code": "synthetic-code"},
+                params={"state": state_cookie, "code": "synthetic-code", **(extra or {})},
                 headers=headers,
             )
         return response, exchange
+
+    def test_callback_google_com_metadados_e_alias_legado(self):
+        from dataclasses import replace
+        self.app = create_app(replace(configured_database(self.database_url), oidc_callback_path="/oauth2callback"))
+        self.client.close()
+        self.client = TestClient(self.app, base_url=ORIGIN, follow_redirects=False)
+        self.addCleanup(self.client.close)
+        state, _ = self._start_login()
+        with patch("api.auth.exchange_code", return_value=verified_claims()) as exchange:
+            response = self.client.get("/oauth2callback", params={
+                "state": state, "code": "synthetic-code", "scope": "openid email profile",
+                "authuser": "0", "prompt": "consent", "hd": "synthetic.example.test",
+                "iss": "https://accounts.google.com",
+            })
+        self.assertEqual(response.status_code, 303)
+        self.assertEqual(self.client.get("/api/v1/auth/me").status_code, 200)
+        self.assertEqual(exchange.call_args.kwargs["code"], "synthetic-code")
+        replay, _ = self._callback(state, force_state_cookie=True, extra={"scope": "openid"})
+        self.assertEqual(replay.json()["error"]["code"], "invalid_oidc_state")
+
+    def test_callback_metadados_nao_contornam_validacoes(self):
+        for extra in (
+            {"iss": "https://attacker.invalid"}, {"unexpected": "synthetic"},
+            {"error": "access_denied"}, {"state": "A" * 43},
+        ):
+            with self.subTest(extra=extra):
+                state, _ = self._start_login()
+                response, exchange = self._callback(state, extra=extra)
+                self.assertEqual(response.json()["error"]["code"], "invalid_oidc_state")
+                exchange.assert_not_called()
 
     def test_login_pkce_transacao_uso_unico_cookie_hash_e_me(self):
         state, authorization_args = self._start_login()

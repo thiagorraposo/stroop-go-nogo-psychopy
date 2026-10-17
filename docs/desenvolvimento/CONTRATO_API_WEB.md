@@ -92,10 +92,17 @@ o mesmo handler de callback. Somente esse caminho legado e o padrao
 `/api/v1/auth/callback` sao aceitos; nenhuma URL arbitraria ou redirecionamento
 intermediario e permitido. Sem a opcao, o alias retorna404.
 
+No callback, metadados opcionais da resposta Google nao definem identidade,
+dominio autorizado ou permissoes. Se presente, `iss` deve ser exatamente
+`https://accounts.google.com`. Parametros duplicados/desconhecidos e mistura de
+`code` com `error` continuam rejeitados; cookie/state, expiracao, uso unico,
+PKCE, nonce e ID token verificado permanecem obrigatorios no sucesso.
+Referencia: [resposta de autorizacao Google](https://developers.google.com/identity/openid-connect/reference#authenticationuriparameters).
+
 | Metodo e caminho | Entrada / resultado de sucesso | Autorizacao |
 |---|---|---|
 | `GET /auth/login` | Sem corpo/query; 303 para Google, cria transacao OIDC de 10 min | Publica, com rate limit |
-| `GET /auth/callback` | Query OIDC `code` e `state`, ou `error` e `state`; apos validar, 303 para aplicacao e cookie profissional novo | Transacao OIDC valida; cadastro previo ativo |
+| `GET /auth/callback` | Query OIDC `code` e `state`, ou `error` e `state`; metadados Google opcionais `scope`, `authuser`, `prompt`, `hd`, `iss`; apos validar, 303 para aplicacao e cookie profissional novo | Transacao OIDC valida; cadastro previo ativo |
 | `POST /auth/logout` | Corpo `{}`; 204 e remocao do cookie/sessao profissional | Sessao profissional e CSRF; repeticao sem cookie continua 204 apos validar origem |
 | `GET /auth/me` | 200 com `user_id` opaco (`iss` + `sub`), `role`, `expires_at`, `csrf_token` | Profissional ativo |
 | `GET /projects` | Lista paginada de `id`, `code`, `name`, `active`, `created_at`; sem corpo | Profissional; somente projetos vinculados, admin pode listar todos |
