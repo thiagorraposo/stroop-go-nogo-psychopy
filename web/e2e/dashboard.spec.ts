@@ -24,6 +24,7 @@ const detail: AssessmentDetail = { ...first, project_id: projectId, session_id: 
     reaction_time_ms: 625, reaction_time_seconds: 0.625 }] }
 async function access(page: Page, role = 'consulta') {
   await page.route('**/api/v1/auth/me', route => route.fulfill({ json: { ...profile, role } }))
+  await page.route('**/api/v1/projects/*/assessments/options*', route => route.fulfill({ json: { participant_id: ['P_SINTETICO_AUSENTE'], visit: ['V2'], evaluator_id: [], test_version: [], platform: ['web', 'psychopy'], test_code: ['stroop_go_nogo_ptbr', 'teste_sintetico'] } }))
   await page.route('**/api/v1/projects?*', route => route.fulfill({ json: { items: [project], next_cursor: null } }))
 }
 function card(page: Page, title: string) {
@@ -70,7 +71,7 @@ test('aguarda todas as paginas e descarta subconjunto em falha', async ({ page }
       : route.fulfill({ json: { items: [second], next_cursor: null } })
   })
   await page.goto('/equipe')
-  await expect(page.getByRole('status')).toContainText('1 recebidas')
+  await expect(page.getByText(/^Carregando avaliações/)).toContainText('1 recebidas')
   await expect(page.locator('.dashboard-cards')).toHaveCount(0)
   release(); await expect(card(page, 'Avaliações')).toHaveText('2')
   fail = true; await page.getByRole('button', { name: 'Aplicar filtros' }).click()
@@ -91,17 +92,14 @@ test('separa instrumento/plataforma e aplica filtros vazios pelo teclado', async
     return route.fulfill({ json: { items: [first, second, generic], next_cursor: null } })
   })
   await page.goto('/equipe'); await expect(card(page, 'Avaliações')).toHaveText('2')
-  await page.getByRole('combobox', { name: /^Plataforma/ }).selectOption('web')
-  await expect(card(page, 'Avaliações')).toHaveText('1')
-  await expect(page.getByRole('table', { name: 'Avaliações filtradas' })).not.toContainText(second.participant_id)
-  await page.getByRole('combobox', { name: /^Instrumento/ }).selectOption(generic.test_code)
+  await page.getByRole('combobox', { name: /^Instrumento$/ }).selectOption(generic.test_code)
   await expect(card(page, 'Avaliações')).toHaveText('1')
   await expect(page.getByText('Precisão média', { exact: true })).toHaveCount(0)
   await expect(page.getByRole('table', { name: 'Avaliações filtradas' })).toContainText(generic.participant_id)
-  await expect(page.getByRole('table', { name: 'Avaliações filtradas' })).not.toContainText(first.participant_id)
-  await page.getByLabel('Participante (código)').fill('P_SINTETICO_AUSENTE')
-  await page.getByLabel('Visita', { exact: true }).fill('V2'); await page.getByLabel('Visita', { exact: true }).press('Enter')
-  await expect(page.getByRole('status')).toHaveText('Nenhuma avaliação corresponde aos filtros.')
+  await page.getByLabel('Participantes (códigos)').selectOption('P_SINTETICO_AUSENTE')
+  await page.getByRole('listbox', { name: 'Visitas', exact: true }).selectOption('V2')
+  await page.getByRole('button', { name: 'Aplicar filtros' }).focus(); await page.keyboard.press('Enter')
+  await expect(page.getByText('Nenhuma avaliação corresponde aos filtros.', { exact: true })).toBeVisible()
   expect(filtered).toBe(true); await expect(page.locator('.dashboard-cards')).toHaveCount(0)
 })
 test('abre detalhe pelo teclado, exporta CSV e trata revogacao segura', async ({ page }) => {

@@ -108,15 +108,15 @@ Web Locks impede motores concorrentes entre abas da mesma origem/perfil.
 
 Painel profissional (W15): a area `/equipe` consulta projetos autorizados e
 carrega todas as paginas do resultado filtrado antes de apresentar totais. Os
-filtros de participante e visita sao enviados ao servidor; instrumento e
-plataforma selecionam o conjunto carregado. Cursor ou ID repetido invalida a
+filtros combinados W15A sao enviados ao servidor; a exibicao permite ainda
+selecionar instrumento/plataforma no conjunto carregado. Cursor ou ID repetido invalida a
 consulta para evitar agregacao parcial/duplicada. Uma falha exige atualizar a
 consulta; resultados parciais nao sao exibidos como completos.
 
 Os cards Stroop reproduzem precisao media/mediana, mediana dos RTs por avaliacao,
 participantes unicos e totais de erros. Sem hits, o RT e ausente; nao conta como
 zero. Graficos mostram datas de inicio, precisao por visita, distribuicao de
-RTs medianos e erros. Filtrar participante mostra evolucao por visita. O detalhe
+RTs medianos e erros. Filtrar um participante num unico projeto mostra evolucao por visita. O detalhe
 conserva metricas/tentativas e proveniencia, inclusive campos ausentes do legado.
 Datas sem fuso nao recebem conversao implicita. Instrumentos adicionais exibem
 suas proprias metricas no detalhe, sem graficos Stroop ou CSV inventado.
@@ -133,8 +133,8 @@ historica. Esses recursos nao sao removidos nem implicitamente migrados ao
 painel WEB. O painel WEB oferece detalhe e CSV oficial por avaliacao; nao
 transmite nomes/iniciais pessoais do legado, nao oferece exportacao agregada,
 filtros por nome de participante/avaliador ou personalizacao de instrumentos.
-Filtros por periodo/versao e exportacao agregada continuam no Streamlit neste
-MVP. Nao ha interpretacao clinica, normativa ou comparacao entre instrumentos.
+Filtros por periodo/versao estao na WEB; exportacao agregada continua no
+Streamlit enquanto o complemento proprio nao for implementado. Nao ha interpretacao clinica, normativa ou comparacao entre instrumentos.
 
 Seguranca da pagina (W17): `security-headers.json` e a baseline testada no proxy
 HTTPS sintetico, a ser consumida no empacotamento W19. Scripts/estilos/conexoes
@@ -147,7 +147,7 @@ A previa Vite e destinada a desenvolvimento e nao atesta headers de producao.
 Em `/equipe`, entre com sua conta previamente cadastrada, selecione um projeto
 ativo ao qual esteja vinculado e use `Preparar sessao` (perfil de coleta/importacao
 ou administracao). Preencha `Codigo do participante` e `Visita da sessao` com
-codigos pseudonimizados de1–64 letras ASCII, numeros, ponto, hifen ou sublinhado.
+codigos pseudonimizados de 1–64 letras ASCII, numeros, ponto, hifen ou sublinhado.
 O avaliador e a conta autenticada, fixada pelo servidor. Use somente sessoes
 sinteticas enquanto os gates de pesquisa real permanecerem pendentes.
 
@@ -164,3 +164,32 @@ automatico nem revogacao sem identificador conhecido. Informe o responsavel
 antes de emitir outro convite nesse caso. `Preparar outra sessao` limpa a tela,
 sem revogar o anterior. `Revogar convite` requer confirmacao do servidor; apos
 confirmacao impede resgate/continuidade, preservando resultados ja concluidos.
+
+## Consultar com filtros combinados
+
+O seletor `Projeto` continua definindo a preparacao de sessoes. Em `Filtrar
+resultados`, `Projetos da consulta` permite combinar ate 20 projetos autorizados.
+Use Ctrl/Cmd ou Shift e as setas nos campos de multisselecao. Codigo igual em
+projetos diferentes representa participantes distintos nos totais; o detalhe
+e o CSV individual usam sempre o projeto da linha.
+
+Escolha datas inclusivas, participantes, visitas, avaliadores tecnicos, versoes,
+plataformas e instrumento, depois `Aplicar filtros`. As opcoes vem somente de
+projetos autorizados no periodo/instrumento; campos vazios nao restringem.
+Valores do mesmo campo combinam por OU e campos diferentes por E. O resumo
+mostra os filtros aplicados; editar a selecao so modifica os resultados depois
+de aplicar. `Limpar filtros` retorna ao projeto de preparacao, sem restricoes
+adicionais. A selecao de exibicao continua mostrando um instrumento por vez.
+
+O periodo usa a data da avaliacao: WEB em UTC, legado na data civil originalmente
+registrada. Sem converter horarios legados em UTC. Identificadores de avaliadores
+legados sem mapa aparecem como ausencia de identificacao tecnica.
+
+O navegador so mostra totais apos completar todas as paginas/projetos, ate 5.000
+avaliacoes por consulta. Acima disso, restrinja o periodo/projetos. Cada faceta
+possui limite 200 por projeto; excesso pede periodo/instrumento mais restrito,
+sem esconder opcoes por truncamento. Mudanca no conjunto durante paginacao ou
+falha de acesso em qualquer projeto limpa o agregado; use `Atualizar consultas`.
+A consistencia e verificada por projeto, sem snapshot global entre projetos.
+CSV agregado da visao filtrada permanece no complemento proprio do roadmap;
+o CSV oficial individual continua disponivel no detalhe autorizado.

@@ -118,3 +118,11 @@ kbd { font: inherit; font-size: .9em; border: 1px solid #b7bfca; border-radius: 
 .session-invitation .quiet { max-width: 72ch; }
 .session-invitation output { display: inline-block; font-family: monospace; font-size: 1.1em; user-select: all; }
 .session-invitation > .button { margin: .25rem .5rem .25rem 0; }
+
+.research-filters { margin-block: 1.5rem; border-block: 1px solid #b9c3d0; padding-block: 1rem; }
+.research-filters .dashboard-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); align-items: start; }
+.research-filters select[multiple] { min-height: 8rem; max-width: 100%; }
+.research-filters > .button { margin: .25rem .5rem .25rem 0; }
+
+.research-filters .project-filter { grid-column: 1 / -1; }
+.research-filters .quiet { max-width: 80ch; }

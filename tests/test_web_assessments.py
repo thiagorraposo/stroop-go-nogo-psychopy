@@ -279,8 +279,91 @@ class WebAssessmentsTests(unittest.TestCase):
                     expires_at=CURRENT_TIMESTAMP-INTERVAL '1 second' WHERE subject=%s''', (helpers.CONSULTA,))
         self.assertEqual(client.get(self.path + '/' + receipt['assessment_id'] + '/export').status_code, 401)
 
+    def test_w15a_filtros_combinados_opcoes_e_periodo_inclusivo(self):
+        receipt, _ = self.complete()
+        legacy = self.legacy()
+        self.link_legacy()
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute("UPDATE assessments SET assessment_date='2026-01-01' WHERE assessment_id=%s", (receipt['assessment_id'],))
+            connection.execute("UPDATE assessments SET assessment_date='2026-01-02',participant_id='P SINTETICO HISTORICO',visit='V HISTORICA' WHERE assessment_id=%s", (legacy,))
+        all_items = self.h.consulta.get(self.path).json()['items']
+        web = next(item for item in all_items if item['platform'] == 'web')
+        params = [('start_date', '2026-01-01'), ('end_date', '2026-01-01'),
+                  ('participant_id', web['participant_id']), ('participant_id', 'OUTRO_SINTETICO'),
+                  ('visit', web['visit']), ('platform', 'web'), ('platform', 'psychopy'),
+                  ('evaluator_id', web['evaluator_id']), ('test_version', web['test_version']),
+                  ('test_code', web['test_code'])]
+        response = self.h.consulta.get(self.path, params=params)
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual([item['assessment_id'] for item in response.json()['items']], [receipt['assessment_id']])
+        legacy_response = self.h.consulta.get(self.path, params={'participant_id': 'P SINTETICO HISTORICO',
+            'visit': 'V HISTORICA', 'evaluator_id': 'LEGADO_NAO_MAPEADO', 'start_date': '2026-01-02', 'end_date': '2026-01-02'})
+        self.assertEqual([item['assessment_id'] for item in legacy_response.json()['items']], [legacy])
+        options = self.h.consulta.get(self.path + '/options')
+        self.assertEqual(options.status_code, 200, options.text)
+        self.assertEqual(set(options.json()), {'participant_id', 'visit', 'evaluator_id', 'test_version', 'platform', 'test_code'})
+        self.assertIn('LEGADO_NAO_MAPEADO', options.json()['evaluator_id'])
+        self.assertNotIn('AVALIADOR_SINTETICO_RESTRITO', options.text)
+        narrowed = self.h.consulta.get(self.path + '/options', params={'start_date': '2026-01-01', 'end_date': '2026-01-01'})
+        self.assertEqual(narrowed.json()['platform'], ['web'])
+        self.assertEqual(self.h.outsider.get(self.path + '/options').status_code, 404)
+        self.h._set_member(self.h.admin, helpers.CONSULTA, False)
+        self.assertEqual(self.h.consulta.get(self.path + '/options').status_code, 404)
+
+    def test_w15a_cursor_canonico_rejeita_concorrencia(self):
+        self.complete()
+        self.legacy()
+        self.link_legacy()
+        params = [('limit', '1'), ('platform', 'web'), ('platform', 'psychopy')]
+        first = self.h.consulta.get(self.path, params=params).json()
+        cursor = first['next_cursor']
+        self.assertTrue(cursor)
+        reordered = [('cursor', cursor), ('platform', 'psychopy'), ('platform', 'web')]
+        self.assertEqual(self.h.consulta.get(self.path, params=reordered).status_code, 200)
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute("UPDATE assessments SET visit='V_SINTETICA_ALTERADA'")
+        conflict = self.h.consulta.get(self.path, params=reordered)
+        self.assertEqual(conflict.status_code, 409, conflict.text)
+        self.assertEqual(conflict.json()['error']['code'], 'state_conflict')
+
+    def test_w15a_queries_datas_e_listas_invalidas(self):
+        for params in ({'start_date': '2026-02-30'}, {'start_date': '2026-03-01', 'end_date': '2026-02-01'},
+                       {'platform': 'mobile'}, {'evaluator_id': 'nome@email'}, {'test_version': ''},
+                       {'participant_id': 'P' * 513}, {'visit': '\x00'},
+                       [('visit', str(i)) for i in range(101)]):
+            response = self.h.consulta.get(self.path, params=params)
+            self.assertEqual(response.status_code, 422, response.text)
+        self.assertEqual(self.h.consulta.get(self.path + '/options', params={'visit': 'V'}).status_code, 422)
+        injection = self.h.consulta.get(self.path, params={'participant_id': "P_SYNTHETIC' OR 1=1 --"})
+        self.assertEqual(injection.status_code, 200)
+        self.assertEqual(injection.json()['items'], [])
+
+    def test_w15a_limites_facetas_e_conjunto_fecham_sem_truncar(self):
+        legacy = self.legacy()
+        self.link_legacy()
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute("""INSERT INTO assessments
+                (assessment_id,test_code,test_version,project,participant_id,participant_name,initials,visit,
+                 evaluator,assessment_date,started_at,source_file,imported_at,import_status)
+                SELECT 'SYNTHETIC_LIMIT_' || n,a.test_code,a.test_version,a.project,'P_SYNTHETIC_' || n,
+                    'NAO_COLETADO',NULL,a.visit,a.evaluator,a.assessment_date,a.started_at,
+                    'synthetic-limit',a.imported_at,a.import_status
+                FROM assessments a CROSS JOIN generate_series(1,201) n WHERE a.assessment_id=%s""", (legacy,))
+        response = self.h.consulta.get(self.path + '/options')
+        self.assertEqual(response.status_code, 422, response.text)
+        self.assertNotIn('items', response.json())
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute("""INSERT INTO assessments
+                (assessment_id,test_code,test_version,project,participant_id,participant_name,initials,visit,
+                 evaluator,assessment_date,started_at,source_file,imported_at,import_status)
+                SELECT 'SYNTHETIC_VOLUME_' || n,a.test_code,a.test_version,a.project,'P_SYNTHETIC',
+                    'NAO_COLETADO',NULL,a.visit,a.evaluator,a.assessment_date,a.started_at,
+                    'synthetic-volume',a.imported_at,a.import_status
+                FROM assessments a CROSS JOIN generate_series(1,5000) n WHERE a.assessment_id=%s""", (legacy,))
+        self.assertEqual(self.h.consulta.get(self.path).status_code, 422)
+
     def test_queries_fechadas_credencial_ausente_e_limite(self):
-        for query in ('?limit=0', '?limit=101', '?limit=2&limit=3', '?visit=a&visit=b',
+        for query in ('?limit=0', '?limit=101', '?limit=2&limit=3', '?test_code=a&test_code=b',
                       '?cursor=bad', '?participant_id=', '?visit=%20', '?unknown=1'):
             self.assertEqual(self.h.consulta.get(self.path + query).status_code, 422, query)
         self.h.app.state.config = replace(self.h.app.state.config, read_database_url='')

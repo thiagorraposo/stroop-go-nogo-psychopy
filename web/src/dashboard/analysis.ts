@@ -7,7 +7,7 @@ export function median(values: readonly number[]): number | null {
   const middle = Math.floor(sorted.length / 2)
   return sorted.length % 2 ? sorted[middle]! : (sorted[middle - 1]! + sorted[middle]!) / 2
 }
-export function summarize(rows: readonly Assessment[]) {
+export function summarize(rows: readonly (Assessment & { project_id?: string })[]) {
   const accuracies: number[] = [], times: number[] = []
   let omissions = 0, commissions = 0
   for (const row of rows) {
@@ -17,7 +17,7 @@ export function summarize(rows: readonly Assessment[]) {
     omissions += row.summary.omission_errors
     commissions += row.summary.commission_errors
   }
-  return { assessments: rows.length, participants: new Set(rows.map(row => row.participant_id)).size,
+  return { assessments: rows.length, participants: new Set(rows.map(row => JSON.stringify([row.project_id ?? '', row.participant_id]))).size,
     meanAccuracy: accuracies.length ? accuracies.reduce((a, b) => a + b, 0) / accuracies.length : null,
     medianAccuracy: median(accuracies), medianResponseSeconds: median(times), omissions, commissions }
 }

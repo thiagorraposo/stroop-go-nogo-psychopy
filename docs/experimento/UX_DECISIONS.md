@@ -146,3 +146,20 @@ a interface informa resultado desconhecido, nao repete POST nem oferece
 revogacao sem identificador confirmado. Nova emissao e uma nova sessao,
 explicitamente solicitada. Revogacao so e declarada apos resposta204; uma
 falha pede confirmacao novamente e orienta a nao entregar o codigo.
+
+## WEB — consulta combinada da equipe (W15A)
+
+`Projeto` mantem o contexto de preparacao da sessao; `Projetos da consulta`
+seleciona os contextos de leitura explicitamente. Filtros usam seletores nativos
+com labels, instrucoes de teclado, datas inclusivas e resumo aplicado.
+Alteracoes no formulario nao mudam o agregado ate `Aplicar filtros`; limpar
+retorna a consulta ao projeto de preparacao. Facetas respeitam projeto,
+periodo e instrumento; erro ou excesso de opcoes e indicado sem truncamento.
+
+A lista so publica o conjunto apos completar todas as paginas, com teto explicito
+de 20 projetos/5.000 avaliacoes. Durante a espera, contagens recebidas sao progresso,
+nao totais de pesquisa. Falha, acesso revogado ou mudanca do conjunto durante
+paginacao descartam totais, tabela e graficos; recuperacao e explicita.
+Participantes sao identificados por projeto+codigo. A evolucao individual
+anterior so aparece num unico projeto, evitando fundir pseudonimos coincidentes.
+A tabela mostra projeto e encaminha detalhe/exportacao ao contexto da linha.

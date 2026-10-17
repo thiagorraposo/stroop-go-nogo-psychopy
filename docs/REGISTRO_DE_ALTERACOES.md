@@ -6,6 +6,35 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-17 — Filtros combinados e agregado autorizado W15A
+
+- Listagem profissional recebe periodo inclusivo sobre assessment_date e listas
+  OU por campo/E entre campos de participantes, visitas, avaliadores tecnicos,
+  versoes e plataformas; instrumento unico. Consultas historicas conservam texto
+  ate 512 caracteres sem ampliar cadastro WEB64ASCII ou ler nomes/iniciais.
+- Facetas SELECT por projeto/periodo/instrumento, limite200 por campo ou422;
+  cursor HMAC vinculado a escopo/filtros canonicos e fingerprint do conjunto,
+  com409 se houver alteracao entre paginas. Teto5000 por projeto, sem truncamento.
+- Interface multisselecao ate20projetos/5000linhas, publica apenas depois de
+  completar todas as paginas; qualquer falha limpa agregado. Participantes
+  usam projeto+codigo; detalhe/CSV preservam projeto da linha. Evolucao anterior
+  restrita a um projeto, evitando fusao de pseudonimos. Sem exportacao agregada
+  nova (W15C), proveniencia nominal ou associacao automatica do legado.
+- Evidencias:326 testes Python/54,018s sem skips;236 frontend, typecheck/build,
+  pip check e diff aprovados. Testes focados cliente50 e browser24 aprovados.
+  Suite completa browser:70 gerais/1min e4 temporais seriais/3,5min aprovados.
+  Motor/protocolo/CSV individual preservados; nao concede homologacao fisica.
+- HTTPS/PostgreSQL reais:2/2 Chromium/Firefox em20,5s com105avaliacoes, paginas
+  reais, pseudonimos coincidentes, filtros combinados/limites inclusivos, valores
+  dos sete cards/graficos, perda de vinculo, recuperacao/vazio/limpeza; emissao
+  e revogacao W13A pela interface incluídas. Fixture inicial sem trials foi
+  corrigida antes do aceite; nenhum erro de produto mascarado por simulacao.
+  Consulta W13A revalidada2/2 em6,8s. Viewport390 e desktop/zoom200% aprovados.
+- Capturas sinteticas form/cards em /tmp/stroop-w15a-*.png inspecionadas;
+  grid corrigida e projetos ampliados antes da ultima revalidacao Chromium1/1.
+  Sources scanner aprovado, contratos/UX/README atualizados. Sem dependencias,
+  schema, deploy, push ou alteracao de coleta existente. Proxima elegivel W15B.
+
 ## 2026-10-17 — Cadastro WEB pela equipe, validacao tecnica W13A
 
 - SessionInvitation e cliente sessions integrados a area profissional: codigo

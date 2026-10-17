@@ -5,6 +5,8 @@ from __future__ import annotations
 from datetime import date, datetime, timezone
 from typing import Any
 import math
+import hashlib
+import json
 from uuid import UUID
 
 import psycopg
@@ -119,28 +121,87 @@ def _base_query(where_clause: str) -> str:
                WHERE p.active AND a.import_status='valid' {where_clause}"""
 
 
-def list_assessments(database_url: str, project_id: UUID, issuer: str, subject: str,
-                     *, participant_id: str | None, visit: str | None,
-                     limit: int, offset: int) -> tuple[bool, list[dict[str, Any]]]:
+class SnapshotConflict(Exception):
+    """Conjunto mudou entre paginas."""
+
+
+class FacetLimitError(Exception):
+    """Opcoes excederam limite explicito."""
+
+
+def _filters(filters):
+    clauses, values = [], []
+    columns = {'participant_id': 'a.participant_id', 'visit': 'a.visit', 'test_version': 'a.test_version',
+               'platform': "COALESCE(wa.platform,'psychopy')",
+               'evaluator_id': "COALESCE(CASE WHEN wa.assessment_id IS NULL THEN NULL ELSE a.evaluator END,'LEGADO_NAO_MAPEADO')"}
+    for key, column in columns.items():
+        if filters.get(key):
+            clauses.append(f'AND {column}=ANY(%s)')
+            values.append(list(filters[key]))
+    for key, operator in [('start_date', '>='), ('end_date', '<=')]:
+        if filters.get(key):
+            clauses.append(f'AND a.assessment_date {operator} %s')
+            values.append(filters[key])
+    if filters.get('test_code'):
+        clauses.append('AND a.test_code=%s')
+        values.append(filters['test_code'])
+    return ' '.join(clauses), values
+
+
+def assessment_options(database_url, project_id, issuer, subject, *, filters):
     try:
         with _connect(database_url) as connection:
             _validate_schema(connection)
             if not _authorized_project(connection, project_id, issuer, subject):
-                return False, []
-            filters: list[str] = []
+                return False, {}
+            where, values = _filters(filters)
+            base = _base_query(where)
+            result = {}
+            for key in ('participant_id', 'visit', 'evaluator_id', 'test_version', 'platform', 'test_code'):
+                expression = "COALESCE(evaluator_id,'LEGADO_NAO_MAPEADO')" if key == 'evaluator_id' else key
+                rows = connection.execute(f'SELECT DISTINCT {expression} AS value FROM ({base}) scoped ORDER BY value LIMIT 201',
+                                          (project_id, issuer, subject, *values)).fetchall()
+                if len(rows) > 200:
+                    raise FacetLimitError
+                result[key] = [row['value'] for row in rows]
+            return True, result
+    except psycopg.Error as exc:
+        raise PersistenceError from exc
+
+
+def list_assessments(database_url: str, project_id: UUID, issuer: str, subject: str,
+                     *, participant_id: str | None = None, visit: str | None = None,
+                     limit: int, offset: int, filters=None, snapshot=None, include_snapshot=False) -> tuple[bool, list[dict[str, Any]]] | tuple[bool, list[dict[str, Any]], str | None]:
+    try:
+        with _connect(database_url) as connection:
+            _validate_schema(connection)
+            if not _authorized_project(connection, project_id, issuer, subject):
+                return (False, [], None) if include_snapshot else (False, [])
+            clauses: list[str] = []
             params: list[Any] = [project_id, issuer, subject]
             if participant_id is not None:
-                filters.append("AND a.participant_id=%s")
+                clauses.append("AND a.participant_id=%s")
                 params.append(participant_id)
             if visit is not None:
-                filters.append("AND a.visit=%s")
+                clauses.append("AND a.visit=%s")
                 params.append(visit)
-            query = _base_query(" ".join(filters)) + """
+            where, values = _filters(filters or {})
+            params.extend(values)
+            base = _base_query(" ".join(clauses) + ' ' + where)
+            fingerprint = None
+            if include_snapshot:
+                entries = connection.execute('SELECT * FROM (' + base + ') scoped ORDER BY assessment_id LIMIT 5001', params).fetchall()
+                if len(entries) > 5000:
+                    raise FacetLimitError
+                fingerprint = hashlib.sha256(json.dumps(entries, sort_keys=True, default=str).encode()).hexdigest()
+                if snapshot is not None and snapshot != fingerprint:
+                    raise SnapshotConflict
+            query = base + """
                 ORDER BY COALESCE(wa.completed_at, a.imported_at::timestamptz), a.assessment_id
                 LIMIT %s OFFSET %s"""
             rows = connection.execute(query, (*params, limit, offset)).fetchall()
             if not rows:
-                return True, []
+                return (True, [], fingerprint) if include_snapshot else (True, [])
             ids = [row["assessment_id"] for row in rows]
             metrics = connection.execute(
                 """SELECT assessment_id, metric_code, metric_value
@@ -175,7 +236,7 @@ def list_assessments(database_url: str, project_id: UUID, issuer: str, subject: 
                 item.pop("assessment_date", None)
                 item.pop("import_status", None)
                 result.append(item)
-            return True, result
+            return (True, result, fingerprint) if include_snapshot else (True, result)
     except (SchemaError, PersistenceError):
         raise
     except psycopg.Error as exc:
@@ -308,4 +369,5 @@ def iso_utc(value: Any) -> str | None:
     return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
-__all__ = ["PersistenceError", "SchemaError", "list_assessments", "get_assessment", "iso_utc"]
+__all__ = ["PersistenceError", "SchemaError", "SnapshotConflict", "FacetLimitError",
+           "list_assessments", "assessment_options", "get_assessment", "iso_utc"]

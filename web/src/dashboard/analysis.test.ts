@@ -45,3 +45,9 @@ test('exibicao profissional preserva arredondamento Python em empates e metricas
   expect(formatMetric(-0.5125, 3)).toBe('-0,512')
   expect(formatMetric(null, 3)).toBe('—')
 })
+
+test('pseudonimos iguais em projetos diferentes contam participantes distintos', () => {
+  const first = { ...rows[0]!, project_id: 'SYNTHETIC_PROJECT_A', participant_id: 'P_SHARED' }
+  const second = { ...rows[1]!, project_id: 'SYNTHETIC_PROJECT_B', participant_id: 'P_SHARED' }
+  expect(summarize([first, second, { ...first, assessment_id: 'SYNTHETIC_REPEAT' }]).participants).toBe(2)
+})

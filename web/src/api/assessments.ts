@@ -20,7 +20,13 @@ export type Trial = { trial_number: number; condition_id: number | null; word: s
 export type AssessmentDetail = Assessment & { project_id: string; session_id: string | null;
   completed_at: string | null; metrics: Metric[]; frame_period_ms: number | null; trials: Trial[] };
 export type PageOptions = { cursor?: string; limit?: number; signal?: AbortSignal };
-export type AssessmentOptions = PageOptions & { participant_id?: string; visit?: string };
+export type AssessmentFacetOptions = { start_date?: string; end_date?: string; test_code?: string; signal?: AbortSignal };
+export type AssessmentOptions = PageOptions & AssessmentFacetOptions & {
+  participant_id?: string | readonly string[]; visit?: string | readonly string[];
+  evaluator_id?: readonly string[]; test_version?: readonly string[]; platform?: readonly ('web' | 'psychopy')[];
+};
+export type AssessmentFacets = { participant_id: string[]; visit: string[]; evaluator_id: string[];
+  test_version: string[]; platform: ('web' | 'psychopy')[]; test_code: string[] };
 
 const uuidPattern = /^[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/i;
 const labelPattern = /^[A-Za-z0-9_.-]{1,64}$/;
@@ -129,12 +135,48 @@ function assessmentPath(projectId: string, assessmentId?: string): string {
 export function listProjects(options: PageOptions = {}): Promise<Page<Project>> {
   return json(path('/api/v1/projects', query(options)), (x) => page(x, project), options.signal);
 }
+const filterPatterns = {
+  participant_id: /^[^\x00-\x1f\x7f]{1,512}$/, visit: /^[^\x00-\x1f\x7f]{1,512}$/,  evaluator_id: /^[A-Za-z0-9_-]{1,512}$/,
+  test_version: /^[A-Za-z0-9_.+-]{1,64}$/, platform: /^(?:web|psychopy)$/,
+};
+function civilDate(value: unknown): value is string {
+  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
+    && Number.isFinite(Date.parse(`${value}T00:00:00Z`))
+    && new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value;
+}
+function contextQuery(options: AssessmentFacetOptions, params = new URLSearchParams()): URLSearchParams {
+  for (const key of ['start_date', 'end_date'] as const) if (options[key] !== undefined) {
+    input(civilDate(options[key])); params.set(key, options[key]);
+  }
+  input(!options.start_date || !options.end_date || options.start_date <= options.end_date);
+  if (options.test_code !== undefined) { input(labelPattern.test(options.test_code)); params.set('test_code', options.test_code); }
+  return params;
+}
 export function listAssessments(projectId: string, options: AssessmentOptions = {}): Promise<Page<Assessment>> {
-  const params = query(options);
-  for (const key of ['participant_id', 'visit'] as const) if (options[key] !== undefined) {
-    input(labelPattern.test(options[key])); params.set(key, options[key]);
+  const params = contextQuery(options, query(options));
+  for (const key of Object.keys(filterPatterns) as (keyof typeof filterPatterns)[]) {
+    const value = options[key];
+    if (value === undefined) continue;
+    const values = typeof value === 'string' ? [value] : value;
+    input(Array.isArray(values) && values.length <= 100
+      && values.every(item => typeof item === 'string' && filterPatterns[key].test(item))
+      && new Set(values).size === values.length);
+    for (const item of values) params.append(key, item);
   }
   return json(path(assessmentPath(projectId), params), (x) => page(x, (item) => assessment(item)), options.signal);
+}
+export function getAssessmentOptions(projectId: string, options: AssessmentFacetOptions = {}): Promise<AssessmentFacets> {
+  return json(path(`${assessmentPath(projectId)}/options`, contextQuery(options)), x => {
+    if (!closed(x, 'participant_id visit evaluator_id test_version platform test_code')) return invalid();
+    for (const key of ['participant_id', 'visit', 'evaluator_id', 'test_version', 'platform', 'test_code'] as const) {
+      const values = x[key];
+      const pattern = key === 'test_code' ? labelPattern : filterPatterns[key];
+      if (!Array.isArray(values) || values.length > 200
+        || !values.every(value => typeof value === 'string' && pattern.test(value))
+        || new Set(values).size !== values.length) return invalid();
+    }
+    return x as AssessmentFacets;
+  }, options.signal);
 }
 export function getAssessment(projectId: string, assessmentId: string, signal?: AbortSignal): Promise<AssessmentDetail> {
   return json(assessmentPath(projectId, assessmentId) as ApiPath, (x) => detail(x, projectId, assessmentId), signal);

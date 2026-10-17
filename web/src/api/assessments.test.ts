@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { exportAssessment, getAssessment, listAssessments, listProjects } from './assessments';
+import { exportAssessment, getAssessment, getAssessmentOptions, listAssessments, listProjects } from './assessments';
 
 const projectId = '00000000-0000-4000-8000-000000000001';
 const project = { id: projectId, code: 'P_SINTETICO', name: 'Pesquisa sintética', active: true,
@@ -63,7 +63,7 @@ describe('consulta profissional paginada', () => {
   });
   it('recusa filtros/ids/limites invalidos antes da rede', async () => {
     for (const invoke of [() => listProjects({ limit: 101 }), () => listProjects({ cursor: '../x' }),
-      () => listAssessments('https://externo.invalid'), () => listAssessments(projectId, { participant_id: 'nome pessoa' }),
+      () => listAssessments('https://externo.invalid'), () => listAssessments(projectId, { participant_id: 'codigo\ncontrole' }),
       () => getAssessment(projectId, '../segredo'), () => exportAssessment(projectId, '..')]) {
       expect(invoke).toThrowError(expect.objectContaining({ code: 'invalid_request' }));
     }
@@ -122,3 +122,64 @@ describe('detalhe e CSV autenticados', () => {
     await expect(result).rejects.toMatchObject({ code: 'request_cancelled' });
   });
 });
+
+describe('filtros completos e facetas autorizadas W15A', () => {
+  const facets = { participant_id: ['P_SINTETICO'], visit: ['V1', 'V2'], evaluator_id: ['LEGADO_NAO_MAPEADO', 'avaliador_sintetico'],
+    test_version: ['1.0.0', '1.0.0+web'], platform: ['web', 'psychopy'], test_code: ['stroop_go_nogo_ptbr'] };
+  it('envia valores repetidos sem juntar delimitadores e contexto de datas inclusivas', async () => {
+    fetchMock.mockResolvedValue(json({ items: [], next_cursor: null }));
+    await listAssessments(projectId, { start_date: '2026-10-01', end_date: '2026-10-17',
+      participant_id: ['P_1', 'P_2'], visit: ['V1', 'V2'], evaluator_id: ['LEGADO_NAO_MAPEADO', 'avaliador_sintetico'],
+      test_version: ['1.0.0+web', 'legacy'], platform: ['web', 'psychopy'], test_code: 'stroop_go_nogo_ptbr' });
+    const url = new URL(String(fetchMock.mock.calls[0]?.[0]), 'https://synthetic.invalid');
+    expect(url.pathname).toBe(`/api/v1/projects/${projectId}/assessments`);
+    expect(url.searchParams.get('start_date')).toBe('2026-10-01'); expect(url.searchParams.get('end_date')).toBe('2026-10-17');
+    expect(url.searchParams.getAll('participant_id')).toEqual(['P_1', 'P_2']);
+    expect(url.searchParams.getAll('visit')).toEqual(['V1', 'V2']);
+    expect(url.searchParams.getAll('evaluator_id')).toEqual(['LEGADO_NAO_MAPEADO', 'avaliador_sintetico']);
+    expect(url.searchParams.getAll('test_version')).toEqual(['1.0.0+web', 'legacy']);
+    expect(url.searchParams.getAll('platform')).toEqual(['web', 'psychopy']);
+    expect(url.searchParams.getAll('test_code')).toEqual(['stroop_go_nogo_ptbr']);
+  });
+  it.each([
+    { start_date: '2026-02-30' }, { end_date: '2026-10-17T00:00:00Z' },
+    { start_date: '2026-10-18', end_date: '2026-10-17' }, { participant_id: ['P'.repeat(513)] },
+    { participant_id: ['P_1', 'P_1'] }, { visit: ['codigo\ncontrole'] }, { evaluator_id: ['../privado'] },
+    { test_version: ['v'.repeat(65)] }, { platform: ['externa'] }, { test_code: '../privado' },
+    { visit: Array.from({ length: 101 }, (_, i) => `V${i}`) },
+  ])('rejeita filtro invalido antes da rede %#', options => {
+    expect(() => listAssessments(projectId, options as Parameters<typeof listAssessments>[1]))
+      .toThrowError(expect.objectContaining({ code: 'invalid_request' }));
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+  it('consulta facetas do projeto com somente periodo/instrumento', async () => {
+    fetchMock.mockResolvedValue(json(facets));
+    await expect(getAssessmentOptions(projectId, { start_date: '2026-10-01', end_date: '2026-10-17', test_code: 'stroop_go_nogo_ptbr' }))
+      .resolves.toEqual(facets);
+    expect(fetchMock.mock.calls[0]?.[0]).toBe(`/api/v1/projects/${projectId}/assessments/options?start_date=2026-10-01&end_date=2026-10-17&test_code=stroop_go_nogo_ptbr`);
+  });
+  it.each([
+    { ...facets, participant_name: ['SINTETICO'] }, { ...facets, visit: ['V1', 'V1'] },
+    { ...facets, platform: ['externa'] }, { ...facets, evaluator_id: ['pessoa@example.invalid'] },
+    { ...facets, test_version: ['segredo\n'] }, { ...facets, test_code: [null] },
+    { ...facets, participant_id: Array.from({ length: 201 }, (_, i) => `P_${i}`) },
+    { ...facets, participant_id: null }, {},
+  ])('rejeita faceta fora do contrato fechado %#', body => {
+    fetchMock.mockResolvedValue(json(body));
+    return expect(getAssessmentOptions(projectId)).rejects.toMatchObject({ code: 'invalid_response' });
+  });
+  it('facetas vazias sao validas e cancelamento nao inicia requisicao', async () => {
+    const empty = { participant_id: [], visit: [], evaluator_id: [], test_version: [], platform: [], test_code: [] };
+    fetchMock.mockResolvedValue(json(empty)); await expect(getAssessmentOptions(projectId)).resolves.toEqual(empty);
+    const abort = new AbortController(); abort.abort(); fetchMock.mockClear();
+    await expect(getAssessmentOptions(projectId, { signal: abort.signal })).rejects.toMatchObject({ code: 'request_cancelled' });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+ it('consulta preserva identificadores historicos com espacos e vazio significa sem restricao', async () => {
+ fetchMock.mockResolvedValue(json({ items: [], next_cursor: null }));
+ await listAssessments(projectId, {participant_id: ['P sintetico legado'], visit: [], platform: []});
+ expect(String(fetchMock.mock.calls[0]?.[0])).toContain('participant_id=P+sintetico+legado');
+ expect(String(fetchMock.mock.calls[0]?.[0])).not.toContain('visit=');
+ });

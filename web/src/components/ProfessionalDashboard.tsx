@@ -1,22 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
-import type { FormEvent } from 'react'
 import type { ProfessionalProfile } from '../api/client'
 import { SessionInvitation } from './SessionInvitation'
+import { ResearchFilters } from './ResearchFilters'
+import type { ResearchQuery } from './ResearchFilters'
 import { ApiError, apiErrorMessage } from '../api/client'
 import { listProjects, listAssessments, getAssessment, exportAssessment } from '../api/assessments'
 import type { Assessment, AssessmentDetail, Project } from '../api/assessments'
 import { accuracyByVisit, countByDate, formatMetric as number, responseDistribution, summarize } from '../dashboard/analysis'
 
-type Filters = { participant_id: string; visit: string }
-const emptyFilters: Filters = { participant_id: '', visit: '' }
+const filterLabels: Record<string, string> = { start_date: 'Data inicial', end_date: 'Data final', participant_id: 'Participantes', visit: 'Visitas', evaluator_id: 'Avaliadores', test_version: 'Versões', platform: 'Plataformas', test_code: 'Instrumento' }
+type ScopedAssessment = Assessment & { project_id: string }
 
 export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfile }) {
   const [projects, setProjects] = useState<Project[]>([])
   const [project, setProject] = useState('')
   const [projectsLoading, setProjectsLoading] = useState(true)
-  const [draft, setDraft] = useState(emptyFilters)
-  const [filters, setFilters] = useState(emptyFilters)
-  const [rows, setRows] = useState<Assessment[]>([])
+  const [query, setQuery] = useState<ResearchQuery | null>(null)
+  const [rows, setRows] = useState<ScopedAssessment[]>([])
   const [loading, setLoading] = useState(false)
   const [loaded, setLoaded] = useState(0)
   const [error, setError] = useState<string | null>(null)
@@ -25,6 +25,7 @@ export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfil
   const [platform, setPlatform] = useState('')
   const [detail, setDetail] = useState<AssessmentDetail | null>(null)
   const [detailId, setDetailId] = useState('')
+  const [detailProject, setDetailProject] = useState('')
   const [detailError, setDetailError] = useState<string | null>(null)
   const [exporting, setExporting] = useState(false)
   const [downloadMessage, setDownloadMessage] = useState<string | null>(null)
@@ -60,54 +61,55 @@ export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfil
     setRows([]); setDetail(null); setDetailId(''); setDetailError(null); setDownloadMessage(null)
     setInstrument(''); setPlatform(''); setLoaded(0)
     downloadIO.current?.abort(); setExporting(false)
-    if (!project) { setLoading(false); return () => io.abort() }
+    const selected = query?.projects ?? (project ? [project] : [])
+    if (!selected.length) { setLoading(false); return () => io.abort() }
     setLoading(true); setError(null)
     void (async () => {
       try {
-        const items: Assessment[] = []
-        const cursors = new Set<string>(), ids = new Set<string>()
-        let cursor: string | undefined
-        do {
-          const page = await listAssessments(project, { participant_id: filters.participant_id || undefined,
-            visit: filters.visit || undefined, cursor, limit: 100, signal: io.signal })
-          for (const item of page.items) {
-            if (ids.has(item.assessment_id)) throw new ApiError('invalid_response', 200)
-            ids.add(item.assessment_id); items.push(item)
-          }
-          cursor = page.next_cursor ?? undefined
-          if (cursor && cursors.has(cursor)) throw new ApiError('invalid_response', 200)
-          if (cursor) cursors.add(cursor)
-          if (io.signal.aborted) return
-          setLoaded(items.length)
-        } while (cursor)
+        const items: ScopedAssessment[] = []
+        if (selected.length > 20) throw new ApiError('invalid_request', 422)
+        for (const projectId of selected) {
+          const cursors = new Set<string>(), ids = new Set<string>()
+          let cursor: string | undefined
+          do {
+            const page = await listAssessments(projectId, { ...query?.filters, cursor, limit: 100, signal: io.signal })
+            for (const item of page.items) {
+              if (ids.has(item.assessment_id)) throw new ApiError('invalid_response', 200)
+              ids.add(item.assessment_id); items.push({ ...item, project_id: projectId })
+              if (items.length > 5000) throw new ApiError('invalid_request', 422)
+            }
+            cursor = page.next_cursor ?? undefined
+            if (cursor && cursors.has(cursor)) throw new ApiError('invalid_response', 200)
+            if (cursor) cursors.add(cursor)
+            if (io.signal.aborted) return
+            setLoaded(items.length)
+          } while (cursor)
+        }
         if (!io.signal.aborted) setRows(items)
-      } catch (cause) { if (!io.signal.aborted) { setRows([]); setError(apiErrorMessage(cause)) } }
+      } catch (cause) { if (!io.signal.aborted) { setRows([]); setError(cause instanceof ApiError && cause.status === 422 ? 'A consulta não pôde ser concluída com estes filtros. Restrinja o período ou os projetos (até 5.000 avaliações); nenhum total parcial foi exibido.' : cause instanceof ApiError && cause.code === 'state_conflict' ? 'O conjunto mudou durante a consulta. Atualize para carregar todas as páginas novamente; nenhum total parcial foi exibido.' : apiErrorMessage(cause)) } }
       finally { if (!io.signal.aborted) setLoading(false) }
     })()
     return () => { io.abort(); downloadIO.current?.abort() }
-  }, [project, filters, revision])
+  }, [project, query, revision])
 
   useEffect(() => {
     const io = new AbortController()
     setDetail(null); setDetailError(null); setDownloadMessage(null)
     downloadIO.current?.abort(); setExporting(false)
-    if (detailId) void getAssessment(project, detailId, io.signal).then(value => {
+    if (detailId) void getAssessment(detailProject, detailId, io.signal).then(value => {
       if (!io.signal.aborted) setDetail(value)
     }, cause => { if (!io.signal.aborted) setDetailError(apiErrorMessage(cause)) })
     return () => io.abort()
-  }, [project, detailId])
+  }, [detailProject, detailId])
   useEffect(() => { if (detail) detailPanel.current?.focus() }, [detail])
   useEffect(() => () => downloadIO.current?.abort(), [])
 
-  function apply(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setFilters({ participant_id: draft.participant_id.trim(), visit: draft.visit.trim() })
-  }
   async function download() {
     if (!detail || exporting) return
     const io = new AbortController(); downloadIO.current = io
     setExporting(true); setDownloadMessage(null)
     try {
-      const result = await exportAssessment(project, detail.assessment_id, io.signal)
+      const result = await exportAssessment(detail.project_id, detail.assessment_id, io.signal)
       if (io.signal.aborted) return
       const url = URL.createObjectURL(result.blob)
       try {
@@ -133,15 +135,12 @@ export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfil
     {!projectsLoading && !projects.length && !error && <p role="status">Nenhum projeto disponível para sua conta.</p>}
     {projects.length > 0 && <>
       <label htmlFor="research-project">Projeto</label>
-      <select id="research-project" value={project} onChange={event => { if (event.target.value !== project) { setRows([]); setDetail(null); setProject(event.target.value) } }}>
+      <select id="research-project" value={project} onChange={event => { if (event.target.value !== project) { setRows([]); setDetail(null); setProject(event.target.value); setQuery(null) } }}>
         {projects.map(item => <option key={item.id} value={item.id}>{item.code} — {item.name}{item.active ? '' : ' (inativo)'}</option>)}
       </select>
-      {projects.find(item => item.id === project)?.active && profile.role !== 'consulta' && <SessionInvitation key={project} project={projects.find(item => item.id === project)!} profile={profile} />}
-      <form className="dashboard-filters" onSubmit={apply}>
-        <label>Participante (código)<input value={draft.participant_id} pattern="[A-Za-z0-9_.-]{1,64}" maxLength={64} onChange={event => setDraft({ ...draft, participant_id: event.target.value })} /></label>
-        <label>Visita<input value={draft.visit} pattern="[A-Za-z0-9_.-]{1,64}" maxLength={64} onChange={event => setDraft({ ...draft, visit: event.target.value })} /></label>
-        <button className="button primary" type="submit" disabled={loading}>Aplicar filtros</button>
-      </form>
+      {projects.find(item => item.id === project)?.active && profile.role !== 'consulta' && <SessionInvitation key={`invitation:${project}`} project={projects.find(item => item.id === project)!} profile={profile} />}
+      <ResearchFilters key={`filters:${project}`} projects={projects} initialProject={project} loading={loading} onApply={value => { setRows([]); setQuery(value) }} />
+      {query && <p className="quiet" role="status">Filtros aplicados: {query.projects.length} projeto(s); {Object.entries(query.filters).filter(([, value]) => Array.isArray(value) ? value.length : !!value).map(([key, value]) => `${filterLabels[key] ?? key}: ${Array.isArray(value) ? value.join(', ') : value}`).join(' · ') || 'sem restrições adicionais'}.</p>}
       {loading && <p role="status">Carregando avaliações… {loaded} recebidas.</p>}
       {!loading && !error && <>
         {!rows.length ? <p role="status">Nenhuma avaliação corresponde aos filtros.</p> : <>
@@ -165,10 +164,10 @@ export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfil
             <figure className="dashboard-chart"><figcaption>Precisão média por visita (%)</figcaption><ul>{accuracyByVisit(visible).map(([visit, accuracy]) => <li key={visit}><span>{visit}</span><meter min={0} max={100} value={accuracy} aria-label={`${visit}: ${number(accuracy, 1)}%`} /><strong>{number(accuracy, 1)}</strong></li>)}</ul></figure>
             <figure className="dashboard-chart"><figcaption>Distribuição dos tempos medianos por avaliação</figcaption><ul>{responseDistribution(visible).map(([range, count]) => <li key={range}><span>{range}</span><meter min={0} max={Math.max(1, visible.length)} value={count} aria-label={`${range}: ${count} avaliações`} /><strong>{count}</strong></li>)}</ul><p className="quiet">Avaliações sem acertos não possuem tempo mediano e ficam fora desta distribuição.</p></figure>
             <figure className="dashboard-chart"><figcaption>Erros no projeto filtrado</figcaption><ul>{([['Omissões', totals.omissions], ['Comissões', totals.commissions]] as const).map(([kind, count]) => <li key={kind}><span>{kind}</span><meter min={0} max={Math.max(1, totals.omissions, totals.commissions)} value={count} aria-label={`${kind}: ${count}`} /><strong>{count}</strong></li>)}</ul></figure>
-            {filters.participant_id && <div className="table-scroll"><table><caption>Evolução descritiva do participante por visita</caption><thead><tr><th>Visita</th><th>Início</th><th>Precisão (%)</th><th>RT mediano (s)</th></tr></thead><tbody>{[...visible].sort((a, b) => a.started_at.localeCompare(b.started_at)).map(row => <tr key={row.assessment_id}><td>{row.visit}</td><td>{row.started_at}</td><td>{'accuracy' in row.summary ? number(row.summary.accuracy, 1) : '—'}</td><td>{'response_time_seconds' in row.summary ? number(row.summary.response_time_seconds, 3) : '—'}</td></tr>)}</tbody></table></div>}
+            {query?.projects.length === 1 && query.filters.participant_id?.length === 1 && <div className="table-scroll"><table><caption>Evolução descritiva do participante por visita</caption><thead><tr><th>Visita</th><th>Início</th><th>Precisão (%)</th><th>RT mediano (s)</th></tr></thead><tbody>{[...visible].sort((a, b) => a.started_at.localeCompare(b.started_at)).map(row => <tr key={`${row.project_id}:${row.assessment_id}`}><td>{row.visit}</td><td>{row.started_at}</td><td>{'accuracy' in row.summary ? number(row.summary.accuracy, 1) : '—'}</td><td>{'response_time_seconds' in row.summary ? number(row.summary.response_time_seconds, 3) : '—'}</td></tr>)}</tbody></table></div>}
           </>}
-          <div className="table-scroll"><table><caption>Avaliações filtradas</caption><thead><tr><th>Participante</th><th>Visita</th><th>Início</th><th>Plataforma</th><th>Versão</th><th>Precisão</th><th>RT mediano (s)</th><th>Detalhe</th></tr></thead>
-            <tbody>{visible.map(row => <tr key={row.assessment_id}><td>{row.participant_id}</td><td>{row.visit}</td><td>{row.started_at}</td><td>{row.platform}</td><td>{row.test_version}</td><td>{'accuracy' in row.summary ? number(row.summary.accuracy, 1) : '—'}</td><td>{'response_time_seconds' in row.summary ? number(row.summary.response_time_seconds, 3) : '—'}</td><td><button className="button secondary" onClick={() => setDetailId(row.assessment_id)} aria-label={`Ver avaliação ${row.participant_id}, visita ${row.visit}`}>Ver</button></td></tr>)}</tbody>
+          <div className="table-scroll"><table><caption>Avaliações filtradas</caption><thead><tr><th>Projeto</th><th>Participante</th><th>Visita</th><th>Início</th><th>Plataforma</th><th>Versão</th><th>Precisão</th><th>RT mediano (s)</th><th>Detalhe</th></tr></thead>
+            <tbody>{visible.map(row => <tr key={`${row.project_id}:${row.assessment_id}`}><td>{projects.find(item => item.id === row.project_id)?.code}</td><td>{row.participant_id}</td><td>{row.visit}</td><td>{row.started_at}</td><td>{row.platform}</td><td>{row.test_version}</td><td>{'accuracy' in row.summary ? number(row.summary.accuracy, 1) : '—'}</td><td>{'response_time_seconds' in row.summary ? number(row.summary.response_time_seconds, 3) : '—'}</td><td><button className="button secondary" onClick={() => { setDetailProject(row.project_id); setDetailId(row.assessment_id) }} aria-label={`Ver avaliação ${row.participant_id}, visita ${row.visit}`} title={projects.find(item => item.id === row.project_id)?.code}>Ver</button></td></tr>)}</tbody>
           </table></div>
         </>}
       </>}

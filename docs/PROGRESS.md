@@ -3,25 +3,27 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
-## Atual — W13A validada tecnicamente; W15A em implementacao
+## Atual — W15A validada; proxima W15B
 
 - Retomada autonoma pelo arquivo anexado; branch prep-web. AGENTS.md raiz
-  preexistente preservado fora do escopo; nenhuma acao remota nesta retomada.
-- W13A implementada: SessionInvitation, sessions.ts/testes e integracao equipe.
-  CSRF RAM, perfil/projeto, campos/avaliador, revogacao, cancelamento/limpeza e
-  resultado desconhecido sem repetir POST. README/UX atualizados. Aceite do
-  operador pendente, sem declarar conclusao da etapa.
-- Evidencias W13A no registro:211 frontend,58 browser gerais e18 focados,
-  typecheck/build/npm ci/audit aprovados. HTTPS real:5/6 primeiro ensaio; falha
-  de reselecao de projeto corrigida e consulta revalidada2/2. Ambos percursos
-  completos60s/recibo/CSV aprovados. Screenshot sintetico inspecionado.
+  preexistente preservado fora dos commits. Nenhuma acao remota nesta retomada.
+- W13A salva em bff6982: cliente/formulario integrado de emissao/revogacao,
+  metadados/CSRF RAM e limpeza; validacao tecnica no registro. Aceite do operador
+  pendente, sem declarar etapa concluida. W16/homologacao/coleta real pendentes.
+- W15A validada: filtros combinados/periodo, facetas SELECT autorizadas e cursor
+  com fingerprint/409; interface ate20projetos/5000avaliacoes sem agregado parcial,
+  participantes por projeto+codigo e detalhe/CSV no projeto da linha. Contrato,
+  UX/README alinhados; captura sintetica form/cards inspecionada.
+- Evidencias:326Python/54,018s sem skips,236frontend, typecheck/build/pipcheck;
+  browser70gerais/1min+4temporais/3,5min; HTTPS2/2 com105avaliacoes/limites/
+  revogacao, regressao consultaW13A2/2. Viewport390/zoomdesktop200% aprovados.
+  Scanner sources e diff aprovados. Detalhes/falhas de fixture no registro.
 - PostgreSQL descartavel proprio stroop-w13a-test/32768, database
-  stroop_etapa4_test_w13a; nenhum container operacional alterado.
-- W15A independente em andamento: agentes backend/client implementam filtros
-  repetidos, periodo assessment_date inclusivo, facetas autorizadas e cursor
-  sensivel a mudancas no conjunto; principal integrara multisselecao/limites.
-- Proxima acao: salvar unidade W13A em commit isolado, integrar W15A e executar
-  validacoes completas. W16/homologacao e coleta real seguem pendentes.
+  stroop_etapa4_test_w13a; nenhum container operacional alterado. PortasHTTPS
+  liberadas. Containerbackend32769 criado/removido pelo agente.
+- Proxima acao: commit local W15A preservando AGENTS raiz; iniciar W15B:
+  ampliar summary profissional Go/No-Go, tabela/detalhe, comparacao de erros
+  e evolucao por identidade projeto+codigo; demo sintetica com visao propria.
 
 ## Historico — relatorio tecnico para leitores externos
 

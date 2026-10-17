@@ -27,7 +27,7 @@ nao o corpo HTTP. Estado e aceite ficam no [roadmap](../ROADMAP_WEB.md).
   no relogio monotono do navegador. Nao usar relogio civil, RTT ou duracao de
   requisicao para calcular RT.
 - Strings sao aparadas nas bordas antes da validacao; rejeitar vazias,
-  controles e quebras de linha. Codigo pseudonimizado e visita: 1–64 caracteres
+  controles e quebras de linha. Codigo pseudonimizado e visita no cadastro WEB: 1–64 caracteres
   ASCII de `[A-Za-z0-9_.-]`. Projeto: `code` com mesma regra (1–64), `name`
   de 1–120 caracteres. `app_version`: 1–64 caracteres ASCII de
   `[A-Za-z0-9_.+-]`, sem informacao pessoal. Limites contam caracteres.
@@ -111,9 +111,49 @@ Referencia: [resposta de autorizacao Google](https://developers.google.com/ident
 | `PUT /projects/{project_id}/members/{user_id}` | `{"active":true}`; 200 com `user_id`, `active`; ativa/desativa vinculo, idempotente | `administracao` + CSRF; usuario profissional deve existir |
 | `POST /projects/{project_id}/invitations` | Metadados abaixo; 201 com convite e codigo uma unica vez | `importacao`/`administracao`, projeto ativo e vinculo |
 | `POST /projects/{project_id}/invitations/{invitation_id}/revoke` | `{}`; 204; repeticao continua 204 | Mesmo requisito da criacao; convite e sessao ainda ativos sao invalidados |
-| `GET /projects/{project_id}/assessments` | Lista paginada de avaliacoes completas; filtro opcional `participant_id` e `visit`, ambos 1–64 | Qualquer perfil com vinculo, inclusive administracao |
+| `GET /projects/{project_id}/assessments` | Lista paginada completa, filtros combinados e limites descritos abaixo | Qualquer perfil com vinculo, inclusive administracao |
+| `GET /projects/{project_id}/assessments/options` | Facetas autorizadas por projeto, periodo e instrumento; sem nomes/iniciais | Qualquer perfil com vinculo ativo |
 | `GET /projects/{project_id}/assessments/{assessment_id}` | 200 com detalhe/metricas recalculadas e tentativas, no formato abaixo | Mesmo escopo da lista |
 | `GET /projects/{project_id}/assessments/{assessment_id}/export` | 200 `text/csv; charset=utf-8`, 21 colunas oficiais, 16 linhas principais | Mesmo escopo da lista; revalidar antes do download |
+
+### Filtros profissionais combinados (W15A)
+
+A listagem aceita `start_date` e `end_date` em YYYY-MM-DD, ambos inclusivos
+sobre `assessment_date`; inicio posterior ao fim e datas invalidas retornam422.
+A data WEB e o dia UTC do inicio; o legado conserva a data civil registrada,
+sem converter horarios sem fuso. `test_code` seleciona um instrumento por igualdade
+(1–64 caracteres ASCII de codigo). Estes parametros, `limit` e `cursor` sao unicos.
+
+`participant_id`, `visit`, `evaluator_id`, `test_version` e `platform` podem se
+repetir ate 100 vezes por campo. Valores do mesmo campo combinam por OU; campos
+diferentes combinam por E. Ausencia significa sem restricao. Codigos/visitas
+historicos de consulta aceitam 1–512 caracteres sem controles ou valor composto
+somente de espacos; nao altera a emissao WEB, que permanece 64 caracteres ASCII. Avaliador
+usa identificacao tecnica opaca de ate 512 caracteres ASCII seguros;
+`LEGADO_NAO_MAPEADO` seleciona ausencia de identidade tecnica sem divulgar o
+rotulo original. Versoes aceitam 1–64 caracteres ASCII de codigo, incluindo `+`; plataformas
+sao `web` e `psychopy`. Valores sao deduplicados/ordenados antes de vincular cursor.
+
+O cursor HMAC de avaliacoes e vinculado ao profissional, projeto e filtros
+canonicos e contem fingerprint dos metadados do conjunto autorizado. Cada pagina
+reautoriza o acesso numa transacao READ ONLY/REPEATABLE READ. Alteracao desse
+conjunto entre paginas retorna409 `state_conflict`, exigindo nova consulta
+integral. Tokens anteriores a este contrato nao sao reutilizaveis (422), sem
+alteracao do formato de resposta `items`/`next_cursor`. Limite de 100 por pagina e
+5.000 avaliacoes no conjunto de cada projeto; exceder retorna422, sem truncar.
+O navegador limita o agregado a20projetos/5.000 avaliacoes; falha em qualquer
+pagina/projeto descarta o agregado e pede recuperacao explicita. A consistencia
+e verificada por projeto, sem afirmar snapshot transacional entre projetos.
+Resultados concluidos nao sao alterados pela interface.
+
+`GET .../assessments/options` aceita somente os parametros unicos `start_date`,
+`end_date`, `test_code`. Responde objeto fechado com arrays de strings
+`participant_id`, `visit`, `evaluator_id`, `test_version`, `platform`, `test_code`.
+Opcoes sao distintas, ordenadas e autorizadas no contexto selecionado. Limite
+de 200 valores por faceta/projeto; excesso retorna422 e pede periodo/instrumento
+mais restrito, sem truncar silenciosamente. Nao le nomes/iniciais nem devolve
+rotulos de avaliadores legados. Facetas nao concedem autorizacao a resultados:
+listagem, detalhe e download reautorizam cada solicitacao.
 
 Admin conserva o poder administrativo global de projetos/vinculos; acesso a
 dados de pesquisa e convites exige vinculo inclusive para administradores.

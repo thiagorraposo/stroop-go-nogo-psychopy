@@ -27,7 +27,7 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W13 | Integracao anterior validada; fluxo completo de cadastro pela interface pendente em W13A |
 | W13A | Implementada e validada tecnicamente; aceite de operacao pelo responsavel pendente |
 | W15 | Painel inicial validado; paridade funcional com legado pendente em W15A–W15E |
-| W15A | Planejada; completar filtros combinados e consulta entre projetos autorizados |
+| W15A | Concluida tecnicamente em 2026-10-17; filtros/facetas, agregado completo limitado e HTTPS reais validados |
 | W15B | Planejada; completar tabela, detalhe, graficos e visoes por instrumento |
 | W15C | Planejada; exportar a visao filtrada em CSV agregado |
 | W15D | Planejada; administrar usuarios, projetos e vinculos pela interface |
@@ -633,7 +633,8 @@ Fontes WEB: [painel atual](../web/src/components/ProfessionalDashboard.tsx),
 
 ### W15A — Filtros completos e conjunto autorizado coerente
 
-- **Estado/objetivo:** planejada; completar filtros do dashboard mantendo a
+- **Estado/objetivo:** concluida tecnicamente em 2026-10-17, com evidencias no
+  registro; filtros do dashboard preservam a
   autorizacao por projeto, com W14/W15 anteriores como base.
 - **Entregaveis:** periodo, projetos, participantes, visitas, avaliadores
   tecnicos, versoes, instrumento unico e plataforma; opcoes a partir de dados

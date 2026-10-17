@@ -10,6 +10,8 @@ from stroop.persistence.auth import PersistenceError
 from stroop.persistence.web_sessions import MissingError
 
 SchemaError = persistence.SchemaError
+SnapshotConflict = persistence.SnapshotConflict
+FacetLimitError = persistence.FacetLimitError
 
 
 def _base(item: dict) -> dict:
@@ -32,6 +34,22 @@ def assessments(database_url: str, project_id: UUID, actor: AppUser,
     if not allowed:
         raise MissingError
     return [_base(item) for item in items]
+
+
+def assessments_page(database_url, project_id, actor, *, filters, limit, offset, snapshot=None):
+    allowed, items, fingerprint = persistence.list_assessments(
+        database_url, project_id, actor.issuer, actor.subject, filters=filters,
+        limit=limit, offset=offset, snapshot=snapshot, include_snapshot=True)
+    if not allowed:
+        raise MissingError
+    return [_base(item) for item in items], fingerprint
+
+
+def options(database_url, project_id, actor, *, filters):
+    allowed, result = persistence.assessment_options(database_url, project_id, actor.issuer, actor.subject, filters=filters)
+    if not allowed:
+        raise MissingError
+    return result
 
 
 def _record(database_url: str, project_id: UUID, assessment_id: str, actor: AppUser) -> dict:
