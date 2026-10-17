@@ -20,7 +20,7 @@ GITLEAKS_IMAGE = 'ghcr.io/gitleaks/gitleaks:v8.30.1'
 PIP_AUDIT_VERSION = '2.10.1'
 SOURCE_SUFFIXES = {'.py', '.ts', '.tsx', '.js', '.mjs', '.json', '.toml', '.yml', '.yaml',
                    '.sql', '.md', '.txt', '.lock', '.sh', '.bat', '.csv', '.psyexp', '.html', '.css',
-                   '.conf', '.ini', '.cfg', '.svg', '.http'}
+                   '.conf', '.ini', '.cfg', '.svg', '.http', '.template', '.example', '.dockerignore'}
 SOURCE_NAMES = {'Dockerfile', 'Makefile', '.dockerignore', '.gitignore'}
 FORBIDDEN_KEY_SUFFIXES = {'.key', '.pem', '.p12', '.pfx'}
 EXCLUDED_ROOTS = {'data', 'database', '.git', 'production-secrets', 'node_modules', '.venv', 'venv'}

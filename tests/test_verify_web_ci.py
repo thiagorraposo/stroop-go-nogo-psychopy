@@ -27,11 +27,13 @@ class WebCIRunnerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             subprocess.run(['git', 'init', '--quiet'], cwd=root, check=True)
-            for name in ('source.py', 'Dockerfile', 'data/tracked.csv', 'database/tracked.sqlite', '.env.example'):
+            sources = ('source.py', 'Dockerfile', 'Dockerfile.api', 'Dockerfile.web.dockerignore',
+                       'web/deploy/nginx.conf.template', 'deploy/web.env.example', '.env.example')
+            for name in (*sources, 'data/tracked.csv', 'database/tracked.sqlite'):
                 path = root / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_text('SINTETICO')
             subprocess.run(['git', 'add', '.'], cwd=root, check=True)
             (root / 'untracked.py').write_text('SINTETICO')
-            self.assertEqual(set(ci.tracked_sources(root)), {Path('source.py'), Path('Dockerfile'), Path('.env.example')})
+            self.assertEqual(set(ci.tracked_sources(root)), {Path(name) for name in sources})
 
     def test_env_operacional_versionado_bloqueia_antes_de_abrir(self):
         result = SimpleNamespace(returncode=0, stdout=b'source.py\0.env\0')
