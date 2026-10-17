@@ -42,6 +42,31 @@ profissional nao e evidencia temporal do experimento.
 
 ## Procedimento de piloto de referencia
 
+### Proposta de configuracao — aguardando aprovacao
+
+Proposta solicitada pelo responsavel para decidir o pacote sem escolher cada
+parametro separadamente. Sao alvos de ensaio, nao equipamentos existentes
+confirmados nem resultados medidos. Nao altera D1/D5 nem concede aceite W16.
+
+| Item | Proposta |
+|---|---|
+| Equipamento | Computador fisico desktop/notebook, CPU com pelo menos quatro processadores logicos, 8 GB de RAM; registrar modelo/CPU/GPU reais antes do ensaio. Esta configuracao de referencia nao constitui requisito minimo comprovado para participantes |
+| Sistemas | Windows 11 e Linux Mint 22.2; equipamento por sistema identificado, preservando o mesmo monitor/teclado quando possivel |
+| Navegadores | Chrome, Edge e Firefox estaveis instalados no inicio da campanha, com versoes exatas registradas; atualizar durante a campanha exige nova identificacao e repeticao do ambiente afetado |
+| Monitor | Uma tela ativa, 1920x1080 a 60 Hz fixos, sem VRR; zoom do navegador 100%, escala do sistema 100%, notebook conectado a energia e economia de energia desativada |
+| Teclado | Teclado fisico USB com fio, Espaco como resposta; registrar modelo e conexao |
+| Replicas | Dez sessoes independentes por combinacao sistema/navegador: seis combinacoes, 60 sessoes; treino e bloco principal completos, somente dados sinteticos |
+| Criterios | Aplicar D5 sem alterar tolerancias: ate um quadro medido por transicao e ate 100 ms de desvio do bloco de 60 s; preservar tambem replicas invalidas e investigar falhas antes de homologar a combinacao |
+| Evidencias e alcance | Artefatos brutos planejados/observados e relatorio por replica, testes de interrupcao separados; homologacao de engenharia por software, sem alegar equivalencia temporal/psicometrica com PsychoPy |
+
+Aprovacao autoriza preparar e executar o plano com recursos disponiveis; nao
+substitui acesso ao Windows, monitor/teclado fisicos ou realizacao dos pilotos.
+O Codex prepara instrumentacao, automacao e analise; o responsavel disponibiliza
+os equipamentos e executa os passos presenciais que nao puderem ser automatizados.
+Equipamento indisponivel continua pendente, sem substituicao silenciosa por VM,
+emulacao ou navegador headless. Equivalencia fisica, se exigida pelo estudo,
+requer protocolo comparativo e instrumentacao separados conforme D5.
+
 1. Usar somente participantes/codigos inequivocamente sinteticos, ambiente
    isolado e versao de aplicativo identificada por commit. Registrar SO,
    navegador/versao, monitor/modelo/resolucao/60 Hz e teclado/modelo/conexao,
