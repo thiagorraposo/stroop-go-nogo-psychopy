@@ -60,8 +60,10 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   WEB/credenciais autenticada em web-config-20261017T011949Z.tar.enc; chavesseparadas.
 - Rollback reforcado: confirma HTTPS do legado e reinicia proxyWEB se falhar;
   dois testes de controle de falha aprovados, sem trocar trafego real novamente.
-- Proxima acao: conferir docs/secretsscan e commit operacional isolado, receber
-  confirmacao Googlepessoal e destino de replica externa automatica. Nao afirmar
+- Commit operacional d6f49a0 concluido; links90, scanner281 e sintaxe shell
+  aprovados. Somente AGENTS raiz preexistente permanece alterado; sem push.
+- Proxima acao: receber confirmacao Googlepessoal e destino de replica externa
+  automatica; corrigir qualquer falha relatada. Nao afirmar
   validacao pessoal sem resposta. Publicacao tecnica e fluxos sinteticos feitos;
   W16/W21 permanecem pendentes. Preservar previa local34647/4173 e AGENTS raiz
   preexistente. TunelSSH19443 encerrado apos cutover.
