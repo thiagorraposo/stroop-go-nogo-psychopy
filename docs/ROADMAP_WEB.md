@@ -20,6 +20,7 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W07 | Concluida em 2026-10-16; ciclo de sessao, autorizacao, limites e migrations validados |
 | W08 | Concluida em 2026-10-16; conclusao atomica, protocolo/tempos, recalculo e replay validados em 240 testes |
 | W09 | Concluida em 2026-10-16; React/TypeScript, cliente HTTP, 36 testes DOM/logica e 10 browser aprovados |
+| W09A | Planejada; refinamento pontual de abertura, tutorial e encerramento, preservando identidade visual e protocolo |
 | W10 | Concluida em 2026-10-16; pratica jsPsych, 77 testes logica/DOM, 18 browser e regressao Python 240 aprovados |
 | W11 | Concluida em 2026-10-16; motor jsPsych, 120 testes logica/DOM e 24 browser aprovados |
 | W12 | Concluida em 2026-10-16; resumo, CSV de 21 campos, paridade Python/TypeScript e importacao real validados |
@@ -42,7 +43,8 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W22 | Publicada na VPS por delegacao explicita, somente testes sinteticos; confirmacao Google pessoal pendente |
 
 As evidencias anteriores de W00–W15 e W17–W20 permanecem validas para os escopos
-testados; W13A e W15A–W15E impedem considerar completos o cadastro, o dashboard
+testados; W09A planeja a experiencia revisada do participante e permanece
+pendente de implementacao/aceite visual. W13A e W15A–W15E impedem considerar completos o cadastro, o dashboard
 e a substituicao funcional do legado pelo navegador. W13A e a proxima prioridade
 de implementacao, seguida dos complementos W15 conforme dependencias, antes
 do aceite funcional W21/W22. Por instrucao mais recente, esta unidade se limita
@@ -309,6 +311,108 @@ Dependencias da fase: W01–W03; integrar ao backend somente em W13.
   segredos ficam no servidor; motor nao depende de renderizacoes React por frame.
 - **Validacoes:** TypeScript, testes, build e navegadores suportados.
 - **Leitura:** contratos web, ADR-001 e `experimento/COPY_DAS_TELAS.md`.
+
+### W09A — Refinamento da experiencia do participante sem troca de identidade
+
+- **Estado:** planejada, nao implementada. Solicitacao atual exclusivamente
+  documental: registrar a proposta neste roadmap, sem alterar frontend, outros
+  documentos de UX/copy, imagens, dependencias, protocolo ou publicacao.
+- **Objetivo:** tornar abertura, orientacoes e encerramento mais claros e
+  contemporaneos com mudancas pontuais de composicao e texto. Preservar o
+  trabalho visual existente; nao redesenhar todo o produto ou copiar o legado.
+- **Referencias examinadas:**15capturas locais em `../telas ref/`, relativas
+  a raiz do repositorio, datadas de2026-07-05. Abertura/instrucoes:11-16-10;
+  introducao pratica:11-32-51; feedback:11-34-13/11-36-34;
+  transicao:11-35-28/11-35-58; resultados:11-38-27. As demais capturas mostram
+  exemplos/tentativas e uma coleta demografica. Os arquivos estao fora do
+  repositorio e nao serao copiados para assets/bundle nem exigidos em CI.
+  Os horarios acima identificam os nomes `Captura de tela de 2026-07-05 HH-MM-SS.png`.
+- **Comparacao com a WEB atual:** [abertura/instrucoes](../web/src/App.tsx)
+  ja possuem cards, exemplos e identidade propria;
+  [preparacao](../web/src/components/PracticePreparation.tsx) ja verifica teclado,
+  permite repetir pratica e controla acesso ao principal;
+  [resumo](../web/src/components/ResultSummary.tsx) ja mostra metricas, estados de
+  envio e finalizacao. A proposta melhora hierarquia, orientacao e acabamento
+  desses componentes, preservando seus controles e estados reais.
+- **Direcao escolhida:** aproveitar das referencias a clareza de uma acao
+  principal por tela, a separacao entre explicacao e exemplo, os passos curtos,
+  a transicao explicita entre pratica/principal e o destaque do resumo final.
+  Adaptar esses principios a composicoes originais do projeto. Nao reproduzir
+  marca, telas, fundos, textos ou assets da referencia. Seus tempos, mensagens
+  de pontuacao, coleta de idade/sexo e alegacoes clinicas nao definem requisitos
+  deste experimento.
+- **Identidade preservada:** fundo escuro atual, superficies claras dos cards,
+  marca/simbolo existentes, tipografia de sistema, cores de destaque atuais,
+  botoes e linguagem visual de bordas/espacamentos. Reaproveitar os estilos
+  existentes, refinando proporcao, agrupamento e hierarquia; sem novo tema,
+  biblioteca visual, fonte externa, imagens decorativas ou rebranding.
+- **Escopo de telas e proposta editorial:** textos abaixo sao propostas para
+  implementacao futura, nao copy ja aplicada nem alteracao metodologica.
+
+  | Tela/momento | Mudanca planejada | Direcao de texto/acao |
+  |---|---|---|
+  | Inicio | Abertura mais compacta, titulo atual preservado, exemplo visual proprio ao lado e uma acao dominante; reduzir repeticao entre card principal e guia lateral | Apresentar atividade com palavras/cores; botao `Iniciar tutorial`; informar teclado fisico e que o bloco principal dura cerca de1minuto, sem prometer duracao total incluindo pratica |
+  | Tutorial | Organizar orientacoes em passos curtos: observar, responder quando coincidir e aguardar quando diferir; exemplos Go/No-Go visiveis com labels e tecla ilustrada | `Quando a palavra e a cor das letras forem iguais, pressione Espaco.` / `Quando forem diferentes, aguarde sem pressionar.`; acao final `Ir para a pratica` |
+  | Acesso por convite | Integrar visualmente o formulario ao percurso, explicando sua finalidade sem pedir metadados novamente | `Informe o convite enviado pela equipe para iniciar esta sessao.`; preservar validacao de uso unico e mensagens fechadas |
+  | Preparacao/pratica | Agrupar verificacao de teclado/foco, instrucao e botao; mostrar passos da preparacao sem competir com a tarefa | `Primeiro, vamos praticar.`; explicar quatro tentativas e feedback; manter verificacao real de pressionar/soltar Espaco |
+  | Pratica concluida | Cartao de transicao claro, com inicio do principal em destaque e repeticao como alternativa secundaria | `Pratica concluida. Quando estiver pronto, comece a tarefa.`; `Comecar tarefa` / `Repetir pratica`; explicitar ausencia de feedback por tentativa no principal |
+  | Resultado recebido | Destaque de conclusao/recebimento, resumo com hierarquia clara, precisao e RT com unidades, contagens em segundo plano visual | `Tarefa concluida. Obrigado por participar.` e, somente com recibo, `Seu resultado foi recebido pela equipe.`; preservar todas as metricas descritivas e explicacao da mediana |
+  | Envio em andamento ou pendente | Separar conclusao das tentativas de confirmacao do servidor; mensagem e acao adequadas ao estado | `Enviando resultado…` / `O recebimento ainda nao foi confirmado.`; manter reenvio seguro e saida sem confirmacao explicitamente identificada |
+  | Acesso encerrado | Confirmacao curta apos concluir a limpeza/encerramento real da sessao, sem reconduzir imediatamente a uma nova coleta | `Participacao encerrada. Voce pode fechar esta pagina.`; nova participacao permanece acao secundaria e requer outro convite |
+
+- **Navegacao:** indicar orientacoes, pratica e tarefa nas telas preparatorias,
+  sem acrescentar HUD/progresso novo durante tentativas. Uma acao primaria por
+  estado, voltar/repetir quando permitido e foco previsivel por teclado.
+  Tutorial pode repartir texto em passos navegaveis, mas exemplos instrucionais
+  permanecem estaticos, sem introduzir novas tentativas, treino adaptativo ou
+  novo criterio de aprovacao. Evitar modais sobrepostos quando um painel de
+  pagina resolver a transicao. Nao acrescentar sons, confete ou animacoes na
+  tarefa. Nao iniciar experimento automaticamente ao avancar orientacoes.
+- **Dependencias:** W09/W10/W12/W13 ja implementadas como base. Coordenar
+  acessos/rotulos com W13A sem duplicar cadastro da sessao no participante;
+  W15A–W15E continuam escopos separados de dashboard. Pode ser preparada
+  independentemente desses complementos; integrar antes do aceite W21/W22.
+- **Entregaveis futuros:** inventario dos estados afetados, especificacao curta
+  de layout/copy e comparativos antes/depois com dados sinteticos; componentes
+  React/CSS refinados apenas nas telas escolhidas; atualizacao posterior de
+  [UX](experimento/UX_DECISIONS.md) e
+  [copy](experimento/COPY_DAS_TELAS.md) com secao WEB explicita, sem sobrescrever
+  o historico PsychoPy nem reutilizar frase de gravacao local para coleta WEB.
+  Preservar links/rotas e controles existentes, salvo ajuste pontual justificado.
+- **Criterios de aceite:**
+  1. Identidade atual reconhecivel em comparativo antes/depois; mudancas
+     concentradas na abertura, tutorial, preparacao/transicao e encerramento.
+     Dashboard/cadastro recebem apenas coerencia de componentes compartilhados,
+     sem reformulacao ampla incidental.
+  2. Texto curto, portugues consistente, exemplos inequivocos e uma proxima
+     acao visivel em cada estado; nenhuma promessa normativa/clinica ou de
+     medicao de habilidades que nao tenha sido aprovada. O resumo permanece
+     descritivo, sem ranking, score proprietario ou incentivo a repetir para
+     melhorar resultado. Indicador visual de precisao, se usado, acompanha
+     numero/rotulo; nao substitui metricas nem sugere faixa de normalidade.
+  3. Motor, ordem/regras, condicoes, dez cores dos estimulos, tempos, feedback,
+     HUD, tratamento de foco/Escape, numero de tentativas e CSV inalterados.
+     Nao importar tempo de3segundos/2minutos ou feedback manual das referencias.
+     Mensagens dos feedbacks cronometrados permanecem fora desta correcao.
+  4. Sem atalho de navegacao vazando resposta para a primeira tentativa;
+     preservar soltura de tecla, verificacao de teclado/foco e fluxo de start.
+     Nao rotular ambiente como homologado enquanto W16 estiver pendente.
+  5. Sucesso de envio somente apos recibo; permitir reenvio apenas conforme
+     contrato; finalizar nao mascara envio pendente, erro de logout ou falha
+     de limpeza. A nova confirmacao de encerramento so aparece apos sucesso
+     real; acesso a novo convite nao reaproveita sessao anterior.
+  6. Layout legivel em desktop/notebook, zoom e navegacao por teclado; labels,
+     contraste, foco e mensagens acessiveis, sem depender apenas de cor.
+     Responsividade da navegacao nao amplia ambientes liberados para a tarefa.
+- **Validacoes futuras:** revisao de textos contra protocolo/copy, testes DOM
+  dos estados e acoes, TypeScript/build, Playwright dos percursos mouse/teclado,
+  foco/tecla mantida, repetir pratica, erros e encerramento. Regressao do motor,
+  resumo/metricas, ausencia de persistencia local e envio/recibo em HTTPS real
+  sintetico. Registrar comparativos visuais originais para revisao do responsavel.
+  Mudancas visuais nao concedem W16; pilotos devem usar a versao final relevante.
+- **Conclusao:** somente apos implementacao, evidencias de regressao e aceite
+  visual do responsavel. Nesta solicitacao apenas a ficha/estado do roadmap sao
+  alterados; nao gerar mockups, modificar frontend, executar piloto ou publicar.
 
 ### W10 — Preparacao e pratica
 
@@ -767,7 +871,7 @@ Dependencias da fase: evidencias funcionais, temporais, de seguranca e operacao.
 - **Objetivo:** validar o pacote completo no ambiente de homologacao autorizado.
 - **Entregaveis:** relatorio de aceite, limite de concorrencia medido, roteiro
   operacional e lista fechada de pendencias; dados sempre sinteticos.
-- **Dependencias:** W13A, W15A–W15E, W16, W17, W18, W20.
+- **Dependencias:** W09A, W13A, W15A–W15E, W16, W17, W18, W20.
 - **Conclusao:** fluxos por perfil, protocolo e recuperacao aprovados;
   capacidade e limites medidos no ambiente alvo, sem estimativas como evidencia.
 - **Validacoes:** ponta a ponta, carga controlada fora do motor experimental,
@@ -781,7 +885,7 @@ a substituicao da aplicacao na VPS existente, mantendo dominio e infraestrutura.
 Publicacao exclusivamente sintetica permitida antes do aceite W16/W21; isso
 nao conclui essas etapas. Evidencias e manutencao em
 [DEPLOY_WEB_VPS](operacao/DEPLOY_WEB_VPS.md); confirmacao Google pessoal solicitada.
-O aceite funcional da interface publicada tambem depende de W13A e W15A–W15E;
+O aceite da interface publicada tambem depende de W09A, W13A e W15A–W15E;
 a publicacao ja realizada nao comprova cadastro de sessao, dashboard completo
 ou substituicao das areas operacionais do legado pelo navegador.
 
