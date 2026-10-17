@@ -6,6 +6,18 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — Correcao de compatibilidade do retorno Google em producao
+
+- Relato de invalid_oidc_state reproduzido: callback rejeitava metadados
+  adicionais Google antes de conferir state. Allowlist conhecida ampliada,
+  validacao do emissor quando presente e protecoes anteriores preservadas.
+- 322 testes Python aprovados, incluindo callback legado com metadados,
+  sessao profissional e rejeicao de replay/parametros invalidos.
+- Fonte26fa9bf publicada na VPS com backup previo e retorno preparado;
+  somente API atualizada, sem migration. HTTPS readiness200, monitor0 e tres
+  servicos saudaveis. Smoke sintetico publico aceita metadados, nega codigo
+  invalido/replay e nao cria sessao. Confirmacao pessoal continua pendente.
+
 ## 2026-10-16 — Publicacao WEB explicitamente delegada na VPS
 
 - Responsavel autorizou substituir o site mantendo dominio/TLS/OIDC e dados.

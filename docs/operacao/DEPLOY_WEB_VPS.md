@@ -13,7 +13,7 @@ para coleta real. Estado e pendencias no [roadmap](../ROADMAP_WEB.md).
 | SSH | `raposo@108.174.145.177`, porta22022, chave local; IP do dominio e hostkey conhecida conferidos |
 | Host | Ubuntu22.04.5 LTS, x86_64, 2vCPU, aproximadamente4GBRAM |
 | Runtime | `/home/raposo/stroop-web` |
-| Release | `current` aponta para `releases/aa6c844`; fonte/manifesto sem dados ou secrets |
+| Release | `current` aponta para `releases/26fa9bf`; fonte/manifesto sem dados ou secrets |
 | Configuracao | `web.env` externo0600 e `compose.vps.yaml`; projeto Compose `stroop-web` |
 | Secrets | `/home/raposo/.local/share/stroop-web/secrets`, diretorio0700, arquivos0600 por UID especifico |
 | Portas | Somente proxy:80/443; API8000 e PostgreSQL5432 sem publicacao |
@@ -27,8 +27,8 @@ foi impressa ou incorporada ao repositorio/imagens.
 
 Imagens transferidas prontas, sem compilar sobre dados/configuracoes da VPS:
 
-- API `stroop-web-api:deploy-20261017`, ID
-  `sha256:40c71ee1922d1df18ad024ca641d80b9a58af58ed656a69d2e25996d0a189a33`.
+- API `stroop-web-api:fix-oidc-20261017`, ID
+  `sha256:b78bc442321e53691affb24a401bc3204f2e3004eb5139da23b9f9f18e868f2b`.
 - Proxy `stroop-web-proxy:deploy-20261017`, ID
   `sha256:51b05c773eccd163c171a9b1f64a8ad2a0020a2a2b312555cac34862bed1277f`.
 
@@ -58,6 +58,16 @@ a operacao levou6,444s. O procedimento tinha retorno automatico ao proxy antigo
 se falhasse a prontidao. Nao se restaurou backup sobre novas coletas.
 
 ## Operacao e manutencao
+
+Correcao26fa9bf publicada apos relato de `invalid_oidc_state`: o callback aceita
+metadados Google conhecidos sem usa-los para autorizar. Regressao322/322 e
+smoke sintetico HTTPS aprovados; login pessoal aguarda nova tentativa.
+Atualizou-se somente a API, com backup previo e sem migration. A imagem anterior
+`stroop-web-api:deploy-20261017`, releaseaa6c844 e `web.env.pre-oidc-fix` foram
+preservados. Para reverter apenas essa correcao, restaure o arquivo de ambiente
+protegido, aponte current para aa6c844 e execute o Compose abaixo com
+`up -d --no-deps --no-build --wait web-api`, conferindo `/health/ready` em seguida.
+Nao execute o rollback legado completo para reverter somente esta correcao.
 
 Na VPS, inspecione sem carregar `.env` por descoberta:
 

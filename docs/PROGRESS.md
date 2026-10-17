@@ -3,7 +3,28 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
-## Atual — deploy delegado explicitamente pelo usuario
+## Atual — correcao do callback Google apos relato de falha
+
+- Usuario encontrou `invalid_oidc_state` no login pessoal. Reproduzido no
+  dominio publico com cookie/state validos e metadados Google sinteticos:
+  a allowlist exigia apenas code/state e rejeitava scope/authuser/prompt/iss.
+- Commit26fa9bf aceita metadados conhecidos; iss opcional exige o emissor Google
+  exato. Duplicados/desconhecidos, code+error, state divergente, expiracao e
+  reutilizacao continuam rejeitados. Identidade vem somente do ID token validado.
+- Regressao: 322 testes Python aprovados em48,161s, com PostgreSQL sintetico;
+  teste novo cobre callback legado com metadados, sessao/me e replay.
+- Backup criptografado executado antes da troca. Runtime current agora aponta
+  releases/26fa9bf; API stroop-web-api:fix-oidc-20261017, imagem b78bc442321e...
+  API anterior e web.env.pre-oidc-fix preservados para retorno. Sem migrations,
+  alteracao de dados, proxy ou credenciais. Todos os servicos saudaveis.
+- Smoke HTTPS publico apos a troca: metadados aceitos; codigo deliberadamente
+  invalido alcanca troca Google e falha fechado; replay rejeitado e nenhuma
+  sessao criada. Readiness200, monitor0. Isso nao comprova login pessoal.
+- Proxima acao: usuario iniciar novo login em /equipe e confirmar acesso.
+  Replica externa automatica e homologacoes W16/W21 continuam pendentes.
+  Somente AGENTS raiz preexistente permanece fora dos commits desta correcao.
+
+## Historico — deploy delegado explicitamente pelo usuario
 
 - Usuario autorizou substituir a aplicacao publicada na VPS, preservar dados/
   credenciais, realizar backups e agir autonomamente. Essa instrucao substitui
