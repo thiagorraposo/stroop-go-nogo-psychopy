@@ -34,7 +34,7 @@ test('CSP real preserva estilo dinamico do motor sem permissoes inline', async (
     await redeem(page, issued.code)
     await finishPractice(page)
     expect(await page.evaluate(() => (window as unknown as { __synthetic_policy_violations: string[] }).__synthetic_policy_violations)).toEqual([])
-    await page.getByRole('button', { name: 'Começar bloco principal' }).click()
+    await page.getByRole('button', { name: 'Começar tarefa' }).click()
     await expect(page.locator('[data-phase="stimulus"]')).toBeVisible({ timeout: 8_000 })
     await page.keyboard.press('Escape')
     await expect(page.getByRole('alert')).toContainText('A execução foi interrompida')

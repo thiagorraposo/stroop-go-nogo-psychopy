@@ -4,6 +4,7 @@ import type { FormEvent } from 'react'
 import { ParticipantRun } from '../participant/ParticipantRun'
 import { PracticePreparation } from './PracticePreparation'
 import { ResultSummaryPanel } from './ResultSummary'
+import { JourneyIndicator } from './JourneyIndicator'
 
 // Coordena montagens consecutivas/StrictMode na mesma pagina. A trava nativa
 // coordena abas diferentes sem gravar credenciais ou resultados em storage.
@@ -15,6 +16,7 @@ export function ParticipantFlow({ onBack }: { onBack: () => void }) {
   const [revision, setRevision] = useState(0)
   const [code, setCode] = useState('')
   const [codeError, setCodeError] = useState<string | null>(null)
+  const [closed, setClosed] = useState(false)
   const panel = useRef<HTMLElement>(null)
   const codeInput = useRef<HTMLInputElement>(null)
 
@@ -59,8 +61,8 @@ export function ParticipantFlow({ onBack }: { onBack: () => void }) {
   const busy = view.phase === 'invite' && view.busy
   useEffect(() => {
     if (view.phase === 'invite' && !busy) codeInput.current?.focus({ preventScroll: true })
-    else if (view.phase !== 'preparing' && view.phase !== 'result') panel.current?.focus({ preventScroll: true })
-  }, [view.phase, busy])
+    else if (closed || view.phase !== 'preparing' && view.phase !== 'result') panel.current?.focus({ preventScroll: true })
+  }, [view.phase, busy, closed])
 
   function redeem(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -72,9 +74,18 @@ export function ParticipantFlow({ onBack }: { onBack: () => void }) {
   async function finish(leave: boolean) {
     if (await run.finish()) {
       setCode(''); setCodeError(null)
-      if (leave) onBack()
+      if (leave) setClosed(true)
     }
   }
+
+  if (closed) return <section className="content-card closing-card" ref={panel} tabIndex={-1} aria-labelledby="closed-title">
+    <JourneyIndicator current={4} />
+    <p className="eyebrow">Acesso encerrado</p>
+    <h1 id="closed-title">Participação encerrada.</h1>
+    <p className="lead">O acesso desta sessão foi finalizado. Você pode fechar esta página.</p>
+    <button className="button primary" onClick={onBack}>Voltar às orientações</button>{' '}
+    <button className="button secondary" onClick={() => setClosed(false)}>Usar outro convite</button>
+  </section>
 
   if (view.phase === 'preparing') return <PracticePreparation key={view.session.session_id}
     onBack={onBack} mainOrder={view.session.main_conditions} onMainStart={() => run.start()}
@@ -84,6 +95,7 @@ export function ParticipantFlow({ onBack }: { onBack: () => void }) {
     busy={view.finishing} onRetry={() => void run.send()} onFinish={() => void finish(true)}
     onNewInvitation={() => void finish(false)} />
   return <section className="content-card" ref={panel} tabIndex={-1}>
+    <JourneyIndicator current={2} />
     <p className="eyebrow">Participação em pesquisa</p>
     {view.phase === 'loading' ? <>
       <h1>Verificando seu acesso.</h1><p role="status">Aguarde um instante…</p>
@@ -91,8 +103,8 @@ export function ParticipantFlow({ onBack }: { onBack: () => void }) {
       <h1>Vamos usar uma única aba.</h1><p role="alert" className="notice">{view.message}</p>
       <button className="button primary" onClick={() => setRevision(value => value + 1)}>Verificar novamente</button>
     </> : <>
-      <h1>Use o convite da equipe.</h1>
-      <p className="lead">Informe o código que você recebeu para acessar esta execução da tarefa.</p>
+      <h1>Informe o convite da equipe.</h1>
+      <p className="lead">Use o código enviado pela equipe para iniciar esta sessão.</p>
       {view.message && <p role="alert" className="notice">{view.message}</p>}
       <form className="invitation-form" onSubmit={redeem} noValidate autoComplete="off" aria-busy={busy}>
         <label htmlFor="invitation-code">Código do convite</label>

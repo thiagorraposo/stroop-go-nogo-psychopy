@@ -43,10 +43,10 @@ export async function invitation(): Promise<Invitation> {
 }
 export async function redeem(page: Page, code: string) {
   await page.goto('/pratica')
-  await expect(page.getByRole('heading', { name: 'Use o convite da equipe.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Informe o convite da equipe.' })).toBeVisible()
   await page.getByLabel('Código do convite').fill(code)
   await page.getByRole('button', { name: 'Validar convite' }).click()
-  await expect(page.getByRole('heading', { name: 'Vamos praticar primeiro.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Primeiro, vamos praticar.' })).toBeVisible()
 }
 export async function finishPractice(page: Page) {
   await page.getByLabel('Estou usando um computador ou notebook com teclado físico.').check()

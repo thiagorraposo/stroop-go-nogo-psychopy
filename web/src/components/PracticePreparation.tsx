@@ -5,6 +5,7 @@ import type { MountExperiment } from '../experiment/ExperimentHost'
 import { checkEnvironment } from '../experiment/environment'
 import { mountPractice } from '../experiment/practice'
 import { mountMain } from '../experiment/main'
+import { JourneyIndicator } from './JourneyIndicator'
 import type { MainResult } from '../experiment/main-engine'
 import type { Condition, InterruptionReason, PracticeSummary } from '../experiment/protocol'
 
@@ -125,7 +126,8 @@ export function PracticePreparation(props: Props) {
   if (phase === 'practice') return <ExperimentHost mount={mount} />
   if (phase === 'main') return <ExperimentHost mount={mountMainBlock} />
   if (phase === 'starting' || phase === 'start-error') return <section className="content-card" ref={panel} tabIndex={-1}>
-    <p className="eyebrow">Bloco principal</p><h1>Preparando a execução.</h1>
+    <JourneyIndicator current={4} />
+    <p className="eyebrow">Etapa 4 · tarefa principal</p><h1>Preparando a execução.</h1>
     {phase === 'starting' ? <p role="status">Confirmando seu acesso antes de começar…</p> : <>
       <p role="alert" className="notice">{participantErrorMessage(startError)}</p>
       <p>A tarefa principal ainda não começou. Você pode tentar confirmar o início novamente.</p>
@@ -134,17 +136,22 @@ export function PracticePreparation(props: Props) {
     </>}
   </section>
   return <section className="content-card practice-preparation" ref={panel} tabIndex={-1}>
-    <p className="eyebrow">Preparação e prática</p>
+    <JourneyIndicator current={3} />
+    <p className="eyebrow">Etapa 3 · prática</p>
     {phase === 'summary' && summary ? <>
       <h1>Prática concluída.</h1>
-      <p className="lead">Você concluiu as {summary.total} tentativas de treino. Se quiser, pode repetir a prática antes de continuar.</p>
-      <p>O treino não faz parte do resultado oficial.</p>
-      <button className="button primary" onClick={() => void beginMain()} disabled={!canStart}>Começar bloco principal</button>{' '}
+      <p className="lead">Você concluiu as {summary.total} tentativas de treino. Quando estiver pronto, comece a tarefa principal.</p>
+      <p>Se quiser, você pode repetir a prática. O treino não faz parte do resultado.</p>
+      <button className="button primary" onClick={() => void beginMain()} disabled={!canStart}>Começar tarefa</button>{' '}
       <button className="button secondary" onClick={begin} disabled={!canStart}>Repetir prática</button>
-      <p className="quiet">Pressione Espaço ou Enter para começar o principal, ou R para repetir a prática.</p>
+      <p className="quiet">Pressione Espaço ou Enter para começar a tarefa, ou R para repetir a prática.</p>
     </> : <>
-      <h1>Vamos praticar primeiro.</h1>
-      <p className="lead">Serão quatro tentativas, com feedback após cada uma. Pressione <kbd>Espaço</kbd> apenas quando a palavra e a cor das letras forem iguais.</p>
+      <h1>Primeiro, vamos praticar.</h1>
+      <p className="lead">Faça quatro tentativas. Durante a prática, você receberá feedback após cada uma.</p>
+      <ol className="preparation-sequence" aria-label="Preparação para a prática">
+        <li><span className="instruction-number">01</span><div><h2>Confirme o teclado</h2><p>Use um computador com teclado físico e mantenha esta aba em foco.</p></div></li>
+        <li><span className="instruction-number">02</span><div><h2>Pratique a regra</h2><p>Pressione <kbd>Espaço</kbd> quando a palavra e a cor das letras forem iguais; nas diferentes, aguarde.</p></div></li>
+      </ol>
       {phase === 'interrupted' && <p className="notice" role="alert">O treino foi interrompido. Recomece uma rodada completa para continuar.</p>}
       {!environment.supported ? <p className="notice" role="alert">Use um computador Windows ou Linux com teclado físico e Chrome, Edge ou Firefox. Este ambiente ainda não foi validado para a tarefa.</p> : <div className="preparation-checks">
         <label className="keyboard-confirm"><input type="checkbox" checked={confirmedKeyboard} onChange={event => setConfirmedKeyboard(event.target.checked)} /> Estou usando um computador ou notebook com teclado físico.</label>

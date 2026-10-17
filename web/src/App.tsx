@@ -6,6 +6,7 @@ import type { ProfessionalProfile } from './api/client'
 import { ParticipantFlow } from './components/ParticipantFlow'
 import { ProfessionalDashboard } from './components/ProfessionalDashboard'
 import { AdministrationPanel } from './components/AdministrationPanel'
+import { JourneyIndicator } from './components/JourneyIndicator'
 
 type Navigate = (path: string) => void
 
@@ -23,36 +24,41 @@ function LocalLink({ href, navigate, children, className }: {
 function Welcome({ navigate }: { navigate: Navigate }) {
   return <section className="welcome-grid">
     <div className="hero-card">
+      <JourneyIndicator current={1} />
       <p className="eyebrow">Participação em pesquisa</p>
       <h1>Tarefa de Correspondência de Cores</h1>
-      <p className="lead">Uma tarefa de atenção às palavras e às cores. Leia as orientações com calma antes de começar.</p>
-      <LocalLink href="/instrucoes" navigate={navigate} className="button primary">Entender a tarefa <span aria-hidden="true">→</span></LocalLink>
-      <p className="quiet">Para participar, siga as instruções e utilize o convite fornecido pela equipe de pesquisa.</p>
+      <p className="lead">Uma tarefa breve de correspondência entre palavras e cores. Primeiro, conheça a regra e faça uma prática.</p>
+      <LocalLink href="/instrucoes" navigate={navigate} className="button primary">Iniciar tutorial <span aria-hidden="true">→</span></LocalLink>
+      <p className="quiet">O bloco principal dura cerca de um minuto. Para participar, você precisará do convite fornecido pela equipe de pesquisa.</p>
     </div>
-    <aside className="guide-card" aria-labelledby="guide-title">
-      <p className="eyebrow">Antes de começar</p>
-      <h2 id="guide-title">Um passo de cada vez.</h2>
-      <ol className="steps">
-        <li><span className="step-number" aria-hidden="true">01</span><div><h3>Conheça a regra</h3><p>Observe o nome da cor e a cor das letras.</p></div></li>
-        <li><span className="step-number" aria-hidden="true">02</span><div><h3>Pratique primeiro</h3><p>O treino ajuda você a se familiarizar com a tarefa.</p></div></li>
-        <li><span className="step-number" aria-hidden="true">03</span><div><h3>Responda com atenção</h3><p>O bloco principal dura cerca de um minuto.</p></div></li>
-      </ol>
+    <aside className="rule-card" aria-labelledby="rule-title">
+      <p className="eyebrow">A regra em um olhar</p>
+      <h2 id="rule-title">Compare palavra e cor.</h2>
+      <div className="rule-examples" aria-label="Exemplos da regra">
+        <article className="rule-example"><span className="rule-tag">Iguais</span><strong className="rule-word rule-word-match">VERDE</strong><p>Pressione <kbd>Espaço</kbd></p></article>
+        <article className="rule-example"><span className="rule-tag">Diferentes</span><strong className="rule-word rule-word-mismatch">VERDE</strong><p>Aguarde sem pressionar</p></article>
+      </div>
       <p className="equipment-note">Use um computador com teclado físico e reserve um momento sem interrupções.</p>
     </aside>
   </section>
 }
 
 function Instructions({ navigate }: { navigate: Navigate }) {
-  return <section className="content-card">
-    <p className="eyebrow">Conheça a regra</p>
-    <h1>Observe a palavra e a cor das letras.</h1>
-    <p className="lead">Pressione <kbd>Espaço</kbd> apenas quando a palavra e a cor das letras forem iguais. Quando forem diferentes, aguarde a próxima tentativa.</p>
+  return <section className="content-card instruction-card">
+    <JourneyIndicator current={1} />
+    <p className="eyebrow">Tutorial · conheça a regra</p>
+    <h1>Observe a palavra e compare a cor das letras.</h1>
+    <ol className="instruction-steps" aria-label="Como responder">
+      <li><span className="instruction-number">01</span><div><h2>Observe</h2><p>Leia o nome da cor.</p></div></li>
+      <li><span className="instruction-number">02</span><div><h2>Compare</h2><p>Confira a cor em que as letras aparecem.</p></div></li>
+      <li><span className="instruction-number">03</span><div><h2>Responda ou aguarde</h2><p>Use Espaço quando forem iguais; quando forem diferentes, não pressione.</p></div></li>
+    </ol>
     <div className="examples" aria-label="Exemplos da regra">
       <article className="example"><p className="example-label">Palavra e cor iguais</p><strong className="word go">VERDE</strong><p>Pressione <kbd>Espaço</kbd>.</p></article>
       <article className="example"><p className="example-label">Palavra e cor diferentes</p><strong className="word no-go">VERMELHO</strong><p>Aguarde, sem pressionar.</p></article>
     </div>
     <p>Durante a prática, você receberá feedback após cada tentativa.</p>
-    <LocalLink href="/pratica" navigate={navigate} className="button primary">Começar prática</LocalLink>{' '}
+    <LocalLink href="/pratica" navigate={navigate} className="button primary">Ir para a prática <span aria-hidden="true">→</span></LocalLink>{' '}
     <LocalLink href="/" navigate={navigate} className="button secondary">Voltar ao início</LocalLink>
   </section>
 }

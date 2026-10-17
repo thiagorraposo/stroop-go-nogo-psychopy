@@ -17,7 +17,7 @@ test('convite e obrigatorio, codigo fica mascarado e duplo clique nao duplica re
   await page.getByRole('button', { name: 'Validar convite' }).evaluate((button: HTMLButtonElement) => {
     button.click(); button.click()
   })
-  await expect(page.getByRole('heading', { name: 'Vamos praticar primeiro.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Primeiro, vamos praticar.' })).toBeVisible()
   expect(redeems).toBe(1)
   await expect(page).toHaveURL('/pratica')
   expect(await page.evaluate(() => ({ local: localStorage.length, session: sessionStorage.length })))
@@ -27,7 +27,7 @@ test('convite e obrigatorio, codigo fica mascarado e duplo clique nao duplica re
 test('trava nativa impede outra aba de obter a mesma sessao e libera ao fechar', async ({ page, context }) => {
   await mockParticipant(page)
   await page.goto('/pratica')
-  await expect(page.getByRole('heading', { name: 'Vamos praticar primeiro.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Primeiro, vamos praticar.' })).toBeVisible()
   const other = await context.newPage()
   await mockParticipant(other)
   let reads = 0
@@ -37,7 +37,7 @@ test('trava nativa impede outra aba de obter a mesma sessao e libera ao fechar',
   expect(reads).toBe(0)
   await page.close()
   await other.getByRole('button', { name: 'Verificar novamente' }).click()
-  await expect(other.getByRole('heading', { name: 'Vamos praticar primeiro.' })).toBeVisible()
+  await expect(other.getByRole('heading', { name: 'Primeiro, vamos praticar.' })).toBeVisible()
   expect(reads).toBe(1)
   await other.close()
 })
@@ -52,5 +52,5 @@ test('bootstrap running aborta reload e nao reconstrui motor pelo servidor', asy
   await expect(page.getByRole('alert')).toContainText('execução anterior foi interrompida')
   await expect.poll(() => reason).toBe('reload')
   await expect(page.locator('[data-phase]')).toHaveCount(0)
-  await expect(page.getByRole('button', { name: 'Começar bloco principal' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Começar tarefa' })).toHaveCount(0)
 })

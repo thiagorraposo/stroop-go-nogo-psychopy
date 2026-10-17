@@ -20,7 +20,7 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W07 | Concluida em 2026-10-16; ciclo de sessao, autorizacao, limites e migrations validados |
 | W08 | Concluida em 2026-10-16; conclusao atomica, protocolo/tempos, recalculo e replay validados em 240 testes |
 | W09 | Concluida em 2026-10-16; React/TypeScript, cliente HTTP, 36 testes DOM/logica e 10 browser aprovados |
-| W09A | Planejada; refinamento pontual de abertura, tutorial e encerramento, preservando identidade visual e protocolo |
+| W09A | Implementada e validada tecnicamente em 2026-10-17; aceite visual do responsavel pendente |
 | W10 | Concluida em 2026-10-16; pratica jsPsych, 77 testes logica/DOM, 18 browser e regressao Python 240 aprovados |
 | W11 | Concluida em 2026-10-16; motor jsPsych, 120 testes logica/DOM e 24 browser aprovados |
 | W12 | Concluida em 2026-10-16; resumo, CSV de 21 campos, paridade Python/TypeScript e importacao real validados |
@@ -43,8 +43,8 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W22 | Publicada na VPS por delegacao explicita, somente testes sinteticos; confirmacao Google pessoal pendente |
 
 As evidencias anteriores de W00–W15 e W17–W20 permanecem validas para os escopos
-testados; W09A planeja a experiencia revisada do participante e permanece
-pendente de implementacao/aceite visual. W13A e W15A–W15E impedem considerar completos o cadastro, o dashboard
+testados; W09A implementa a experiencia revisada do participante e permanece
+pendente de aceite visual. W13A e W15A–W15E impedem considerar completos o cadastro, o dashboard
 e a substituicao funcional do legado pelo navegador. W13A aguarda aceite de operacao; a implementacao segue W15C e demais
 complementos elegiveis conforme dependencias, antes
 do aceite funcional W21/W22. A instrucao atual retoma a implementacao autonoma local; publicacao e aceite
@@ -314,9 +314,9 @@ Dependencias da fase: W01–W03; integrar ao backend somente em W13.
 
 ### W09A — Refinamento da experiencia do participante sem troca de identidade
 
-- **Estado:** planejada, nao implementada. Solicitacao atual exclusivamente
-  documental: registrar a proposta neste roadmap, sem alterar frontend, outros
-  documentos de UX/copy, imagens, dependencias, protocolo ou publicacao.
+- **Estado (2026-10-17):** implementada e validada tecnicamente; aceite visual
+  do responsavel pendente. Capturas sinteticas: `/tmp/stroop-w09a-before-{home,instructions}.png`
+  e `/tmp/stroop-w09a-after-{home,instructions,preparation,practice,result,closure}-{chromium,firefox}.png`.
 - **Objetivo:** tornar abertura, orientacoes e encerramento mais claros e
   contemporaneos com mudancas pontuais de composicao e texto. Preservar o
   trabalho visual existente; nao redesenhar todo o produto ou copiar o legado.

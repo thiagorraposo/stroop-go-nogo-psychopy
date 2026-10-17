@@ -8,12 +8,14 @@ const profile = {
 test('navega pelas orientacoes e respeita o historico e o foco', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Tarefa de Correspondência de Cores' })).toBeVisible()
-  await page.getByRole('link', { name: 'Entender a tarefa' }).click()
+  await expect(page.getByLabel('Exemplos da regra')).toContainText('Iguais')
+  await page.getByRole('link', { name: 'Iniciar tutorial' }).click()
   await expect(page).toHaveURL('/instrucoes')
   await expect(page.getByRole('main')).toBeFocused()
-  await expect(page.getByRole('heading', { name: 'Observe a palavra e a cor das letras.' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Observe a palavra e compare a cor das letras.' })).toBeVisible()
   await expect(page.getByLabel('Exemplos da regra')).toContainText('Palavra e cor iguais')
   await expect(page.getByLabel('Exemplos da regra')).toContainText('Palavra e cor diferentes')
+  await expect(page.getByRole('list', { name: 'Como responder' }).getByRole('listitem')).toHaveCount(3)
   await page.goBack()
   await expect(page).toHaveURL('/')
   await expect(page.getByRole('heading', { name: 'Tarefa de Correspondência de Cores' })).toBeVisible()
@@ -21,6 +23,25 @@ test('navega pelas orientacoes e respeita o historico e o foco', async ({ page }
   await expect(page).toHaveURL('/instrucoes')
   await page.getByRole('link', { name: 'Voltar ao início' }).click()
   await expect(page).toHaveURL('/')
+})
+
+test('percurso preparatorio e exemplos permanecem legiveis sem rolagem horizontal', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.route('**/api/v1/participant/session', route => route.fulfill({ status: 401,
+    json: { error: { code: 'authentication_required' }, request_id: 'synthetic-journey' } }))
+  await page.goto('/')
+  await expect(page.getByLabel('Exemplos da regra')).toBeVisible()
+  await expect(page.getByRole('list', { name: 'Etapas da participação' }).locator('[aria-current="step"]')).toContainText('Orientações')
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await page.getByRole('link', { name: 'Iniciar tutorial' }).click()
+  await expect(page.getByRole('list', { name: 'Como responder' }).getByRole('listitem')).toHaveCount(3)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await page.getByRole('link', { name: 'Ir para a prática' }).click()
+  await expect(page.getByRole('list', { name: 'Etapas da participação' }).locator('[aria-current="step"]')).toContainText('Convite')
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await page.evaluate(() => { document.documentElement.style.zoom = '2' })
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })
 
 test('mostra carregamento e direciona o acesso profissional ao Google', async ({ page }) => {

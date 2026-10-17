@@ -1,5 +1,34 @@
 # Copy das telas
 
+Este arquivo preserva abaixo o copy historico do PsychoPy. A secao WEB registra
+o texto efetivamente aplicado na experiencia web; nao altera o instrumento
+local.
+
+## WEB — percurso do participante (W09A)
+
+### Abertura
+
+- Titulo: `Tarefa de Correspondência de Cores`
+- Acao: `Iniciar tutorial`
+- Apoio: `Uma tarefa breve de correspondência entre palavras e cores. Primeiro, conheça a regra e faça uma prática.`
+- Regra visual: `Iguais` / `Pressione Espaço`; `Diferentes` / `Aguarde sem pressionar`.
+- Nota: `Use um computador com teclado físico e reserve um momento sem interrupções.`
+
+### Tutorial e pratica
+
+- Acao do tutorial: `Ir para a prática`.
+- Preparacao: `Primeiro, vamos praticar.`; verificar teclado/foco e reservar quatro
+  tentativas de treino com feedback.
+- Transicao: `Começar tarefa`; `Repetir prática` permanece acao secundaria.
+
+### Resultado e encerramento
+
+- Somente depois do recibo: `Tarefa concluída. Obrigado por participar.` e
+  `Resultado recebido pela equipe.`
+- Encerramento confirmado: `Participação encerrada. Você pode fechar esta página.`
+- Falha de envio ou logout preserva o estado recuperavel e nao declara
+  recebimento/encerramento.
+
 Textos sugeridos para a proxima versao visual do experimento. Estes textos estao prontos para copia futura em componentes do PsychoPy, mas ainda nao foram implementados.
 
 ## Tela 01 - Abertura

@@ -14,14 +14,21 @@ const main = source('bloco_principal_stroop_go_nogo_ptbr.csv')
 const practice = source('pratica_stroop_go_nogo_ptbr.csv')
 const order = [9, 1, 10, 2, 11, 3, 12, 4, 13, 5, 14, 6, 15, 7, 16, 8]
 
-export async function mockParticipant(page: Page, initial: 'preparing' | 'running' | 'none' = 'preparing') {
+export async function mockParticipant(page: Page, initial: 'preparing' | 'running' | 'completed' | 'none' = 'preparing') {
   let state: 'preparing' | 'running' | 'completed' | 'aborted' | 'none' = initial
-  let receipt: Record<string, unknown> | undefined
   let startCalls = 0
   let completeCalls = 0
   const now = Date.now()
   const common = { session_id: '00000000-0000-4000-8000-000000000130',
     activated_at: new Date(now).toISOString(), expires_at: new Date(now + 1_800_000).toISOString(), csrf_token: 's'.repeat(43) }
+  let receipt: Record<string, unknown> | undefined = initial === 'completed' ? {
+    session_id: common.session_id, assessment_id: '00000000-0000-4000-8000-000000000131',
+    state: 'completed', completed_at: new Date(now).toISOString(), platform: 'web',
+    test_code: 'stroop_go_nogo_ptbr', test_version: '0.2.2-web.1',
+    protocol_id: 'stroop_go_nogo_ptbr/0.2.2-web.1', app_version: 'web-0.1.0',
+    summary: { accuracy: 50, response_time_seconds: 0.51225, total_trials: 16,
+      hits: 4, omission_errors: 4, commission_errors: 4, correct_rejections: 4 },
+  } : undefined
   await page.route('**/api/v1/participant/**', async route => {
     const request = route.request()
     const path = new URL(request.url()).pathname

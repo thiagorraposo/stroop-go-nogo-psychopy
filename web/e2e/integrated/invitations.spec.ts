@@ -44,7 +44,7 @@ test('cadastro pela equipe conserva metadados ate recibo, consulta e CSV reais',
   try {
     await redeem(participantPage, issued.code)
     await finishPractice(participantPage)
-    await participantPage.getByRole('button', { name: 'Começar bloco principal' }).click()
+    await participantPage.getByRole('button', { name: 'Começar tarefa' }).click()
     await expect(participantPage.getByRole('heading', { name: 'Resumo da execução' })).toBeVisible({ timeout: 70_000 })
     await expect(participantPage.getByRole('status')).toContainText('Resultado recebido pela equipe.', { timeout: 15_000 })
     const stored = manage('state', { session_id: issued.session_id })
@@ -74,7 +74,7 @@ test('cadastro pela equipe conserva metadados ate recibo, consulta e CSV reais',
       }
     }
     await participantPage.getByRole('button', { name: 'Finalizar', exact: true }).click()
-    await expect(participantPage).toHaveURL('/instrucoes')
+    await expect(participantPage.getByRole('heading', { name: 'Participação encerrada.' })).toBeVisible()
   } finally { await participantPage.close() }
 })
 
@@ -95,7 +95,7 @@ test('administracao vinculada emite e revoga pela tela impedindo resgate', async
     await participant.getByRole('button', { name: 'Validar convite' }).click()
     expect((await redemption).ok()).toBe(false)
     await expect(participant.getByRole('alert')).toBeVisible()
-    await expect(participant.getByRole('heading', { name: 'Vamos praticar primeiro.' })).toHaveCount(0)
+    await expect(participant.getByRole('heading', { name: 'Primeiro, vamos praticar.' })).toHaveCount(0)
     expect(manage('state', { session_id: issued.session_id }).assessments).toBe(0)
   } finally { await participant.close() }
 })

@@ -204,3 +204,20 @@ o alvo e o efeito e pede confirmacao. Projetos nao concedem acesso por criacao:
 cada profissional precisa de vinculo explicito. Bloqueio e revogacao preservam
 coletas e o servidor revalida cada operacao. Nao ha autocadastro, exclusao nem
 edicao de mapa legado nessa tela.
+
+## WEB — percurso do participante (W09A)
+
+A abertura preserva a identidade visual e o titulo da tarefa, com acao
+`Iniciar tutorial` e exemplos proprios que distinguem palavra/cor iguais e
+diferentes. O tutorial organiza a regra em passos curtos e segue para a pratica.
+O indicador de percurso aparece nas telas preparatorias, sem HUD novo durante
+tentativas. Preparacao apresenta verificacoes e passos; no resumo da pratica,
+`Comecar tarefa` e a acao primaria e repetir fica secundaria.
+
+O resumo principal so declara conclusao/agradecimento quando o recibo foi
+confirmado. Envio pendente continua distinguivel e recuperavel; falha ao encerrar
+a sessao nao mostra a tela de encerramento e permite tentar novamente. A
+confirmacao de encerramento oferece retorno as orientacoes e deixa outro convite
+como opcao secundaria. O foco programatico permanece visivel. Essas telas nao
+alteram motor, estimulos, condicoes, tempos, feedback cronometrado, teclas,
+tratamento de foco/Escape ou CSV.

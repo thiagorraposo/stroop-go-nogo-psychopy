@@ -60,7 +60,7 @@ kbd { font: inherit; font-size: .9em; border: 1px solid #b7bfca; border-radius: 
 .role-badge { display: table; color: #31513a; background: #dfe9d9; border: 1px solid #b4c9ac; border-radius: 20px; padding: 7px 14px; font-size: 12px; margin: 0 0 28px; }
 .skip-link { position: absolute; left: 16px; top: -70px; z-index: 20; padding: 12px 18px; color: #142033; background: white; border-radius: 6px; }
 .skip-link:focus { top: 15px; }
-.practice-preparation:focus { outline: none; }
+.content-card:focus, .practice-preparation:focus { outline: 3px solid #9a7df4; outline-offset: 4px; }
 .preparation-checks { padding: 24px 0 10px; border-top: 1px solid #cdd1d5; }
 .keyboard-confirm { display: flex; align-items: flex-start; gap: 12px; line-height: 1.7; }
 .keyboard-confirm input { width: 18px; height: 18px; margin-top: 5px; flex-shrink: 0; accent-color: #273852; }
@@ -83,6 +83,38 @@ kbd { font: inherit; font-size: .9em; border: 1px solid #b7bfca; border-radius: 
 .result-highlights dd { font-size: clamp(2rem, 5vw, 3.5rem); }
 .result-counts dd { font-size: 1.7rem; }
 @media (max-width: 700px) { .result-counts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.journey-indicator { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; list-style: none; padding: 0; margin: 0 0 32px; }
+.journey-indicator li { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 8px 4px; border-bottom: 2px solid #cdd1d5; color: #687184; font-size: 12px; line-height: 1.35; }
+.journey-indicator li[aria-current="step"] { color: #172139; border-color: #273852; font-weight: 700; }
+.journey-number { font-family: ui-monospace, monospace; font-size: 11px; color: #687184; }
+.journey-indicator li[aria-current="step"] .journey-number { color: #273852; }
+.hero-card .journey-indicator { width: 100%; }
+.rule-card { padding: 36px 30px; border: 1px solid #30394e; border-radius: 14px; background: #11192b; }
+.rule-card .eyebrow { color: #bac4da; margin-bottom: 16px; }
+.rule-card h2 { color: #f4f3ed; }
+.rule-examples { display: grid; gap: 14px; margin: 28px 0; }
+.rule-example { display: grid; grid-template-columns: minmax(90px, 1fr) 1fr 1.25fr; align-items: center; gap: 12px; padding: 16px 14px; border: 1px solid #354057; border-radius: 9px; }
+.rule-tag { color: #c1cbe0; font-size: 12px; }
+.rule-word { font-size: clamp(21px, 2.3vw, 30px); font-weight: 750; letter-spacing: .04em; }
+.rule-word-match { color: #9bd18e; }
+.rule-word-mismatch { color: #93c5fd; }
+.rule-example p { margin: 0; color: #e0e6f1; font-size: 12px; line-height: 1.5; }
+.rule-card .equipment-note { margin-top: 24px; }
+.instruction-steps, .preparation-sequence { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; list-style: none; padding: 0; margin: 28px 0; }
+.instruction-steps li, .preparation-sequence li { display: flex; gap: 12px; padding: 18px 14px; border: 1px solid #d7d9db; border-radius: 9px; background: #f9f8f4; }
+.instruction-number { flex: 0 0 auto; color: #59677e; font: 700 11px ui-monospace, monospace; padding-top: 3px; }
+.instruction-steps h2, .preparation-sequence h2 { font-size: 15px; font-weight: 650; letter-spacing: 0; margin: 0 0 7px; }
+.instruction-steps p, .preparation-sequence p { margin: 0; color: #4c566a; font-size: 13px; line-height: 1.6; }
+.instruction-card > p:not(.eyebrow):not(.lead):not(.quiet) { margin: 20px 0; }
+.closing-card { max-width: 760px; }
+.participant-thanks { padding: 15px 18px; border-radius: 8px; background: #e8efe4; color: #31513a; font-weight: 650; }
+.delivery-status { padding: 15px 18px; border: 1px solid #d3ae9d; border-radius: 8px; line-height: 1.65; }
+.delivery-saved { color: #31513a; background: #e8efe4; border-color: #b8c9b0; }
+.delivery-sending { color: #475569; background: #edf0f3; border-color: #cdd1d5; }
+.delivery-pending, .delivery-local { color: #793e29; background: #fbefe6; }
+@media (max-width: 850px) { .instruction-steps, .preparation-sequence { grid-template-columns: 1fr; } .rule-example { grid-template-columns: minmax(80px, .8fr) 1fr 1.3fr; } }
+@media (max-width: 540px) { .journey-indicator { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 10px; margin-bottom: 25px; } .journey-indicator li { font-size: 11px; } .rule-card { padding: 28px 22px; } .rule-example { grid-template-columns: 1fr 1fr; gap: 8px 12px; } .rule-example p:last-child { grid-column: 1 / -1; } .instruction-steps, .preparation-sequence { gap: 9px; } }
 
 .invitation-form { max-width: 40rem; margin-top: 2rem; }
 .invitation-form label { display: block; font-weight: 700; margin-bottom: .75rem; }

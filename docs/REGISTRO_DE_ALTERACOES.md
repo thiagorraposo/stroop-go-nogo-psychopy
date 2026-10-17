@@ -6,6 +6,21 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-17 — Percurso do participante WEB W09A
+
+- Abertura e tutorial organizam a regra em exemplos visuais e passos curtos.
+  Indicador de percurso cobre orientacoes, convite, pratica e tarefa;
+  preparacao/transicao e encerramento receberam acoes e estados mais claros.
+  A conclusao aparece somente apos recibo; falha de logout preserva o resumo e
+  permite nova tentativa. Foco programatico ganhou contorno visivel.
+- Preservados motor, condicoes, cores, temporizacao, HUD, feedback da tarefa,
+  teclas/foco/Escape e contrato CSV. Capturas comparativas usam somente dados
+  sinteticos em `/tmp/stroop-w09a-*`.
+- Evidencias: 268 testes Vitest, typecheck/build; Playwright geral94/94,
+  temporizacao4/4 e integracao HTTPS/PostgreSQL2/2 Chromium/Firefox; `git diff
+  --check` aprovado. Aceite visual do responsavel continua pendente. W15E segue
+  aguardando decisao de minimizacao antes de upload.
+
 ## 2026-10-17 — Administracao de contas/projetos W15D
 
 - Area WEB exclusiva do perfil `administracao` lista contas paginadas, cadastra

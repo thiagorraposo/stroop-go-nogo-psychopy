@@ -18,7 +18,7 @@ test('principal executa 16 condicoes reais sem feedback nem encurtar resposta', 
   test.setTimeout(100_000)
   await finishPractice(page)
   await page.keyboard.down('Space')
-  await page.getByRole('button', { name: 'Começar bloco principal' }).click()
+  await page.getByRole('button', { name: 'Começar tarefa' }).click()
   const ids: number[] = []
   const kinds: string[] = []
   for (let trial = 1; trial <= 16; trial += 1) {
@@ -50,21 +50,30 @@ test('principal executa 16 condicoes reais sem feedback nem encurtar resposta', 
   await expect(page.getByRole('status')).toContainText('Resultado recebido pela equipe.')
   expect(await page.evaluate(() => ({ local: localStorage.length, session: sessionStorage.length })))
     .toEqual({ local: 0, session: 0 })
+  await page.route('**/api/v1/participant/logout', route => route.fulfill({ status: 503,
+    json: { error: { code: 'service_unavailable' }, request_id: 'synthetic-logout-failure' } }), { times: 1 })
   await page.getByRole('button', { name: 'Finalizar', exact: true }).click()
+  await expect(page.getByRole('alert')).toContainText('temporariamente indisponível')
+  await expect(page.getByRole('heading', { name: 'Participação encerrada.' })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Resumo da execução' })).toBeVisible()
+  await page.getByRole('button', { name: 'Finalizar', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Participação encerrada.' })).toBeVisible()
+  await expect(page.getByText('Você pode fechar esta página.')).toBeVisible()
+  await page.getByRole('button', { name: 'Voltar às orientações' }).click()
   await expect(page).toHaveURL('/instrucoes')
   await page.goBack()
   await expect(page.getByRole('heading', { name: 'Resumo da execução' })).toHaveCount(0)
-  await expect(page.getByRole('button', { name: 'Começar bloco principal' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Começar tarefa' })).toHaveCount(0)
 })
 
 test('Escape no principal descarta execucao e exige nova sessao com pratica', { tag: '@timing' }, async ({ page }) => {
   test.setTimeout(35_000)
   await finishPractice(page)
-  await page.getByRole('button', { name: 'Começar bloco principal' }).click()
+  await page.getByRole('button', { name: 'Começar tarefa' }).click()
   await expect(page.locator('[data-phase="stimulus"]')).toBeVisible({ timeout: 8_000 })
   await page.keyboard.press('Escape')
   await expect(page.getByRole('alert')).toContainText('A execução foi interrompida')
   await expect(page.getByRole('alert')).toContainText('novo convite e faça a prática novamente')
-  await expect(page.getByRole('button', { name: 'Começar bloco principal' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Começar tarefa' })).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Resumo da execução' })).toHaveCount(0)
 })

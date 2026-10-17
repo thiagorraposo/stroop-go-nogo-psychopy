@@ -3,7 +3,24 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
-## Atual — W15D validada; proxima W15E depende de contrato/minimizacao
+## Atual — W09A validada tecnicamente; aceite visual pendente
+
+- W09A refinou abertura, tutorial, indicador de percurso, preparacao/pratica,
+  resumo condicionado ao recibo e encerramento confirmado apos logout. Motor,
+  condicoes, cores, tempos, HUD, feedback cronometrado, teclas e CSV preservados.
+- Validacao: 268 testes Vitest; build e typecheck; Playwright geral94/94 e
+  temporal4/4 em Chromium/Firefox; integracao HTTPS/PostgreSQL2/2 para recuperar
+  recibo sem duplicar avaliacao e encerrar credencial; `git diff --check`.
+  Capturas comparativas sinteticas em `/tmp/stroop-w09a-*`; nenhuma coleta real.
+- Falta o aceite visual do responsavel para concluir W09A. W15E continua
+  aguardando decisao de minimizacao explicitamente solicitada: copia redigida
+  no cliente (`participant_name` fixo nao identificavel e `initials` vazio) ou
+  aceitar somente arquivos previamente minimizados.
+- Proxima acao: responsavel revisar capturas, confirmar aceite visual W09A e
+  definir politica W15E. W13A aguarda aceite operacional; W16/W21 permanecem
+  dependentes de evidencias/equipamentos/homologacao.
+
+## Historico — W15D validada; W15E depende de contrato/minimizacao
 
 - Branch `prep-web`; `AGENTS.md` raiz preexistente permanece fora dos commits.
   W13A esta implementada, mas aguarda aceite operacional. W16 e homologacao/
@@ -24,8 +41,7 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 - W15A–W15C mantem evidencias registradas abaixo/historico. Banco descartavel
   `stroop-w13a-test` na porta 32768/database `stroop_etapa4_test_w13a`; nenhum
   container operacional alterado.
-- W15D commit `576e642` (`feat(web): administra contas e vinculos de pesquisa`);
-  working tree so mantem a alteracao preexistente de `AGENTS.md`.
+- W15D commit `576e642` (`feat(web): administra contas e vinculos de pesquisa`).
 - Proxima acao: definir politica de minimizacao W15E antes do codigo de upload.
   O CSV Stroop canonico exige `participant_name` nao vazio e inclui `initials`;
   o roadmap exige impedir transmissao nominal para a WEB e especificar
