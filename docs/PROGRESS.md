@@ -24,10 +24,12 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 - W15A–W15C mantem evidencias registradas abaixo/historico. Banco descartavel
   `stroop-w13a-test` na porta 32768/database `stroop_etapa4_test_w13a`; nenhum
   container operacional alterado.
-- Proxima acao: finalizar `git diff --check`, atualizar roadmap/registro e
-  commit local W15D, preservando `AGENTS.md`; depois avaliar W15E apenas conforme
-  minimizacao/contrato ja autorizado no roadmap. W13A permanece pendente de
-  aceite operacional.
+- W15D commit `576e642` (`feat(web): administra contas e vinculos de pesquisa`);
+  working tree so mantem a alteracao preexistente de `AGENTS.md`.
+- Proxima acao: definir politica de minimizacao W15E antes do codigo de upload.
+  O CSV Stroop canonico exige `participant_name` nao vazio e inclui `initials`;
+  o roadmap exige impedir transmissao nominal para a WEB e especificar
+  compatibilidade dos validadores. W13A permanece pendente de aceite operacional.
 
 ## Historico — relatorio tecnico para leitores externos
 
