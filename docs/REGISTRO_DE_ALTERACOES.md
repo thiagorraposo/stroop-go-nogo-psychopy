@@ -6,6 +6,20 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W19: pacote WEB e acesso sintetico local
+
+- Imagens API/proxy separadas do legado, nao-root, contextos permitidos,
+  filesystem RO, redes internas, portas somente do proxy e secrets externos.
+- Migrations/provisionamento explicitos; writer/reader separados e funcao de
+  lock da migration0008 sem UPDATE de usuarios no runtime. Testes de grants,
+  rollback e concorrencia aprovados. Fixture antiga de upgrade preservada.
+- Smoke HTTPS real aprovado: coleta, retry, consulta/exportacao e reinicio do
+  banco com persistencia. Corrigida lista YAML de tmpfs e verificacao de portas
+  via bindings reais do Docker. Scanner inclui templates/exemplos e recusou
+  placeholder antigo; exemplo agora usa marcador curto sem segredo ficticio.
+- Previa sintetica local disponibilizada; navegador acessou build compilado
+  e tela de convite sem erros JS. Sem deploy, dados reais ou aceite temporal.
+
 ## 2026-10-16 — W18: pipeline reproduzivel e falhas bloqueantes
 
 - `ci`: workflow sem deploy, actions fixadas por SHA, PostgreSQL17.6/tmpfs e

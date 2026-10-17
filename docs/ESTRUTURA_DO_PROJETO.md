@@ -93,7 +93,9 @@ stroop-cognifit/
 │   ├── REGISTRO_DE_ALTERACOES.md
 │   └── ESTRUTURA_DO_PROJETO.md # este mapa
 ├── nginx/                      # proxy existente
-├── compose*.yaml               # dev, producao e restauracao existentes
+├── compose*.yaml               # legado e pilha WEB independente compose.web.yaml
+├── deploy/                     # modelo WEB sem secrets; arquivos reais externos
+├── Dockerfile.api / Dockerfile.web # imagens WEB e ignores dedicados
 ├── Dockerfile.dashboard
 ├── Dockerfile.proxy
 ├── .streamlit/                 # configuracao; secrets reais ignorados

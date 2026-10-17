@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import ipaddress
 import os
+import stat
 import re
 from typing import Mapping
 from urllib.parse import urlsplit
@@ -18,6 +19,58 @@ class ConfigurationError(RuntimeError):
 
 def _invalid() -> None:
     raise ConfigurationError("Configuracao da API ausente ou invalida.") from None
+
+
+def secret_value(values: Mapping[str, str], key: str, default: str = "") -> str:
+    """Le somente arquivo explicitamente indicado; nao descobre .env/secrets."""
+    file_key = f"{key}_FILE"
+    if file_key not in values:
+        return values.get(key, default)
+    if key in values:
+        _invalid()
+    path = values[file_key]
+    if not isinstance(path, str) or not path or "\x00" in path:
+        _invalid()
+    descriptor = None
+    try:
+        # NONBLOCK permite recusar FIFO/dispositivo sem esperar por um produtor.
+        descriptor = os.open(path, os.O_RDONLY | os.O_NONBLOCK)
+        if not stat.S_ISREG(os.fstat(descriptor).st_mode):
+            _invalid()
+        content = os.read(descriptor, 16385)
+        if len(content) > 16384:
+            _invalid()
+        value = content.decode("utf-8")
+        if value.endswith("\n"):
+            value = value[:-1]
+            if value.endswith("\r"):
+                value = value[:-1]
+        if not value:
+            _invalid()
+        return value
+    except ConfigurationError:
+        raise
+    except (OSError, UnicodeError, ValueError):
+        _invalid()
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
+
+
+def postgres_database_url(value: str) -> str:
+    """Valida DSN URI para runtime e migrador, sem refletir credenciais."""
+    try:
+        if (not isinstance(value, str) or not value.startswith(("postgresql://", "postgres://"))
+                or any(character.isspace() for character in value)):
+            _invalid()
+        database = conninfo_to_dict(value)
+        if not database.get("dbname") or not (database.get("host") or database.get("hostaddr")):
+            _invalid()
+    except ConfigurationError:
+        raise
+    except Exception:
+        _invalid()
+    return value
 
 
 @dataclass(frozen=True, slots=True, repr=False)
@@ -91,15 +144,7 @@ class APIConfig:
             if self.read_database_url:
                 database_urls.append(self.read_database_url)
             for database_url in database_urls:
-                if not isinstance(database_url, str) or not database_url.startswith(
-                    ("postgresql://", "postgres://")
-                ):
-                    _invalid()
-                if any(character.isspace() for character in database_url):
-                    _invalid()
-                database = conninfo_to_dict(database_url)
-                if not database.get("dbname") or not (database.get("host") or database.get("hostaddr")):
-                    _invalid()
+                postgres_database_url(database_url)
             if not isinstance(self.public_origin, str) or any(
                 character.isspace() or ord(character) < 32 for character in self.public_origin
             ):
@@ -151,13 +196,13 @@ class APIConfig:
         except (TypeError, ValueError):
             _invalid()
         return cls(
-            database_url=values.get("API_DATABASE_URL", ""),
-            read_database_url=values.get("API_READ_DATABASE_URL", ""),
+            database_url=secret_value(values, "API_DATABASE_URL"),
+            read_database_url=secret_value(values, "API_READ_DATABASE_URL"),
             public_origin=values.get("API_PUBLIC_ORIGIN", ""),
             app_env=values.get("APP_ENV", ""),
-            oidc_client_id=values.get("OIDC_CLIENT_ID", ""),
-            oidc_client_secret=values.get("OIDC_CLIENT_SECRET", ""),
-            session_secret=values.get("API_SESSION_SECRET", ""),
+            oidc_client_id=secret_value(values, "OIDC_CLIENT_ID"),
+            oidc_client_secret=secret_value(values, "OIDC_CLIENT_SECRET"),
+            session_secret=secret_value(values, "API_SESSION_SECRET"),
             login_rate_limit=login_rate_limit,
             login_rate_window_seconds=login_rate_window_seconds,
             redeem_rate_limit=redeem_rate_limit,

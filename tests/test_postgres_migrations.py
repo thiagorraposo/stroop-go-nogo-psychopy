@@ -89,6 +89,7 @@ class PostgresMigrationsTests(unittest.TestCase):
                 "0005_web_participant_sessions.sql",
                 "0006_web_completed_results.sql",
                 "0007_web_legacy_project_links.sql",
+                "0008_web_user_lock.sql",
             ],
         )
         with psycopg.connect(TEST_DATABASE_URL) as connection:
@@ -160,6 +161,7 @@ class PostgresMigrationsTests(unittest.TestCase):
         self.assertEqual(apply_migrations(TEST_DATABASE_URL), [
             "0005_web_participant_sessions.sql", "0006_web_completed_results.sql",
             "0007_web_legacy_project_links.sql",
+            "0008_web_user_lock.sql",
         ])
         with psycopg.connect(TEST_DATABASE_URL) as connection:
             self.assertEqual(connection.execute("SELECT COUNT(*) FROM assessments").fetchone()[0], 1)
@@ -182,32 +184,49 @@ class PostgresMigrationsTests(unittest.TestCase):
             self.assertIsNone(exists)
 
     def test_migration_resultados_preserva_sessao_web_em_execucao(self) -> None:
-        from datetime import datetime, timedelta, timezone
         from uuid import uuid4
-        from stroop.application import auth as auth_application, web_sessions
+        from stroop.application import web_sessions
 
         with tempfile.TemporaryDirectory() as directory:
             older = Path(directory)
             for path in sorted(MIGRATIONS_DIR.glob('000[1-5]_*.sql')):
                 shutil.copyfile(path, older / path.name)
             self.assertEqual(len(apply_migrations(TEST_DATABASE_URL, older)), 5)
+        # Fixture SQL do schema antigo: o adaptador atual exige a funcao 0008 e
+        # nao deve ser executado antes de aplicar suas dependencias de schema.
         issuer, subject = 'https://accounts.google.com', 'synthetic-upgrade-user'
-        auth_application.bootstrap_admin(TEST_DATABASE_URL, issuer, subject)
-        actor = auth_application.authorize(TEST_DATABASE_URL, {
-            'iss': issuer, 'sub': subject,
-            'exp': int((datetime.now(timezone.utc) + timedelta(hours=1)).timestamp()),
-        }, 'manage_projects')
-        project_id = uuid4()
-        web_sessions.create_project(TEST_DATABASE_URL, project_id, 'SYNTHETIC_UPGRADE', 'Projeto sintetico', actor)
-        web_sessions.set_member(TEST_DATABASE_URL, project_id, issuer, subject, True, actor)
-        web_sessions.create_invitation(TEST_DATABASE_URL, uuid4(), uuid4(), project_id,
-                                       'a' * 64, 'P_SINTETICO', 'V1', actor)
-        web_sessions.redeem(TEST_DATABASE_URL, 'a' * 64, 'b' * 64)
-        web_sessions.start(TEST_DATABASE_URL, 'b' * 64, 'synthetic-web-0.1.0')
-        before = web_sessions.participant_session(TEST_DATABASE_URL, 'b' * 64)
+        project_id, invitation_id, session_id = uuid4(), uuid4(), uuid4()
+        session_query = 'SELECT * FROM web_participant_sessions WHERE session_id=%s'
+        order_query = 'SELECT trial_number,condition_id FROM web_session_main_order WHERE session_id=%s ORDER BY trial_number'
+        invitation_query = 'SELECT * FROM web_invitations WHERE session_id=%s'
+        with psycopg.connect(TEST_DATABASE_URL) as connection:
+            connection.execute("INSERT INTO app_users(issuer,subject,role) VALUES(%s,%s,'administracao')", (issuer, subject))
+            connection.execute("""INSERT INTO web_projects(project_id,code,name,created_by_issuer,created_by_subject)
+                VALUES(%s,'SYNTHETIC_UPGRADE','Projeto sintetico',%s,%s)""", (project_id, issuer, subject))
+            connection.execute('INSERT INTO web_project_members(project_id,issuer,subject) VALUES(%s,%s,%s)', (project_id, issuer, subject))
+            connection.execute("""INSERT INTO web_invitations(invitation_id,session_id,project_id,code_sha256,
+                participant_id,visit,evaluator_issuer,evaluator_subject,state,expires_at,redeemed_at)
+                VALUES(%s,%s,%s,%s,'P_SINTETICO','V1',%s,%s,'redeemed',
+                CURRENT_TIMESTAMP+interval '24 hours',CURRENT_TIMESTAMP)""",
+                (invitation_id, session_id, project_id, 'a' * 64, issuer, subject))
+            connection.execute("""INSERT INTO web_participant_sessions(session_id,participant_token_sha256,state,
+                activated_at,expires_at,started_at,app_version) VALUES(%s,%s,'running',CURRENT_TIMESTAMP,
+                CURRENT_TIMESTAMP+interval '30 minutes',CURRENT_TIMESTAMP,'synthetic-web-0.1.0')""", (session_id, 'b' * 64))
+            connection.cursor().executemany('INSERT INTO web_session_main_order(session_id,trial_number,condition_id) VALUES(%s,%s,%s)',
+                [(session_id, index, index) for index in range(1, 17)])
+            before = (connection.execute(session_query, (session_id,)).fetchall(),
+                      connection.execute(order_query, (session_id,)).fetchall(),
+                      connection.execute(invitation_query, (session_id,)).fetchall())
         self.assertEqual(apply_migrations(TEST_DATABASE_URL), [
-            '0006_web_completed_results.sql', '0007_web_legacy_project_links.sql'])
-        self.assertEqual(web_sessions.participant_session(TEST_DATABASE_URL, 'b' * 64), before)
+            '0006_web_completed_results.sql', '0007_web_legacy_project_links.sql', '0008_web_user_lock.sql'])
+        with psycopg.connect(TEST_DATABASE_URL) as connection:
+            after = (connection.execute(session_query, (session_id,)).fetchall(),
+                     connection.execute(order_query, (session_id,)).fetchall(),
+                     connection.execute(invitation_query, (session_id,)).fetchall())
+        self.assertEqual(after, before)
+        session = web_sessions.participant_session(TEST_DATABASE_URL, 'b' * 64)
+        self.assertEqual(session.state, 'running')
+        self.assertEqual(session.session_id, session_id)
 
     def test_migracao_sqlite_preserva_dados_relacionamentos_e_sequences(self) -> None:
         apply_migrations(TEST_DATABASE_URL)
@@ -279,6 +298,7 @@ class PostgresMigrationStaticTests(unittest.TestCase):
                 "0005_web_participant_sessions.sql",
                 "0006_web_completed_results.sql",
                 "0007_web_legacy_project_links.sql",
+                "0008_web_user_lock.sql",
             ],
         )
 

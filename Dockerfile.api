@@ -1,0 +1,24 @@
+FROM python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+WORKDIR /app
+
+COPY api/requirements.lock /app/api/requirements.lock
+RUN python -m pip install --requirement /app/api/requirements.lock \
+    && groupadd --gid 10001 stroop \
+    && useradd --uid 10001 --gid 10001 --no-create-home --shell /usr/sbin/nologin stroop
+
+COPY api /app/api
+COPY stroop /app/stroop
+COPY scripts/migrations.py scripts/provision_web_database.py /app/scripts/
+COPY scripts/migrations /app/scripts/migrations
+COPY condicoes/web_protocol.json condicoes/pratica_stroop_go_nogo_ptbr.csv condicoes/bloco_principal_stroop_go_nogo_ptbr.csv /app/condicoes/
+
+USER 10001:10001
+EXPOSE 8000
+HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=6 \
+    CMD ["python", "-m", "api.runtime", "healthcheck"]
+ENTRYPOINT ["python", "-m", "api.runtime"]
+CMD ["serve"]

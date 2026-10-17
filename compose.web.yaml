@@ -1,0 +1,154 @@
+# Pilha WEB independente. Nao combinar implicitamente com compose.yaml legado.
+services:
+  web-postgres:
+    profiles: [web]
+    image: postgres:17.6-bookworm@sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3
+    environment:
+      POSTGRES_DB: ${WEB_POSTGRES_DB:?Informe WEB_POSTGRES_DB explicitamente}
+      POSTGRES_USER: ${WEB_POSTGRES_OWNER:?Informe WEB_POSTGRES_OWNER explicitamente}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    secrets: [postgres_password]
+    volumes: [web_postgres_data:/var/lib/postgresql/data]
+    networks: [web_data]
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    security_opt: [no-new-privileges:true]
+    pids_limit: 160
+    mem_limit: 768m
+    cpus: 1.0
+    restart: unless-stopped
+
+  web-api:
+    profiles: [web]
+    image: ${WEB_API_IMAGE:-stroop-web-api:local}
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    # Somente o proxy participa de web_link; API sem portas publicadas.
+    # O proxy sobrescreve XFF/proto. Nunca usar este opt-in com API exposta.
+    command: [serve, --forwarded-allow-ips, '*']
+    environment:
+      APP_ENV: ${WEB_APP_ENV:-production}
+      API_PUBLIC_ORIGIN: ${WEB_PUBLIC_ORIGIN:?Informe origem HTTPS}
+      API_DATABASE_URL_FILE: /run/secrets/api_database_url
+      API_READ_DATABASE_URL_FILE: /run/secrets/api_read_database_url
+      OIDC_CLIENT_ID_FILE: /run/secrets/oidc_client_id
+      OIDC_CLIENT_SECRET_FILE: /run/secrets/oidc_client_secret
+      API_SESSION_SECRET_FILE: /run/secrets/api_session_secret
+    secrets: [api_database_url, api_read_database_url, oidc_client_id, oidc_client_secret, api_session_secret]
+    networks: [web_link, web_data, web_api_egress]
+    depends_on:
+      web-postgres: {condition: service_healthy}
+    read_only: true
+    tmpfs: ['/tmp:rw,noexec,nosuid,size=16m']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 96
+    mem_limit: 384m
+    cpus: 1.0
+    healthcheck:
+      test: [CMD, python, -m, api.runtime, healthcheck]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
+  web-proxy:
+    profiles: [web]
+    image: ${WEB_PROXY_IMAGE:-stroop-web-proxy:local}
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    environment:
+      WEB_PUBLIC_ORIGIN: ${WEB_PUBLIC_ORIGIN:?Informe origem HTTPS}
+      APP_ENV: ${WEB_APP_ENV:-production}
+      ALLOW_SYNTHETIC_CERTIFICATE_FOR_TESTS: ${WEB_ALLOW_SYNTHETIC_CERTIFICATE_FOR_TESTS:-0}
+    secrets: [tls_certificate, tls_private_key]
+    networks: [web_edge, web_link]
+    depends_on:
+      web-api: {condition: service_healthy}
+    ports:
+      - '${WEB_BIND_ADDRESS:-127.0.0.1}:${WEB_HTTP_PORT:-8088}:8080'
+      - '${WEB_BIND_ADDRESS:-127.0.0.1}:${WEB_HTTPS_PORT:-8448}:8443'
+    read_only: true
+    tmpfs: ['/tmp:rw,noexec,nosuid,size=32m']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+    mem_limit: 128m
+    cpus: 0.5
+    healthcheck:
+      test: [CMD, /usr/local/bin/stroop-web, healthcheck]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
+  # Ferramentas apenas por chamada explicita; nao iniciadas com `up --profile web`.
+  web-migrate:
+    profiles: [web-tools]
+    image: ${WEB_API_IMAGE:-stroop-web-api:local}
+    build: {context: ., dockerfile: Dockerfile.api}
+    command: [migrate]
+    environment:
+      API_MIGRATION_DATABASE_URL_FILE: /run/secrets/migration_database_url
+    secrets: [migration_database_url]
+    networks: [web_data]
+    depends_on:
+      web-postgres: {condition: service_healthy}
+    read_only: true
+    tmpfs: ['/tmp:rw,noexec,nosuid,size=16m']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 48
+    mem_limit: 192m
+    cpus: 0.5
+    restart: 'no'
+
+  web-provision:
+    profiles: [web-tools]
+    image: ${WEB_API_IMAGE:-stroop-web-api:local}
+    build: {context: ., dockerfile: Dockerfile.api}
+    entrypoint: [python, -m, scripts.provision_web_database]
+    command: []
+    environment:
+      API_MIGRATION_DATABASE_URL_FILE: /run/secrets/migration_database_url
+      API_DATABASE_URL_FILE: /run/secrets/api_database_url
+      API_READ_DATABASE_URL_FILE: /run/secrets/api_read_database_url
+    secrets: [migration_database_url, api_database_url, api_read_database_url]
+    networks: [web_data]
+    depends_on:
+      web-postgres: {condition: service_healthy}
+    read_only: true
+    tmpfs: ['/tmp:rw,noexec,nosuid,size=16m']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 48
+    mem_limit: 192m
+    cpus: 0.5
+    restart: 'no'
+
+networks:
+  web_data: {internal: true}
+  web_link: {internal: true}
+  web_edge: {}
+  web_api_egress: {}
+volumes:
+  web_postgres_data: {}
+secrets:
+  postgres_password: {file: '${WEB_POSTGRES_PASSWORD_FILE:?Informe secret externo}'}
+  migration_database_url: {file: '${WEB_MIGRATION_DATABASE_URL_FILE:?Informe secret externo}'}
+  api_database_url: {file: '${WEB_DATABASE_URL_FILE:?Informe secret externo}'}
+  api_read_database_url: {file: '${WEB_READ_DATABASE_URL_FILE:?Informe secret externo}'}
+  oidc_client_id: {file: '${WEB_OIDC_CLIENT_ID_FILE:?Informe secret externo}'}
+  oidc_client_secret: {file: '${WEB_OIDC_CLIENT_SECRET_FILE:?Informe secret externo}'}
+  api_session_secret: {file: '${WEB_SESSION_SECRET_FILE:?Informe secret externo}'}
+  tls_certificate: {file: '${WEB_TLS_CERTIFICATE_FILE:?Informe certificado externo}'}
+  tls_private_key: {file: '${WEB_TLS_PRIVATE_KEY_FILE:?Informe chave externa}'}

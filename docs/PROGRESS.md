@@ -318,7 +318,7 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   e protocolo de evidencias. Ausencia de equipamento/manual impede homologacao
   fisica, mas nao bloqueia revisao de seguranca W17 e automacao W18.
 
-## W16 pendente / W17 e W18 concluidas / W19 seguinte
+## W16 pendente / W17–W19 concluidas / W20 seguinte
 
 - Commits: W15 4d539f9, paridade fd212a9, W17 8bdeab2, CI721c86c e fixYAML
   3b20144. AGENTS raiz preexistente preservado fora dos commits.
@@ -338,11 +338,34 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   sinteticos futuros, banco stroop_etapa4_test_w13. Nenhum servico real acessado.
 - Previa do usuario: http://127.0.0.1:4173, processo67560, frontend apenas,
   HTTP200 confirmado; preservar. Testes isolados usam4273; HTTPS4373/API4381.
-- Proxima acao: registrar aceite/commit documental W18 e iniciar W19. Plano API
-  preliminar do subagente w15_client: imagem nao-root, *_FILE, healthcheck Host
-  correto e migrate explicito com credencial separada. Root cuidara proxy,
-  frontend/Compose/integração. Resolver IP real do proxy sem confiar XFF externo;
-  nao executar migrations, configure/deploy na VPS nem alterar legado.
+- W18 aceite documental em 8ed8611, scanner ampliado em84a8963.
+- W19: Dockerfiles API/proxy e Compose isolado construidos/validados. Secrets
+  *_FILE externos, somente proxy publica portas, API/proxy nao-root/RO/nocaps,
+  jobs migrate/provision explicitos. Migration0008 oferece lock estreito de
+  app_users sem UPDATE para writer; grants canonicos reader e DML minimo writer.
+- Python307/50s:306 passaram e fixture de upgrade antigo falhou por usar API
+  nova antes0008; corrigida para SQLestado0005/snapshot. Modulo migrations11/11
+  reexecutado no CI32783 aprovado. Provision7/runtime11/proxy5 passaram.
+- Smoke Compose processo80853 terminou0: HTTPS/headers/Host/isolamento, grants,
+  convite/coleta16tentativas, retry, consulta/CSV e persistencia apos reiniciar
+  banco aprovados. Temporarios/volumes somente do smoke removidos. Corrigidas
+  opcoes tmpfs YAML entre aspas; verificacao de portas via DockerPortBindings,
+  pois composeport sem publicacao nao serve como criterio confiavel.
+- Scanner269 passou apos trocar placeholder do exemplo Streamlit por marcador
+  curto <substituir>; nenhum segredo operacional aberto. Diffcheck aprovado.
+- Acesso manual entregue ao usuario: https://127.0.0.1:34647/, pilha exclusiva
+  stroopw198e97815396, configuracao /tmp/stroop-web-preview-6ay1rzpw/compose.env.
+  Convite exclusivamente sintetico em /tmp/stroop-web-preview-access.json e
+  preview.json no diretorio externo; nao copiar codigo para docs/versionamento.
+  Preservar essa pilha para usuario e preview antigo4173. Nao consumir seu convite.
+  Chromium abriu welcome/orientacoes/pratica viaHTTPS sem erroJS, input presente.
+- Scripts smoke_web_compose.py/preview_web.py geram apenas dados sinteticos.
+  Certificado autoassinado requer excecao manual local; area equipe Google real
+  nao configurada. Isso nao substitui pilotos temporais W16/homologacao W21.
+- Proxima acao: concluir commit W19 sem AGENTS raiz; iniciar W20 com ferramentas
+  existentes de backup criptografado/restauracao/alerta e rollback compativel.
+  ContainerCI stroop-web-ci-721c86c ativo porta32783/banco stroop_etapa4_test_ci;
+  DBw13/32781 intocado. Nenhuma operacao VPS/push/deploy autorizada.
 
 ## Decisoes e contexto preservados
 

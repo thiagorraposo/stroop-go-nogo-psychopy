@@ -163,3 +163,61 @@ ou tamanho divergente) e rejeitado. Cookies participantes nao emitidos recebem
 401 sem criar contadores; limites de volume por IP/conexao no proxy continuam
 necessarios. A CSP de paginas/bundle e separada, em `web/security-headers.json`;
 a API nao serve HTML da aplicacao.
+
+## Runtime e imagem WEB
+
+`Dockerfile.api` usa a mesma base Python fixada do dashboard, mas instala somente
+`api/requirements.lock`. O contexto proprio em `Dockerfile.api.dockerignore`
+permite apenas o adaptador, nucleo Python, migrador/migrations e as tres fontes
+canonicas de condicoes. Dados, `.env`, secrets, PsychoPy, frontend, testes e
+artefatos locais ficam fora da imagem. O processo executa como UID/GID 10001,
+porta interna 8000, sem access log nem header de versao do servidor. A imagem
+aceita filesystem somente leitura; nao escreve codigo, dados ou migrations.
+
+A configuracao aceita os pares abaixo, com **somente uma origem por valor**:
+
+| Valor de ambiente | Arquivo externo explicito |
+|---|---|
+| `API_DATABASE_URL` | `API_DATABASE_URL_FILE` |
+| `API_READ_DATABASE_URL` | `API_READ_DATABASE_URL_FILE` |
+| `OIDC_CLIENT_ID` | `OIDC_CLIENT_ID_FILE` |
+| `OIDC_CLIENT_SECRET` | `OIDC_CLIENT_SECRET_FILE` |
+| `API_SESSION_SECRET` | `API_SESSION_SECRET_FILE` |
+
+O caminho `_FILE` deve apontar para arquivo regular legivel pelo UID 10001,
+UTF-8 de ate 16 KiB; um LF/CRLF final e removido. Ausencia, conflito entre
+valor e arquivo, arquivo vazio/invalido ou configuracao resultante invalida
+produzem mensagem fixa. Nao ha descoberta de arquivos `.env` ou secrets.
+Montagens e permissoes sao responsabilidade do operador; nao copie secrets ao
+contexto de build. A credencial de leitura continua sem fallback para escrita.
+
+Entrypoint: `python -m api.runtime`. Subcomandos:
+
+- `serve`: valida configuracao e inicia somente a API. Nao aplica migrations.
+- `healthcheck`: consulta `http://127.0.0.1:8000/health/ready`, com Host da
+  `API_PUBLIC_ORIGIN`, timeout de quatro segundos e sem proxies do ambiente;
+  retorna codigo zero apenas para resposta 200 `{"status":"ready"}`. O
+  healthcheck nao necessita ler secrets e nao altera o schema.
+- `migrate`: exige **exclusivamente** `API_MIGRATION_DATABASE_URL` ou
+  `API_MIGRATION_DATABASE_URL_FILE`, chama o migrador canonico explicitamente e
+  encerra. Nao herda a credencial de runtime nem exige OIDC. A credencial DDL
+  deve ser montada somente no job operacional, nunca no servico API permanente.
+
+`serve` ignora headers encaminhados por padrao. A opcao explicita
+`serve --forwarded-allow-ips IP,CIDR` habilita confianca apenas na lista
+informada; valores sao IPs/CIDRs, sem resolucao implicita de nomes. `*` e
+permitido somente por escolha explicita e exige API sem porta publicada e rede
+confinada exclusivamente ao proxy autorizado. O proxy deve sobrescrever
+X-Forwarded-For/Proto, para o limitador por endereco remoto nao aceitar valores
+forjados pelo cliente externo. Rede Docker compartilhada com outros aplicativos
+nao satisfaz esse confinamento. O Compose WEB e a validacao de spoofing do proxy
+sao entregaveis de infraestrutura separados; esta opcao nao torna confiavel um
+proxy arbitrario.
+
+Build local: `docker build -f Dockerfile.api -t stroop-web-api:w19 .` na raiz.
+Readiness consulta migrations na conexao operacional e nao comprova os grants
+da credencial de consulta; valide leitura autorizada e rejeicao de escrita
+separadamente antes da operacao. Aplicacao de migrations, provisionamento de
+papeis e conexao do proxy sao acoes explicitas; nenhum launcher legado mudou.
+
+Testes adicionais: `.venv/bin/python -m unittest tests.test_web_runtime -v`.

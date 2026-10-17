@@ -175,7 +175,7 @@ def create_invitation(database_url: str, invitation_id: UUID, session_id: UUID,
                 (project_id, issuer, subject),
             ).fetchone()
             user = connection.execute(
-                "SELECT active,role FROM app_users WHERE issuer=%s AND subject=%s FOR SHARE",
+                "SELECT active,role FROM public.web_lock_emitter(%s,%s)",
                 (issuer, subject),
             ).fetchone()
             if (project is None or not project[0] or project[1] != 'synthetic'
@@ -212,7 +212,7 @@ def revoke_invitation(database_url: str, project_id: UUID, invitation_id: UUID,
                 (project_id, issuer, subject),
             ).fetchone()
             user = connection.execute(
-                "SELECT active,role FROM app_users WHERE issuer=%s AND subject=%s FOR SHARE",
+                "SELECT active,role FROM public.web_lock_emitter(%s,%s)",
                 (issuer, subject),
             ).fetchone()
             if (project is None or not project[0] or member is None or not member[0]
@@ -334,7 +334,7 @@ def redeem(database_url: str, code_hash: str, token_hash: str,
                 (candidate[2],candidate[3],candidate[4]),
             ).fetchone()
             user = connection.execute(
-                "SELECT active,role FROM app_users WHERE issuer=%s AND subject=%s FOR SHARE",
+                "SELECT active,role FROM public.web_lock_emitter(%s,%s)",
                 (candidate[3],candidate[4]),
             ).fetchone()
             row = connection.execute(
@@ -398,7 +398,7 @@ def _eligible_session(connection, token_hash: str):
         (candidate[1],candidate[2],candidate[3]),
     ).fetchone()
     user = connection.execute(
-        "SELECT active,role FROM app_users WHERE issuer=%s AND subject=%s FOR SHARE",
+        "SELECT active,role FROM public.web_lock_emitter(%s,%s)",
         (candidate[2],candidate[3]),
     ).fetchone()
     invitation = connection.execute(

@@ -1,0 +1,18 @@
+# Allowlist exclusiva: nenhum dado, secret, cache, frontend ou legado Builder.
+**
+!Dockerfile.api
+!Dockerfile.api.dockerignore
+!api/
+!api/*.py
+!api/requirements.lock
+!stroop/
+!stroop/**/*.py
+!scripts/
+!scripts/migrations.py
+!scripts/provision_web_database.py
+!scripts/migrations/
+!scripts/migrations/*.sql
+!condicoes/
+!condicoes/web_protocol.json
+!condicoes/pratica_stroop_go_nogo_ptbr.csv
+!condicoes/bloco_principal_stroop_go_nogo_ptbr.csv
