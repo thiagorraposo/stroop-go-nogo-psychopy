@@ -18,7 +18,7 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 - O responsavel instruiu “pressuponha todos os aceites”. W09A e W13A foram
   aceitas formalmente por essa instrucao. Isso nao substitui evidencia de piloto
   em equipamento real nem medicao de capacidade/homologacao.
-- Commits locais: `e0e2adb` (W15E) e documentacao de retomada a seguir.
+- Commits locais: `e0e2adb` (W15E), `43a7faf` e `5a5d270` (retomada/evidencias).
   Alteracao preexistente em `AGENTS.md` permanece fora dos commits; nesta
   unidade nao houve dado real, acesso VPS, deploy ou push.
 - Inventario local parcial registrado: host Linux Mint 22.2, painel eDP
