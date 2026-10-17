@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
+import type { ProfessionalProfile } from '../api/client'
+import { SessionInvitation } from './SessionInvitation'
 import { ApiError, apiErrorMessage } from '../api/client'
 import { listProjects, listAssessments, getAssessment, exportAssessment } from '../api/assessments'
 import type { Assessment, AssessmentDetail, Project } from '../api/assessments'
@@ -8,7 +10,7 @@ import { accuracyByVisit, countByDate, formatMetric as number, responseDistribut
 type Filters = { participant_id: string; visit: string }
 const emptyFilters: Filters = { participant_id: '', visit: '' }
 
-export function ProfessionalDashboard() {
+export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfile }) {
   const [projects, setProjects] = useState<Project[]>([])
   const [project, setProject] = useState('')
   const [projectsLoading, setProjectsLoading] = useState(true)
@@ -131,9 +133,10 @@ export function ProfessionalDashboard() {
     {!projectsLoading && !projects.length && !error && <p role="status">Nenhum projeto disponível para sua conta.</p>}
     {projects.length > 0 && <>
       <label htmlFor="research-project">Projeto</label>
-      <select id="research-project" value={project} onChange={event => { setRows([]); setDetail(null); setProject(event.target.value) }}>
+      <select id="research-project" value={project} onChange={event => { if (event.target.value !== project) { setRows([]); setDetail(null); setProject(event.target.value) } }}>
         {projects.map(item => <option key={item.id} value={item.id}>{item.code} — {item.name}{item.active ? '' : ' (inativo)'}</option>)}
       </select>
+      {projects.find(item => item.id === project)?.active && profile.role !== 'consulta' && <SessionInvitation key={project} project={projects.find(item => item.id === project)!} profile={profile} />}
       <form className="dashboard-filters" onSubmit={apply}>
         <label>Participante (código)<input value={draft.participant_id} pattern="[A-Za-z0-9_.-]{1,64}" maxLength={64} onChange={event => setDraft({ ...draft, participant_id: event.target.value })} /></label>
         <label>Visita<input value={draft.visit} pattern="[A-Za-z0-9_.-]{1,64}" maxLength={64} onChange={event => setDraft({ ...draft, visit: event.target.value })} /></label>

@@ -14,6 +14,7 @@ from common import ROOT, ISSUER, SUBJECT, database_url
 import psycopg
 from api.auth import PROFESSIONAL_COOKIE
 from stroop.application import auth
+from stroop.domain.auth import opaque_user_id
 from stroop.application.import_postgres import import_csv
 from stroop.persistence import web_auth
 
@@ -55,7 +56,8 @@ def execute(value):
     token = secrets.token_urlsafe(32)
     web_auth.create_professional_session(database, sha256(token.encode()).hexdigest(), ISSUER, subject, expires)
     return {'cookie_name': PROFESSIONAL_COOKIE, 'token': token, 'project_id': str(project_id),
-            'subject': subject, 'assessment_id': assessment_id}
+            'subject': subject, 'assessment_id': assessment_id,
+            'evaluator_id': opaque_user_id(ISSUER, subject)}
 
 
 if __name__ == '__main__':

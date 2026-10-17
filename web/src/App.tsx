@@ -122,7 +122,7 @@ function ProfessionalAccess() {
       <p className="role-badge">{roleNames[state.profile.role]}</p>
       {logoutError && <p role="alert" className="notice">Não foi possível confirmar o encerramento. Tente novamente.</p>}
       <button className="button secondary" disabled={ending} onClick={() => void endSession(state.profile)}>{ending ? 'Encerrando…' : 'Encerrar sessão'}</button>
-      {!ending && <ProfessionalDashboard />}
+      {!ending && <ProfessionalDashboard profile={state.profile} />}
     </>}
   </section>
 }

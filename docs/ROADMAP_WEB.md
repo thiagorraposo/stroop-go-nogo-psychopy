@@ -25,7 +25,7 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W11 | Concluida em 2026-10-16; motor jsPsych, 120 testes logica/DOM e 24 browser aprovados |
 | W12 | Concluida em 2026-10-16; resumo, CSV de 21 campos, paridade Python/TypeScript e importacao real validados |
 | W13 | Integracao anterior validada; fluxo completo de cadastro pela interface pendente em W13A |
-| W13A | Planejada; cadastro da sessao pela equipe e gestao do convite ainda nao implementados na interface |
+| W13A | Implementada e validada tecnicamente; aceite de operacao pelo responsavel pendente |
 | W15 | Painel inicial validado; paridade funcional com legado pendente em W15A–W15E |
 | W15A | Planejada; completar filtros combinados e consulta entre projetos autorizados |
 | W15B | Planejada; completar tabela, detalhe, graficos e visoes por instrumento |
@@ -47,8 +47,8 @@ testados; W09A planeja a experiencia revisada do participante e permanece
 pendente de implementacao/aceite visual. W13A e W15A–W15E impedem considerar completos o cadastro, o dashboard
 e a substituicao funcional do legado pelo navegador. W13A e a proxima prioridade
 de implementacao, seguida dos complementos W15 conforme dependencias, antes
-do aceite funcional W21/W22. Por instrucao mais recente, esta unidade se limita
-ao planejamento documental; nao inicia codigo, testes funcionais ou publicacao.
+do aceite funcional W21/W22. A instrucao atual retoma a implementacao autonoma local; publicacao e aceite
+operacional permanecem sujeitos aos gates e autorizacoes especificos.
 A publicacao de testes W22 foi explicitamente
 delegada e executada; W16 e W21 continuam pendentes. Nenhuma dessas pendencias
 concede conclusao geral ou autoriza coleta real. Retomada detalhada em
@@ -471,7 +471,8 @@ Dependencias da fase: backend e execucao local aprovados.
 
 ### W13A — Cadastro da sessao pela equipe e emissao de convite
 
-- **Estado:** planejada, sem implementacao ou aceite. Complemento corretivo de
+- **Estado:** implementada e validada tecnicamente em 2026-10-17; aceite de
+  operacao pelo responsavel pendente, sem conclusao antecipada. Complemento corretivo de
   W13/W15 identificado pelo responsavel apos testar a versao publicada; preserva
   os IDs existentes e nao transforma testes anteriores em evidencia deste fluxo.
 - **Problema:** o participante consegue informar um convite, mas a equipe nao

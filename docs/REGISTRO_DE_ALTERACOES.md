@@ -6,6 +6,30 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-17 — Cadastro WEB pela equipe, validacao tecnica W13A
+
+- SessionInvitation e cliente sessions integrados a area profissional: codigo
+  pseudonimizado/visita, projeto e avaliador autenticado, emissao/revogacao,
+  espera, erros fechados, resultado desconhecido e limpeza de RAM. Sem backend
+  novo, migration ou mudanca no protocolo. Preparar outra sessao nao revoga a
+  anterior; cancelamento local nao presume desfazer operacao remota.
+- Correcao encontrada na integracao: selecionar novamente o projeto atual
+  limpava a lista sem disparar nova consulta. Mantida lista quando nao ha troca.
+- npm ci/audit sem achados; 211 testes frontend, typecheck/build aprovados.
+  Suite geral Chromium/Firefox:58/58 em57,1s. Convites focados:18/18 em11,6s,
+  incluindo teclado/foco, perfis, projeto inativo, trim/erros, duplo envio,
+  rede sem retry, troca de projeto/resposta tardia e logout. Screenshot sintetico
+  /tmp/stroop-w13a-invite.png inspecionado; acrescentados espacamento e quebra
+  de codigos longos. Sem alegacao de homologacao temporal fisica.
+- HTTPS/PostgreSQL reais: cinco de seis cenarios passaram no primeiro ensaio,
+  inclusive os dois percursos de60s e CSV com participante/visita/avaliador,
+  revogacao e zero resultado parcial. Falha de consulta Chromium identificou a
+  correcao acima; reexecucao focada passou nos dois navegadores (2/2 em7,1s).
+  Testes usam banco descartavel stroop_etapa4_test_w13a, sem dados reais.
+- README WEB e UX documentam operacao e limites. Aceite do responsavel para
+  operar a interface permanece pendente; W13A nao e declarada concluida.
+  W15A pode avancar independentemente. Sem publicacao, push ou acesso a VPS.
+
 ## 2026-10-16 — Relatorio tecnico de funcionamento
 
 - Criado desenvolvimento/RELATORIO_TECNICO.md para leitores externos, reunindo

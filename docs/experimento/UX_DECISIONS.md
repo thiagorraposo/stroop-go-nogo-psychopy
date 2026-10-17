@@ -126,3 +126,23 @@ permissao nao veem essa area; conta nao cadastrada ve apenas os identificadores
 `iss` e `sub` da propria sessao para solicitar cadastro manual. O e-mail e
 exibido somente como informacao auxiliar da conta autenticada. Detalhes em
 [AUTENTICACAO_E_PERMISSOES.md](../seguranca/AUTENTICACAO_E_PERMISSOES.md).
+
+## WEB — preparacao da sessao pela equipe (W13A)
+
+A area autenticada oferece `Preparar sessao` no projeto ativo para perfis de
+coleta/importacao e administracao. Exibe projeto e identificacao tecnica da
+conta; o servidor fixa o avaliador. Os dois campos recebem apenas codigo
+pseudonimizado e visita, com validacao por campo e foco no primeiro erro.
+Nao coleta nome, iniciais ou outros dados pessoais do participante.
+
+A emissao exige acao explicita e bloqueia envio concorrente. A confirmacao
+mostra metadados e convite de uso unico somente em RAM, com prazo UTC.
+`Abrir pratica em outra aba` usa apenas `/pratica`, sem segredo na URL.
+Troca de projeto, recarga, saida ou expiracao da conta descartam a exibicao;
+cancelar uma requisicao local nao desfaz uma escrita no servidor.
+
+Timeout, falha de rede ou resposta invalida nao provam que a criacao falhou:
+a interface informa resultado desconhecido, nao repete POST nem oferece
+revogacao sem identificador confirmado. Nova emissao e uma nova sessao,
+explicitamente solicitada. Revogacao so e declarada apos resposta204; uma
+falha pede confirmacao novamente e orienta a nao entregar o codigo.

@@ -3,7 +3,27 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
-## Atual — relatorio tecnico para leitores externos
+## Atual — W13A validada tecnicamente; W15A em implementacao
+
+- Retomada autonoma pelo arquivo anexado; branch prep-web. AGENTS.md raiz
+  preexistente preservado fora do escopo; nenhuma acao remota nesta retomada.
+- W13A implementada: SessionInvitation, sessions.ts/testes e integracao equipe.
+  CSRF RAM, perfil/projeto, campos/avaliador, revogacao, cancelamento/limpeza e
+  resultado desconhecido sem repetir POST. README/UX atualizados. Aceite do
+  operador pendente, sem declarar conclusao da etapa.
+- Evidencias W13A no registro:211 frontend,58 browser gerais e18 focados,
+  typecheck/build/npm ci/audit aprovados. HTTPS real:5/6 primeiro ensaio; falha
+  de reselecao de projeto corrigida e consulta revalidada2/2. Ambos percursos
+  completos60s/recibo/CSV aprovados. Screenshot sintetico inspecionado.
+- PostgreSQL descartavel proprio stroop-w13a-test/32768, database
+  stroop_etapa4_test_w13a; nenhum container operacional alterado.
+- W15A independente em andamento: agentes backend/client implementam filtros
+  repetidos, periodo assessment_date inclusivo, facetas autorizadas e cursor
+  sensivel a mudancas no conjunto; principal integrara multisselecao/limites.
+- Proxima acao: salvar unidade W13A em commit isolado, integrar W15A e executar
+  validacoes completas. W16/homologacao e coleta real seguem pendentes.
+
+## Historico — relatorio tecnico para leitores externos
 
 - Criada sintese em desenvolvimento/RELATORIO_TECNICO.md, com fluxo local/WEB,
   tempos, classificacao das respostas, formulas/exemplo sintetico, arquitetura,

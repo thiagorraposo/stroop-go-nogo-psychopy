@@ -113,3 +113,8 @@ kbd { font: inherit; font-size: .9em; border: 1px solid #b7bfca; border-radius: 
 .dashboard-chart li > span { overflow-wrap: anywhere; min-width: 0; }
 .professional-dashboard select { max-width: 100%; }
 .professional-dashboard input:focus-visible, .professional-dashboard select:focus-visible { outline: 3px solid #7350c7; outline-offset: 2px; }
+
+.session-invitation { padding: 1.25rem; border: 1px solid var(--line, #b9c3d0); border-radius: .75rem; margin-block: 1.5rem; overflow-wrap: anywhere; }
+.session-invitation .quiet { max-width: 72ch; }
+.session-invitation output { display: inline-block; font-family: monospace; font-size: 1.1em; user-select: all; }
+.session-invitation > .button { margin: .25rem .5rem .25rem 0; }

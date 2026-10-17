@@ -141,3 +141,26 @@ HTTPS sintetico, a ser consumida no empacotamento W19. Scripts/estilos/conexoes
 sao restritos a mesma origem, sem unsafe-inline ou unsafe-eval. Os motores usam
 propriedades CSS diretas; testes verificam pratica e principal sem violacoes.
 A previa Vite e destinada a desenvolvimento e nao atesta headers de producao.
+
+## Preparar uma sessao pela equipe
+
+Em `/equipe`, entre com sua conta previamente cadastrada, selecione um projeto
+ativo ao qual esteja vinculado e use `Preparar sessao` (perfil de coleta/importacao
+ou administracao). Preencha `Codigo do participante` e `Visita da sessao` com
+codigos pseudonimizados de1–64 letras ASCII, numeros, ponto, hifen ou sublinhado.
+O avaliador e a conta autenticada, fixada pelo servidor. Use somente sessoes
+sinteticas enquanto os gates de pesquisa real permanecerem pendentes.
+
+`Gerar convite` mostra o codigo uma unica vez, os dados da sessao e a expiracao
+UTC. Entregue-o por canal apropriado. `Abrir pratica em outra aba` abre `/pratica`,
+onde o participante informa o codigo; ele nunca integra o endereco. O participante
+segue orientacoes, verificacao de teclado, pratica e principal. Recebimento
+somente e confirmado apos recibo do servidor; os resultados podem ser consultados
+no projeto e exportados no CSV oficial autorizado.
+
+Trocar projeto, sair ou recarregar apaga o codigo exibido. Ele nao pode ser
+recuperado. Uma resposta perdida pode ter criado a sessao; nao ha reenvio
+automatico nem revogacao sem identificador conhecido. Informe o responsavel
+antes de emitir outro convite nesse caso. `Preparar outra sessao` limpa a tela,
+sem revogar o anterior. `Revogar convite` requer confirmacao do servidor; apos
+confirmacao impede resgate/continuidade, preservando resultados ja concluidos.
