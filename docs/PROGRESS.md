@@ -318,7 +318,7 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   e protocolo de evidencias. Ausencia de equipamento/manual impede homologacao
   fisica, mas nao bloqueia revisao de seguranca W17 e automacao W18.
 
-## W16 pendente / W17–W19 concluidas / W20 seguinte
+## W16 pendente / W17–W20 concluidas / homologacao aguarda ambiente
 
 - Commits: W15 4d539f9, paridade fd212a9, W17 8bdeab2, CI721c86c e fixYAML
   3b20144. AGENTS raiz preexistente preservado fora dos commits.
@@ -362,10 +362,30 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 - Scripts smoke_web_compose.py/preview_web.py geram apenas dados sinteticos.
   Certificado autoassinado requer excecao manual local; area equipe Google real
   nao configurada. Isso nao substitui pilotos temporais W16/homologacao W21.
-- Proxima acao: concluir commit W19 sem AGENTS raiz; iniciar W20 com ferramentas
-  existentes de backup criptografado/restauracao/alerta e rollback compativel.
-  ContainerCI stroop-web-ci-721c86c ativo porta32783/banco stroop_etapa4_test_ci;
-  DBw13/32781 intocado. Nenhuma operacao VPS/push/deploy autorizada.
+- W19 commit34d2ce1 concluido. W20: monitor_web.py real retornou ready e
+  somente contagens, quatro testes de falha/privacidade passaram; backup existente
+  reutilizado e hardening21/21 com PostgreSQLCI32783 passou, sem skips. Regressao
+  backupweb1/1 comprova servico com hifen, dump criptografado e opcoes invalidas.
+- Ensaio recuperacao processo15468 terminou0: backup/restauracao isolada7,083s,
+  8migrations/1coleta restauradas; integridade16tentativas/12metricas/estado
+  concluido verificada, alerta durante falha de banco, candidatoimagem invalido
+  e retorno a imagem aceita com contagens preservadas. Apenas recursos proprios
+  do ensaio removidos; previa do usuario mantida saudavel.
+- backup_postgres.py aceita --verify-web e servicoCompose comhifen; restore
+  sempre recebe envvazio explicito, sem descoberta .env. ContextoDocker do
+  candidato e diretorio minimo sem secrets. Runbook WEB_RECUPERACAO registra
+  RPO24h/RTO4h aprovados como objetivos, grants aposrestore e rollbackcompativel.
+- Scanner274 fontes sem achados; diffcheck e links operacionais aprovados.
+  Docs/topologia ajustam --project-name stroop-web explicito para isolar legado.
+  Nenhum push/deploy/servicoexterno acionado. AGENTS raiz permanece preexistente.
+- Pendencias reais: W16 requer equipamento de referencia/dez replicas fisicas;
+  W21 depende disso e ambiente alvo autorizado com capacidade medida. W22 e
+  execucao do usuario; W23 depende da implantacao/aceite. Perguntas sobre hardware
+  e ambiente de homologacao enviadas; nao presumir autorizacao VPS ou resultados.
+- Proxima acao: commitW20 isolado, aguardar informacoes/artefatos necessarios e
+  executar proxima validacao viavel sem antecipar aceite. ContainerCI
+  stroop-web-ci-721c86c ativo32783/banco stroop_etapa4_test_ci; DBw13/32781 intocado.
+  Preservar pilha de acesso manual e preview4173; convite sem consumo peloCodex.
 
 ## Decisoes e contexto preservados
 

@@ -40,12 +40,12 @@ da W22; possuir dominio/VPS nao concede esse aceite.
 Exemplo com arquivo externo; substitua o caminho antes da execucao:
 
 ```bash
-docker compose --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web config --quiet
-docker compose --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web build
-docker compose --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web up -d --wait web-postgres
-docker compose --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web-tools run --rm web-migrate
-docker compose --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web-tools run --rm web-provision
-docker compose --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web up -d --wait
+docker compose --project-name stroop-web --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web config --quiet
+docker compose --project-name stroop-web --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web build
+docker compose --project-name stroop-web --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web up -d --wait web-postgres
+docker compose --project-name stroop-web --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web-tools run --rm web-migrate
+docker compose --project-name stroop-web --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web-tools run --rm web-provision
+docker compose --project-name stroop-web --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web up -d --wait
 ```
 
 Migrations e provisionamento sao jobs explicitos, nunca executados ao iniciar
@@ -88,7 +88,7 @@ desativa access logs. Limites por IP na borda complementam os limites da API.
 Para parar preservando o volume:
 
 ```bash
-docker compose --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web down
+docker compose --project-name stroop-web --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web down
 ```
 
 Nao remova volumes para atualizar ou recuperar a aplicacao. Restauracao e

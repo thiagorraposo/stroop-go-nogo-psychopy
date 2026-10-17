@@ -29,7 +29,7 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W17 | Concluida; hardening, CSP, 284 testes Python, HTTPS e auditorias aprovados |
 | W18 | Concluida; pipeline completo em checkout sparse limpo, testes e auditorias aprovados |
 | W19 | Concluida; imagens nao-root, Compose isolado e smoke HTTPS/coleta/reinicio aprovados |
-| W20 | Proxima; observabilidade, recuperacao e rollback |
+| W20 | Concluida; monitor, backup criptografado/restauracao isolada, alerta e rollback validados |
 | W21, W23 | Nao iniciadas |
 | W14 | Concluida em 2026-10-16; consulta/CSV autorizados, papel SELECT, mapa legado e testes PostgreSQL validados |
 | W22 | Nao iniciada; implantacao futura de responsabilidade do usuario |

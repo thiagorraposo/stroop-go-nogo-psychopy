@@ -6,6 +6,19 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-16 — W20: observabilidade e recuperacao WEB
+
+- Monitor local somente leitura com saude/contagens e alerta fechado, sem dados
+  de participantes ou endpoint publico. Falhas e privacidade cobertas em4testes.
+- Backup existente reutilizado; servico Compose admite hifen sem relaxar SQL,
+  regressao especifica aprovada. Restore usa envvazio explicito e verifica
+  integridade WEB. Hardening21/21 aprovado com PostgreSQL sintetico.
+- Ensaio real aprovado: dump criptografado, restauracao isolada de8migrations/
+  1coleta em7,083s, falha de banco detectada, candidato invalido e retorno a
+  imagem aceita com contagens preservadas. Nenhum recurso da previa interrompido.
+- Runbook registra RPO24h/RTO4h aprovados como objetivos, grants apos restore,
+  rollback compativel sem apagar coletas e limites de homologacao em VPS.
+
 ## 2026-10-16 — W19: pacote WEB e acesso sintetico local
 
 - Imagens API/proxy separadas do legado, nao-root, contextos permitidos,
