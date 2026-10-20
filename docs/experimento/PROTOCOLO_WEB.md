@@ -165,6 +165,12 @@ continuam sob as respectivas etapas do roadmap, que concentra o aceite formal.
 
 ### Verificacao temporal aprovada (D5)
 
+Excecao de aceite W16 em 2026-10-20: por decisao explicita do responsavel,
+a etapa pode ser encerrada com evidencia local parcial e ressalvas. O alcance
+esta registrado no [historico de decisoes](DECISOES_DO_EXPERIMENTO.md#historico-de-decisoes).
+Essa excecao modifica o aceite da etapa, sem alterar os limites de validade
+abaixo nem transformar medicoes de software em latencia fisica comprovada.
+
 1. Preservar duracoes nominais, contagens, HUD e sequencia atuais. Registrar
    instantes planejados e observados de apresentacao/retirada do estimulo com
    relogio monotono no navegador; registrar eventos do teclado no mesmo dominio

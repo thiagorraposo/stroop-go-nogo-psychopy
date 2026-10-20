@@ -5,6 +5,78 @@ Estado e aceite permanecem no [roadmap](ROADMAP_WEB.md); tempos e tolerancias
 sao definidos somente em [D5 do protocolo](experimento/PROTOCOLO_WEB.md#verificacao-temporal-aprovada-d5).
 Nao constitui homologacao para coleta real ou equivalencia com PsychoPy.
 
+## Campanha local — 2026-10-20
+
+O responsavel instruiu "produza evidência parcial e trate como completo" apos
+ser informado sobre os recursos ausentes e as limitacoes da automacao.
+O aceite excepcional reduz o escopo de encerramento W16 a evidencia local,
+com as ressalvas deste relatorio. A matriz fisica original abaixo permanece
+historico do plano, sem ser apresentada como executada. Limites D5 do motor e
+da API continuam inalterados. Estado e aceite vigente ficam no roadmap.
+
+Metodo: `cd web && npm run test:w16`, 10 tentativas independentes por navegador
+e Escape separado, um worker, sem retries; pratica e principal reais, rAF e
+`performance.now()` reais, navegador visivel em X11. Teclado automatizado,
+API double `mockParticipant`, Vite dev com captura opt-in. Esta campanha nao
+mede latencia fisica, nao cria convites reais nem comprova persistencia/API.
+Nao houve controle dos demais processos/carga ambiente do computador.
+
+Host observado: Linux Mint 22.2, Intel Core i5-1334U, 12 processadores logicos,
+cerca de 15 GiB RAM, Intel Iris Xe. `xrandr --current` mostrou eDP-1 ativo em
+1920x1080/60 Hz e HDMI desconectado. Viewport configurado 1440x900; dimensoes
+efetivas e densidade de pixels constam dos artefatos, sem confundir a emulacao
+de viewport/screen do Playwright com medicao fisica do monitor. Chrome instalado
+155.0.8059.84 e Firefox Playwright 157.0; Firefox instalado 158.0 nao foi usado.
+Motor no commit `a6c870e`; hashes do coletor/configuracao registrados em
+`host.json`. Nesta campanha o motor nao foi alterado.
+
+Coleta entre 12:55:38 e 13:23:03 UTC: **20 cenarios aprovados, 2 falhas,
+0 skips, 0 retries**, em 27,4 minutos. O comando terminou com exit code 1;
+o aceite excepcional nao converte esse resultado em suite integralmente verde.
+
+| Navegador | Tentativas principais planejadas | Conclusoes validas | Principal invalidado | Falha antes do principal | Escape separado |
+|---|---:|---:|---:|---:|---|
+| Chrome 155.0.8059.84 instalado | 10 | 10 | 0 | 0 | Aprovado |
+| Firefox 157.0 Playwright | 10 | 8 | 1 | 1 | Aprovado |
+
+Medicoes abaixo sao condicionais **somente aos blocos completos validos**;
+nao representam a variabilidade de todas as tentativas. Tempos em milissegundos,
+arredondados apenas nesta tabela; JSONs conservam os valores observados.
+
+| Navegador / n valido | Periodo de quadro min–max | Maior desvio de transicao | Maior desvio do bloco de 60 s | Duracao media | DP amostral da duracao |
+|---|---:|---:|---:|---:|---:|
+| Chrome / 10 | 16,668–16,700 | 8,700 | 7,600 | 59998,810 | 4,696 |
+| Firefox / 8 | 16,330–17,100 | 4,000 | 3,000 | 59997,625 | 0,518 |
+
+Falhas preservadas, sem substituicao de replicas:
+
+- Firefox, tentativa 2: pratica nao chegou ao resumo dentro de 25 s; contexto
+  final mostrava a primeira tentativa de treino. Principal nao iniciado, sem
+  trilha principal ficticia. `results.json` e `error-context.md` preservados.
+- Firefox, tentativa 4: `timing_invalid`, 42 transicoes preservadas e maior
+  desvio absoluto observado de **864 ms**. Gate interrompeu a execucao, que nao
+  foi contada como resultado valido. A causa da interrupcao e da falha da
+  pratica nao foi determinada; nao atribuir ambas ao mesmo problema sem prova.
+
+Artefatos locais ignorados pelo Git: `exports/w16/2026-10-20T13-23-27Z/`.
+Contem 21 trilhas principais brutas (18 validas, 2 Escape e 1 invalida), resumos,
+erros, relatorio Playwright completo, inventario e copias exatas do coletor e da
+configuracao usados. `aggregate.json` recalcula as estatisticas dos `timing.json`.
+`SHA256SUMS` tem 92 entradas; verificar nesse diretorio com
+`sha256sum --check SHA256SUMS --quiet`. SHA-256 do proprio manifesto:
+`5b81243c1a0081a85acec6fc29476f49a3cfb14d5cfd001107f350f27f4f511e`.
+O arquivo foi copiado antes de outras suites; os artefatos originais permanecem
+intactos. Nenhum arquivo bruto/export/log foi versionado.
+
+Nota sobre os resumos originais: nas trilhas interrompidas, `duration_ms` de
+`summary.json` designava o fim da ultima tentativa concluida, nao a duracao do
+bloco. O agregado usa duracao nula para essas trilhas; o coletor versionado
+agora separa `last_completed_trial_end_ms` de duracao completa. Essa correcao
+de rotulo nao altera medicoes nem reescreve os JSONs da campanha.
+Probe separado do rotulo corrigido: Escape Chrome 1/1, fora das 22 tentativas
+originais, em `web/test-results/w16-summary-check/`. Vitest 273/273 e
+typecheck/build aprovados; nenhuma nova integracao Python/API foi alegada.
+
 ## Ambiente observado em 2026-10-16
 
 | Sistema/navegador | Modo observado | Evidencia | Pendencia de referencia |
@@ -67,7 +139,11 @@ Comandos reproduziveis: `npm test`, `npm run test:browser` e
 um ensaio temporal de referencia. Relogio controlado de testes da area
 profissional nao e evidencia temporal do experimento.
 
-## Procedimento de piloto de referencia
+## Procedimento original de piloto fisico — referencia historica
+
+Plano aprovado em 2026-10-16; a matriz abaixo foi dispensada pelo responsavel
+para o encerramento excepcional de 2026-10-20. Nao foi executada integralmente
+nem substituida por uma alegacao de medicao fisica da campanha automatizada.
 
 ### Configuracao de referencia aprovada
 
@@ -124,16 +200,18 @@ Modelo de registro por replica (sem valores preenchidos artificialmente):
 |---|---|---|---|---|---|---|
 | A preencher no equipamento de referencia | — | — | — | — | — | Nao executado |
 
-## Limite atual
+## Limites mantidos apos o aceite excepcional
 
 Faltam teclado USB com fio para o host Linux, Edge, ambiente Windows 11,
 execucao presencial das dez replicas por combinacao e evidencias fisicas/
 comparativas quando exigidas pelo estudo. O inventario parcial acima nao e
 resultado de piloto. O Codex pode preparar software e analisar artefatos
-sinteticos, mas nao atestar ensaios fisicos sem os equipamentos. W16 continua
-pendente de aceite. A configuracao do pacote esta decidida; a pendencia e a
-disponibilidade/verificacao dos equipamentos e a execucao dos ensaios, sem nova
-aprovacao tecnica rotineira. W17–W20 ja foram executadas independentemente.
+sinteticos, mas nao atestar ensaios fisicos sem os equipamentos. O responsavel
+aceitou encerrar W16 com evidencia parcial local; isso nao transforma o plano
+original nao executado em evidencia, nem homologa outros ambientes. As duas
+falhas Firefox continuam achados reais com causa desconhecida. W21 conserva
+seu aceite proprio de homologacao/capacidade no ambiente alvo; coleta real e
+novas publicacoes nao foram autorizadas por esta decisao.
 
 A [documentacao primaria de temporizacao do jsPsych](https://www.jspsych.org/v8/overview/timing-accuracy/)
 distingue limitacoes de apresentacao em navegador e alerta que resultados de

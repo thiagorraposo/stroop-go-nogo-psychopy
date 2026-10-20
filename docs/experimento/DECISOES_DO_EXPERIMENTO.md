@@ -100,6 +100,16 @@ respectivas etapas; o formulario e os dados locais existentes sao preservados.
 
 ## Historico de decisoes
 
+- 2026-10-20: apos ser informado sobre os ambientes/perifericos ausentes e a
+  diferenca entre automacao e piloto fisico, o responsavel instruiu
+  "produza evidência parcial e trate como completo". Autoriza encerrar W16
+  por aceite de escopo reduzido aos recursos locais, com limitacoes explicitadas.
+  A matriz fisica original permanece referencia historica nao executada;
+  nao declarar seus criterios comprovados nem homologacao universal. Os gates
+  de validade temporal D5 do motor/API permanecem obrigatorios e inalterados;
+  tentativas invalidas continuam invalidas e seus artefatos sao preservados.
+  O aceite da etapa nao mede latencia fisica nem dispensa W21 ou autoriza coleta
+  real/deploy. Resultados observados em `../VALIDACAO_WEB.md`; estado no roadmap.
 - 2026-10-16: usuario aprovou os itens 1–19 da proposta da sessao, incluindo
   D1–D6 do protocolo WEB, finalidade de coleta por seu grupo de pesquisa, publico
   amplo e responsabilidade propria pelo protocolo, validacao e operacao.

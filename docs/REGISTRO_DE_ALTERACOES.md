@@ -6,6 +6,33 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-20 — W16: evidencia local e encerramento por aceite excepcional
+
+- Responsavel instruiu "produza evidência parcial e trate como completo" apos
+  esclarecimento dos limites. Registrado encerramento W16 com escopo reduzido,
+  mantendo a matriz fisica original como referencia nao executada. Gates D5,
+  motor, API, tempos, estimulos, metricas e CSV permanecem inalterados.
+- Nova campanha explicita `cd web && npm run test:w16`: navegadores visiveis
+  na sessao X11, Chrome instalado 155.0.8059.84 e Firefox Playwright 157.0,
+  teclado automatizado e API double; pratica e principal reais. Dez tentativas
+  por navegador, Escape separado, um worker, sem retries ou dependencias novas.
+- Campanha de 27,4 minutos: 20 aprovados, 2 falhas, 0 skips, exit 1. Chrome
+  10/10 completos validos; Firefox 8/10, tentativa 2 sem terminar pratica em
+  25 s e tentativa 4 invalidada pelo gate (864 ms, 42 transicoes preservadas).
+  Escape aprovado em ambos. Falhas nao foram apagadas/substituidas ou reclassificadas
+  como testes aprovados; causas ainda nao determinadas.
+- Lote arquivado localmente em `exports/w16/2026-10-20T13-23-27Z/`: 21 trilhas
+  brutas (18 validas, 2 Escape, 1 invalida), relatorio de falhas, inventario,
+  agregado e copia do coletor usado. Manifesto com 92 entradas conferido;
+  SHA e estatisticas em `VALIDACAO_WEB.md`. Artefatos ignorados pelo Git.
+- Coletor separa duracao completa de fim da ultima tentativa em interrupcoes;
+  campanha original intacta, agregado calculado diretamente das trilhas.
+  Probe do rotulo corrigido em Escape Chrome 1/1; Vitest 273/273,
+  typecheck/build, 66 links locais e `git diff --check` aprovados. Nenhum teste Python/API novo
+  exigido por alteracoes restritas a coleta de evidencias/docs/frontend de teste.
+  Sem dado real, VPS, deploy ou push; `AGENTS.md` preexistente preservado.
+  Aceite administrativo W16 nao equivale a homologacao fisica nem conclui W21.
+
 ## 2026-10-17 — Instrumentacao local opt-in para pilotos W16
 
 - Motor do bloco principal oferece trilha opcional de transicoes, intervalo de

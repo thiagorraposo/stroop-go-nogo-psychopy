@@ -32,12 +32,12 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W15C | Concluida tecnicamente em 2026-10-17; CSV agregado autorizado e consistente |
 | W15D | Concluida tecnicamente em 2026-10-17; contas, projetos e vinculos pela interface |
 | W15E | Concluida em 2026-10-17; upload CSV autenticado, minimizacao no navegador, auditoria e consulta real validados |
-| W16 | Instrumentacao local opt-in pronta; inventario parcial Linux Mint 22.2, mas faltam teclado USB com fio, Edge, Windows 11 e 60 replicas presenciais |
+| W16 | Encerrada com ressalvas em 2026-10-20 por aceite explicito de evidencia parcial; campanha local com 20 cenarios aprovados e 2 falhas Firefox, matriz fisica original dispensada para este encerramento |
 | W17 | Concluida; hardening, CSP, 284 testes Python, HTTPS e auditorias aprovados |
 | W18 | Concluida; pipeline completo em checkout sparse limpo, testes e auditorias aprovados |
 | W19 | Concluida; imagens nao-root, Compose isolado e smoke HTTPS/coleta/reinicio aprovados |
 | W20 | Concluida; monitor, backup criptografado/restauracao isolada, alerta e rollback validados |
-| W21 | VPS definida/inventariada; pendentes W16, capacidade e aceite de homologacao |
+| W21 | VPS definida/inventariada; W16 encerrada com ressalvas; pendentes capacidade medida e aceite de homologacao no ambiente alvo |
 | W23 | Nao iniciada; depende da implantacao/aceite W22 |
 | W14 | Concluida em 2026-10-16; consulta/CSV autorizados, papel SELECT, mapa legado e testes PostgreSQL validados |
 | W22 | Publicada na VPS por delegacao explicita, somente testes sinteticos; confirmacao Google pessoal pendente |
@@ -47,8 +47,11 @@ testados. O responsavel instruiu explicitamente presumir os aceites pendentes e
 prosseguir autonomamente; por isso W09A e W13A estao formalmente aceitas. Essa
 instrucao nao cria evidencias de piloto fisico, capacidade medida ou homologacao.
 A publicacao de testes W22 foi explicitamente
-delegada e executada; W16 e W21 continuam pendentes. Nenhuma dessas pendencias
-concede conclusao geral ou autoriza coleta real. Retomada detalhada em
+delegada e executada. Em 2026-10-20 o responsavel instruiu produzir evidencia
+parcial e tratar W16 como completa: etapa encerrada por aceite de escopo reduzido,
+com resultados/falhas locais em `VALIDACAO_WEB.md`. Isso nao declara executada a
+matriz fisica original. W21 continua pendente; o encerramento W16 nao concede
+conclusao geral, homologacao universal ou autorizacao de coleta real. Retomada em
 [PROGRESS.md](PROGRESS.md). Evidencias em
 [registro de alteracoes](REGISTRO_DE_ALTERACOES.md).
 Bloqueio de produto/metodo resolvido pela aprovacao explicita na sessao.
@@ -393,7 +396,8 @@ Dependencias da fase: W01–W03; integrar ao backend somente em W13.
      Mensagens dos feedbacks cronometrados permanecem fora desta correcao.
   4. Sem atalho de navegacao vazando resposta para a primeira tentativa;
      preservar soltura de tecla, verificacao de teclado/foco e fluxo de start.
-     Nao rotular ambiente como homologado enquanto W16 estiver pendente.
+     O aceite excepcional W16 de escopo reduzido nao homologa ambientes nao
+     medidos; homologacao do pacote depende de W21.
   5. Sucesso de envio somente apos recibo; permitir reenvio apenas conforme
      contrato; finalizar nao mascara envio pendente, erro de logout ou falha
      de limpeza. A nova confirmacao de encerramento so aparece apos sucesso
@@ -821,9 +825,18 @@ Dependencias da fase: fluxo integrado; seguranca basica ja e obrigatoria desde W
   protocolo de piloto, evidencias sinteticas e limites conhecidos; captura local
   opt-in preserva trilhas de execucoes completas/interrompidas.
 - **Dependencias:** W13.
-- **Conclusao:** criterios de temporizacao W01 comprovados, interrupcoes
-  detectadas e formulas verificadas. Sem evidencias manuais necessarias,
-  registrar pendencia; testes automatizados nao substituem medicao fisica.
+- **Aceite vigente:** encerramento com ressalvas autorizado pelo responsavel
+  em 2026-10-20, por instrucao de produzir evidencia parcial e tratar como completo.
+  Campanha local: 10 tentativas por navegador visivel, Chrome instalado e Firefox
+  Playwright, com teclado sintetico/API double, tempos brutos e Escape separado.
+  Resultado: 20 cenarios aprovados e 2 falhas Firefox; dados/falhas preservados no
+  relatorio. Aceite administrativo de escopo reduzido, sem homologacao fisica.
+- **Criterio original preservado como referencia:** criterios de temporizacao
+  W01 comprovados, interrupcoes detectadas e formulas verificadas; matriz fisica
+  de seis combinacoes/60 sessoes. Esta matriz nao foi executada e foi dispensada
+  para o encerramento atual, nao convertida em teste aprovado. Gates D5 do
+  motor/API permanecem inalterados; tentativas temporalmente invalidas continuam
+  invalidas. A decisao e limites estao no historico metodologico e relatorio W16.
 - **Validacoes:** piloto autorizado, variacao de frames, latencia/variabilidade,
   tecla mantida, perda de foco e comparacao controlada quando exigida pelo estudo.
 - **Leitura:** protocolo web e documentacao de temporizacao do jsPsych.

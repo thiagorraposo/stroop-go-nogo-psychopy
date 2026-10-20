@@ -39,6 +39,23 @@ inequivocamente sinteticas; producao nao possui respostas simuladas. Nao executa
 esses testes contra coleta real. `npm run preview` serve o build local em 4173.
 `dist/`, `node_modules/`, traces e resultados de teste nao sao versionados.
 
+## Campanha local W16
+
+Campanha local W16: `npm run test:w16` usa a sessao grafica disponivel, Chrome
+instalado e Firefox do Playwright, um worker, dez tentativas por navegador e
+Escape separado, sem retries. Requer os binarios existentes; nao instala nada.
+Leva cerca de 30 minutos. Usa teclado sintetico e API double; o motor jsPsych,
+relogio e quadros sao reais. Mantenha a janela em foco durante a campanha.
+A captura opt-in e ativada so nesse servidor local (porta 4186). Artefatos
+`timing.json`/`summary.json` por tentativa e `results.json` ficam em
+`test-results/w16/`, ignorado pelo Git. Preserve o diretorio antes de repetir,
+pois o runner limpa o output da campanha. Invalidacoes do principal falham depois
+da exportacao; falhas anteriores ao principal ficam em `results.json` e no
+contexto de erro, sem inventar trilha de um bloco nao iniciado. Nao ha substituicao
+silenciosa de tentativas. Este comando mede somente
+o comportamento observavel por software no ambiente descrito, sem certificar
+teclado fisico, todas as combinacoes suportadas ou recebimento no servidor.
+
 ## Organizacao e fronteiras
 
 - `src/App.tsx`: telas e navegacao; `src/styles.css`: apresentacao responsiva,

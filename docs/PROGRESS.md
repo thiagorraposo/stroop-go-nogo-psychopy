@@ -3,7 +3,33 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
-## Atual — W15E concluida; instrumentacao W16 pronta; pilotos fisicos pendentes
+## Atual — W16 encerrada com ressalvas por aceite de evidencia parcial
+
+- Em 2026-10-20 o responsavel instruiu produzir evidencia parcial e tratar W16
+  como completa. Aceite registrado como encerramento com ressalvas, sem
+  afirmar execucao da matriz fisica original. Gates de motor/API inalterados.
+- Campanha `cd web && npm run test:w16`: 10 tentativas independentes por
+  navegador visivel (Chrome instalado e Firefox Playwright), Escape separado,
+  um worker e zero retries. Pratica e principal reais; API double e teclado
+  sintetico. Artefatos em `web/test-results/w16/` (ignorados pelo Git).
+- Resultado: 20 cenarios aprovados e 2 falhas Firefox; exit 1, zero skips/retries.
+  Chrome 10/10 blocos validos; Firefox 8/10, falha de pratica na tentativa 2 e
+  `timing_invalid` na 4 (864 ms, 42 transicoes preservadas). Escape passou nos
+  dois navegadores. Causas das falhas nao determinadas, sem nova tentativa para
+  substituir as falhas. Matriz fisica original dispensada para este aceite.
+- Lote imutavel local em `exports/w16/2026-10-20T13-23-27Z/`, 21 trilhas brutas,
+  erros, inventario, coletor original e agregado. 92 checksums verificados.
+  Medicoes/limites em [VALIDACAO_WEB](VALIDACAO_WEB.md), estado no roadmap.
+- Validacao adicional: 273 Vitest, typecheck/build, probe Escape Chrome 1/1 e
+  `git diff --check`; 66 links locais conferidos. Corrigido rotulo de duracao das interrupcoes no coletor;
+  JSONs originais preservados. Motor/API/paradigma nao alterados. Arquivos:
+  `web/pilots/`, config Playwright W16, comando npm/tsconfig, README e documentos
+  de metodo/roadmap/validacao/registro. `AGENTS.md` preexistente fora do commit.
+- Proxima etapa do roadmap: W21, que ainda exige homologacao no ambiente alvo
+  autorizado e capacidade medida. O aceite parcial W16 nao autoriza acesso
+  remoto, deploy, coleta real ou homologacao de combinacoes nao testadas.
+
+## Historico — W15E concluida; instrumentacao W16 pronta; pilotos fisicos pendentes
 
 - W15E entrega upload CSV WEB com minimizacao em memoria no navegador,
   validacao server-side, vinculo explicito ao projeto, auditoria e recuperacao
