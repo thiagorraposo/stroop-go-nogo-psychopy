@@ -67,7 +67,7 @@ class WebProxyConfigTests(unittest.TestCase):
         self.assertIn('client_max_body_size 64k;', config)
         self.assertIn('if ($http_host != "${WEB_AUTHORITY}")', config)
         self.assertIn('location /api/', config)
-        self.assertIn('location ~ ^/api/v1/projects/[0-9a-fA-F-]{36}/imports/[0-9a-fA-F-]{36}$', config)
+        self.assertIn('location ~ "^/api/v1/projects/[0-9a-fA-F-]{36}/imports/[0-9a-fA-F-]{36}$"', config)
         self.assertIn('client_max_body_size 5m;', config)
 
     def test_http_acme_webroot_exclusivo_preserva_redirect_e_tls_fechado(self):

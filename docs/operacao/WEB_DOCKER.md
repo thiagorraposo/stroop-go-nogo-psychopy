@@ -99,6 +99,11 @@ dados nem reverte migrations.
 
 ## Evidencias e teste manual sintetico
 
+Para carga controlada na pilha exclusiva local, use
+`python scripts/benchmark_web.py --build-images --output exports/w21/capacity-NOVA.json`.
+Metodo, resultados e limites em [HOMOLOGACAO_WEB](HOMOLOGACAO_WEB.md). O medidor
+nao recebe URL externa e nao substitui a capacidade medida da VPS.
+
 `python scripts/smoke_web_compose.py` cria projeto/volume/secrets exclusivos,
 valida imagens prontas, HTTPS, headers, Host, portas/privilegios, leitura restrita,
 convite/resgate/inicio/conclusao, retry idempotente, consulta/exportacao e

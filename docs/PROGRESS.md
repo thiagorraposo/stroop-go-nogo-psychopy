@@ -3,7 +3,42 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
-## Atual — W16 encerrada com ressalvas por aceite de evidencia parcial
+## Atual — W21 validada localmente; homologacao do alvo bloqueada por acesso SSH
+
+- Retomada em 2026-10-21 apos pausa solicitada pelo responsavel. Git em
+  `prep-web`; `AGENTS.md` preexistente permanece fora da tarefa.
+- `scripts/benchmark_web.py` cria pilha exclusiva HTTPS/API/PostgreSQL, mede
+  1 GET/s por sessao nos niveis 1/4/8/16, sem alterar limitadores. Massa de uma
+  avaliacao sintetica; OIDC apenas fixture de sessao. Nao extrapolar para VPS.
+  Helpers Compose aceitam imagens explicitas; recuperacao consulta a lista
+  vigente de migrations em vez de exigir oito.
+- Primeiro ensaio falhou antes da carga: Nginx rejeitou regex CSV com `{36}`
+  sem aspas. Corrigido `web/deploy/nginx.conf.template`; smoke real agora
+  confere corpo maior que 64 KiB aceito ate autenticacao nessa rota e 413
+  nas demais. Segundo ensaio corrigiu Content-Type da fixture, sem alterar API.
+- Terceiro ensaio concluiu: 870 requisicoes; niveis 1/4/8 clientes ativos a
+  1 GET/s sem rejeicoes; em 16 clientes, 320 sucessos e 160 respostas 429.
+  Nenhum 5xx ou erro de transporte. Reinicio dos tres containers preservou
+  1 avaliacao/16 tentativas/12 metricas. Nao e capacidade medida da VPS.
+- Recuperacao com as mesmas imagens: 9 migrations/1 avaliacao restauradas,
+  alerta e rollback de candidato invalido aprovados. Regressao Python 352/352,
+  zero skips; integracao HTTPS/API/PG Chromium/Firefox 36/36; typecheck/build
+  aprovados. Nenhum recurso temporario desses ensaios permaneceu ativo.
+- [Relatorio de homologacao local](operacao/HOMOLOGACAO_WEB.md): metodo,
+  resultados e limites. Artefatos em `exports/w21/`, incluindo as duas falhas
+  iniciais; manifesto com 10 checksums conferidos. Sem logs/exports no Git.
+- SSH de leitura ao alvo documentado: autenticacao recusada; chave local
+  protegida por passphrase. Solicitado desbloqueio no agente, sem pedir segredo
+  na conversa. Dialogo grafico nao carregou a chave; agente temporario removido.
+  Smoke publico fez apenas dois GETs (200); nenhuma alteracao remota.
+  Homologacao/capacidade/reboot do alvo
+  continuam sem evidencia e o aceite reduzido W16 nao se aplica a W21.
+- Proxima acao: disponibilizar chave desbloqueada em agente SSH acessivel a
+  esta sessao, conferir o alvo em leitura e executar homologacao isolada la.
+  Nao publicar o candidato, reiniciar a VPS ou acessar dados reais implicitamente.
+  W21 nao concluida; W22/W23 nao foram avancadas. `AGENTS.md` preservado.
+
+## Historico — W16 encerrada com ressalvas por aceite de evidencia parcial
 
 - Em 2026-10-20 o responsavel instruiu produzir evidencia parcial e tratar W16
   como completa. Aceite registrado como encerramento com ressalvas, sem

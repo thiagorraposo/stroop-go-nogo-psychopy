@@ -6,6 +6,47 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-21 — W21: pilha local validada; alvo aguarda acesso SSH
+
+- Retomada apos pausa do responsavel. Novo `scripts/benchmark_web.py` cria
+  pilha exclusiva HTTPS/API/PostgreSQL e mede consultas autenticadas sem aceitar
+  alvo externo. Limites padrao preservados, clientes com pacing de 1 GET/s,
+  quatro operacoes, evidencias exclusivas e sem corpos/cookies/DSNs nos arquivos.
+  Helpers Compose/recuperacao aceitam imagens explicitas, sem alterar defaults
+  dos comandos existentes; recuperacao usa a lista canonica de migrations.
+- Encontrada falha real da imagem atual: Nginx recusava regex CSV com `{36}`
+  sem aspas. Corrigida delimitacao e acrescentado smoke real de limites:
+  rota CSV aceita mais de 64 KiB ate autenticacao; demais mantem 413. O primeiro
+  ensaio falhou por essa sintaxe; o segundo corrigiu Content-Type da fixture
+  de transporte. Ambos preservados, sem carga medida ou aceite artificial.
+- Terceiro ensaio: 870 requisicoes, 710 respostas 200 validas e 160 respostas
+  429; nenhum 5xx, erro de transporte ou resposta 200 invalida. Niveis 1/4/8
+  clientes ativos a 1 GET/s passaram sem rejeicoes. Em 16, 320/480 sucessos,
+  p95 dos sucessos 860,92 ms. Maior nivel testado sem rejeicao: 8, p95 115,42 ms.
+  Massa de uma avaliacao; isto nao mede teto de hardware, participantes ou VPS.
+  Canarios de sessao ausentes dos logs API/proxy e contagens preservadas apos
+  reiniciar os tres containers. Sem reboot do host.
+- Mesmas imagens em backup/restauracao/alerta/rollback: 9 migrations e uma
+  avaliacao restauradas, integridade e contagens preservadas; ensaio de backup
+  + restauracao local em 6,927 s. Nenhuma garantia de RPO/RTO do alvo inferida.
+- Regressao Python 352/352 sem skips, com banco novo descartavel; integracao
+  HTTPS/API/PostgreSQL Chromium/Firefox 36/36 em 10,9 minutos; typecheck/build
+  aprovados. A suite usa proxy HTTPS proprio, complementado pelo Nginx real
+  nos ensaios Compose. Nenhuma nova dependencia ou ferramenta instalada no host.
+- Artefatos em `exports/w21/`: `capacity-local-20261021{,-r2,-r3}.json`,
+  `recovery-local-20261021.json`, `validation-local-20261021.json`, logs
+  sanitizados, smoke publico, estado SSH e hashes das fontes. Manifesto com
+  10 entradas conferido; metodo, digests e limites em
+  [HOMOLOGACAO_WEB](operacao/HOMOLOGACAO_WEB.md). Logs/exports nao versionados.
+- Smoke publico fez somente dois GETs: pagina e prontidao 200, HSTS/CSP
+  observados. SSH de leitura recusado: chave criptografada nao liberada e
+  agente da sessao indisponivel. Tentativa por dialogo grafico nao carregou a
+  chave; agente temporario removido. Solicitado acesso sem pedir segredo na
+  conversa. Nenhuma alteracao remota, leitura de dado real, deploy ou push.
+- W21 continua pendente do ambiente alvo (capacidade, recuperacao/reboot,
+  autenticacao externa e aceite); W22/W23 nao avancadas. `AGENTS.md` preexistente
+  preservado fora do commit. Conferidos links locais e `git diff --check`.
+
 ## 2026-10-20 — W16: evidencia local e encerramento por aceite excepcional
 
 - Responsavel instruiu "produza evidência parcial e trate como completo" apos

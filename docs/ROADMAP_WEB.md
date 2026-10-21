@@ -37,7 +37,7 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W18 | Concluida; pipeline completo em checkout sparse limpo, testes e auditorias aprovados |
 | W19 | Concluida; imagens nao-root, Compose isolado e smoke HTTPS/coleta/reinicio aprovados |
 | W20 | Concluida; monitor, backup criptografado/restauracao isolada, alerta e rollback validados |
-| W21 | VPS definida/inventariada; W16 encerrada com ressalvas; pendentes capacidade medida e aceite de homologacao no ambiente alvo |
+| W21 | Validacao local executada em 2026-10-21; carga/recuperacao/regressao aprovadas no escopo local; bloqueada no alvo por chave/agente SSH indisponiveis; homologacao/capacidade/reboot da VPS nao comprovados |
 | W23 | Nao iniciada; depende da implantacao/aceite W22 |
 | W14 | Concluida em 2026-10-16; consulta/CSV autorizados, papel SELECT, mapa legado e testes PostgreSQL validados |
 | W22 | Publicada na VPS por delegacao explicita, somente testes sinteticos; confirmacao Google pessoal pendente |
@@ -905,6 +905,11 @@ Dependencias da fase: evidencias funcionais, temporais, de seguranca e operacao.
 
 ### W21 — Homologacao e capacidade
 
+- **Evidencia atual:** [relatorio local](operacao/HOMOLOGACAO_WEB.md), com
+  carga HTTPS real, recuperacao, 352 testes Python e 36 de integracao. Nao
+  concede conclusao da etapa: SSH ao ambiente alvo depende de chave liberada
+  em agente acessivel; capacidade/reboot/aceite desse ambiente permanecem sem
+  prova. O aceite excepcional W16 nao dispensa esses criterios da W21.
 - **Objetivo:** validar o pacote completo no ambiente de homologacao autorizado.
 - **Entregaveis:** relatorio de aceite, limite de concorrencia medido, roteiro
   operacional e lista fechada de pendencias; dados sempre sinteticos.

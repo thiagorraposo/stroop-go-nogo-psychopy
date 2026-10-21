@@ -19,6 +19,7 @@ import io
 import json
 import os
 from pathlib import Path
+import re
 import secrets
 import shutil
 import socket
@@ -92,7 +93,13 @@ class _PinnedHTTPConnection(http.client.HTTPConnection):
 
 
 class WebComposeSmoke:
-    def __init__(self, temporary: Path, build_images: bool):
+    def __init__(self, temporary: Path, build_images: bool, *,
+                 api_image: str = API_IMAGE, proxy_image: str = PROXY_IMAGE):
+        if any(not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._/@:-]*', image)
+               for image in (api_image, proxy_image)):
+            raise SmokeFailure('image')
+        self.api_image = api_image
+        self.proxy_image = proxy_image
         self.temporary = temporary
         self.project = "stroopw19" + secrets.token_hex(5)
         self.environment_file = temporary / "compose.env"
@@ -163,8 +170,8 @@ class WebComposeSmoke:
             "WEB_BIND_ADDRESS": "127.0.0.1",
             "WEB_HTTP_PORT": str(self.http_port),
             "WEB_HTTPS_PORT": str(self.https_port),
-            "WEB_API_IMAGE": API_IMAGE,
-            "WEB_PROXY_IMAGE": PROXY_IMAGE,
+            "WEB_API_IMAGE": self.api_image,
+            "WEB_PROXY_IMAGE": self.proxy_image,
             "WEB_ALLOW_SYNTHETIC_CERTIFICATE_FOR_TESTS": "1",
         }
         values.update({key: str(value) for key, value in self.secret_paths.items()})
@@ -176,12 +183,12 @@ class WebComposeSmoke:
 
     def _build_images(self):
         # Sequential on purpose: API and frontend builds do not compete for CPU/RAM.
-        _run(["docker", "build", "--file", "Dockerfile.api", "--tag", API_IMAGE, "."])
-        _run(["docker", "build", "--file", "Dockerfile.web", "--tag", PROXY_IMAGE, "."])
+        _run(["docker", "build", "--file", "Dockerfile.api", "--tag", self.api_image, "."])
+        _run(["docker", "build", "--file", "Dockerfile.web", "--tag", self.proxy_image, "."])
 
     def _require_images(self):
-        _run(["docker", "image", "inspect", API_IMAGE])
-        _run(["docker", "image", "inspect", PROXY_IMAGE])
+        _run(["docker", "image", "inspect", self.api_image])
+        _run(["docker", "image", "inspect", self.proxy_image])
 
     def compose(self, *args: str, input_text: str | None = None,
                 timeout: int = 180) -> str:
@@ -312,6 +319,17 @@ class WebComposeSmoke:
         self._assert(status == 400)
         status, _, body = self._request(tls=True, method="GET", path="/health/ready")
         self._assert(status == 200 and json.loads(body) == {"status": "ready"})
+        # Regex com quantificadores precisa ser aceita pelo parser real Nginx.
+        # A rota CSV deixa passar mais de 64 KiB ate a autenticacao da API,
+        # enquanto as demais mantem o limite global na borda.
+        oversized = b' ' * (65536 + 1)
+        status, _, _ = self._request(tls=True, method='POST',
+            path=f'/api/v1/projects/{uuid.uuid4()}/imports/{uuid.uuid4()}', body=oversized,
+            headers={'Content-Type': 'text/csv; charset=utf-8'})
+        self._assert(status == 401)
+        status, _, _ = self._request(tls=True, method='POST',
+                                     path='/api/v1/projects', body=oversized)
+        self._assert(status == 413)
 
     def _seed_admin_session(self) -> dict[str, str]:
         # Provision container reads credentials via *_FILE; session creation is

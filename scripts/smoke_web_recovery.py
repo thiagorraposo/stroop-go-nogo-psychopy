@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Ensaio WEB sintetico: backup, restauracao, falha de banco e rollback."""
 from pathlib import Path
+import argparse
 import json
 import subprocess
 import sys
@@ -12,17 +13,23 @@ if __package__ in {None, ''}:
 
 from scripts.backup_postgres import create_backup, generate_key, restore_isolated
 from scripts.monitor_web import check
-from scripts.smoke_web_compose import API_IMAGE, WebComposeSmoke, _run
+from scripts.migrations import discover_migrations
+from scripts.smoke_web_compose import API_IMAGE, PROXY_IMAGE, WebComposeSmoke, _run
 
 
-def main():
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--api-image', default=API_IMAGE)
+    parser.add_argument('--proxy-image', default=PROXY_IMAGE)
+    options = parser.parse_args(argv)
     stack = None
     candidate = None
     stage = 'stack'
     try:
         with tempfile.TemporaryDirectory(prefix='stroop-web-recovery-') as directory:
             root = Path(directory)
-            stack = WebComposeSmoke(root, False)
+            stack = WebComposeSmoke(root, False, api_image=options.api_image,
+                                    proxy_image=options.proxy_image)
             try:
                 stack.run()
                 stage = 'monitor'
@@ -39,7 +46,7 @@ def main():
                     env_file=stack.environment_file)
                 stage = 'restore'
                 migrations, assessments = restore_isolated(backup, key, verify_web=True)
-                stack._assert(migrations == 8 and assessments == 1)
+                stack._assert(migrations == len(discover_migrations()) and assessments == 1)
                 restoration_seconds = round(time.monotonic() - started, 3)
                 stage = 'outage'
                 stack.compose('stop', 'web-postgres')
@@ -54,7 +61,7 @@ def main():
                 context = root / 'candidate-context'
                 context.mkdir(mode=0o700)
                 dockerfile = context / 'Dockerfile'
-                dockerfile.write_text(f'FROM {API_IMAGE}\nENTRYPOINT ["python","-c","raise SystemExit(1)"]\n')
+                dockerfile.write_text(f'FROM {stack.api_image}\nENTRYPOINT ["python","-c","raise SystemExit(1)"]\n')
                 _run(['docker','build','-f',str(dockerfile),'-t',candidate,str(context)])
                 override = root / 'rollback.yaml'
                 override.write_text(f'services:\n  web-api:\n    image: {candidate}\n    restart: "no"\n')
@@ -66,7 +73,7 @@ def main():
                 after = check(stack.environment_file, stack.project)
                 stack._assert(after['status'] == 'ready' and after['counts'] == before['counts'])
                 print(json.dumps({'status':'passed','restoration_seconds':restoration_seconds,
-                    'restored_assessments':assessments,'database_outage_detected':True,
+                    'restored_assessments':assessments,'restored_migrations':migrations,'database_outage_detected':True,
                     'failed_candidate_rollback':True,'counts_preserved':True}))
             finally:
                 stack.cleanup()
