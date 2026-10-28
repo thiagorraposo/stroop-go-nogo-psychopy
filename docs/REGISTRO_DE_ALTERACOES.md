@@ -10,6 +10,17 @@ O estado da nova versao web e mantido separadamente no
 
 ### Homologacao fechada no alvo e integracao com privilegios minimos
 
+- Preparada replica externa automatica no destino ja usado pelo responsavel:
+  `replicate_web_backup.py` copia somente ciphertext por SSH dedicado, sem agente,
+  hostkey estrita, config/chave0600, validacao de formato/tamanho/SHA e publicacao
+  exclusiva sem sobrescrever evidencia; retencao30geracoes e alerta apos24h.
+  Exportador de comando forcado aceita apenas manifest/download canonico e
+  recusa shell, paths, symlinks, plaintext e chaves. Nao le a chave AES.
+  Modelos systemd por usuario usam agenda horaria com recuperacao de agenda
+  perdida; disponibilidade do computador/rede condiciona o objetivo RPO.
+  Dez testes sinteticos e CLIhelp/diff check aprovados. Instalacao, transporte
+  restrito real e restauracao da replica ainda serao comprovados emW22.
+
 - Candidato corrigido aprovado na VPS:32/32 verificacoes de interface em dois
   navegadores, incluindo cadastro/edicao/bloqueio201/200 e ultima conta409.
   Um timeout inicial de seletor do harness nao enviou a operacao; evidencia

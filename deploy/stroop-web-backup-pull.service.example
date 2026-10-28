@@ -1,0 +1,9 @@
+[Unit]
+Description=Replica externa de backups WEB criptografados
+
+[Service]
+Type=oneshot
+UMask=0077
+NoNewPrivileges=yes
+ExecStart=/usr/bin/python3 /CLIENTE-IMUTAVEL/scripts/replicate_web_backup.py --config /CONFIGURACAO-PRIVADA/pull.json
+TimeoutStartSec=240

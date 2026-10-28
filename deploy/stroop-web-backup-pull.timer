@@ -1,0 +1,11 @@
+[Unit]
+Description=Verifica replica externa WEB a cada hora
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+RandomizedDelaySec=5m
+Unit=stroop-web-backup-pull.service
+
+[Install]
+WantedBy=timers.target

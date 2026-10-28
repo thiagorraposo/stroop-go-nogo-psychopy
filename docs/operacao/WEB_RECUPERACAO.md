@@ -65,6 +65,44 @@ novos papeis dedicados. O provisionador recusa baseline inseguro e nunca concede
 DDL ao runtime para contornar essa recusa. Segredos OIDC/sessao/TLS, manifesto
 das imagens e chaves de backup exigem custodia separada; nao fazem parte do dump.
 
+## Replica externa automatica
+
+`scripts/replicate_web_backup.py --config /CONFIGURACAO-PRIVADA/pull.json`
+copia somente ciphertext por SSH. Configuracao JSON0600 exige `host`, `port`,
+`user`, `key_file`, `known_hosts_file` e `destination`, com caminhos absolutos.
+Chave SSH0600 exclusiva, separada dos backups, autenticacao sem agente e
+hostkey conhecida obrigatoria. Nao inclui a chave AES nem descriptografa dados.
+
+No servidor, a chave publica deve usar `restrict,command="/usr/bin/python3
+/RELEASE-IMUTAVEL/deploy/vps-export-encrypted-backup.py"` em uma unica linha do
+authorized_keys. Esse comando forcado aceita somente `manifest` e `download`
+de nome canonico, recusa shell, paths, links, chaves e plaintext. Preserve a
+fonte canonica `scripts/backup_postgres.py` na mesma release do exportador.
+
+O cliente verifica formato, tamanho e SHA-256 antes de publicar atomicamente,
+recusa sobrescrever evidencia diferente e conserva30geracoes verificadas.
+Falha fechada ou geracao com mais de24h retorna alerta e codigo1, sem imprimir
+secrets ou conteudo. A copia antiga valida pode ser preservada, mas nao conta
+como geracao atual. Retencao e disponibilidade seguem a politica vigente.
+
+Os modelos [servico](../../deploy/stroop-web-backup-pull.service.example) e
+[timer](../../deploy/stroop-web-backup-pull.timer) permitem agenda systemd do
+usuario. Instale o cliente em release local imutavel, sem depender da branch
+de desenvolvimento; preencha os caminhos do servico e confira o timer.
+`Persistent=true` recupera uma agenda perdida quando o gerenciador do usuario
+volta, mas nao executa com o computador desligado. O destino atual escolhido
+e o computador do responsavel, ja usado para custodia externa. Deve permanecer
+disponivel para cumprir os objetivos de RPO; se isso nao for possivel, mover
+a configuracao para equipamento sempre disponivel. Nao se promete RPO durante
+indisponibilidade do destino, SSH ou rede. A agenda de backup da VPS permanece
+diaria; o cliente procura nova geracao a cada hora e sinaliza atraso de24h.
+
+Verifique `systemctl --user status stroop-web-backup-pull.timer` e o resultado
+do servico no journal local. Nao ha envio automatico de mensagens externas.
+Teste uma copia real por restauracao isolada, usando a chave AES sob custodia
+separada; nao restaure sobre banco operacional. Ao trocar a chave SSH, remova
+somente a autorizacao exclusiva anterior depois de comprovar a nova copia.
+
 ## Atualizacao e rollback
 
 Antes de atualizar, registre os digests das imagens aceitas, faca backup e
