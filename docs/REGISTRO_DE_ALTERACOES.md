@@ -20,6 +20,10 @@ O estado da nova versao web e mantido separadamente no
   perdida; disponibilidade do computador/rede condiciona o objetivo RPO.
   Dez testes sinteticos e CLIhelp/diff check aprovados. Instalacao, transporte
   restrito real e restauracao da replica ainda serao comprovados emW22.
+  Scanner detectou falso positivo no SHA-256 rotulado como pacote da API;
+  rotulo esclarecido, hash preservado e338fontes verificadas sem achados,
+  sem enfraquecer regras ou adicionar excecao. Commit local anterior foi criado
+  antes de tratar a saida; pacote nao foi instalado/publicado antes da correcao.
 
 - Candidato corrigido aprovado na VPS:32/32 verificacoes de interface em dois
   navegadores, incluindo cadastro/edicao/bloqueio201/200 e ultima conta409.

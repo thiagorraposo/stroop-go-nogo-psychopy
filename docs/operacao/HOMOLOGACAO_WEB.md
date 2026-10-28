@@ -245,7 +245,7 @@ API corrigida: `stroop-web-api:w21-admin-20261028`, ID
 Proxy W21 inalterado. Fontes e imagem conferidas na origem e na VPS:
 
 - Arquivo de fontes: `71300ebe10450fa8812449c2d62ebd7d8e43ddce7685696947793f286a280906`.
-- Arquivo da API: `9c69e92a4afc1fad235b4478132aa6cf321a53d09884698a7b84ce3346072fc4`.
+- SHA-256 do pacote de imagem: `9c69e92a4afc1fad235b4478132aa6cf321a53d09884698a7b84ce3346072fc4`.
 
 Suite Python corrigida:357/357, sem skips; testes focados13/13 incluem HTTP
 com writer real, grants, ator bloqueado e duas despromocoes concorrentes que
