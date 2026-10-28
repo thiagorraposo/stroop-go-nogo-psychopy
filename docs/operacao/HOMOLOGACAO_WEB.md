@@ -1,6 +1,6 @@
 # Homologacao WEB — evidencias W21
 
-Observacoes em 2026-10-21, somente com dados sinteticos. Estado e aceite da
+Observacoes em 2026-10-21 e retomada em 2026-10-27, somente com dados sinteticos. Estado e aceite da
 etapa permanecem no [roadmap](../ROADMAP_WEB.md). Este relatorio distingue a
 pilha local efetivamente ensaiada do ambiente alvo; nao extrapola capacidade
 da VPS nem aplica a W21 o aceite excepcional concedido a W16.
@@ -136,7 +136,7 @@ das alteracoes W21. Nao versionar logs, dumps, exports, configuracao privada ou
 secrets. Os recursos temporarios destes ensaios foram removidos; projetos e
 containers preexistentes permaneceram intactos.
 
-## Ambiente alvo e pendencias concretas
+## Historico — ambiente alvo em 2026-10-21
 
 O smoke publico leu apenas pagina e prontidao por HTTPS: ambos responderam 200,
 HSTS presente, CSP na pagina e prontidao com corpo esperado. Foram duas consultas,
@@ -156,4 +156,74 @@ validar recuperacao e o reboot autorizado, conferir autenticacao externa e
 fechar a lista de pendencias. A validacao local nao substitui essas evidencias.
 As duas falhas Firefox registradas no aceite excepcional W16 continuam riscos
 conhecidos, sem causa determinada. Nenhuma coleta real, alteracao da versao
-publicada, acesso a dados operacionais ou publicacao foi feita nesta unidade.
+publicada, acesso a dados operacionais ou publicacao foi feita naquela unidade.
+
+## Retomada no ambiente alvo — 2026-10-27
+
+O responsavel autorizou concluir as etapas restantes. O agente SSH voltou a
+autenticar no alvo conhecido. Inventario reconfirmado: duas CPUs logicas,
+aproximadamente 4 GiB de RAM, 84 GiB livres; a aplicacao publica ainda utiliza
+`26fa9bf`. O candidato `af73939` foi transferido por arquivo completo de fontes
+versionadas para `/home/raposo/stroop-web/homologacao/af73939`. Nenhum dado ou
+secret operacional foi incluido. SHA-256 do arquivo de fontes:
+`6f3553be0d26eb1624aa764528a987474168e8fae6d05d6703ed4d2e8411ed3e`.
+Arquivo das duas imagens: `ddd9dffbe9d3059c27b174d66953f28a9d369518f540156336253c2e20165f40`.
+Checksums conferidos na origem e no alvo; IDs das imagens iguais aos do ensaio
+local acima. O ambiente publicado permaneceu ativo durante a campanha.
+
+### Capacidade medida na VPS
+
+O comando `python3 scripts/benchmark_web.py --output exports/w21/capacity-vps-20261027.json`
+foi executado **na propria VPS**, em Compose, volume e portas loopback exclusivos.
+O campo `scope=isolated-local-compose` do artefato indica o loopback do host
+executor, que nesta campanha e a VPS, nao o computador de desenvolvimento.
+Mesma massa de uma avaliacao, quatro operacoes, 30 segundos por nivel e limites
+padrao do metodo acima; os servicos publicados e legados permaneceram ativos.
+
+| Clientes ativos / GET/s oferecidos | Respostas validas / programadas | HTTP 429 | p95 dos sucessos (ms) | p99 (ms) |
+|---|---:|---:|---:|---:|
+| 1 | 30/30 | 0 | 57,49 | 82,91 |
+| 4 | 120/120 | 0 | 59,31 | 91,50 |
+| 8 | 240/240 | 0 | 58,73 | 64,39 |
+| 16 | 320/480 | 160 | 64,97 | 82,15 |
+
+Total: 870 requisicoes, 710 sucessos validos e 160 rejeicoes pelo limitador,
+sem 5xx, falhas de transporte ou respostas 200 invalidas. Maior nivel testado
+sem rejeicao: **8 clientes ativos a 1 GET/s**. Nao representa capacidade de
+participantes executando o motor nem limite de hardware, e nao extrapola para
+outras massas/duracoes. Canarios de sessao ausentes dos logs da pilha sintetica.
+Reinicio dos tres containers aprovou prontidao e preservou 1 avaliacao,
+16 tentativas e 12 metricas. Nao houve reboot do host.
+
+### Correcao operacional e verificacao publica
+
+O ensaio `scripts/smoke_web_recovery.py`, tambem executado na VPS com as mesmas
+imagens e uma pilha sintetica exclusiva, aprovou backup criptografado,
+restauracao isolada de nove migrations e uma avaliacao, deteccao da falha de
+banco e retorno da imagem deliberadamente invalida. Contagens preservadas;
+backup mais restauracao medidos em **5,943 s**. O resultado nao garante RPO/RTO
+operacional nem equivale a reboot do host. A primeira chamada falhou antes de
+criar a pilha por ausencia de `psycopg` no Python do host; para a segunda foram
+extraidos wheels das mesmas versoes do lock em diretorio privado do harness,
+sem instalar pacotes globalmente ou alterar a aplicacao publicada.
+
+A rotina publicada criou novo backup criptografado, mas `restore-check` falhou:
+o pacote antigo omitia `compose.restore-test.yaml`. Reposto o arquivo com
+conteudo identico ao do commit original, sem mudar imagem, banco ou trafego;
+o mesmo `tools/vps-maintenance.sh restore-check` passou apos a correcao.
+O empacotamento completo e sua verificacao estao documentados na
+[transicao](TRANSICAO_WEB.md). Nova copia criptografada foi transferida para
+fora da VPS e teve SHA-256 conferido; isso ainda nao configura replicacao
+externa automatica nem garante RPO externo continuo.
+
+Smoke publico: pagina e readiness 200, HSTS/CSP presentes; inicio OIDC 303
+para `accounts.google.com`. Nao foi executado login pessoal nem concluido o
+callback Google nesta verificacao. Nenhum cookie ou parametro OIDC foi gravado
+nos artefatos. Esses resultados pertencem a release publicada antiga.
+
+Evidencias privadas/ignoradas em `exports/w21/20261027-vps/`; os JSONs de carga
+e recuperacao tambem sao mantidos no diretorio de homologacao da VPS.
+O acesso administrativo para reboot, o aceite Google pessoal e o destino
+estavel de backup externo foram solicitados ao responsavel sem pedir senhas.
+W21 ainda exige o fechamento dessas evidencias aplicaveis; W22/W23 nao recebem
+aceite automatico pela medicao de capacidade ou pela documentacao preparada.

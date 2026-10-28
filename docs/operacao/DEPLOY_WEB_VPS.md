@@ -150,6 +150,23 @@ o webroot da nova versao nao e servido pelo proxy legado original.
 
 ## Evidencias e limites
 
+Em 2026-10-27, a inspecao autorizada reconfirmou a release publica `26fa9bf` e
+os containers saudaveis. Novo backup foi criado com sucesso; o ensaio agendado
+`restore-check` falhou porque `compose.restore-test.yaml` nao estava no pacote
+remoto. Foi reposto o arquivo identico ao versionado na release original e a
+mesma rotina passou. Nao houve alteracao de imagens, schema ou trafego publico.
+Uma copia criptografada nova foi guardada fora da VPS, no computador do
+responsavel, com checksum conferido. O destino automatico estavel continua
+pendente; copia manual nao garante o RPO externo continuo. O
+[procedimento de transicao](TRANSICAO_WEB.md) orienta empacotar todas as fontes
+versionadas, incluindo o Compose da restauracao.
+
+O candidato `af73939` foi ensaiado em pilhas isoladas no proprio alvo, conforme
+a [homologacao](HOMOLOGACAO_WEB.md). Capacidade, reinicio dos containers,
+restauracao e retorno do candidato invalido foram medidos sem substituir a
+release publica. Reboot do host e login Google pessoal ainda carecem de prova;
+inicio OIDC com redirecionamento ao Google nao conclui o login.
+
 Python317/317, callback5/5 e proxy6/6 aprovados antes da publicacao. Na VPS e
 no dominio publico: HTTPS/headers/Host/bodylimit, prontidao, convite/resgate,
 conclusao/retry/consulta/CSV e persistencia aprovados. Chromium executou pratica

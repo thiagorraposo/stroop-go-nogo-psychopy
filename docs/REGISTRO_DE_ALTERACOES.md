@@ -6,6 +6,41 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-10-28 — W21: capacidade e recuperacao medidas na VPS; transicao preparada
+
+- Autorizacao do responsavel para concluir as etapas restantes; SSH restabelecido.
+  Fontes `af73939` e imagens W21 transferidas com checksums conferidos para
+  homologacao isolada na VPS, sem substituir a release publica `26fa9bf`.
+- Campanha no alvo em 2026-10-27: 870 consultas HTTPS, 710 sucessos validos e
+  160 respostas429, sem5xx/erro de transporte. Niveis1/4/8clientes a1GET/s
+  sem rejeicoes; oito clientes com p95 de58,73ms. Em16clientes, limitador
+  recusou160/480consultas. Nao mede capacidade de participantes ou timing fisico.
+- Reinicio dos tres containers preservou1avaliacao/16tentativas/12metricas.
+  Recuperacao isolada na VPS: nove migrations/uma avaliacao restauradas em
+  5,943s, alerta de banco e retorno de candidato invalido aprovados. Primeira
+  chamada falhou antes do ensaio por ausencia de psycopg; wheels das versoes
+  do lock extraidos em diretorio privado, sem instalacao global.
+- Detectado defeito operacional da release publicada: arquivo
+  `compose.restore-test.yaml` ausente fazia restore-check agendado falhar.
+  Reposto conteudo identico ao versionado; novo backup e mesma rotina de
+  restauracao aprovados. Copia criptografada fora da VPS com checksum conferido;
+  destino automatico estavel segue pendente. Nenhum dado pessoal foi aberto.
+- Smoke publico: pagina/readiness200, HSTS/CSP e inicio OIDC303para Google.
+  Sem login pessoal ou reboot do host; acesso administrativo, confirmacao Google
+  e destino externo solicitados ao responsavel. W21/W22 nao recebem aceite
+  por presuncao. Evidencias e limites em [HOMOLOGACAO_WEB](operacao/HOMOLOGACAO_WEB.md)
+  e [DEPLOY_WEB_VPS](operacao/DEPLOY_WEB_VPS.md); artefatos ignorados em exports/w21.
+- Guia do usuario ampliado para fluxos WEB; nova
+  [matriz de transicao](operacao/TRANSICAO_WEB.md) cobre historico, coexistencia,
+  manutencao, retorno e empacotamento completo por git archive. Nao retira
+  PsychoPy/Streamlit nem concede aceite W23. Indice, roadmap e retomada alinhados.
+- Regressao salva da execucao anterior: Python352/352 sem skips, frontend273/273,
+  tipos/build, navegador98gerais+4temporais aprovados. Integracao interrompida
+  antes dos testes nao conta como aprovada; nova verificacao na retomada.
+  Documentos: 141 links locais existentes, diff check aprovado e scanner de
+  330 fontes versionadas sem achados.
+  Alteracao preexistente em AGENTS raiz preservada fora da tarefa.
+
 ## 2026-10-21 — W21: pilha local validada; alvo aguarda acesso SSH
 
 - Retomada apos pausa do responsavel. Novo `scripts/benchmark_web.py` cria

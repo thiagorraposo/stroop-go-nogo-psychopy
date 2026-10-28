@@ -3,7 +3,43 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
-## Atual — W21 validada localmente; homologacao do alvo bloqueada por acesso SSH
+## Atual — W21 no alvo, retomada em 2026-10-28
+
+- Usuario autorizou concluir as etapas restantes com liberdade de execucao.
+  Branch `prep-web`; alteracao preexistente de `AGENTS.md` preservada.
+- SSH pelo agente funciona novamente. VPS ainda publica release `26fa9bf`;
+  somente API/proxy publicos antigos e bancos preexistentes foram identificados,
+  sem abrir dados pessoais. Root/sudo sem senha indisponiveis; reboot depende
+  de acesso administrativo. Solicitados esse acesso, confirmacao Google pessoal
+  e destino estavel de backup externo, sem pedir segredos na conversa.
+- Candidato `af73939` transferido por `git archive` completo para
+  `/home/raposo/stroop-web/homologacao/af73939`; imagens W21 com IDs iguais aos
+  ensaios locais. Checksums de fonte/imagens conferidos nas duas maquinas.
+  Carga HTTPS isolada no proprio alvo concluida, sem trocar trafego publico:
+  870 requisicoes, 710 sucessos, 160 respostas429, nenhum5xx/transporte invalido.
+  Oito clientes a1GET/s sem rejeicoes, p95 58,73ms; reinicio dos tres containers
+  preservou 1avaliacao/16tentativas/12metricas. Nao e reboot do host.
+- Encontrada falha real: restore-check agendado falhava por ausencia de
+  `compose.restore-test.yaml` na release publicada. Reposto arquivo identico ao
+  versionado na release original; backup novo e restore-check passaram.
+  Copia criptografada externa manual com checksum conferido, sem replicacao
+  automatica. Ensaio de recuperacao do candidato na VPS passou: 9migrations e
+  1avaliacao restauradas em5,943s, alerta de falha e retorno de imagem invalida.
+  Primeira chamada falhou por falta de psycopg no host; wheels do lock extraidos
+  em diretorio privado do harness, sem instalacao global.
+- Guia WEB e matriz de transicao preparados, com coexistencia e empacotamento
+  completo. Ainda nao concedem aceite W23. Regressao salva: Python352/352 sem
+  skips, frontend273/273/tipos/build, browser98gerais+4temporais aprovados.
+  Integracao anterior foi interrompida antes dos testes; nova suite isolada e
+  verificacao da interface compilada no alvo em andamento em2026-10-28.
+- Evidencias em exports/w21/20261027-{final,vps} e 20261028-final, ignoradas.
+  Detalhes no relatorio HOMOLOGACAO_WEB. Root/sudo continuam indisponiveis;
+  pergunta de desbloqueio/login/destino externo reapresentada na retomada.
+- Proxima acao: concluir integracao/interface no alvo, validar docs/links/diff e
+  salvar commit local; fechar reboot/login W21 e backup externo W22 quando os
+  recursos forem disponibilizados. Nao conceder conclusao por presuncao.
+
+## Historico — W21 validada localmente; alvo aguardava acesso SSH
 
 - Retomada em 2026-10-21 apos pausa solicitada pelo responsavel. Git em
   `prep-web`; `AGENTS.md` preexistente permanece fora da tarefa.

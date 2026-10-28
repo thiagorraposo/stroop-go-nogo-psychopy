@@ -15,6 +15,7 @@ experimento, calculos, arquitetura, dados, acesso e limites de validacao.
 - [Protocolo de trabalho](desenvolvimento/WORKFLOW_CODEX_CLI.md).
 - [Validacao WEB e piloto](VALIDACAO_WEB.md).
 - [Homologacao WEB e capacidade observada](operacao/HOMOLOGACAO_WEB.md).
+- [Transicao WEB, cobertura e manutencao](operacao/TRANSICAO_WEB.md).
 - [CI WEB reproduzivel](desenvolvimento/CI_WEB.md).
 - [Contrato HTTP WEB](desenvolvimento/CONTRATO_API_WEB.md).
 - [Padrao de commits](desenvolvimento/PADRAO_DE_COMMITS.md).

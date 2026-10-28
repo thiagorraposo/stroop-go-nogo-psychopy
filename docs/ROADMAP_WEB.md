@@ -37,8 +37,8 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W18 | Concluida; pipeline completo em checkout sparse limpo, testes e auditorias aprovados |
 | W19 | Concluida; imagens nao-root, Compose isolado e smoke HTTPS/coleta/reinicio aprovados |
 | W20 | Concluida; monitor, backup criptografado/restauracao isolada, alerta e rollback validados |
-| W21 | Validacao local executada em 2026-10-21; carga/recuperacao/regressao aprovadas no escopo local; bloqueada no alvo por chave/agente SSH indisponiveis; homologacao/capacidade/reboot da VPS nao comprovados |
-| W23 | Nao iniciada; depende da implantacao/aceite W22 |
+| W21 | Carga, reinicio de containers e recuperacao isolados aprovados na VPS em 2026-10-27; reboot do host e autenticacao externa ainda sem comprovacao; aceite pendente |
+| W23 | Guia e matriz de transicao preparados; aceite depende da implantacao/aceite W22 e revisao operacional |
 | W14 | Concluida em 2026-10-16; consulta/CSV autorizados, papel SELECT, mapa legado e testes PostgreSQL validados |
 | W22 | Publicada na VPS por delegacao explicita, somente testes sinteticos; confirmacao Google pessoal pendente |
 
@@ -907,9 +907,12 @@ Dependencias da fase: evidencias funcionais, temporais, de seguranca e operacao.
 
 - **Evidencia atual:** [relatorio local](operacao/HOMOLOGACAO_WEB.md), com
   carga HTTPS real, recuperacao, 352 testes Python e 36 de integracao. Nao
-  concede conclusao da etapa: SSH ao ambiente alvo depende de chave liberada
-  em agente acessivel; capacidade/reboot/aceite desse ambiente permanecem sem
-  prova. O aceite excepcional W16 nao dispensa esses criterios da W21.
+  concede conclusao da etapa. SSH ao ambiente alvo restabelecido em 2026-10-27;
+  carga no alvo aprovou 8 clientes a 1 GET/s sem rejeicoes; em 16 houve 160
+  respostas 429, sem 5xx. Reinicio de containers, restauracao de nove migrations
+  e retorno de candidato invalido aprovados. Reboot do host e aceite de
+  autenticacao externa ainda sem prova. O aceite excepcional W16 nao dispensa
+  esses criterios da W21.
 - **Objetivo:** validar o pacote completo no ambiente de homologacao autorizado.
 - **Entregaveis:** relatorio de aceite, limite de concorrencia medido, roteiro
   operacional e lista fechada de pendencias; dados sempre sinteticos.
