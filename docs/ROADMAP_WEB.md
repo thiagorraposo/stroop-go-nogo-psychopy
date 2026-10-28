@@ -37,30 +37,32 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W18 | Concluida; pipeline completo em checkout sparse limpo, testes e auditorias aprovados |
 | W19 | Concluida; imagens nao-root, Compose isolado e smoke HTTPS/coleta/reinicio aprovados |
 | W20 | Concluida; monitor, backup criptografado/restauracao isolada, alerta e rollback validados |
-| W21 | Carga, reinicio de containers e recuperacao isolados aprovados na VPS em 2026-10-27; reboot do host e autenticacao externa ainda sem comprovacao; aceite pendente |
+| W21 | Concluida em 2026-10-28 no escopo homologado: runtime restrito corrigido, UI32/32, integracao36/36, carga/recuperacao/reboot real e evidencia agregada de sessao Google real; limites W16 preservados |
 | W23 | Guia e matriz de transicao preparados; aceite depende da implantacao/aceite W22 e revisao operacional |
 | W14 | Concluida em 2026-10-16; consulta/CSV autorizados, papel SELECT, mapa legado e testes PostgreSQL validados |
-| W22 | Publicada na VPS por delegacao explicita, somente testes sinteticos; confirmacao Google pessoal pendente |
+| W22 | Publicacao sintetica existente; atualizacao do candidato homologado e replica externa automatica em execucao; sem liberacao de coleta real |
 
 As evidencias anteriores de W00–W15 e W17–W20 permanecem validas para os escopos
 testados. O responsavel instruiu explicitamente presumir os aceites pendentes e
 prosseguir autonomamente; por isso W09A e W13A estao formalmente aceitas. Essa
 instrucao nao cria evidencias de piloto fisico, capacidade medida ou homologacao.
 A publicacao de testes W22 foi explicitamente
-delegada e executada. Em 2026-10-20 o responsavel instruiu produzir evidencia
+delegada e executada; a autorizacao para concluir as pendencias foi reiterada
+em2026-10-28. Em 2026-10-20 o responsavel instruiu produzir evidencia
 parcial e tratar W16 como completa: etapa encerrada por aceite de escopo reduzido,
 com resultados/falhas locais em `VALIDACAO_WEB.md`. Isso nao declara executada a
-matriz fisica original. W21 continua pendente; o encerramento W16 nao concede
-conclusao geral, homologacao universal ou autorizacao de coleta real. Retomada em
+matriz fisica original. W21 foi validada no alvo em2026-10-28 com evidencias
+proprias; o encerramento W16 nao concede homologacao universal ou autorizacao
+de coleta real. A conclusao geral ainda depende das etapas finais. Retomada em
 [PROGRESS.md](PROGRESS.md). Evidencias em
 [registro de alteracoes](REGISTRO_DE_ALTERACOES.md).
 Bloqueio de produto/metodo resolvido pela aprovacao explicita na sessao.
 Finalidade: coleta do grupo de pesquisa do usuario; participantes da pesquisa
 sem restricao demografica nova. Usuario responsavel por protocolo, validacao,
 operacao e incidentes. Hospedagem: VPS adquirida e dominio existente, conforme
-[ADR-002](arquitetura/ADR-002-hospedagem-vps.md). Configuracao real, evidencias
-de homologacao, OIDC e backup externo permanecem entregas futuras; nao bloqueiam
-implementacao local com dados sinteticos nem equivalem a aceite antecipado.
+[ADR-002](arquitetura/ADR-002-hospedagem-vps.md). Homologacao no alvo e evidencia
+de sessao Google real registradas. Atualizacao publicada, replica externa e
+aceite de transicao seguem as etapas finais, sem liberacao antecipada de coleta real.
 Nao atribuir percentual por quantidade de etapas: elas possuem esforcos distintos.
 
 Comandos para o Codex CLI, a partir da raiz do repositorio:
@@ -907,12 +909,13 @@ Dependencias da fase: evidencias funcionais, temporais, de seguranca e operacao.
 
 - **Evidencia atual:** [relatorio local](operacao/HOMOLOGACAO_WEB.md), com
   carga HTTPS real, recuperacao, 352 testes Python e 36 de integracao. Nao
-  concede conclusao da etapa. SSH ao ambiente alvo restabelecido em 2026-10-27;
-  carga no alvo aprovou 8 clientes a 1 GET/s sem rejeicoes; em 16 houve 160
-  respostas 429, sem 5xx. Reinicio de containers, restauracao de nove migrations
-  e retorno de candidato invalido aprovados. Reboot do host e aceite de
-  autenticacao externa ainda sem prova. O aceite excepcional W16 nao dispensa
-  esses criterios da W21.
+  substitui a campanha no alvo. SSH restabelecido e candidato corrigido validado
+  na VPS em2026-10-28: UI32/32, integracao36/36 com writer restrito, carga com
+  oito clientes a1GET/s sem rejeicoes (em16,160respostas429, sem5xx), restauracao
+  de dez migrations, retorno de imagens e reboot real preservando resultados.
+  Registro agregado de sessao administrativa nao sintetica nas ultimas24h
+  comprova emissao no Google existente; nao foi executado novo login interativo.
+  Evidencias e limites no relatorio; W16 reduzida nao homologa timing universal.
 - **Objetivo:** validar o pacote completo no ambiente de homologacao autorizado.
 - **Entregaveis:** relatorio de aceite, limite de concorrencia medido, roteiro
   operacional e lista fechada de pendencias; dados sempre sinteticos.
@@ -929,7 +932,8 @@ Autorizacao posterior nesta sessao: responsavel delegou explicitamente ao Codex
 a substituicao da aplicacao na VPS existente, mantendo dominio e infraestrutura.
 Publicacao exclusivamente sintetica permitida antes do aceite W16/W21; isso
 nao conclui essas etapas. Evidencias e manutencao em
-[DEPLOY_WEB_VPS](operacao/DEPLOY_WEB_VPS.md); confirmacao Google pessoal solicitada.
+[DEPLOY_WEB_VPS](operacao/DEPLOY_WEB_VPS.md); evidencia agregada de sessao Google
+real recente registrada na homologacao, sem novo login interativo pelo Codex.
 O aceite da interface publicada tambem depende de W09A, W13A e W15A–W15E;
 a publicacao ja realizada nao comprova cadastro de sessao, dashboard completo
 ou substituicao das areas operacionais do legado pelo navegador.
@@ -938,8 +942,8 @@ ou substituicao das areas operacionais do legado pelo navegador.
 - **Entregaveis:** dominio/TLS, credenciais externas, backup externo,
   responsaveis, runbook executado e evidencias de smoke publico.
 - **Dependencias:** W21 e autorizacao/configuracao operacional do usuario.
-- **Conclusao:** usuario executa e valida a implantacao; Codex pode preparar ou
-  revisar evidencias quando solicitado. `continue web` nao autoriza acesso a VPS,
+- **Conclusao:** responsavel executa e valida ou delega explicitamente a
+  implantacao; execucao atual delegada. `continue web` sozinho nao autoriza acesso a VPS,
   custos, publicacao, dados reais ou mudanca do estado por presuncao.
 - **Validacoes:** HTTPS real, login configurado, portas internas fechadas,
   backup/restauracao, reboot e rollback com evidencias do ambiente publicado.

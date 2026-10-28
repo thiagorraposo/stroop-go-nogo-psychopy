@@ -3,51 +3,42 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
-## Atual — W21 no alvo, retomada em 2026-10-28
+## Atual — W21 validada; preparacao operacional W22 em 2026-10-28
 
-- Novo impedimento funcional descoberto no alvo: cadastro de conta pela
-  interface retorna503 com writer provisionado. W15D usava INSERT/UPDATE de
-  app_users, negados corretamente pelo baseline W19. Consulta, detalhe, CSV,
-  convite e importacao passaram com writer real; administracao nao recebe aceite.
-  Correcao implementada: migration0010 e adaptadores WEB usam capacidade SQL
-  estreita, revalidam admin e preservam negacao de DML direto/protecao concorrente
-  do ultimo administrador. PostgreSQL357/357 sem skips e focados13/13 aprovados.
-  Imagem stroop-web-api:w21-admin-20261028 construida; recuperacao local com dez
-  migrations/uma avaliacao em7,012s aprovada. Faltam repetir interface/campanha
-  no alvo com essa imagem; integracao administrativa em navegador2/2 aprovada.
-- Usuario autorizou concluir as etapas restantes com liberdade de execucao.
-  Branch `prep-web`; alteracao preexistente de `AGENTS.md` preservada.
-- SSH pelo agente funciona novamente. VPS ainda publica release `26fa9bf`;
-  somente API/proxy publicos antigos e bancos preexistentes foram identificados,
-  sem abrir dados pessoais. Root/sudo sem senha indisponiveis; reboot depende
-  de acesso administrativo. Solicitados esse acesso, confirmacao Google pessoal
-  e destino estavel de backup externo, sem pedir segredos na conversa.
-- Candidato `af73939` transferido por `git archive` completo para
-  `/home/raposo/stroop-web/homologacao/af73939`; imagens W21 com IDs iguais aos
-  ensaios locais. Checksums de fonte/imagens conferidos nas duas maquinas.
-  Carga HTTPS isolada no proprio alvo concluida, sem trocar trafego publico:
-  870 requisicoes, 710 sucessos, 160 respostas429, nenhum5xx/transporte invalido.
-  Oito clientes a1GET/s sem rejeicoes, p95 58,73ms; reinicio dos tres containers
-  preservou 1avaliacao/16tentativas/12metricas. Nao e reboot do host.
-- Encontrada falha real: restore-check agendado falhava por ausencia de
-  `compose.restore-test.yaml` na release publicada. Reposto arquivo identico ao
-  versionado na release original; backup novo e restore-check passaram.
-  Copia criptografada externa manual com checksum conferido, sem replicacao
-  automatica. Ensaio de recuperacao do candidato na VPS passou: 9migrations e
-  1avaliacao restauradas em5,943s, alerta de falha e retorno de imagem invalida.
-  Primeira chamada falhou por falta de psycopg no host; wheels do lock extraidos
-  em diretorio privado do harness, sem instalacao global.
-- Guia WEB e matriz de transicao preparados, com coexistencia e empacotamento
-  completo. Ainda nao concedem aceite W23. Regressao salva: Python352/352 sem
-  skips, frontend273/273/tipos/build, browser98gerais+4temporais aprovados.
-  Integracao anterior foi interrompida antes dos testes; nova suite isolada e
-  verificacao da interface compilada no alvo em andamento em2026-10-28.
-- Evidencias em exports/w21/20261027-{final,vps} e 20261028-final, ignoradas.
-  Detalhes no relatorio HOMOLOGACAO_WEB. Root/sudo continuam indisponiveis;
-  pergunta de desbloqueio/login/destino externo reapresentada na retomada.
-- Proxima acao: concluir integracao/interface no alvo, validar docs/links/diff e
-  salvar commit local; fechar reboot/login W21 e backup externo W22 quando os
-  recursos forem disponibilizados. Nao conceder conclusao por presuncao.
+- Branch `prep-web`; AGENTS raiz preexistente preservado fora dos commits.
+  Correcao `ad3a469`: administracao usa funcao SQL estreita da migration0010,
+  sem DML direto em usuarios. Python357/357 sem skips, focados13/13 e navegador
+  administrativo2/2 aprovados. Guia/transicao anteriores em7159b60.
+- No alvo, API corrigida `stroop-web-api:w21-admin-20261028` e proxyW21:
+  interface32/32 em dois navegadores, recuperacao10migrations/1avaliacao em6,013s,
+  carga870consultas com710sucessos/160respostas429 e nenhum5xx/transporte invalido.
+  Oito clientes a1GET/s sem rejeicoes, p95 67,11ms. Sem extrapolar para participantes.
+- Reboot real comprovado por bootID alterado; publicacao4/64/48 e candidato1/16/12
+  preservados, detalhe/CSV autenticados aprovados. Administracao via Docker
+  existente resolveu ausencia de sudo, sem alterar credenciais/permissoesSSH.
+  Pilhas proprias removidas; cinco servicos preexistentes saudaveis.
+- Consulta somente de agregados confirmou sessao administrativa nao sintetica
+  emitida nas ultimas24h. Callback de conta cadastrada inalterado frente a release
+  publica; evidencia operacional registrada sem expor identidade/cookie. Nao foi
+  executado novo login Google interativo; limitesW16 permanecem preservados.
+- Harness HTTPS reforcado: API usa writer/reader canonicos, sem DSN proprietaria,
+  com assertions negativas de privilegios. Integracao completa36/36 em10,9min,
+  sem falhas/retries; proprietario somente nas fixtures/migrations.
+- Rollback compativel com schema10 ensaiado na VPS: imagem
+  stroop-web-api:rollback-schema10-20261028 preserva base antiga e acrescenta
+  somente manifests0009/0010. API/proxy anteriores consultam e exportam, retorno
+  ao candidato preserva1/16/12 e administra contas201/200. Sem reverter migrations.
+- Publicacao ainda26fa9bf. Backup/restauracao e copia externa criptografada
+  conferidos antes do reboot. Destino externo existente escolhido para automatizar:
+  computador do responsavel; ferramenta SSH forcada/pull e timer em preparacao.
+  Dez testes sinteticos do replicador passaram; falta instalar/testar transporte
+  real, agenda e restauracao externa. RPO depende da disponibilidade do destino.
+- Evidencias em exports/w21/adminfix-20261028 e 20261028-runtime-fix, ignoradas;
+  detalhes no relatorio HOMOLOGACAO_WEB. Roadmap concentra estado/aceite.
+- Proxima acao: salvar marcos validados, instalar replica restrita+timer em
+  cliente imutavel, testar copia/restauracao real; publicar candidato com backup
+  e retorno compativel, executar smoke publico e concluir transicao tecnica.
+  W23 exige aceite final do responsavel, apos resultado concreto disponivel.
 
 ## Historico — W21 validada localmente; alvo aguardava acesso SSH
 

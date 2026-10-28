@@ -10,12 +10,11 @@ import time
 import urllib.request
 from urllib.parse import urlsplit
 
-from common import API_PORT, ISSUER, ORIGIN, READER, READER_PASSWORD, ROOT, SUBJECT, database_url, environment
+from common import API_PORT, ISSUER, ORIGIN, ROOT, SUBJECT, database_url, environment, read_url, write_url
 import psycopg
-from psycopg import sql
 from scripts.migrations import apply_migrations
+from scripts.provision_web_database import provision
 from stroop.application import auth
-from stroop.persistence.web_assessments import REQUIRED_COLUMNS
 
 
 def main():
@@ -29,14 +28,15 @@ def main():
         connection.execute('CREATE SCHEMA public')
     apply_migrations(database)
     auth.bootstrap_admin(database, ISSUER, SUBJECT)
-    with psycopg.connect(database) as connection:
-        if not connection.execute('SELECT 1 FROM pg_roles WHERE rolname=%s', (READER,)).fetchone():
-            connection.execute(sql.SQL('CREATE ROLE {} LOGIN PASSWORD {}').format(
-                sql.Identifier(READER), sql.Literal(READER_PASSWORD)))
-        connection.execute(sql.SQL('GRANT USAGE ON SCHEMA public TO {}').format(sql.Identifier(READER)))
-        for table, columns in REQUIRED_COLUMNS.items():
-            connection.execute(sql.SQL('GRANT SELECT ({}) ON {} TO {}').format(
-                sql.SQL(',').join(map(sql.Identifier, sorted(columns))), sql.Identifier(table), sql.Identifier(READER)))
+    provision({'API_MIGRATION_DATABASE_URL': database,
+               'API_DATABASE_URL': write_url(), 'API_READ_DATABASE_URL': read_url()})
+    with psycopg.connect(write_url()) as connection:
+        if connection.execute("""SELECT rolsuper,rolcreatedb,rolcreaterole,
+            has_schema_privilege(current_user,'public','CREATE'),
+            has_column_privilege(current_user,'public.app_users','issuer','INSERT'),
+            has_column_privilege(current_user,'public.app_users','role','UPDATE')
+            FROM pg_roles WHERE rolname=current_user""").fetchone() != (False,) * 6:
+            raise RuntimeError('Writer sintetico deve permanecer restrito.')
     children = []
     with tempfile.TemporaryDirectory(prefix='stroop-synthetic-https-') as directory:
         private = Path(directory) / 'key.pem'

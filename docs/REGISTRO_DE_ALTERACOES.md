@@ -8,6 +8,38 @@ O estado da nova versao web e mantido separadamente no
 
 ## 2026-10-28 — W21: capacidade e recuperacao medidas na VPS; transicao preparada
 
+### Homologacao fechada no alvo e integracao com privilegios minimos
+
+- Candidato corrigido aprovado na VPS:32/32 verificacoes de interface em dois
+  navegadores, incluindo cadastro/edicao/bloqueio201/200 e ultima conta409.
+  Um timeout inicial de seletor do harness nao enviou a operacao; evidencia
+  preservada e campanha completa corrigida passou. Quatro screenshots sinteticos
+  inspecionados; pilhas/tuneis/credenciais de ensaio proprios removidos.
+- Nova carga do candidato:870consultas,710sucessos/160respostas429, sem5xx ou
+  transporte invalido; oito clientes a1GET/s sem rejeicoes, p9567,11ms. Recuperacao
+  no alvo de dez migrations/uma avaliacao em6,013s, alerta e rollback aprovados.
+- Backup restaurado e nova copia externa criptografada conferidos antes de reboot
+  real. Capacidade administrativa ja existente no Docker permitiu comando efemero
+  no namespace do host, sem alterar SSH/sudo ou credenciais. BootID mudou;
+  publicacao4/64/48 e candidato1/16/12preservados; detalhe/CSV autenticados
+  aprovados e cinco servicos preexistentes saudaveis. Sem medir janela integral
+  de indisponibilidade; uptime na verificacao29,08s.
+- Consulta somente de agregados confirmou sessao administrativa nao sintetica
+  emitida nas ultimas24h. Nenhuma identidade/cookie/hash foi exibido. Callback de
+  conta cadastrada permanece igual ao publicado; evidencia operacional existente,
+  sem novo login Google interativo. Limites W16 preservados. Aceite W21 registrado
+  no roadmap com essas evidencias, sem homologacao temporal universal/coleta real.
+- Harness de integracao agora usa o provisionador canonico, writer/reader reais
+  restritos e assertions negativas de privilegios; proprietario somente em
+  fixtures/migrations e sua DSN ausente do processo API.36/36integracoes em10,9min,
+  sem falhas/retries em Chromium/Firefox, tipos/build aprovados.
+- Retorno das imagens compativel com schema10 ensaiado na VPS: API anterior com
+  somente manifests0009/0010adicionados e proxy anterior saudaveis, consulta/CSV
+  e1/16/12preservados; retorno ao candidato manteve dados e administracao201/200.
+  Imagem antiga original rejeitaria readiness com migrations adicionais. Nenhum
+  restore sobre coletas, migration reversa ou reprovisionamento no retorno.
+  Evidencias em [HOMOLOGACAO_WEB](operacao/HOMOLOGACAO_WEB.md) e exports ignorados.
+
 ### Correcao de administracao com credencial restrita
 
 - A interface compilada na pilha isolada da VPS aprovou 25 verificacoes de

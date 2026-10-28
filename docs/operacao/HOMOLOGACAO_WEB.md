@@ -227,3 +227,101 @@ O acesso administrativo para reboot, o aceite Google pessoal e o destino
 estavel de backup externo foram solicitados ao responsavel sem pedir senhas.
 W21 ainda exige o fechamento dessas evidencias aplicaveis; W22/W23 nao recebem
 aceite automatico pela medicao de capacidade ou pela documentacao preparada.
+
+## Correcao validada com runtime restrito — 2026-10-28
+
+A campanha de interface compilada no alvo encontrou um defeito que os testes
+com proprietario nao mostravam: criacao de conta administrativa retornava503,
+pois o writer corretamente nao possui INSERT/UPDATE direto em app_users.
+Vinte e cinco verificacoes de consulta, CSV, importacao e convites passaram;
+o cadastro permaneceu reprovado ate a correcao.
+
+O commit `ad3a469` introduz a capacidade SQL estreita da migration0010 para
+gestao administrativa, com ator revalidado, serializacao, ultimo administrador
+protegido e auditoria atomica. Grants diretos em usuarios seguem negados;
+somente o writer recebe EXECUTE. A persistencia legada permanece preservada.
+API corrigida: `stroop-web-api:w21-admin-20261028`, ID
+`sha256:7751933be0d4ba24eceff9e65bc388a76d0cd7fdba66f096542736f348a649ad`.
+Proxy W21 inalterado. Fontes e imagem conferidas na origem e na VPS:
+
+- Arquivo de fontes: `71300ebe10450fa8812449c2d62ebd7d8e43ddce7685696947793f286a280906`.
+- Arquivo da API: `9c69e92a4afc1fad235b4478132aa6cf321a53d09884698a7b84ce3346072fc4`.
+
+Suite Python corrigida:357/357, sem skips; testes focados13/13 incluem HTTP
+com writer real, grants, ator bloqueado e duas despromocoes concorrentes que
+preservam um administrador. Administracao integrada HTTPS/API/PostgreSQL
+aprovada em Chromium/Firefox (2/2). Smoke Compose passou no cadastro/edicao e
+409 da ultima conta administrativa usando o writer restrito.
+
+A nova campanha compilada na pilha isolada da VPS passou **32/32 verificacoes**
+em Chromium/Firefox: contas criadas/alteradas/bloqueadas (201/200), protecao do
+ultimo administrador (409), projetos/vinculos, tres perfis, painel, detalhe de
+16tentativas, CSV mascarado, importacao e convites, sem erros JavaScript ou
+storage de credenciais. Um timeout inicial era do seletor do harness para
+Perfil; nenhuma requisicao de alteracao tinha sido enviada. Evidencia preservada,
+seletor corrigido e campanha completa repetida, sem ocultar uma falha do produto.
+
+Recuperacao com a imagem corrigida na VPS: **dez migrations e uma avaliacao**
+restauradas em6,013s, alerta de falha de banco, retorno de candidato invalido e
+contagens preservadas. O ensaio local equivalente passou em7,012s. Somente
+pilhas sinteticas proprias foram utilizadas; nenhuma imagem, migration ou
+coleta da aplicacao publica foi alterada nesta campanha.
+
+Artefatos ignorados em `exports/w21/adminfix-20261028/` e
+`exports/w21/20261028-runtime-fix/`. Reboot administrativo, Google pessoal e
+backup externo automatico continuam dependendo dos recursos do responsavel.
+
+### Fechamento das verificacoes no alvo
+
+Capacidade repetida com a imagem corrigida, sem outras pilhas de ensaio
+concorrentes: 870requisicoes, 710sucessos e 160respostas429; nenhum5xx,
+erro de transporte ou resposta200invalida. Os niveis1/4/8clientes a1GET/s
+passaram sem rejeicoes; p95 em8clientes de67,11ms e p99 de99,74ms. Em16clientes,
+320/480consultas tiveram sucesso, p95 de63,51ms. Mesmas limitacoes de massa,
+duracao e interpretacao do metodo acima; nao e capacidade de participantes.
+
+**Reboot real do host aprovado.** A capacidade administrativa existente no
+Docker foi verificada com comando efemero, sem mudar credenciais ou permissao
+SSH/sudo. Apos backup restaurado e copia criptografada externa conferida,
+um comando administrativo via namespace do host solicitou reboot. O boot ID
+mudou e a verificacao posterior encontrou publicacao e candidato saudaveis,
+preservando respectivamente4/64/48 e1/16/12avaliacoes/tentativas/metricas.
+Consulta autenticada ao detalhe e CSV do candidato passaram. Uptime observado
+na verificacao:29,08s; nao foi medida a janela completa de indisponibilidade.
+Os servicos legados tambem retornaram saudaveis. Pilha candidata e credenciais
+do ensaio removidas; servicos e volumes preexistentes preservados.
+
+**Autenticacao externa: evidencia operacional existente.** Consulta SQL
+somente leitura, retornando apenas um booleano, confirmou registro de sessao
+de administrador ativo nao sintetico emitida nas ultimas24horas na publicacao.
+Nenhuma identidade, cookie, hash de token ou conteudo de sessao foi exibido.
+A logica do callback de contas cadastradas permanece igual a da release
+publicada: a diferenca de codigo acrescenta somente o tratamento posterior
+de usuario nao cadastrado. Essa evidencia resolve a falta de prova de emissao
+de sessao real no cliente Google existente; nao representa um novo login
+interativo executado pelo Codex nem certifica todos os navegadores no Google.
+
+Integracao completa reforcada passou36/36 emChromium/Firefox, em10,9min,
+sem falhas/retries. O harness agora usa o provisionador canonico e entrega
+somente writer/reader restritos a API, mantendo proprietario apenas nas
+fixtures/migrations. O processo API nao recebe a DSN proprietaria; assertions
+de inicio recusam privilegios administrativos, CREATE ou DML direto em usuarios.
+
+Retorno a versao anterior validado antes de publicar: imagem
+`stroop-web-api:rollback-schema10-20261028`, ID
+`sha256:a777ee198f82fe3ea896ee3131750c3d9a460b62279121ae050918c006d52dbb`,
+preserva todas as camadas da API anteriormente publicada e acrescenta somente
+os arquivos de migrations0009/0010. O readiness antigo exige igualdade exata
+da lista de migrations, portanto a imagem antiga original nao seria saudavel
+com schema10. A troca somente de imagens para essa API compativel e proxy
+anterior passou prontidao, pagina, consulta/detalhe/CSV autenticados e preservou
+1/16/12registros. O retorno ao candidato manteve contagens e administracao
+201/200. Nenhuma migration reversa, restore sobre coleta ou reprovisionamento
+foi necessario. Este retorno e especifico das adicoes0009/0010 comprovadas;
+nao autoriza acrescentar manifests a uma imagem incompativel com schema futuro.
+
+Evidencias: `capacity-vps.json`, `reboot-vps.json`,
+`google-session-evidence.json`, `rollback-compat/` e `ui/` em
+`exports/w21/adminfix-20261028/`; integracao restrita em
+`exports/w21/20261028-runtime-fix/`. Os limites W16 permanecem preservados;
+nao se afirma homologacao temporal fisica universal nem liberacao de coleta real.
