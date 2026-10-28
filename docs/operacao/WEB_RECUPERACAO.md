@@ -51,11 +51,13 @@ O teste nao substitui uma recuperacao operacional: restaure primeiro em banco
 novo e isolado, compare contagens e criterios de integridade, confira todas as
 migrations e reconfigure papeis/privilegios antes de conectar a API. O dump
 nao carrega owners/grants. Em particular, funcoes SECURITY DEFINER restauradas
-precisam ter EXECUTE removido de PUBLIC antes do provisionamento; para a funcao
-conhecida da migration0008, execute como proprietario no banco restaurado:
+precisam ter EXECUTE removido de PUBLIC antes do provisionamento; para as funcoes
+conhecidas das migrations 0008 e 0010, execute como proprietario no banco
+restaurado (somente as presentes na versao recuperada):
 
 ```sql
 REVOKE ALL ON FUNCTION public.web_lock_emitter(text, text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.web_manage_user(text,text,text,text,text,text,text,boolean) FROM PUBLIC;
 ```
 
 Depois execute `web-provision` com o proprietario da funcao restaurada e os

@@ -8,7 +8,8 @@ from api.errors import APIError
 from api.models import RequestModel
 from api.sessions import _next_cursor, _page, _professional_read, _professional_write, _reject_empty_body, _reject_query
 from stroop.application import auth as application
-from stroop.domain.auth import AuthError, InvalidIdentityError, LastAdminProtectionError
+from stroop.application import web_administration as management
+from stroop.domain.auth import AuthError, ForbiddenOperationError, InvalidIdentityError, LastAdminProtectionError
 
 
 router = APIRouter(prefix="/api/v1/admin", tags=["administration"])
@@ -32,6 +33,8 @@ def _database_error(error: AuthError) -> APIError:
         return APIError("service_unavailable")
     if isinstance(error, LastAdminProtectionError):
         return APIError("state_conflict")
+    if isinstance(error, ForbiddenOperationError):
+        return APIError("forbidden")
     if isinstance(error, InvalidIdentityError):
         return APIError("invalid_request")
     return APIError("service_unavailable")
@@ -63,7 +66,7 @@ async def create_user(request: Request, body: CreateUser):
     _reject_query(request)
     actor = _professional_write(request, "manage_users")
     try:
-        application.create_user(request.app.state.config.database_url, body.issuer, body.subject,
+        management.create_user(request.app.state.config.database_url, body.issuer, body.subject,
                                 body.role, body.email, actor)
     except AuthError as exc:
         try:
@@ -83,7 +86,7 @@ async def update_user(user_id: str, request: Request, body: UpdateUser):
     if identity is None:
         raise APIError("invalid_request")
     try:
-        application.update_user(request.app.state.config.database_url, identity[0], identity[1],
+        management.update_user(request.app.state.config.database_url, identity[0], identity[1],
                                 role=body.role, active=body.active, email=body.email, actor=actor)
     except AuthError as exc:
         try:

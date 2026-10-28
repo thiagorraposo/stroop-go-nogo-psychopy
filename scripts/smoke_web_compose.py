@@ -417,8 +417,30 @@ print(json.dumps({'select':True,'insert':False,'schema_create':False}))
         except json.JSONDecodeError:
             raise SmokeFailure from None
 
+    def _administration_smoke(self, admin: dict[str, str]):
+        """Exige gestao real pelo writer restrito, sem promover o runtime a owner."""
+        headers = self._api_headers(admin, write=True)
+        status, _, user = self._json_request(
+            'POST', '/api/v1/admin/users',
+            {'issuer': 'https://accounts.google.com',
+             'subject': 'synthetic-w21-managed', 'role': 'consulta'}, headers,
+        )
+        self._assert(status == 201 and user['role'] == 'consulta' and user['active'])
+        status, _, result = self._json_request(
+            'PUT', f"/api/v1/admin/users/{user['user_id']}",
+            {'role': 'importacao', 'active': False, 'email': None}, headers,
+        )
+        self._assert(status == 200 and result['role'] == 'importacao'
+                     and result['active'] is False)
+        status, _, result = self._json_request(
+            'PUT', f"/api/v1/admin/users/{admin['user_id']}",
+            {'role': 'consulta', 'active': True, 'email': None}, headers,
+        )
+        self._assert(status == 409 and result['error']['code'] == 'state_conflict')
+
     def _collect_and_query(self):
         admin = self._seed_admin_session()
+        self._administration_smoke(admin)
         admin_headers = self._api_headers(admin)
         write_headers = self._api_headers(admin, write=True)
         status, _, project = self._json_request(

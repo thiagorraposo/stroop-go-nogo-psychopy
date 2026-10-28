@@ -61,9 +61,14 @@ privilegios administrativos, memberships ou propriedade de objetos. Confere
 tambem grants inseguros de PUBLIC, sem alterar globalmente um banco compartilhado.
 Conceda o baseline necessario por procedimento do operador antes de repetir um
 job recusado. A leitura recebe somente as colunas do contrato de consultas;
-o writer recebe DML operacional, sem modificar usuarios ou o mapa de legado.
+o writer recebe DML operacional, sem DML direto em usuarios ou no mapa de legado.
 Uma funcao estreita da migration 0008 adquire o lock de usuario necessario a
-revogacoes concorrentes, com EXECUTE somente para o writer. O privilegio
+revogacoes concorrentes. A migration 0010 acrescenta a capacidade de criar e
+alterar contas por operacoes fechadas: revalida o ator administrativo, serializa
+mudancas, protege o ultimo administrador e registra auditoria na transacao.
+Ambas usam SECURITY DEFINER com search_path fixo; EXECUTE e concedido somente
+ao writer e revogado de PUBLIC. Nenhuma concede INSERT/UPDATE de app_users
+ao runtime; os fluxos legados conservam sua persistencia existente. O privilegio
 UPDATE(name) de projetos permite seu row lock. O baseline PostgreSQL de tabelas
 temporarias por PUBLIC permanece; nao ha CREATE persistente para o runtime.
 

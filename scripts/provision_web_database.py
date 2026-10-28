@@ -154,9 +154,12 @@ def provision(environment: Mapping[str, str] | None = None):
             connection.execute('SELECT pg_advisory_xact_lock(%s)', (LOCK_ID,))
             db_name, db_oid, owner_oid = connection.execute("SELECT current_database(),(SELECT oid FROM pg_database WHERE datname=current_database()),(SELECT oid FROM pg_roles WHERE rolname=current_user)").fetchone()
             _baseline(connection)
-            function = connection.execute("SELECT proowner,prosecdef FROM pg_proc WHERE oid=to_regprocedure('public.web_lock_emitter(text,text)')").fetchone()
-            if not function or function != (owner_oid, True):
-                _fail()
+            functions = ('public.web_lock_emitter(text,text)',
+                         'public.web_manage_user(text,text,text,text,text,text,text,boolean)')
+            for signature in functions:
+                function = connection.execute('SELECT proowner,prosecdef FROM pg_proc WHERE oid=to_regprocedure(%s)', (signature,)).fetchone()
+                if not function or function != (owner_oid, True):
+                    _fail()
             writer_name = _role(connection, writer, 'writer', db_oid, owner_oid)
             reader_name = _role(connection, reader, 'reader', db_oid, owner_oid)
             for name in (writer_name, reader_name):
@@ -171,6 +174,7 @@ def provision(environment: Mapping[str, str] | None = None):
             for sequence in ('auth_audit_events_audit_id_seq', 'trial_results_trial_result_id_seq', 'assessment_metrics_metric_id_seq'):
                 connection.execute(sql.SQL('GRANT USAGE ON SEQUENCE public.{} TO {}').format(sql.Identifier(sequence), sql.Identifier(writer_name)))
             connection.execute(sql.SQL('GRANT EXECUTE ON FUNCTION public.web_lock_emitter(text,text) TO {}').format(sql.Identifier(writer_name)))
+            connection.execute(sql.SQL('GRANT EXECUTE ON FUNCTION public.web_manage_user(text,text,text,text,text,text,text,boolean) TO {}').format(sql.Identifier(writer_name)))
     except ProvisionError:
         raise
     except Exception:

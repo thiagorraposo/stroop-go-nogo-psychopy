@@ -5,6 +5,16 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 
 ## Atual — W21 no alvo, retomada em 2026-10-28
 
+- Novo impedimento funcional descoberto no alvo: cadastro de conta pela
+  interface retorna503 com writer provisionado. W15D usava INSERT/UPDATE de
+  app_users, negados corretamente pelo baseline W19. Consulta, detalhe, CSV,
+  convite e importacao passaram com writer real; administracao nao recebe aceite.
+  Correcao implementada: migration0010 e adaptadores WEB usam capacidade SQL
+  estreita, revalidam admin e preservam negacao de DML direto/protecao concorrente
+  do ultimo administrador. PostgreSQL357/357 sem skips e focados13/13 aprovados.
+  Imagem stroop-web-api:w21-admin-20261028 construida; recuperacao local com dez
+  migrations/uma avaliacao em7,012s aprovada. Faltam repetir interface/campanha
+  no alvo com essa imagem; integracao administrativa em navegador2/2 aprovada.
 - Usuario autorizou concluir as etapas restantes com liberdade de execucao.
   Branch `prep-web`; alteracao preexistente de `AGENTS.md` preservada.
 - SSH pelo agente funciona novamente. VPS ainda publica release `26fa9bf`;

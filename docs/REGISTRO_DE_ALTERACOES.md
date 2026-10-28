@@ -8,6 +8,32 @@ O estado da nova versao web e mantido separadamente no
 
 ## 2026-10-28 — W21: capacidade e recuperacao medidas na VPS; transicao preparada
 
+### Correcao de administracao com credencial restrita
+
+- A interface compilada na pilha isolada da VPS aprovou 25 verificacoes de
+  consulta, CSV, importacao e convites em Chromium/Firefox, mas cadastro de
+  conta retornou503: o adaptador administrativo usava INSERT/UPDATE negados
+  pelo papel de runtime. Suites com proprietario nao detectavam essa divergencia.
+- Nova migration0010 fornece `web_manage_user`, operacoes fechadas em funcao
+  SECURITY DEFINER com search_path fixo, revalidacao do administrador ativo,
+  serializacao e protecao do ultimo admin, com auditoria na mesma transacao.
+  Provisionamento confere proprietario/definer e concede somente EXECUTE ao
+  writer; PUBLIC/reader nao executam. DML direto em app_users segue negado.
+- Adaptadores WEB de aplicacao/persistencia usam a capacidade SQL; API conserva
+  contratos. Persistencia administrativa legada preservada. Smoke Compose agora
+  exige criar/editar conta e proteger o ultimo admin usando o writer restrito.
+  Guias Docker/restauracao incluem a nova funcao e remocao de EXECUTE de PUBLIC
+  depois de restaurar dump sem grants. Expectativas de migrations atualizadas.
+- PostgreSQL real: 13 testes focados aprovados, incluindo cinco novos testes de
+  HTTP/auditoria, perfis, grants e concorrencia; suite completa357/357 em72,471s,
+  sem skips. Recuperacao Compose com imagem corrigida passou: dez migrations,
+  uma avaliacao restauradas em7,012s, alerta/retorno de candidato invalido e
+  contagens preservadas. Administracao integrada HTTPS/API/PostgreSQL passou
+  em Chromium/Firefox (2/2, 15,2s). Scanner de334fontes sem achados e diff check
+  aprovados. Repeticao no alvo ainda pendente; isto nao concede aceite W21/W22/W23.
+
+### Evidencias da campanha anterior
+
 - Autorizacao do responsavel para concluir as etapas restantes; SSH restabelecido.
   Fontes `af73939` e imagens W21 transferidas com checksums conferidos para
   homologacao isolada na VPS, sem substituir a release publica `26fa9bf`.
