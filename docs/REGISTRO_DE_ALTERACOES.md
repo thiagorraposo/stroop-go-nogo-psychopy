@@ -26,6 +26,10 @@ O estado da nova versao web e mantido separadamente no
   Bash passaram no agente. Pipeline hospedado e integracao via PR ainda pendentes.
   Principal confirmou11/11 em0,031s, actionlint,118links locais, scanner de339fontes
   sem achados e diff check. Nenhum deploy ou alteracao em dados operacionais.
+  [PR1](https://github.com/thiagorraposo/stroop-go-nogo-psychopy/pull/1) aberto;
+  verificacao hospedada iniciou e passou Python/PostgreSQL, scanner e frontend
+  na primeira revisao. Resultado da HEAD final/merge e verificavel nos metadados
+  do PR e execucoes do Actions, sem fonte paralela de estado mutavel em docs.
 
 ## 2026-11-04 — Checkpoint M3: transporte de replica externa validado
 

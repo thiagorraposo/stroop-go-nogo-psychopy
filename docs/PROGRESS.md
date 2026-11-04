@@ -3,12 +3,12 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
-## Atual — GitHub Flow e CI em 2026-11-04
+## Atual — GitHub Flow permanente; proxima unidade de desenvolvimento W22
 
 - Solicitacao autoriza permanentemente pushes, PRs e squash merges com CI/regras
   satisfeitas; sem force push, bypass, deploy ou operacoes destrutivas.
   Diretriz em AGENTS/CONTRIBUTING e protocolo alinhado, mantendo limites legados.
-- Branch local `prep-web` renomeada para `feat/evolucao-web`, preservando os67
+- Branch de integracao `prep-web` renomeada para `feat/evolucao-web`, preservando os67
   commits WEB ainda nao publicados. Base remota main9a52eda, conferida por fetch.
   Hunk preexistente de AGENTS raiz preservado somente na worktree, fora do index.
 - GitHub permite administracao; main antes sem protecao. Agora exige PR, verify
@@ -26,11 +26,18 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
   na proveniencia documentada e no valor conhecido do hash, sem ler dados privados.
 - Validacao local do agente:11/11 testes do runner, actionlint oficial1.7.7,
   YAML/Bash aprovados. Principal confirmou11/11 em0,031s, actionlint,118links,
-  scanner339fontes e diff check. CI hospedada e PR ainda pendentes;
-  nao conceder conclusao antes dos checks e sincronizacao de main.
-- Proxima acao: validar/commitar somente mudancas da tarefa, publicar a branch,
-  abrir PR, acompanhar verify e corrigir falhas; squash sem bypass, sincronizar
-  main e preservar o hunk local. W22/W23 mantem pendencias do checkpoint M3.
+  scanner339fontes e diff check. A integracao e acompanhada pelo
+  [PR1](https://github.com/thiagorraposo/stroop-go-nogo-psychopy/pull/1).
+  Resultado vivo dos checks/merge no GitHub: `gh pr view 1 --json state,mergeCommit,statusCheckRollup`.
+  Isso evita duplicar no arquivo o estado mutavel de cada execucao do Actions.
+- Para encerrar a unidade Git, exigir verify aprovado na HEAD final, squash sem
+  bypass, main sincronizada e branch temporaria removida; preservar hunk local.
+  A execucao de push em main tambem deve passar. A solicitacao nao inclui deploy.
+- Proxima acao de desenvolvimento, apos integrar e conferir Git/CI: retomar M3,
+  instalar/testar timer local da replica externa e validar restauracao isolada.
+  W22/W23 mantem as pendencias do checkpoint abaixo; nao iniciar publicacao
+  de producao por este fluxo Git. Antes de retomar, conferir `git status`,
+  `git log -1`, PR1 e execucao de main, sem repetir implementacao ja integrada.
 
 ## Checkpoint M3 — transporte restrito fechado em 2026-11-04
 
