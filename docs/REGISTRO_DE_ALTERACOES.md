@@ -6,6 +6,27 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-11-04 — Diretriz permanente de GitHub Flow e CI
+
+- Responsavel autorizou git/gh para branches curtas, pushes, PRs e squash merge
+  quando CI e regras permitirem, sem nova confirmacao rotineira. Sem force push,
+  bypass, deploy ou operacoes destrutivas. AGENTS/protocolo alinhados e novo
+  CONTRIBUTING com comandos e referencias; hunk local preexistente preservado.
+- Diagnostico:67commits WEB em prep-web ainda fora de main, nenhum PR/workflow
+  hospedado executado ou protecao remota existente. Branch renomeada para
+  feat/evolucao-web. Caminhos de saida conferidos sem novos dados locais/secrets;
+  scanner historico apontou um hash de imagem conhecido, nao credencial real.
+- Protecao main configurada: PR, verify do GitHub Actions, branch atualizada,
+  historico linear e conversas resolvidas, inclusive administradores; force push
+  e exclusao de main bloqueados. Sem criar aprovacao humana obrigatoria adicional.
+  Repo remove branch temporaria apos merge. Configuracao nao faz deploy.
+- CI mantida e enxugada: pushmain/PR/manual, PostgreSQL no digest Compose,
+  typecheck feito uma vez pelo build. Teste real Bash/GITHUB_ENV valida DSN;
+  nenhuma correcao de printf foi necessaria.11testes do runner e actionlint/YAML/
+  Bash passaram no agente. Pipeline hospedado e integracao via PR ainda pendentes.
+  Principal confirmou11/11 em0,031s, actionlint,118links locais, scanner de339fontes
+  sem achados e diff check. Nenhum deploy ou alteracao em dados operacionais.
+
 ## 2026-11-04 — Checkpoint M3: transporte de replica externa validado
 
 - A pedido do responsavel, fechada somente a menor unidade em andamento:

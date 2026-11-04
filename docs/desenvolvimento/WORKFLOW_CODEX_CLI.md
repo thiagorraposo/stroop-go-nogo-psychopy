@@ -46,8 +46,10 @@ somente no roadmap. Nao gerar prompts nem copias de tabelas de progresso.
 
 Trabalhar em branch de desenvolvimento separada e fazer commits locais pequenos
 apos validacao, conforme o AGENTS raiz e `PADRAO_DE_COMMITS.md`, sem incluir
-alteracoes preexistentes. Nao fazer push, merge na principal, tags ou deploy
-sem autorizacao explicita. O versionamento manual abaixo pertence ao legado.
+alteracoes preexistentes. A diretriz permanente do responsavel autoriza pushes,
+PRs e merges conforme [GitHub Flow](../../CONTRIBUTING.md), com CI aprovada e
+regras/revisoes obrigatorias satisfeitas. Nao usar force push ou bypass.
+Tags, deploy e operacoes destrutivas exigem autorizacao especifica.
 
 Nao encerrar entre etapas para relatar resultados. Continuar enquanto houver
 tarefa viavel e recursos, usando a janela de 5 horas quando disponivel, sem
@@ -60,7 +62,7 @@ limitacoes e proxima acao de forma objetiva.
 
 W22 pertence ao usuario: nenhum comando de continuacao autoriza acesso OCI,
 deploy, contratacao ou dados reais. As restricoes operacionais de seguranca
-abaixo continuam validas; o ritmo e o versionamento do legado aplicam-se somente
+abaixo continuam validas; o ritmo do legado aplica-se somente
 aos comandos legados. `continue o projeto`, `mostrar status` e `validar etapa
 atual` sem qualificacao conservam o significado legado.
 
@@ -179,6 +181,6 @@ outro chat; nao gerar novo prompt externo para cada etapa.
 Nao abrir, copiar, migrar ou publicar dados reais. O Codex nao acessa ou configura
 OCI por iniciativa propria; decisoes de producao e execucao das Etapas 11 e 12
 cabem ao usuario. Nao antecipar etapas posteriores, instalar dependencias sem
-necessidade comprovada ou ignorar as regras de Git do escopo: commits locais
-validados no WEB autonomo; versionamento manual no legado. Na execucao WEB,
+necessidade comprovada ou ignorar a diretriz permanente de GitHub Flow,
+que governa o versionamento sem ampliar o escopo legado. Na execucao WEB,
 uma etapa posterior com dependencias concluidas passa a ser trabalho elegivel.

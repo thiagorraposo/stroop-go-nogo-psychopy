@@ -1,5 +1,7 @@
 # Stroop Go/No-Go PsychoPy
 
+Contribuicoes seguem [GitHub Flow](CONTRIBUTING.md), com PRs, CI e squash merge.
+
 ## Evolucao para WEB
 
 A versao WEB esta publicada para testes sinteticos em

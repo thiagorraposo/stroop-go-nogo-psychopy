@@ -19,6 +19,7 @@ experimento, calculos, arquitetura, dados, acesso e limites de validacao.
 - [CI WEB reproduzivel](desenvolvimento/CI_WEB.md).
 - [Contrato HTTP WEB](desenvolvimento/CONTRATO_API_WEB.md).
 - [Padrao de commits](desenvolvimento/PADRAO_DE_COMMITS.md).
+- [Contribuicao e GitHub Flow](../CONTRIBUTING.md).
 - [Registro de alteracoes](REGISTRO_DE_ALTERACOES.md): evidencias datadas.
 - [Instrucoes de documentacao](AGENTS.md).
 

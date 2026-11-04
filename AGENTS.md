@@ -117,9 +117,9 @@ a primeira etapa nao concluida do backlog; `mostrar status` e somente leitura;
 para as Etapas 11 e 12, sem avancar.
 Siga integralmente o protocolo para os tres comandos. Nao acesse ou configure
 OCI por iniciativa do Codex; decisoes materiais cabem ao usuario.
-Somente no workflow legado, execute uma etapa por solicitacao e mantenha o
-versionamento manual, salvo instrucao explicita do usuario. Essas restricoes nao
-limitam o workflow WEB continuo acima.
+Somente no workflow legado, execute uma etapa por solicitacao. O versionamento
+segue a diretriz permanente de GitHub Flow da secao Git; isso nao autoriza
+iniciar as Etapas 11 e 12 nem limita o workflow WEB continuo acima.
 
 ## Qualidade e arquitetura
 
@@ -182,16 +182,23 @@ limitam o workflow WEB continuo acima.
 
 ## Git
 
-- Trabalhe em branch de desenvolvimento separada; crie-a quando necessario sem
-  descartar alteracoes existentes. Nao troque a branch de trabalho sem verificar
-  seu estado nem sobrescreva trabalho preexistente.
-- No trabalho WEB autonomo, faca commits locais pequenos e coerentes apos
-  validacao, preferindo Conventional Commits em portugues conforme
-  `docs/desenvolvimento/PADRAO_DE_COMMITS.md`. Adicione apenas os arquivos ou hunks da tarefa;
-  nao inclua alteracoes preexistentes ou alheias. Se nao puder isolar o commit
-  com seguranca, preserve o trabalho e registre a pendencia.
-- No workflow legado ou quando o usuario limitar o versionamento, apenas sugira
-  uma mensagem de commit, respeitando a autorizacao recebida.
-- Nao execute push, merge na branch principal, tags ou deploy de producao sem
-  autorizacao explicita. Nao execute comandos destrutivos; nao exponha
-  credenciais ou dados sensiveis em comandos, diffs, logs ou commits.
+- Diretriz permanente do responsavel: seguir GitHub Flow, usando `git` e `gh`.
+  Pushes, criacao de PRs e merges estao autorizados para tarefas de desenvolvimento,
+  sem nova confirmacao para operacoes rotineiras. Respeite limites de escopo e
+  aprovacoes/protecoes obrigatorias; nunca use force push ou bypass administrativo.
+- Mantenha `main` estavel. Trabalhe em branch curta `feat/`, `fix/`, `refactor/`,
+  `docs/` ou `chore/`, sem branches redundantes. Confira estado e preserve todas
+  as alteracoes preexistentes antes de trocar de branch.
+- Faca commits pequenos e coerentes, apos validacao, em Conventional Commits
+  em portugues conforme `docs/desenvolvimento/PADRAO_DE_COMMITS.md`. Adicione
+  somente arquivos/hunks da tarefa; preserve alteracoes alheias fora dos commits.
+- Execute os checks pertinentes, publique a branch e abra PR com problema,
+  comportamento e validacao objetivos. Corrija falhas antes de integrar.
+  Aguarde CI/checks obrigatorios e revisoes exigidas; prefira squash merge.
+- Apos merge permitido, atualize `main` por fast-forward e remova branches
+  temporarias integradas. Nao remova trabalho local nao integrado ou alteracoes
+  preexistentes; registre qualquer impedimento real.
+- Fluxo de contribuicao e comandos em `CONTRIBUTING.md`; CI em
+  `docs/desenvolvimento/CI_WEB.md`. Essa diretriz vale para proximas tarefas.
+- Deploy de producao, tags e operacoes destrutivas exigem autorizacao especifica.
+  Nao exponha secrets, dados pessoais, backups ou exports em commits, PRs ou logs.

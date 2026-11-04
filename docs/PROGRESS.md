@@ -3,6 +3,35 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
+## Atual — GitHub Flow e CI em 2026-11-04
+
+- Solicitacao autoriza permanentemente pushes, PRs e squash merges com CI/regras
+  satisfeitas; sem force push, bypass, deploy ou operacoes destrutivas.
+  Diretriz em AGENTS/CONTRIBUTING e protocolo alinhado, mantendo limites legados.
+- Branch local `prep-web` renomeada para `feat/evolucao-web`, preservando os67
+  commits WEB ainda nao publicados. Base remota main9a52eda, conferida por fetch.
+  Hunk preexistente de AGENTS raiz preservado somente na worktree, fora do index.
+- GitHub permite administracao; main antes sem protecao. Agora exige PR, verify
+  do app GitHub Actions15368, branch atualizada, historico linear e conversas
+  resolvidas, inclusive administradores; force push/exclusao de main negados.
+  Nenhum novo aprovador humano exigido; remocao automatica de branch integrada.
+- CI existente preservada: Python/PostgreSQL, frontend, navegadores/motor,
+  HTTPS real e auditorias. Push limitado a main para evitar duplicar PR; banco
+  fixado ao digest Compose e typecheck duplicado removido (build ja o executa).
+  Teste Bash/GITHUB_ENV confirma URL de banco valida e quebra de linha correta.
+- Verificacao de caminhos dos67commits nao encontrou dados locais/chaves/exports
+  novos. Scanner historico apontou somente SHA-256 de imagem documentado, ja
+  esclarecido no HEAD, sem credencial real ou excecao de regra adicionada.
+  Arquivo temporario original nao esta mais disponivel; classificacao baseada
+  na proveniencia documentada e no valor conhecido do hash, sem ler dados privados.
+- Validacao local do agente:11/11 testes do runner, actionlint oficial1.7.7,
+  YAML/Bash aprovados. Principal confirmou11/11 em0,031s, actionlint,118links,
+  scanner339fontes e diff check. CI hospedada e PR ainda pendentes;
+  nao conceder conclusao antes dos checks e sincronizacao de main.
+- Proxima acao: validar/commitar somente mudancas da tarefa, publicar a branch,
+  abrir PR, acompanhar verify e corrigir falhas; squash sem bypass, sincronizar
+  main e preservar o hunk local. W22/W23 mantem pendencias do checkpoint M3.
+
 ## Checkpoint M3 — transporte restrito fechado em 2026-11-04
 
 - **Escopo encerrado:** menor unidade em andamento de W22: verificar a replica
