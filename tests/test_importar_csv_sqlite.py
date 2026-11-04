@@ -172,24 +172,40 @@ class ImportarCsvSqliteTests(unittest.TestCase):
 
     def test_rollback_em_erro_de_insercao(self):
         self.write_csv(valid_rows())
-        original_calculate_metrics = importar_csv_sqlite.calculate_metrics
-
-        def broken_metrics(rows):
-            metrics = original_calculate_metrics(rows)
-            metrics[0]["metric_value"] = None
-            return metrics
-
-        importar_csv_sqlite.calculate_metrics = broken_metrics
+        connection = importar_csv_sqlite.connect_database(self.db_path)
         try:
-            with self.assertRaises(sqlite3.IntegrityError):
-                importar_csv_sqlite.import_csv(self.csv_path, self.db_path)
+            connection.execute(
+                """CREATE TRIGGER synthetic_failure BEFORE INSERT ON assessment_metrics
+                BEGIN SELECT RAISE(ABORT, 'synthetic failure'); END"""
+            )
+            connection.commit()
         finally:
-            importar_csv_sqlite.calculate_metrics = original_calculate_metrics
+            connection.close()
+
+        with self.assertRaises(sqlite3.IntegrityError):
+            importar_csv_sqlite.import_csv(self.csv_path, self.db_path)
 
         with self.connect() as conn:
             self.assertEqual(conn.execute("SELECT COUNT(*) FROM assessments").fetchone()[0], 0)
             self.assertEqual(conn.execute("SELECT COUNT(*) FROM trial_results").fetchone()[0], 0)
             self.assertEqual(conn.execute("SELECT COUNT(*) FROM assessment_metrics").fetchone()[0], 0)
+
+    def test_rollback_de_force_preserva_avaliacao_tentativas_e_metricas(self):
+        self.write_csv(valid_rows())
+        importar_csv_sqlite.import_csv(self.csv_path, self.db_path)
+        tables = ("assessments", "trial_results", "assessment_metrics")
+        with self.connect() as connection:
+            before = {table: connection.execute(f"SELECT * FROM {table}").fetchall()
+                      for table in tables}
+            connection.execute(
+                """CREATE TRIGGER synthetic_failure BEFORE INSERT ON assessment_metrics
+                BEGIN SELECT RAISE(ABORT, 'synthetic failure'); END"""
+            )
+        with self.assertRaises(sqlite3.IntegrityError):
+            importar_csv_sqlite.import_csv(self.csv_path, self.db_path, force=True)
+        with self.connect() as connection:
+            for table in tables:
+                self.assertEqual(before[table], connection.execute(f"SELECT * FROM {table}").fetchall())
 
     def test_reaction_time_ausente_em_sem_resposta_e_valido(self):
         rows = [

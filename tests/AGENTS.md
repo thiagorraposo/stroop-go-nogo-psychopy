@@ -12,3 +12,10 @@ Escopo: `tests/`. Herda todas as regras da raiz.
   variaveis, colunas, tempos e compatibilidade entre arquivos.
 - Cubra comportamento e regressao do escopo; nao enfraqueca assercoes nem altere
   funcionalidade apenas para fazer a suite passar.
+- Para etapas WEB, cubra os limites e fluxos reais exigidos na ficha, incluindo
+  autorizacao negativa, erros e integracao quando aplicaveis. Doubles e relogios
+  controlados servem a testes isolados; nao substituem banco, navegador ou
+  medicao fisica quando estes forem criterios de aceite.
+- Use os comandos de teste, lint, tipos e build documentados para cada camada
+  implementada; registre aprovados, falhas, erros e skips separadamente. Uma
+  verificacao obrigatoria indisponivel mantem o criterio pendente.

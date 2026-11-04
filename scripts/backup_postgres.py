@@ -13,6 +13,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import tempfile
 from typing import BinaryIO
 
 from cryptography.exceptions import InvalidTag
@@ -178,7 +179,9 @@ def create_backup(
     key = load_key(key_file)
     database = _identifier(database, "Banco")
     user = _identifier(user, "Usuario")
-    service = _identifier(service, "Servico")
+    # Nome Compose admite hifen; nao e identificador SQL nem argumento livre.
+    if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]{0,62}', service):
+        raise BackupError('Servico invalido.')
     generations = _positive_generations(generations)
     try:
         output_directory.mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -246,11 +249,14 @@ def verify_checksum(backup: Path) -> None:
         raise BackupError("Checksum do backup nao confere.")
 
 
-def restore_isolated(backup: Path, key_file: Path) -> tuple[int, int]:
+def restore_isolated(backup: Path, key_file: Path, *, verify_web: bool = False) -> tuple[int, int]:
     """Restaura em PostgreSQL tmpfs sem portas e sempre remove o ambiente."""
     verify_checksum(backup)
     key = load_key(key_file)
-    compose = _compose_base(RESTORE_COMPOSE, "stroop-restore-validation")
+    # A pilha isolada usa apenas constantes; nao descobrir .env operacional.
+    empty_environment = tempfile.NamedTemporaryFile(prefix='stroop-restore-env-')
+    compose = _compose_base(RESTORE_COMPOSE, "stroop-restore-validation",
+                            Path(empty_environment.name))
     try:
         subprocess.run(
             compose + ["up", "-d", "--wait", "restore-postgres"],
@@ -290,6 +296,17 @@ def restore_isolated(backup: Path, key_file: Path) -> tuple[int, int]:
             raise
         if process.wait() != 0:
             raise BackupError("Restauracao isolada nao confirmada.")
+        verification_sql = "SELECT COUNT(*) FROM schema_migrations; SELECT COUNT(*) FROM assessments;"
+        if verify_web:
+            # Somente contagens/integridade; nenhum dado de participante sai do container.
+            verification_sql += """
+            SELECT COUNT(*) FROM web_assessments;
+            SELECT COUNT(*) FROM web_assessments w WHERE
+              (SELECT COUNT(*) FROM trial_results t WHERE t.assessment_id=w.assessment_id)<>16
+              OR (SELECT COUNT(*) FROM assessment_metrics m WHERE m.assessment_id=w.assessment_id)<>12;
+            SELECT COUNT(*) FROM web_assessments w JOIN web_participant_sessions s USING(session_id)
+              WHERE s.state<>'completed';
+            """
         result = subprocess.run(
             compose
             + [
@@ -304,14 +321,15 @@ def restore_isolated(backup: Path, key_file: Path) -> tuple[int, int]:
                 "--tuples-only",
                 "--no-align",
                 "--command",
-                "SELECT COUNT(*) FROM schema_migrations; SELECT COUNT(*) FROM assessments;",
+                verification_sql,
             ],
             check=True,
             capture_output=True,
             text=True,
         )
         counts = [int(line) for line in result.stdout.splitlines() if line.strip()]
-        if len(counts) != 2 or counts[0] < 1 or counts[1] < 0:
+        if (len(counts) != (5 if verify_web else 2) or counts[0] < 1 or counts[1] < 0
+                or (verify_web and (counts[2] < 0 or counts[3:] != [0, 0]))):
             raise BackupError("Restauracao isolada sem verificacao estrutural.")
         return counts[0], counts[1]
     except BackupError:
@@ -325,6 +343,7 @@ def restore_isolated(backup: Path, key_file: Path) -> tuple[int, int]:
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
+        empty_environment.close()
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -352,6 +371,8 @@ def _parser() -> argparse.ArgumentParser:
     restore = subparsers.add_parser("restore-test")
     restore.add_argument("--key-file", required=True, type=Path)
     restore.add_argument("--backup", required=True, type=Path)
+    restore.add_argument("--verify-web", action="store_true",
+                         help="verifica integridade das coletas WEB restauradas")
     return parser
 
 
@@ -375,7 +396,8 @@ def main(argv: list[str] | None = None) -> int:
             )
             print("Backup PostgreSQL criptografado concluido.")
         else:
-            migrations, assessments = restore_isolated(args.backup, args.key_file)
+            migrations, assessments = restore_isolated(args.backup, args.key_file,
+                                                       verify_web=args.verify_web)
             print(
                 "Restauracao isolada comprovada; "
                 f"migrations={migrations}; avaliacoes={assessments}."

@@ -44,6 +44,13 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 
+# Frontend e verificacoes de navegador
+node_modules/
+web/dist/
+web/test-results/
+web/playwright-report/
+*.tsbuildinfo
+
 # Ambientes e configuracoes locais
 .venv/
 venv/

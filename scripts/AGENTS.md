@@ -2,6 +2,10 @@
 
 Escopo: `scripts/`. Herda todas as regras da raiz.
 
+- Regras, contratos e adaptadores extraidos ficam em `stroop/`. Preserve as
+  reexportacoes de compatibilidade e a execucao por caminho e por modulo.
+  Nao reintroduza dependencia do nucleo em CLIs; veja o ADR-001 em `docs/arquitetura/`.
+
 - Nunca modifique CSV bruto. Valide completamente antes de persistir e mantenha
   erros de validacao separados de dados aceitos.
 - Preserve rastreabilidade por `assessment_id` e `source_file`, transacoes,

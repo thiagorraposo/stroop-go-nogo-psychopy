@@ -1,0 +1,9 @@
+# Runtime HTTP e cliente necessario aos testes unittest/TestClient.
+fastapi==0.143.3
+cryptography==50.0.1
+google-auth==2.62.0
+httpx==0.28.1
+psycopg[binary]==3.3.5
+requests==2.34.2
+uvicorn==0.52.4
+urllib3==2.8.0

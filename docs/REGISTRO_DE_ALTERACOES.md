@@ -1,12 +1,934 @@
 # Registro de alteracoes
 
 Este arquivo preserva fatos datados; nao define estado ou aceite vigente.
-Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
+Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
+
+O estado da nova versao web e mantido separadamente no
+[roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
+
+## 2026-11-04 — Correcao da auditoria de dependencias no PR1
+
+- CI de4782ae6 passou suites Python/PostgreSQL, frontend, navegadores e HTTPS;
+  auditoria Python bloqueou a entrega. Atualizados Streamlit1.66.1,
+  Authlib1.9.4, certifi2026.10.18, joserfc1.7.6, Pillow13.0.0 e pyasn1 0.6.5
+  nos requisitos/locks pertinentes, sem excecoes de vulnerabilidade.
+- Auditoria npm/pip-audit repetida sem vulnerabilidades conhecidas; pip check,
+  12testes do runner e27focados aprovados. Actionlint, scanner339fontes e prova
+  negativa passaram. Auditoria antecipada antes dos navegadores/HTTPS no runner
+  e workflow, com teste de bloqueio e reproducao documentada em CI_WEB.
+- Regressao Python/PostgreSQL descartavel:369/369, zero skips, em69,246s.
+- Hunk preexistente de AGENTS preservado fora dos commits; nenhum deploy.
+  CI da HEAD final e merge conferiveis no PR1 e nas execucoes do Actions.
+
+## 2026-11-04 — Diretriz permanente de GitHub Flow e CI
+
+- Responsavel autorizou git/gh para branches curtas, pushes, PRs e squash merge
+  quando CI e regras permitirem, sem nova confirmacao rotineira. Sem force push,
+  bypass, deploy ou operacoes destrutivas. AGENTS/protocolo alinhados e novo
+  CONTRIBUTING com comandos e referencias; hunk local preexistente preservado.
+- Diagnostico:67commits WEB em prep-web ainda fora de main, nenhum PR/workflow
+  hospedado executado ou protecao remota existente. Branch renomeada para
+  feat/evolucao-web. Caminhos de saida conferidos sem novos dados locais/secrets;
+  scanner historico apontou um hash de imagem conhecido, nao credencial real.
+- Protecao main configurada: PR, verify do GitHub Actions, branch atualizada,
+  historico linear e conversas resolvidas, inclusive administradores; force push
+  e exclusao de main bloqueados. Sem criar aprovacao humana obrigatoria adicional.
+  Repo remove branch temporaria apos merge. Configuracao nao faz deploy.
+- CI mantida e enxugada: pushmain/PR/manual, PostgreSQL no digest Compose,
+  typecheck feito uma vez pelo build. Teste real Bash/GITHUB_ENV valida DSN;
+  nenhuma correcao de printf foi necessaria.11testes do runner e actionlint/YAML/
+  Bash passaram no agente. Pipeline hospedado e integracao via PR ainda pendentes.
+  Principal confirmou11/11 em0,031s, actionlint,118links locais, scanner de339fontes
+  sem achados e diff check. Nenhum deploy ou alteracao em dados operacionais.
+  [PR1](https://github.com/thiagorraposo/stroop-go-nogo-psychopy/pull/1) aberto;
+  verificacao hospedada iniciou e passou Python/PostgreSQL, scanner e frontend
+  na primeira revisao. Resultado da HEAD final/merge e verificavel nos metadados
+  do PR e execucoes do Actions, sem fonte paralela de estado mutavel em docs.
+
+## 2026-11-04 — Checkpoint M3: transporte de replica externa validado
+
+- A pedido do responsavel, fechada somente a menor unidade em andamento:
+  verificacao do transporte SSH restrito da replica W22, sem instalar agenda,
+  restaurar banco, publicar candidato ou avancar etapas. Codigo validado em
+  `39dbf378536c16f033152bffe0f6b1e7e6ae30ee`; alteracao preexistente de AGENTS
+  raiz preservada. M3 registrado em PROGRESS, sem nova fonte de estado.
+- `.venv/bin/python -m unittest tests.test_web_backup_replication -v`:
+  10 testes aprovados em0,089s, zero falhas/erros/skips. Transporte real com
+  cliente imutavel: `copied` seguido de `already_current`, ambos codigo0,
+  sem alerta;69.269bytes, duas geracoes retidas e idade aproximada13,34h.
+  A mesma identidade recusou comando de shell `id`; nenhum dado descriptografado
+  ou chave AES foi aberto. Evidencia ignorada em exports/w22/20261104.
+- Timer local consultado: `not-found`. Permanecem agenda, restauracao isolada
+  da replica, atualizacao/smoke publico W22 e aceite de transicao W23. Checkpoint
+  inclui HEAD validado, entregas, resultados, limites e proxima acao exata.
+  Fontes do cliente imutavel conferidas;51links locais existentes, scanner de
+  338fontes sem achados e `git diff --check` aprovado. Sem push ou deploy.
+
+## 2026-10-28 — W21: capacidade e recuperacao medidas na VPS; transicao preparada
+
+### Homologacao fechada no alvo e integracao com privilegios minimos
+
+- Preparada replica externa automatica no destino ja usado pelo responsavel:
+  `replicate_web_backup.py` copia somente ciphertext por SSH dedicado, sem agente,
+  hostkey estrita, config/chave0600, validacao de formato/tamanho/SHA e publicacao
+  exclusiva sem sobrescrever evidencia; retencao30geracoes e alerta apos24h.
+  Exportador de comando forcado aceita apenas manifest/download canonico e
+  recusa shell, paths, symlinks, plaintext e chaves. Nao le a chave AES.
+  Modelos systemd por usuario usam agenda horaria com recuperacao de agenda
+  perdida; disponibilidade do computador/rede condiciona o objetivo RPO.
+  Dez testes sinteticos e CLIhelp/diff check aprovados. Instalacao, transporte
+  restrito real e restauracao da replica ainda serao comprovados emW22.
+  Scanner detectou falso positivo no SHA-256 rotulado como pacote da API;
+  rotulo esclarecido, hash preservado e338fontes verificadas sem achados,
+  sem enfraquecer regras ou adicionar excecao. Commit local anterior foi criado
+  antes de tratar a saida; pacote nao foi instalado/publicado antes da correcao.
+
+- Candidato corrigido aprovado na VPS:32/32 verificacoes de interface em dois
+  navegadores, incluindo cadastro/edicao/bloqueio201/200 e ultima conta409.
+  Um timeout inicial de seletor do harness nao enviou a operacao; evidencia
+  preservada e campanha completa corrigida passou. Quatro screenshots sinteticos
+  inspecionados; pilhas/tuneis/credenciais de ensaio proprios removidos.
+- Nova carga do candidato:870consultas,710sucessos/160respostas429, sem5xx ou
+  transporte invalido; oito clientes a1GET/s sem rejeicoes, p9567,11ms. Recuperacao
+  no alvo de dez migrations/uma avaliacao em6,013s, alerta e rollback aprovados.
+- Backup restaurado e nova copia externa criptografada conferidos antes de reboot
+  real. Capacidade administrativa ja existente no Docker permitiu comando efemero
+  no namespace do host, sem alterar SSH/sudo ou credenciais. BootID mudou;
+  publicacao4/64/48 e candidato1/16/12preservados; detalhe/CSV autenticados
+  aprovados e cinco servicos preexistentes saudaveis. Sem medir janela integral
+  de indisponibilidade; uptime na verificacao29,08s.
+- Consulta somente de agregados confirmou sessao administrativa nao sintetica
+  emitida nas ultimas24h. Nenhuma identidade/cookie/hash foi exibido. Callback de
+  conta cadastrada permanece igual ao publicado; evidencia operacional existente,
+  sem novo login Google interativo. Limites W16 preservados. Aceite W21 registrado
+  no roadmap com essas evidencias, sem homologacao temporal universal/coleta real.
+- Harness de integracao agora usa o provisionador canonico, writer/reader reais
+  restritos e assertions negativas de privilegios; proprietario somente em
+  fixtures/migrations e sua DSN ausente do processo API.36/36integracoes em10,9min,
+  sem falhas/retries em Chromium/Firefox, tipos/build aprovados.
+- Retorno das imagens compativel com schema10 ensaiado na VPS: API anterior com
+  somente manifests0009/0010adicionados e proxy anterior saudaveis, consulta/CSV
+  e1/16/12preservados; retorno ao candidato manteve dados e administracao201/200.
+  Imagem antiga original rejeitaria readiness com migrations adicionais. Nenhum
+  restore sobre coletas, migration reversa ou reprovisionamento no retorno.
+  Evidencias em [HOMOLOGACAO_WEB](operacao/HOMOLOGACAO_WEB.md) e exports ignorados.
+
+### Correcao de administracao com credencial restrita
+
+- A interface compilada na pilha isolada da VPS aprovou 25 verificacoes de
+  consulta, CSV, importacao e convites em Chromium/Firefox, mas cadastro de
+  conta retornou503: o adaptador administrativo usava INSERT/UPDATE negados
+  pelo papel de runtime. Suites com proprietario nao detectavam essa divergencia.
+- Nova migration0010 fornece `web_manage_user`, operacoes fechadas em funcao
+  SECURITY DEFINER com search_path fixo, revalidacao do administrador ativo,
+  serializacao e protecao do ultimo admin, com auditoria na mesma transacao.
+  Provisionamento confere proprietario/definer e concede somente EXECUTE ao
+  writer; PUBLIC/reader nao executam. DML direto em app_users segue negado.
+- Adaptadores WEB de aplicacao/persistencia usam a capacidade SQL; API conserva
+  contratos. Persistencia administrativa legada preservada. Smoke Compose agora
+  exige criar/editar conta e proteger o ultimo admin usando o writer restrito.
+  Guias Docker/restauracao incluem a nova funcao e remocao de EXECUTE de PUBLIC
+  depois de restaurar dump sem grants. Expectativas de migrations atualizadas.
+- PostgreSQL real: 13 testes focados aprovados, incluindo cinco novos testes de
+  HTTP/auditoria, perfis, grants e concorrencia; suite completa357/357 em72,471s,
+  sem skips. Recuperacao Compose com imagem corrigida passou: dez migrations,
+  uma avaliacao restauradas em7,012s, alerta/retorno de candidato invalido e
+  contagens preservadas. Administracao integrada HTTPS/API/PostgreSQL passou
+  em Chromium/Firefox (2/2, 15,2s). Scanner de334fontes sem achados e diff check
+  aprovados. Repeticao no alvo ainda pendente; isto nao concede aceite W21/W22/W23.
+
+### Evidencias da campanha anterior
+
+- Autorizacao do responsavel para concluir as etapas restantes; SSH restabelecido.
+  Fontes `af73939` e imagens W21 transferidas com checksums conferidos para
+  homologacao isolada na VPS, sem substituir a release publica `26fa9bf`.
+- Campanha no alvo em 2026-10-27: 870 consultas HTTPS, 710 sucessos validos e
+  160 respostas429, sem5xx/erro de transporte. Niveis1/4/8clientes a1GET/s
+  sem rejeicoes; oito clientes com p95 de58,73ms. Em16clientes, limitador
+  recusou160/480consultas. Nao mede capacidade de participantes ou timing fisico.
+- Reinicio dos tres containers preservou1avaliacao/16tentativas/12metricas.
+  Recuperacao isolada na VPS: nove migrations/uma avaliacao restauradas em
+  5,943s, alerta de banco e retorno de candidato invalido aprovados. Primeira
+  chamada falhou antes do ensaio por ausencia de psycopg; wheels das versoes
+  do lock extraidos em diretorio privado, sem instalacao global.
+- Detectado defeito operacional da release publicada: arquivo
+  `compose.restore-test.yaml` ausente fazia restore-check agendado falhar.
+  Reposto conteudo identico ao versionado; novo backup e mesma rotina de
+  restauracao aprovados. Copia criptografada fora da VPS com checksum conferido;
+  destino automatico estavel segue pendente. Nenhum dado pessoal foi aberto.
+- Smoke publico: pagina/readiness200, HSTS/CSP e inicio OIDC303para Google.
+  Sem login pessoal ou reboot do host; acesso administrativo, confirmacao Google
+  e destino externo solicitados ao responsavel. W21/W22 nao recebem aceite
+  por presuncao. Evidencias e limites em [HOMOLOGACAO_WEB](operacao/HOMOLOGACAO_WEB.md)
+  e [DEPLOY_WEB_VPS](operacao/DEPLOY_WEB_VPS.md); artefatos ignorados em exports/w21.
+- Guia do usuario ampliado para fluxos WEB; nova
+  [matriz de transicao](operacao/TRANSICAO_WEB.md) cobre historico, coexistencia,
+  manutencao, retorno e empacotamento completo por git archive. Nao retira
+  PsychoPy/Streamlit nem concede aceite W23. Indice, roadmap e retomada alinhados.
+- Regressao salva da execucao anterior: Python352/352 sem skips, frontend273/273,
+  tipos/build, navegador98gerais+4temporais aprovados. Integracao interrompida
+  antes dos testes nao conta como aprovada; nova verificacao na retomada.
+  Documentos: 141 links locais existentes, diff check aprovado e scanner de
+  330 fontes versionadas sem achados.
+  Alteracao preexistente em AGENTS raiz preservada fora da tarefa.
+
+## 2026-10-21 — W21: pilha local validada; alvo aguarda acesso SSH
+
+- Retomada apos pausa do responsavel. Novo `scripts/benchmark_web.py` cria
+  pilha exclusiva HTTPS/API/PostgreSQL e mede consultas autenticadas sem aceitar
+  alvo externo. Limites padrao preservados, clientes com pacing de 1 GET/s,
+  quatro operacoes, evidencias exclusivas e sem corpos/cookies/DSNs nos arquivos.
+  Helpers Compose/recuperacao aceitam imagens explicitas, sem alterar defaults
+  dos comandos existentes; recuperacao usa a lista canonica de migrations.
+- Encontrada falha real da imagem atual: Nginx recusava regex CSV com `{36}`
+  sem aspas. Corrigida delimitacao e acrescentado smoke real de limites:
+  rota CSV aceita mais de 64 KiB ate autenticacao; demais mantem 413. O primeiro
+  ensaio falhou por essa sintaxe; o segundo corrigiu Content-Type da fixture
+  de transporte. Ambos preservados, sem carga medida ou aceite artificial.
+- Terceiro ensaio: 870 requisicoes, 710 respostas 200 validas e 160 respostas
+  429; nenhum 5xx, erro de transporte ou resposta 200 invalida. Niveis 1/4/8
+  clientes ativos a 1 GET/s passaram sem rejeicoes. Em 16, 320/480 sucessos,
+  p95 dos sucessos 860,92 ms. Maior nivel testado sem rejeicao: 8, p95 115,42 ms.
+  Massa de uma avaliacao; isto nao mede teto de hardware, participantes ou VPS.
+  Canarios de sessao ausentes dos logs API/proxy e contagens preservadas apos
+  reiniciar os tres containers. Sem reboot do host.
+- Mesmas imagens em backup/restauracao/alerta/rollback: 9 migrations e uma
+  avaliacao restauradas, integridade e contagens preservadas; ensaio de backup
+  + restauracao local em 6,927 s. Nenhuma garantia de RPO/RTO do alvo inferida.
+- Regressao Python 352/352 sem skips, com banco novo descartavel; integracao
+  HTTPS/API/PostgreSQL Chromium/Firefox 36/36 em 10,9 minutos; typecheck/build
+  aprovados. A suite usa proxy HTTPS proprio, complementado pelo Nginx real
+  nos ensaios Compose. Nenhuma nova dependencia ou ferramenta instalada no host.
+- Artefatos em `exports/w21/`: `capacity-local-20261021{,-r2,-r3}.json`,
+  `recovery-local-20261021.json`, `validation-local-20261021.json`, logs
+  sanitizados, smoke publico, estado SSH e hashes das fontes. Manifesto com
+  10 entradas conferido; metodo, digests e limites em
+  [HOMOLOGACAO_WEB](operacao/HOMOLOGACAO_WEB.md). Logs/exports nao versionados.
+- Smoke publico fez somente dois GETs: pagina e prontidao 200, HSTS/CSP
+  observados. SSH de leitura recusado: chave criptografada nao liberada e
+  agente da sessao indisponivel. Tentativa por dialogo grafico nao carregou a
+  chave; agente temporario removido. Solicitado acesso sem pedir segredo na
+  conversa. Nenhuma alteracao remota, leitura de dado real, deploy ou push.
+- W21 continua pendente do ambiente alvo (capacidade, recuperacao/reboot,
+  autenticacao externa e aceite); W22/W23 nao avancadas. `AGENTS.md` preexistente
+  preservado fora do commit. Conferidos links locais e `git diff --check`.
+
+## 2026-10-20 — W16: evidencia local e encerramento por aceite excepcional
+
+- Responsavel instruiu "produza evidência parcial e trate como completo" apos
+  esclarecimento dos limites. Registrado encerramento W16 com escopo reduzido,
+  mantendo a matriz fisica original como referencia nao executada. Gates D5,
+  motor, API, tempos, estimulos, metricas e CSV permanecem inalterados.
+- Nova campanha explicita `cd web && npm run test:w16`: navegadores visiveis
+  na sessao X11, Chrome instalado 155.0.8059.84 e Firefox Playwright 157.0,
+  teclado automatizado e API double; pratica e principal reais. Dez tentativas
+  por navegador, Escape separado, um worker, sem retries ou dependencias novas.
+- Campanha de 27,4 minutos: 20 aprovados, 2 falhas, 0 skips, exit 1. Chrome
+  10/10 completos validos; Firefox 8/10, tentativa 2 sem terminar pratica em
+  25 s e tentativa 4 invalidada pelo gate (864 ms, 42 transicoes preservadas).
+  Escape aprovado em ambos. Falhas nao foram apagadas/substituidas ou reclassificadas
+  como testes aprovados; causas ainda nao determinadas.
+- Lote arquivado localmente em `exports/w16/2026-10-20T13-23-27Z/`: 21 trilhas
+  brutas (18 validas, 2 Escape, 1 invalida), relatorio de falhas, inventario,
+  agregado e copia do coletor usado. Manifesto com 92 entradas conferido;
+  SHA e estatisticas em `VALIDACAO_WEB.md`. Artefatos ignorados pelo Git.
+- Coletor separa duracao completa de fim da ultima tentativa em interrupcoes;
+  campanha original intacta, agregado calculado diretamente das trilhas.
+  Probe do rotulo corrigido em Escape Chrome 1/1; Vitest 273/273,
+  typecheck/build, 66 links locais e `git diff --check` aprovados. Nenhum teste Python/API novo
+  exigido por alteracoes restritas a coleta de evidencias/docs/frontend de teste.
+  Sem dado real, VPS, deploy ou push; `AGENTS.md` preexistente preservado.
+  Aceite administrativo W16 nao equivale a homologacao fisica nem conclui W21.
+
+## 2026-10-17 — Instrumentacao local opt-in para pilotos W16
+
+- Motor do bloco principal oferece trilha opcional de transicoes, intervalo de
+  quadros e eventos de teclado, inclusive quando uma execucao termina invalida
+  ou e interrompida. Captura requer build local `VITE_W16_TIMING_CAPTURE=synthetic-only`
+  e query `?w16=1`; o painel guarda em memoria e exporta apenas sob acao explicita.
+- Artefato registra ambiente tecnico e nao recebe identificador de participante,
+  convite ou dados de resultado. Testes sinteticos cobrem conclusao,
+  interrupcao e opt-in. Esta ferramenta nao constitui evidencia nem aceite W16;
+  pilotos fisicos nos seis ambientes continuam pendentes.
+
+## 2026-10-17 — Importacao CSV WEB W15E e aceites presumidos
+
+- Entregue migration/auditoria de operacoes CSV, API autenticada por projeto,
+  estado consultavel e transacao atomica. Browser redige somente copia em RAM
+  (`participant_name=NAO_COLETADO`, `initials` vazio); original nao e enviado
+  nem alterado. 5 MiB/10.000 registros na rota dedicada, 64 KiB preservados
+  nas demais; temp privado apagado, sem filename/caminho/conteudo nos logs.
+- Resultado fica apenas no projeto selecionado; rótulo de CSV legado nao cria
+  mapa/associacao. Duplicatas sao rejeitadas; UUID/hash permitem reconsulta e
+  repeticao explicita. Provisionamento minimo usa lock emitido para autorizar
+  identidade e lock consultivo por assessment ID, sem privilégio de tabela amplo.
+- Evidencias: suite Python completa 347/347 sem skips; Vitest 271/271,
+  TypeScript/build; Playwright geral e temporal; upload real HTTPS/API/PostgreSQL
+  ate consulta, detalhe e exportacao em Chromium/Firefox 2/2; suite de integracao
+  completa 36/36 em Chromium/Firefox; teste com papeis provisionados writer/reader;
+  `git diff --check`. Somente dados
+  sinteticos e banco descartavel. Sem dependencia nova, deploy, VPS ou push.
+- O responsavel instruiu explicitamente presumir todos os aceites; W09A visual
+  e W13A operacional foram aceitas por essa instrucao. A instrucao nao cria
+  evidencias de piloto fisico ou capacidade. W16/W21 permanecem limitadas por
+  evidencia real indisponivel. Inventario local parcial W16: Linux Mint 22.2,
+  painel eDP 1920x1080/60 Hz, Chrome 155/Firefox 158; teclado USB com fio e Edge
+  nao identificados; Windows 11 indisponivel. Nenhuma replica fisica executada.
+
+## 2026-10-17 — Percurso do participante WEB W09A
+
+- Abertura e tutorial organizam a regra em exemplos visuais e passos curtos.
+  Indicador de percurso cobre orientacoes, convite, pratica e tarefa;
+  preparacao/transicao e encerramento receberam acoes e estados mais claros.
+  A conclusao aparece somente apos recibo; falha de logout preserva o resumo e
+  permite nova tentativa. Foco programatico ganhou contorno visivel.
+- Preservados motor, condicoes, cores, temporizacao, HUD, feedback da tarefa,
+  teclas/foco/Escape e contrato CSV. Capturas comparativas usam somente dados
+  sinteticos em `/tmp/stroop-w09a-*`.
+- Evidencias: 268 testes Vitest, typecheck/build; Playwright geral94/94,
+  temporizacao4/4 e integracao HTTPS/PostgreSQL2/2 Chromium/Firefox; `git diff
+  --check` aprovado. Aceite visual do responsavel continua pendente. W15E segue
+  aguardando decisao de minimizacao antes de upload.
+
+## 2026-10-17 — Administracao de contas/projetos W15D
+
+- Area WEB exclusiva do perfil `administracao` lista contas paginadas, cadastra
+  identidade Google `iss` + `sub`, altera perfil/estado/e-mail auxiliar e
+  confirma mudancas. Callback OIDC de identidade verificada nao cadastrada
+  apresenta somente seus proprios identificadores para solicitacao institucional,
+  sem criar sessao/autocadastro. API tem schemas fechados, CSRF/origem,
+  autorizacao por operacao, auditoria sem claims/e-mail e lock transacional que
+  preserva pelo menos um admin ativo sob concorrencia.
+- Administracao de projetos/membros reaproveita as rotas existentes; nao ha
+  acesso automatico a resultados, exclusao, alteracao de projeto ou mapa legado.
+  UI explicita vinculos, mostra e-mail somente no contexto admin e revalida
+  bloqueio/revogacao no servidor sem apagar coletas.
+- Evidencias:341 testes Python sem skips;268 frontend;build/typecheck aprovados;
+  browser geral90/90 e temporal4/4 Chromium/Firefox, com seletor de perfil ajustado apos a
+  navegacao administrativa adicionar um segundo texto homonimo. HTTPS/PostgreSQL
+  reais2/2 Chromium/Firefox cobrem cadastro, criacao/vinculo, convite via UI W13A,
+  resultado sintetico pelo endpoint real, consulta, revogacao e bloqueio. Testes
+  PostgreSQL comprovam pagina de contas/membros, CSRF, perfil negativo, email
+  omitido da resposta de membros, ultimo admin e corrida concorrente. `git diff
+  --check` aprovado. Sem migration/dependencias, dados/coletas identificaveis,
+  deploy, push ou acesso remoto; `AGENTS.md` preexistente preservado.
+- Roadmap, contrato API, autenticacao/permissoes, UX, README e PROGRESS
+  sincronizados. Proxima W15E depende da decisao de contrato/minimizacao; W13A
+  permanece implementada com aceite operacional pendente.
+
+## 2026-10-17 — Exportacao agregada autorizada W15C
+
+- Adicionado contrato de CSV agregado por instrumento, uma linha por avaliacao,
+  com metadados tecnicos permitidos, unidades explicitas e sem nomes/iniciais,
+  paths, IDs de sessao ou metricas nao registradas. UTF-8 sem BOM, CSV padrao
+  com CRLF, protecao de formulas em celulas textuais, ausencias vazias e numeros
+  preservados sem arredondamento. Arquivo e rota separados do CSV oficial de
+  tentativas e nao sao aceitos pelo importador.
+- Listagem entrega snapshot HMAC opaco, vinculado a ator/projeto/filtros e valido
+  por15min. Fingerprint inclui dados usados na tabela e nos summaries (tentativas
+  principais Stroop e metricas genericas). Exportacao POST valida CSRF/origem,
+  reautoriza todos os projetos, compara os snapshots e limita20projetos/5000
+  avaliacoes numa transacao READ ONLY/REPEATABLE READ. Revogacao/alteracao/erro
+  nao retorna arquivo; resposta usa nome fixo/no-store e nao persiste no servidor.
+- Interface so habilita a acao com todas as paginas/projetos e snapshots
+  consistentes; instrumento e plataforma seguem a visao selecionada. Tokens e
+  blob ficam em memoria local apenas durante a acao, com cancelamento em troca
+  de consulta, detalhe, instrumento, plataforma ou desmontagem. CSV individual
+  continua disponivel no detalhe.
+- Evidencias:339 testes Python/62,766s sem skips;264 testes frontend;browser
+  geral86/86 e focado14/14 em Chromium/Firefox. HTTPS real/PostgreSQL4/4 em19,3s:
+  105 avaliacoes em multiplas paginas e dois projetos, filtros combinados,
+  valores Stroop, metricas demonstrativas isoladas e revogacao impedindo arquivo.
+  `npm audit --omit=dev --audit-level=high` sem vulnerabilidades, build/typecheck,
+  pip check e scanner303 fontes aprovados. Nenhuma dependencia, migration, dado
+  real, deploy ou push.
+- Roadmap, contrato HTTP, UX, README e PROGRESS sincronizados. Proxima etapa
+  elegivel W15D; W13A permanece pendente de aceite operacional.
+
+## 2026-10-17 — Tabela, detalhe e visualizacoes por instrumento W15B
+
+- Summary profissional fechado de onze campos acrescenta precisao e totais
+  Go/No-Go recalculados pelo nucleo; denominador ausente gera null em summary
+  e metricas do detalhe, incluindo percentual de omissoes sem Go. Recibo do
+  participante de sete campos, formulas e CSV oficial inalterados. Cliente
+  rejeita shape antigo/incompleto; consultas/facetas rejeitam whitespace puro.
+- ResultsTable apresenta colunas permitidas, avaliador tecnico e quatro
+  contagens; detalhe identifica IDs/projeto, inicio/conclusao, versoes, protocolo,
+  aplicativo e observacoes. Nenhum path/arquivo fonte/nome/iniciais acrescentado.
+- ResearchVisualizations compara erros por projeto e seleciona participante
+  por projeto+codigo, mantendo visitas repetidas e ordem inicio+ID; precisao
+  e RT mediano em figuras separadas com tabela alternativa. Rotulo inicial
+  indevido de tempo medio corrigido antes da validacao. Demo registrada possui
+  cards/graficos/tabela de demo_total/count e demo_mean/unit; desconhecidos
+  permanecem tabela neutra. Valores negativos/ausentes preservados, sem N+1.
+- Evidencias:329 testes Python/51,984s sem skips;261 frontend (incluindo6DOM
+  novos/69cliente), typecheck/build/npm ci/audit sem achados, compileall/pipcheck
+  e diff aprovados. Browser geral72/1,1min aprovado; quatro temporais W15A
+  permanecem evidencia do motor/fluxo participante nao alterados nesta unidade.
+- HTTPS real:W15B+W15A4/4 em28,6s; revalidacao perfis/detalhe/CSV individual e
+  visuais8/8 em29,6s, Chromium/Firefox, sem erros JS. Importacao pelo nucleo de
+  Stroop e demo, Go/No-Go/sem hits,16tentativas, ausenciaRT, metadados, repeticao
+  de visita, identidades por projeto e valores demo comprovados sem mocks.
+- Capturas sinteticas /tmp/stroop-w15b-*.png inspecionadas. Ajustada especificidade
+  CSS para scroll local da tabela ampla; nova assercao comprovou scroll local
+  e ausencia de overflow de pagina,390px e desktop/zoom200% (Chromium1/1 em6,1s).
+  Contrato/UX/README atualizados. Sem schema/dependencias/deploy/push/dados reais.
+  Proxima elegivel W15C, CSV agregado com reautorizacao e consistencia do conjunto.
+
+## 2026-10-17 — Filtros combinados e agregado autorizado W15A
+
+- Listagem profissional recebe periodo inclusivo sobre assessment_date e listas
+  OU por campo/E entre campos de participantes, visitas, avaliadores tecnicos,
+  versoes e plataformas; instrumento unico. Consultas historicas conservam texto
+  ate 512 caracteres sem ampliar cadastro WEB64ASCII ou ler nomes/iniciais.
+- Facetas SELECT por projeto/periodo/instrumento, limite200 por campo ou422;
+  cursor HMAC vinculado a escopo/filtros canonicos e fingerprint do conjunto,
+  com409 se houver alteracao entre paginas. Teto5000 por projeto, sem truncamento.
+- Interface multisselecao ate20projetos/5000linhas, publica apenas depois de
+  completar todas as paginas; qualquer falha limpa agregado. Participantes
+  usam projeto+codigo; detalhe/CSV preservam projeto da linha. Evolucao anterior
+  restrita a um projeto, evitando fusao de pseudonimos. Sem exportacao agregada
+  nova (W15C), proveniencia nominal ou associacao automatica do legado.
+- Evidencias:326 testes Python/54,018s sem skips;236 frontend, typecheck/build,
+  pip check e diff aprovados. Testes focados cliente50 e browser24 aprovados.
+  Suite completa browser:70 gerais/1min e4 temporais seriais/3,5min aprovados.
+  Motor/protocolo/CSV individual preservados; nao concede homologacao fisica.
+- HTTPS/PostgreSQL reais:2/2 Chromium/Firefox em20,5s com105avaliacoes, paginas
+  reais, pseudonimos coincidentes, filtros combinados/limites inclusivos, valores
+  dos sete cards/graficos, perda de vinculo, recuperacao/vazio/limpeza; emissao
+  e revogacao W13A pela interface incluídas. Fixture inicial sem trials foi
+  corrigida antes do aceite; nenhum erro de produto mascarado por simulacao.
+  Consulta W13A revalidada2/2 em6,8s. Viewport390 e desktop/zoom200% aprovados.
+- Capturas sinteticas form/cards em /tmp/stroop-w15a-*.png inspecionadas;
+  grid corrigida e projetos ampliados antes da ultima revalidacao Chromium1/1.
+  Sources scanner aprovado, contratos/UX/README atualizados. Sem dependencias,
+  schema, deploy, push ou alteracao de coleta existente. Proxima elegivel W15B.
+
+## 2026-10-17 — Cadastro WEB pela equipe, validacao tecnica W13A
+
+- SessionInvitation e cliente sessions integrados a area profissional: codigo
+  pseudonimizado/visita, projeto e avaliador autenticado, emissao/revogacao,
+  espera, erros fechados, resultado desconhecido e limpeza de RAM. Sem backend
+  novo, migration ou mudanca no protocolo. Preparar outra sessao nao revoga a
+  anterior; cancelamento local nao presume desfazer operacao remota.
+- Correcao encontrada na integracao: selecionar novamente o projeto atual
+  limpava a lista sem disparar nova consulta. Mantida lista quando nao ha troca.
+- npm ci/audit sem achados; 211 testes frontend, typecheck/build aprovados.
+  Suite geral Chromium/Firefox:58/58 em57,1s. Convites focados:18/18 em11,6s,
+  incluindo teclado/foco, perfis, projeto inativo, trim/erros, duplo envio,
+  rede sem retry, troca de projeto/resposta tardia e logout. Screenshot sintetico
+  /tmp/stroop-w13a-invite.png inspecionado; acrescentados espacamento e quebra
+  de codigos longos. Sem alegacao de homologacao temporal fisica.
+- HTTPS/PostgreSQL reais: cinco de seis cenarios passaram no primeiro ensaio,
+  inclusive os dois percursos de60s e CSV com participante/visita/avaliador,
+  revogacao e zero resultado parcial. Falha de consulta Chromium identificou a
+  correcao acima; reexecucao focada passou nos dois navegadores (2/2 em7,1s).
+  Testes usam banco descartavel stroop_etapa4_test_w13a, sem dados reais.
+- README WEB e UX documentam operacao e limites. Aceite do responsavel para
+  operar a interface permanece pendente; W13A nao e declarada concluida.
+  W15A pode avancar independentemente. Sem publicacao, push ou acesso a VPS.
+
+## 2026-10-16 — Relatorio tecnico de funcionamento
+
+- Criado desenvolvimento/RELATORIO_TECNICO.md para leitores externos, reunindo
+  experimento, tempos, metricas com exemplo sintetico, arquitetura, percurso dos
+  dados, autorizacao e limites de validacao; referencias mantidas nas fontes.
+- Adicionada entrada no indice documental. Nenhuma formula, contrato ou
+  funcionalidade alterada; etapas futuras nao sao descritas como concluidas.
+
+## 2026-10-16 — Comparacao e planejamento de paridade do dashboard
+
+- Comparados Streamlit e WEB por codigo/contratos, incluindo filtros, cards,
+  graficos, tabela, detalhe, instrumentos, exportacoes, importacao e administracao.
+  Revisao independente confirmou diferenca entre API pronta e interface ausente
+  em projetos/vinculos e falta de API/interface de contas/upload.
+- Roadmap recebeu matriz com fontes e complementos W15A–W15E, dependencias,
+  criterios de aceite e validacoes previstas. Atualizado estado W15 para
+  distinguir painel inicial validado de paridade ainda pendente; aceite W21/W22
+  e transicao W23 devem cobrir os recursos novos.
+- Mantidas minimizacao WEB, identidade tecnica, mapa explicito ADR-003,
+  exclusao de dados identificaveis das novas superficies e coexistencia legada.
+  CSV agregado planejado nao altera CSV oficial individual de21colunas.
+- Somente documentacao; nenhuma implementacao, publicacao ou coleta executada.
+
+## 2026-10-16 — Planejamento do cadastro WEB da sessao
+
+- Apos apontamento do responsavel e consulta ao formulario legado, registrada
+  W13A no roadmap: cadastro pela equipe, campos permitidos, avaliador vinculado
+  a conta autenticada, emissao/revogacao de convite e aceite ponta a ponta real.
+- Corrigida a leitura do estado: integracao anterior preservada, mas cadastro
+  completo pelo navegador ainda pendente. Incluido W13A no gate funcional W21
+  e no aceite da publicacao W22. W16 e coleta real nao sao liberadas por isso.
+- Atendido o limite documental solicitado; nenhum codigo, teste funcional ou
+  deploy executado. Validacao desta unidade limitada aos documentos/links/diff.
+
+## 2026-10-16 — Correcao de compatibilidade do retorno Google em producao
+
+- Relato de invalid_oidc_state reproduzido: callback rejeitava metadados
+  adicionais Google antes de conferir state. Allowlist conhecida ampliada,
+  validacao do emissor quando presente e protecoes anteriores preservadas.
+- 322 testes Python aprovados, incluindo callback legado com metadados,
+  sessao profissional e rejeicao de replay/parametros invalidos.
+- Fonte26fa9bf publicada na VPS com backup previo e retorno preparado;
+  somente API atualizada, sem migration. HTTPS readiness200, monitor0 e tres
+  servicos saudaveis. Smoke sintetico publico aceita metadados, nega codigo
+  invalido/replay e nao cria sessao. Confirmacao pessoal continua pendente.
+
+## 2026-10-16 — Publicacao WEB explicitamente delegada na VPS
+
+- Responsavel autorizou substituir o site mantendo dominio/TLS/OIDC e dados.
+  Pilha anterior, volume e conta preservados; backups banco/configuracoes/
+  Certbot criptografados/autenticados, restore real e copias externas conferidas.
+- Nova pilha paralela validada antes do cutover de6,444s em01:11:40Z/17outUTC.
+  Novo banco isolado recebeu copia e migrations0004–8/grants; nada apagado no
+  original. API/proxy nao-root/RO, somente proxy80/443, logs limitados no overlay.
+- OIDCcallback legado opt-in preservado, Python317/317 e proxy6/6 aprovados.
+  Preflight e dominio publico: convite/conclusao/retry/consulta/CSV; navegador
+  executou pratica+principal60s, gravacao16tentativas/12metricas e logout.
+- Certbot passou awebroot; dryrun e hook reais aprovados. Rotinas de monitor,
+  backup diario e restore semanal instaladas e verificadas; rollback preserva
+  ambos os bancos. Runbook operacional DEPLOY_WEB_VPS publicado.
+- Confirmacao da sessao Google pessoal solicitada; replica externa automatica
+  depende de destino estavel. W16/W21 nao homologadas; somente testes sinteticos.
+
+## 2026-10-16 — W16: pacote de referencia aprovado
+
+- Responsavel aprovou integralmente o pacote registrado em VALIDACAO_WEB.md:
+  duas plataformas, tres navegadores e dez replicas por combinacao; parametros
+  de equipamento e criterios D5 preservados. Sem medicoes ou aceite inferidos.
+- Pendencia passou de escolha da configuracao para disponibilidade/inventario
+  dos equipamentos e execucao dos pilotos fisicos. Nenhuma alteracao do motor.
+
+## 2026-10-16 — W20: observabilidade e recuperacao WEB
+
+- Monitor local somente leitura com saude/contagens e alerta fechado, sem dados
+  de participantes ou endpoint publico. Falhas e privacidade cobertas em4testes.
+- Backup existente reutilizado; servico Compose admite hifen sem relaxar SQL,
+  regressao especifica aprovada. Restore usa envvazio explicito e verifica
+  integridade WEB. Hardening21/21 aprovado com PostgreSQL sintetico.
+- Ensaio real aprovado: dump criptografado, restauracao isolada de8migrations/
+  1coleta em7,083s, falha de banco detectada, candidato invalido e retorno a
+  imagem aceita com contagens preservadas. Nenhum recurso da previa interrompido.
+- Runbook registra RPO24h/RTO4h aprovados como objetivos, grants apos restore,
+  rollback compativel sem apagar coletas e limites de homologacao em VPS.
+
+## 2026-10-16 — W19: pacote WEB e acesso sintetico local
+
+- Imagens API/proxy separadas do legado, nao-root, contextos permitidos,
+  filesystem RO, redes internas, portas somente do proxy e secrets externos.
+- Migrations/provisionamento explicitos; writer/reader separados e funcao de
+  lock da migration0008 sem UPDATE de usuarios no runtime. Testes de grants,
+  rollback e concorrencia aprovados. Fixture antiga de upgrade preservada.
+- Smoke HTTPS real aprovado: coleta, retry, consulta/exportacao e reinicio do
+  banco com persistencia. Corrigida lista YAML de tmpfs e verificacao de portas
+  via bindings reais do Docker. Scanner inclui templates/exemplos e recusou
+  placeholder antigo; exemplo agora usa marcador curto sem segredo ficticio.
+- Previa sintetica local disponibilizada; navegador acessou build compilado
+  e tela de convite sem erros JS. Sem deploy, dados reais ou aceite temporal.
+
+## 2026-10-16 — W18: pipeline reproduzivel e falhas bloqueantes
+
+- `ci`: workflow sem deploy, actions fixadas por SHA, PostgreSQL17.6/tmpfs e
+  runner com secrets/dependencias, Python sem skips, frontend e navegador real.
+  Checkout sparse antecede materializacao; sem copiar dados historicos/.env.
+- `test`: CIall aprovado em checkout limpo: 284 Python, 188 frontend, 40 browser
+  gerais, quatro temporais e 18 HTTPS reais. Build/typecheck, Gitleaks248,
+  falsoPAT controlado e audits npm/Python aprovados; nenhum secret impresso.
+- `fix`: discovery compativel com tests sem __init__, selftest exige finding
+  estruturado e erroinfra falha; porta do job em contexto GitHub valido.
+  Actionlint e revisoes oficiais das actions confirmados. Sem execucao remota.
+- `docs`: comandos/isolamento/limites em desenvolvimento/CI_WEB.md. Previa4173
+  preservada; container CI encerrado, sem push/deploy ou dados reais.
+
+## 2026-10-16 — W17: seguranca integrada e preparacao do piloto W16
+
+- `fix`: headers seguros inclusive erros/CSV, framing ambiguo recusado, nonce
+  OIDCUnicode fechado e cookies inventados sem criar contadores no banco.
+- `security`: CSP de pagina estrita, sem inline/eval, em baseline compartilhada
+  com proxy sintetico; script inline/conexao alheia bloqueados, pratica e
+  principal preservados em Chromium/Firefox. Proxy de producao continua W19.
+- `security`: urllib3 2.8.0 nas diretas/locks API e dashboard corrige tres
+  advisories detectados pela auditoria. Fonte: [release oficial](https://github.com/urllib3/urllib3/releases/tag/2.8.0).
+- `test`: 284 Python sem skips, 188 frontend, HTTPS14 apos hardening, CSP4 e
+  painel6 aprovados; npm/Python audits sem achados, Gitleaks244fontes e falha
+  controlada sem imprimir credenciais. Imagem dashboard reconstruida/smokeOK.
+- `docs`: threat model atualizado; VALIDACAO_WEB registra matriz/procedimento,
+  mantendo W16 pendente dos pilotos no equipamento de referencia, sem inventar
+  medicoes. Previa local4173 preservada; nenhum deploy ou dado real.
+
+## 2026-10-16 — Correcao de arredondamento do painel WEB
+
+- `fix`: exibicao profissional reutiliza half-even Python do resumo W12,
+  incluindo valores negativos de outros instrumentos. 56,25% com uma casa
+  aparece 56,2%, como no Streamlit, sem alterar numeros crus ou formulas.
+- `test`: 188 frontend e seis HTTPS reais de painel sob CSP estrita aprovados,
+  incluindo empate56.25 e CSV/detalhe/revogacao por perfil.
+
+## 2026-10-16 — W15: painel profissional integrado
+
+- `feat`: filtros/projetos autorizados, conjunto paginado completo, cards e
+  graficos descritivos por instrumento/plataforma, detalhe e CSV reautorizado.
+  Sem hits permanece ausente; instrumentos adicionais nao recebem formulas
+  Stroop. Limpeza na expiracao/pagehide e revalidacao de BFCache.
+- `fix`: foco do detalhe aplicado apos commit DOM para navegacao por teclado;
+  paginas repetidas falham sem totais inflados ou parciais.
+- `test`: 187 frontend, 40 browser gerais, seis HTTPS/API/PostgreSQL reais por
+  perfil e 20 regressao Streamlit aprovados; paridade Python, CSV mascarado,
+  revogacao, teclado e viewport390px verificados. Build/typecheck/links/diff OK.
+- `docs`: limites do MVP explicitos no README; operacao Streamlit preservada,
+  sem alteracao do legado, dependencia adicional ou deploy.
+
+## 2026-10-16 — W13: sessao participante integrada
+
+- `feat`: convite e bootstrap real, ordem do servidor, start confirmado antes
+  do motor, payload imutavel em RAM, recuperacao de recibo e reenvio manual.
+  Mensagem de recebido depende da confirmacao real; nenhuma retomada de running.
+- `security`: Web Locks entre abas, descarte em pagehide, expiracao e logout
+  HttpOnly com invalidacao no banco, sem apagar resultados. Nenhum storage JS.
+- `test`: oito testes HTTPS reais Chromium/Firefox com PostgreSQL, incluindo
+  principal completo, perda de resposta apos commit e falha antes da gravacao,
+  reenvio identico, duplo clique, expiracao, refresh e limpeza de cookie.
+  Regressao Python 262 testes sem skips e frontend 157 aprovados. Validacao
+  temporal fisica/homologacao permanece em W16, sem inferencia de equivalencia.
+
+## 2026-10-16 — W14: consulta profissional e exportacao autorizada
+
+- `feat`: lista/detalhe/CSV sob projeto e sessao profissional, filtros fechados,
+  cursor HMAC, reautorizacao e recalculo Stroop pelo nucleo. Outros instrumentos
+  mantem metricas/identidade propria; nao recebem tentativas ou CSV ficticios.
+- `security`: credencial SELECT por coluna e transacao READ ONLY, sem fallback;
+  nomes/iniciais inacessiveis a essa credencial e ausentes do JSON. Migration
+  0007/ADR-003 exigem mapa operacional explicito para legado, sem heranca por nome.
+- `test`: 257 testes integrais e validacoes focadas finais de consulta/migrations
+  aprovados no PostgreSQL sintetico; grants minimos, acesso cruzado, colisoes,
+  revogacoes, schema, paginacao e exportacao verificados. Sem alteracao de coletas
+  existentes ou aplicacao de grants/migrations na VPS.
+
+## 2026-10-16 — W12: resumo e CSV compativel
+
+- `feat`: resumo principal com precisao, mediana dos hits e quatro respostas;
+  ausencia de hits permanece `—`, exibicao segue Python e Finalizar descarta RAM.
+- `feat`: serializer Python de 21 colunas para uso profissional autorizado,
+  mascaramento nome/iniciais, escaping/formulas, RT em segundos sem quantizacao
+  e nome seguro. Sem exportacao participante; rota profissional pertence a W14.
+- `test`: cinco fixtures compartilhadas Python/TypeScript e importacao SQLite
+  real com paridade das 12 metricas. 133 frontend, 24 browser, tipos/build e
+  preview visual aprovados. Regressao PostgreSQL 245 testes sem skips e seis
+  focados CSV aprovados; nao substitui homologacao ou envio real W13.
+
+## 2026-10-16 — W11: bloco principal WEB
+
+- `feat`: motor jsPsych com 16 condicoes sem reposicao, ordem explicita,
+  calibracao rAF, origem monotona, HUD e registro observado das transicoes e
+  primeira resposta valida. Nenhuma resposta abrevia estimulo; interrupcoes
+  invalidam a serie inteira. UI conecta pratica e principal local em RAM.
+- `fix`: agendamento pelo quadro mais proximo usa tolerancia simetrica aprovada,
+  mantendo gates absolutos/duracao, timestamps reais e RT exclusivo. Ensaios
+  temporais rodam em serie sem trace para reduzir interferencia do proprio teste.
+- `test`: 120 testes logica/DOM; 20 browser gerais e quatro temporais reais
+  Chromium/Firefox aprovados. Typecheck/build/npm ci/diff aprovados; sem alegar
+  homologacao fisica ou envio confirmado pela API, reservado a outras etapas.
+
+## 2026-10-16 — W10: preparacao e pratica jsPsych
+
+- `feat`: ambiente Windows/Linux e familias aprovadas, confirmacao/teste de
+  teclado, contagem e quatro tentativas sem reposicao com feedback, HUD e
+  repeticao opcional. Pressao de navegacao/tecla mantida nao responde; foco,
+  visibilidade, Escape e fechamento descartam treino. Sem limiar de desempenho.
+- `refactor`: snapshot aprovado extraido para `condicoes/web_protocol.json`,
+  consumido pela API/frontend; CSV e Builder preservados. Lembrete de 1500 ms
+  ja aprovado explicitado no snapshot, sem alterar os demais parametros.
+- `test`: 77 testes frontend e 18 Chromium/Firefox; typecheck, build, npm ci,
+  auditoria sem vulnerabilidades e preview visual sem excecoes aprovados.
+  Regressao Python real PostgreSQL: 240 testes, zero skips; compileall/pip check
+  aprovados. Evidencia nao certifica latencia fisica, Windows ou coleta real.
+
+## 2026-10-16 — W09: base React e cliente HTTP
+
+- `feat`: interface React/TypeScript com navegacao acessivel, historico, orientacoes,
+  acesso da equipe, estados de rede e cliente HTTP seguro. Host experimental
+  separa DOM imperativo do ciclo React; ainda sem execucao do experimento.
+- `build`: Vite, TypeScript, Vitest e Playwright com versoes exatas/lockfile;
+  comandos e fronteiras documentados. Artefatos npm/build/traces ignorados.
+- `test`: 36 testes de logica/DOM e 10 em Chromium/Firefox aprovados; typecheck,
+  build, instalacao limpa e auditoria aprovados. Preview visual sem excecoes.
+  Rede API sintetica nos testes nao substitui integracao real ou validacao temporal.
+
+## 2026-10-16 — W08: conclusao transacional e resultados WEB
+
+- `feat`: conclusao valida protocolo, ordem persistida, temporalidade e RT;
+  deriva respostas e recalcula metricas no nucleo, sem aceitar metricas do cliente.
+  Migration aditiva 0006 vincula sessao/avaliacao e conserva proveniencia WEB,
+  observacoes temporais, hash canonico e recibo, preservando o schema legado.
+- `fix`: limites de participantes por HMAC sao independentes; cookie desconhecido
+  recebe 401. Acesso/estado precedem schema na conclusao; expiracao do canal nao
+  muda resultado completed. RT nao representavel em segundos positivos e rejeitado.
+- `test`: 19 testes puros e integracao real cobrem quatro respostas, gates,
+  equivalencia numerica de replay, conflito, concorrencia, rollback tardio por
+  trigger e upgrades com dados/sessao em andamento. Regressao integral: 240
+  testes aprovados, sem skips; compilacao, dependencias e diff aprovados.
+
+## 2026-10-16 — W07: ciclo de sessao participante
+
+- `feat`: migration aditiva 0005 cria projetos sinteticos, vinculos,
+  convites, sessoes participantes, ordem principal persistida e limite de
+  resgate. Sem migrar ou reescrever `assessments`, metricas ou tentativas.
+- `feat`: API implementa gestao de projetos/vinculos, convite com segredo
+  aleatorio exibido uma vez e hash no banco, resgate atomicamente one-use,
+  cookie participante separado, bootstrap, start idempotente, abortamento e
+  revogacao. Valida origem/CSRF, escopo, perfil, estado, prazos absolutos e
+  limites configuraveis; ordem de 16 condicoes usa as fontes/paleta oficiais.
+  Projetos estao restritos a `synthetic`; coleta real continua desabilitada.
+- `security`: limites configuraveis de leitura/escrita por credencial profissional
+  armazenam somente HMAC; `user_id` opaco preserva a identidade composta `iss` +
+  `sub`; convite desconhecido ou fora do projeto retorna 404 antes da permissao.
+- `test`: PostgreSQL descartavel valida migration vazia e upgrade com dados
+  legados preservados, concorrencia de resgate, autorizacao negativa,
+  identificadores, ordem fixa, start/retry/conflito, abortamento, expiracao,
+  revogacao e rate limit. Resultados detalhados em `PROGRESS.md`.
+
+## 2026-10-16 — Documentacao organizada por assunto
+
+- `docs`: 37 documentos agrupados em `experimento/`, `dados/`, `seguranca/`,
+  `operacao/`, `desenvolvimento/` (incluindo prompts) e `legado/`.
+  ADRs continuam em `arquitetura/`; roadmap, progresso, registro e mapa
+  continuam na raiz. Criado [indice](README.md), atualizado mapa e simplificada
+  a listagem da raiz. Backlog legado continua vigente para seu fluxo.
+- `compat`: referencias atuais de Markdown/AGENTS atualizadas. Integridade
+  dos 37 documentos conferida contra snapshot anterior: apenas referencias
+  alteradas. Caminhos textuais historicos preservados em registros datados.
+  Nenhuma fonte executavel existente, condicao, launcher, schema, migration,
+  dependencia ou configuracao de infraestrutura alterada por esta unidade.
+- `test`: caminho documental corrigido em `test_hardening_producao.py`,
+  mantendo assercoes. Suite integral: 189 testes aprovados em 5,651 s,
+  zero falhas/erros/skips, com PostgreSQL sintetico descartavel; 240 links
+  locais validos, revisao independente e `git diff --check` aprovados.
+  Container exclusivo de testes encerrado sem volume persistente.
+- `scope`: implementacao W05 ja em andamento preservada fora do commit de
+  organizacao. Nenhuma nova etapa iniciada; W05 nao recebeu aceite antecipado.
+
+## 2026-10-16 — W05: base HTTP validada
+
+- `feat`: criada factory `api.main:create_app`, configuracao obrigatoria
+  (PostgreSQL, origem HTTPS e ambiente), schemas estritos, health/readiness
+  e fronteira ASGI com limite real de 64 KiB, rejeicao de JSON inseguro,
+  erros de formato fixo e logs sem payload/traceback. Readiness e somente
+  leitura, exige conjunto exato de migrations e timeout limitado. Sem rotas
+  de coleta ou autenticacao; dependencias API fixadas em arquivos proprios.
+- `test`: suite integral com PostgreSQL descartavel: 189 testes aprovados,
+  zero falhas/erros/skips. Integracao real aplicou migrations na fixture e
+  confirmou que readiness nao alterou migrations nem contagens de tabelas.
+  `compileall`, `pip check` e `git diff --check` aprovados.
+- `test`: processo real Uvicorn iniciado em loopback, sem access log;
+  `/health/live` e `/health/ready` retornaram 200, `Cache-Control: no-store`
+  e request IDs; Host divergente retornou 422. A configuracao apontou apenas
+  ao banco sintetico temporario. Revisao independente sem defeitos criticos.
+- `scope`: W05 concluida; segue W06 para OIDC e autorizacao. Sem credenciais,
+  migrations, rotas de pesquisa, servico de producao ou coleta real.
+
+## 2026-10-16 — W06: autenticacao e autorizacao HTTP
+
+- `feat`: adicionados login/callback OIDC Google com state, nonce, PKCE S256,
+  endpoints de provedor restritos, verificacao de assinatura RS256, emissor,
+  audiencia, nonce, `azp` e expiracao; callback usa destino local fixo e nao
+  expõe tokens ou valores da query.
+- `feat`: adicionada sessao profissional opaca, cookie `__Host-` seguro,
+  persistencia somente do hash, limite absoluto de oito horas limitado ao ID
+  token, `/auth/me`, logout com Origin/CSRF, revalidacao de cadastro/perfil e
+  rate limit de login configuravel por IP sem guardar endereco bruto. Fachada
+  `dashboard/auth.py` preserva imports existentes; migration 0004 e lock API.
+- `test`: certificados RSA sintéticos exercitam o verificador real do
+  `google-auth`, inclusive assinatura inválida, issuer, audience, token vencido,
+  nonce e `azp`. Integração PostgreSQL descartável valida transação one-use,
+  hash de sessão, bloqueio, perfil insuficiente, limite e logout. Suite integral
+  com banco temporário: 201 testes aprovados, sem falhas, erros ou skips;
+  `pip check` aprovado.
+- `scope`: W06 concluída. Acesso entre projetos é validado em W14, quando as
+  rotas de consulta estiverem implementadas; não existe endpoint equivalente
+  nesta etapa. Nenhuma credencial real, dado de pesquisa, push ou deploy foi usado.
+
+## 2026-10-16 — W03: acesso e dados WEB especificados
+
+- `docs`: criado `ACESSO_WEB.md` com matriz de perfis/projeto, dados permitidos
+  e finalidade de cada campo. Administracao global de vinculos nao concede
+  acesso automatico a pesquisa; criacao de convites, consulta e exportacao
+  exigem vinculo inclusive para administrador. Revogacao/bloqueio revalidam
+  tambem a autorizacao de convites/sessoes participantes ainda ativos.
+- `docs`: threat model e tratamento de dados recebem extensoes WEB, preservando
+  integralmente o historico anterior. Documentados codigo vazado, replay,
+  concorrencia, expiracao, interrupcao, reenvio em RAM e exportacao minimizada.
+  Coleta real por projeto exige configuracao especifica pelo responsavel;
+  desenvolvimento sintetico segue liberado, sem filtro etario novo.
+- `test`: revisao dos cenarios da ficha, 16 links relativos e
+  `git diff --check` aprovados. Documentos descrevem controles a implementar,
+  sem atribuir aceite de autenticacao/coleta ou medicao fisica.
+- `scope`: W03 concluida; W05 permanece em implementacao. Direcionamento
+  posterior do usuario prioriza organizar arquivos preservando funcionamento.
+
+## 2026-10-16 — W02: contrato HTTP e ciclo de sessao
+
+- `docs`: especificado `CONTRATO_API_WEB.md`, com catalogo de operacoes,
+  cookies/CSRF, estados, expiracao, limites, erros seguros e idempotencia por
+  sessao/hash canonico. Criacao, resgate, inicio, abortamento, conclusao,
+  consulta e exportacao possuem escopos e resultados definidos.
+- `decision`: administrador gerencia projetos/vinculos globalmente, mas acesso
+  a pesquisa/convites exige vinculo inclusive para administradores. Identidade
+  do avaliador vem do servidor; cliente nao envia nome/iniciais ou metricas.
+  Snapshot preserva paleta efetiva do Builder, nao hexadecimais historicos dos
+  CSVs de condicoes. RT HTTP em ms e normalizado uma vez para segundos.
+- `test`: seis exemplos JSON parseaveis; corpo completo com 16 tentativas,
+  permutacao sem reposicao, sequencia e tempos coerentes. Sete links locais
+  validos; matriz revisada de reenvio/conflito/expiracao/interrupcao/acesso
+  cruzado/resultado invalido. `git diff --check` aprovado.
+- `scope`: contrato nao representa rotas implementadas; W02 concluida e W03/W05
+  iniciadas conforme dependencias. Start HTTP nao prova apresentacao fisica;
+  nao retomar motor apos reload. Medicao W16 preservada.
+
+## 2026-10-16 — W01 aprovada e retomada da implementacao WEB
+
+- `decision`: usuario aprovou explicitamente os itens 1–19 da proposta da
+  sessao, incluindo D1–D6 do protocolo, acesso Google/projetos, convites de uso
+  unico (24 h), sessoes de 30 min, dados pseudonimizados sem nome/iniciais,
+  exportacao profissional, reenvio apenas em memoria, coexistencia e autonomia
+  com commits locais. Finalidade: coleta por seu grupo de pesquisa; publico
+  participantes da pesquisa sem novo filtro demografico; usuario responsavel.
+- `docs`: consolidadas decisoes em protocolo/metodologia. ADR-002 registra VPS
+  ja adquirida e dominio existente, substituindo OCI como alvo WEB; sem acesso
+  ao host, custos novos, credenciais ou deploy. Backup diario/30 geracoes e
+  objetivos de perda maxima 24 h/recuperacao 4 h serao validados nas suas etapas.
+- `test`: 39 testes focados aprovados (13 condicoes, 15 interface, 11 CSV),
+  sem falhas/erros/skips. Revisao dos dois documentos e 14 links relativos
+  aprovados; `git diff --check` aprovado. Criterio temporal aprovado e distinto
+  de medicao: W16 permanece obrigatoria, sem equivalencia fisica presumida.
+- `scope`: W01 concluida; W02 iniciada em seguida. Nenhuma alteracao do Builder,
+  condicoes, CSV legado, formulas, dados reais ou aceitacao antecipada de W16.
+
+## 2026-10-16 — W01: protocolo factual e decisoes pendentes
+
+- `docs`: criado `PROTOCOLO_WEB.md` com fluxo realmente configurado no Builder,
+  contagens, balanceamento, tempos/HUD, quatro respostas, casos de fronteira,
+  tecla mantida, abortamento, ausencia de hits e distincao da proposta historica.
+  Matriz D1–D6 apresenta recomendacoes concretas sem presumir aceite.
+- `fix/docs`: exemplos de `CSV_UNIFICADO.md` tinham 20 campos e cabecalho sem
+  `participant_name`; corrigidos para 21 colunas e versao local `0.2.2`, com
+  dados inequivocamente sinteticos. O comando de analise agora usa o padrao
+  seguro de nome com teste/timestamp. Sem alteracao do contrato ou exportador.
+- `test`: 39 testes focados aprovados, zero falhas/erros/skips: 13 de condicoes
+  e tempos, 15 da interface pre-pratica, 11 de CSV. Comandos de descoberta
+  `test_fase3_condicoes_tempos.py`, `test_interface_pre_pratica.py` e
+  `test_csv_unificado.py`; XML/loops/colunas conferidos estaticamente.
+  Quatro exemplos atuais reunidos em CSV temporario foram aceitos pelo nucleo
+  e `scripts/analisar_stroop.py`: quatro classificacoes, precisao 50%, mediana
+  dos hits 0,512 s. Conferidos 29 links relativos nos cinco documentos desta
+  unidade, sem ausencias; `git diff --check` aprovado.
+- `blocker`: W01 exige decisoes explicitas do usuario sobre MVP, foco/aba,
+  pratica e variante. Solicitadas tambem tolerancias temporais e fronteiras
+  de teclado propostas, pois afetam aceite do protocolo. Sem resposta ate este
+  registro; W01 nao concluida. W04 independente foi concluida no commit
+  `cd35d78`; nenhuma outra etapa e elegivel com as dependencias atuais.
+- `scope`: nenhum `.psyexp`, condicao, CSV coletado, formula, schema, versao
+  experimental vigente ou dependencia alterado. Nao houve Pilot grafico,
+  medicao fisica, validacao psicometrica, infraestrutura externa ou coleta real.
+  As propostas WEB continuam pendentes de decisao, sem equivalencia presumida.
+  Auditoria das 24 fichas confirmou ausencia de outra etapa elegivel. Containers
+  sinteticos exclusivos de teste e smoke da W04 encerrados/removidos ao concluir.
+
+## 2026-10-16 — W04: casos de uso e persistencia reutilizaveis
+
+- `refactor`: importacao SQLite/PostgreSQL extraida para `stroop/application/`
+  e SQL/conexoes/transacoes para `stroop/persistence/`. Relogio UTC compartilhado
+  e erros publicos separados; CLIs delegam e reexportam nomes/assinaturas.
+  Nenhuma camada nova importa scripts, dashboard ou frameworks web.
+- `compat`: preservados retornos, excecoes, duplicidade, `--force`,
+  `--validate-only`, lock PostgreSQL, rastreabilidade e codigos de CLI. Validadores
+  distintos e caminhos do schema/migrations mantidos; sem repositorio generico.
+  Comparacao AST: 12 literais SQL SQLite e seis PostgreSQL identicos ao HEAD
+  anterior; hashes SHA-256 do schema e das tres migrations inalterados.
+- `test`: baseline integral de 168 testes em 5,554 s; apos extracao, **173
+  aprovados, zero falhas, erros ou skips**, em 5,778 s. Comando:
+  `TEST_DATABASE_URL=URL_SINTETICA .venv/bin/python -m unittest discover -s tests -v`.
+  Banco exclusivo `stroop_etapa4_test_web_w04`, PostgreSQL 17.6 em tmpfs,
+  sem volume operacional. Logs sinteticos temporarios fora do repositorio.
+- `test`: novas regressoes de reexportacao, casos de uso sem interfaces,
+  SQLite sem site-packages/psycopg, CLI por modulo e rollback integral de
+  `--force`. Teste anterior de rollback atualizado para falha real do SQLite;
+  teste de paridade controla o relogio compartilhado em seu novo modulo.
+  Suite existente cobre concorrencia, paridade integral SQLite/PostgreSQL,
+  rollback, CSV imutavel, multiplos instrumentos e erros sanitizados.
+- `test`: `compileall`, configuracao Compose com `.env.example`,
+  `docker build --tag stroop-web-w04-dashboard --file Dockerfile.dashboard .`
+  e smoke isolado aprovados. Imagem em filesystem somente leitura retornou
+  health `ok`/HTTP 200 e imports validos; sem rede, validou fixture PostgreSQL
+  e importou quatro tentativas/12 metricas em SQLite tmpfs. Revisao independente
+  confirmou equivalencia SQLite; links locais e `git diff --check` aprovados.
+  Lint/tipos autonomos nao possuem configuracao no projeto Python atual.
+- `scope`: W04 depende apenas de W00 e foi executada enquanto W01 aguarda
+  decisoes de produto/metodo. Nenhuma rota, frontend, dependencia, schema,
+  migration, formula, coleta, dado operacional ou recurso OCI alterado.
+  Arquitetura ja prevista no ADR-001, sem nova decisao de stack.
+
+## 2026-10-16 — Regras de execucao autonoma e memoria de retomada
+
+- `docs`: consolidadas as sete secoes solicitadas em `AGENTS.md`,
+  `docs/AGENTS.md` e `tests/AGENTS.md`: inicializacao, continuidade WEB,
+  coordenacao de subagentes, qualidade, contexto, Git e encerramento.
+- `docs`: protocolo, comandos no roadmap e README alinhados com execucao
+  continua e commits locais validados em branch de desenvolvimento. Ritmo e
+  versionamento manual do legado preservados; producao e OCI dependem do usuario.
+- `docs`: criado `PROGRESS.md` para retomada concisa e adicionado ao mapa.
+  Mantidos `ROADMAP_WEB.md` e ADRs existentes nos papeis dos nomes genericos
+  `ROADMAP.md` e `ARCHITECTURE.md`, sem duplicar estado ou decisoes.
+- `test`: verificador Python ad hoc conferiu 50 destinos de links relativos
+  nos nove documentos da unidade, sem ausencias. Comparacao com o HEAD comprovou
+  preservacao das fichas W00–W23, estado/aceite do roadmap, protocolo legado e
+  limites de dominio/seguranca. Revisao independente por subagente nao encontrou
+  lacunas materiais nas sete secoes; `git diff --check` aprovado.
+- `scope`: mudanca exclusivamente documental, sem alterar codigo ou ADR.
+  Testes de codigo, lint, tipos, build e integracao nao se aplicam a este escopo.
+  Objetivo de implementacao permanece pausado; nenhuma etapa funcional iniciada
+  ou concluida por presuncao. Branch `prep-web` ja existente, inicialmente limpa.
+
+## 2026-10-16 — Preparacao estrutural da evolucao web
+
+- `refactor`: extraidos contratos, excecoes, validacao e metricas para
+  `stroop/domain/`; leitura CSV e adaptadores para `stroop/ingestion/`.
+  Removida a dependencia do registro de instrumentos no importador SQLite.
+  Os modulos anteriores reexportam os nomes por compatibilidade; persistencia
+  e CLIs conservam comportamento, caminhos, argumentos e codigos de saida.
+- `build`: `Dockerfile.dashboard` copia o novo pacote. Nenhuma dependencia,
+  imagem base, schema ou migration foi alterada.
+- `docs`: criado ADR-001 de monolito modular, atualizado o mapa estrutural e
+  reservado `api/` e `web/` somente com READMEs. Criado roadmap com 24 fichas
+  W00–W23, objetivos, entregaveis, dependencias, aceite, validacoes e leituras.
+  Instrucoes distinguem o workflow web do backlog legado e permitem uma etapa
+  por sessao, sem repetir a inspecao global.
+- `test`: baseline anterior de 164 testes aprovada; apos a extracao e quatro
+  regressoes novas, **168 aprovados, zero falhas, erros ou skips** em 5,584 s.
+  Comando: `.venv/bin/python -m unittest discover -s tests -v`, com
+  `TEST_DATABASE_URL` exclusivamente em PostgreSQL 17.6 descartavel em tmpfs,
+  nome `stroop_etapa4_test_web_structure` e dados sinteticos. Procedimento
+  reproduzivel no roadmap; nenhum banco operacional foi consultado.
+- `test`: 34 definicoes movidas/preservadas comparadas por AST com o HEAD;
+  regras e constantes identicas. Testes novos protegem os imports/excecoes
+  anteriores, o nucleo sem site-packages/banco/UI e as CLIs por caminho externo
+  e por modulo, incluindo duplicidade e `--force` no SQLite temporario.
+- `test`: configuracoes Compose de desenvolvimento, producao e restauracao
+  aprovadas com exemplos ficticios; avisos existentes sobre `secrets.mode`
+  ignorado fora do Swarm permanecem, sem alterar permissoes de arquivos reais.
+  `docker build --tag stroop-web-structure-dashboard --file Dockerfile.dashboard .`
+  aprovado; smoke com filesystem somente leitura retornou health `ok`, HTTP 200
+  e imports da aplicacao validos. CLI `--validate-only` validou fixture na imagem
+  sem rede. Links locais e `git diff --check` aprovados.
+- `scope`: nenhuma funcionalidade web, coleta, alteracao experimental, acesso
+  OCI ou deploy. Dados, secrets, PsychoPy, condicoes, dashboard, SQL e launchers
+  existentes preservados. As etapas legadas 11/12 nao foram iniciadas.
+  W01–W23 nao iniciadas; decisoes de protocolo/acesso/dados ficam nas fichas
+  W01–W03. Containers sinteticos de verificacao removidos ao concluir.
 
 ## 2026-10-07 — Execucao do gerenciador de usuarios como modulo
 
 - `docs`: corrigidos os comandos `bootstrap` e `recover-admin` em
-  [autenticacao e permissoes](AUTENTICACAO_E_PERMISSOES.md) para usar
+  [autenticacao e permissoes](seguranca/AUTENTICACAO_E_PERMISSOES.md) para usar
   `python -m scripts.gerenciar_usuarios`; nenhuma outra ocorrencia equivalente
   foi encontrada nos arquivos pesquisados, excluindo secrets e dados locais.
 - `test`: nove testes de autenticacao aprovados; ajuda dos dois subcomandos
@@ -18,7 +940,7 @@ Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 
 - `fix`: atualizada somente a revisao fixada do pacote OpenSSL em
   `Dockerfile.proxy`, de `3.3.7-r0` para `3.3.7-r2`.
-- `docs`: sincronizada a versao descrita em [hardening](HARDENING_PRODUCAO.md).
+- `docs`: sincronizada a versao descrita em [hardening](operacao/HARDENING_PRODUCAO.md).
 - `test`: 12 testes estaticos de producao e seis de infraestrutura aprovados;
   `git diff --check` aprovado.
 - `scope`: sem build, deploy, alteracao de banco, acesso a secrets ou mudanca
@@ -38,7 +960,7 @@ Consulte o [backlog canonico](Projeto%20Stroop%20Test.md).
 
 ## 2026-09-13 — Consulta pública para a Etapa 11
 
-- `docs`: registrada em [OCI_ETAPA11.md](OCI_ETAPA11.md) a consulta de
+- `docs`: registrada em [OCI_ETAPA11.md](legado/OCI_ETAPA11.md) a consulta de
   documentação pública da Oracle sobre Always Free, `VM.Standard.A1.Flex`
   ARM64, cotas, disponibilidade, volumes e isolamento de rede.
 - `docs`: a proposta mantém limites do Compose configuráveis, reserva de

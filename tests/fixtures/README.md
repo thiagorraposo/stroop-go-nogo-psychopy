@@ -13,3 +13,11 @@ Todos os nomes, identificadores e metadados sao deliberadamente ficticios.
 
 As fixtures invalidas devem ser rejeitadas por
 `scripts/importar_csv_sqlite.py`. Elas nao devem ser colocadas em `data/`.
+
+## Fixtures WEB compartilhadas
+
+- `web_result_canonical.json`: vetores sinteticos de JSON canonico/hash W08.
+- `web_results_summary.json`: cinco execucoes sinteticas completas, ordem,
+  observacoes temporais, metricas Python, exibicao e CSV esperado W12. Consumida
+  por Python/TypeScript; nao e uma coleta nem fonte de protocolo do aplicativo.
+  Inclui mediana par/impar, ausencia de hits e RT positivo muito pequeno.

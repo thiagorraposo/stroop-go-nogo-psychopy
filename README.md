@@ -1,9 +1,37 @@
 # Stroop Go/No-Go PsychoPy
 
+Contribuicoes seguem [GitHub Flow](CONTRIBUTING.md), com PRs, CI e squash merge.
+
+## Evolucao para WEB
+
+A versao WEB esta publicada para testes sinteticos em
+[strooptest.thiagorraposo.dev](https://strooptest.thiagorraposo.dev).
+Participantes precisam de convite; a equipe usa Google com cadastro previo.
+Homologacao temporal e liberacao para coleta real continuam pendentes.
+Implantacao, manutencao e recuperacao: [runbook da VPS](docs/operacao/DEPLOY_WEB_VPS.md).
+
+O repositorio desenvolve a versao web no mesmo projeto, com arquitetura de
+monolito modular. O nucleo Python em `stroop/` concentra contratos, validacao,
+metricas e adaptadores CSV reutilizados pelo fluxo atual. `api/` concentra a
+autenticacao, sessoes e resultados HTTP; `web/` contem a base React/TypeScript,
+navegacao e cliente HTTP. Comandos e fronteiras da interface ficam no
+[README WEB](web/README.md).
+O estado de entrega e validacao permanece no roadmap.
+
+- [Estrutura e mapa de compatibilidade](docs/ESTRUTURA_DO_PROJETO.md).
+- [Decisao arquitetural e stack alvo](docs/arquitetura/ADR-001-evolucao-web.md).
+- [Roadmap WEB e ponto de retomada](docs/ROADMAP_WEB.md).
+
+No Codex CLI, `continue web` executa o roadmap continuamente, validando e
+registrando cada etapa antes de avancar; `execute Wxx` seleciona a etapa inicial
+com dependencias atendidas, salvo limite explicito de escopo. Contexto de
+retomada: [PROGRESS.md](docs/PROGRESS.md). A operacao PsychoPy/Streamlit
+e os comandos abaixo continuam disponiveis.
+
 ## Workflow de evolucao
 
-O [backlog canonico](docs/Projeto%20Stroop%20Test.md) e a unica fonte de escopo,
-aceite, dependencias, estado e progresso. O [protocolo](docs/WORKFLOW_CODEX_CLI.md)
+O [backlog legado](docs/legado/Projeto%20Stroop%20Test.md) e a unica fonte de escopo,
+aceite, dependencias, estado e progresso do fluxo existente. O [protocolo](docs/desenvolvimento/WORKFLOW_CODEX_CLI.md)
 orienta o trabalho do Codex CLI neste repositorio. As Etapas 11 e 12 serao
 executadas e validadas diretamente pelo usuario.
 
@@ -28,7 +56,7 @@ Este projeto e mantido para fins educacionais e de pesquisa exploratoria. Ele na
 
 O PsychoPy precisa ser instalado separadamente para executar ou editar o experimento. O fluxo abaixo configura apenas o dashboard local, baseado em Python, Streamlit e SQLite.
 
-Para usar sem Git, abra o repositorio no GitHub e escolha `Code` -> `Download ZIP`, descompacte o arquivo e abra um terminal dentro da pasta. Em repositorios privados, e necessario estar conectado a uma conta autorizada. Consulte o passo a passo em [`docs/USO_POR_ZIP_GITHUB.md`](docs/USO_POR_ZIP_GITHUB.md) e o fluxo cotidiano em [`docs/GUIA_DO_USUARIO.md`](docs/GUIA_DO_USUARIO.md).
+Para usar sem Git, abra o repositorio no GitHub e escolha `Code` -> `Download ZIP`, descompacte o arquivo e abra um terminal dentro da pasta. Em repositorios privados, e necessario estar conectado a uma conta autorizada. Consulte o passo a passo em [`docs/operacao/USO_POR_ZIP_GITHUB.md`](docs/operacao/USO_POR_ZIP_GITHUB.md) e o fluxo cotidiano em [`docs/operacao/GUIA_DO_USUARIO.md`](docs/operacao/GUIA_DO_USUARIO.md).
 
 No Windows:
 
@@ -63,7 +91,7 @@ python scripts/run_dashboard.py
 O launcher importa o arquivo mais recente em `data/*_trials.csv` e abre o
 dashboard. O acesso ao dashboard exige Google OIDC, usuario previamente
 cadastrado e `AUTH_DATABASE_URL`; veja
-[`docs/AUTENTICACAO_E_PERMISSOES.md`](docs/AUTENTICACAO_E_PERMISSOES.md). Use
+[`docs/seguranca/AUTENTICACAO_E_PERMISSOES.md`](docs/seguranca/AUTENTICACAO_E_PERMISSOES.md). Use
 `--csv CAMINHO` para selecionar outro CSV e `--force` para reimportar uma
 avaliacao. Os CSVs e o banco permanecem locais em `data/` e `database/`;
 `database/` nao deve ser enviada ao Git. Os resultados apresentados sao
@@ -81,64 +109,51 @@ Copie `.env.example` para `.env`, ajuste a senha ficticia e execute:
 docker compose up --build -d --wait
 ```
 
-Consulte [`docs/INFRAESTRUTURA_DOCKER.md`](docs/INFRAESTRUTURA_DOCKER.md) para
+Consulte [`docs/operacao/INFRAESTRUTURA_DOCKER.md`](docs/operacao/INFRAESTRUTURA_DOCKER.md) para
 limites, validacao e encerramento seguro sem excluir o volume.
 
 A preparacao de producao fica separada em `compose.production.yaml`, com Nginx,
 TLS obrigatorio, servicos internos, limites e backup criptografado. Ela nao
 configura nem autoriza deploy. Consulte
-[`docs/HARDENING_PRODUCAO.md`](docs/HARDENING_PRODUCAO.md), o
-[`threat model`](docs/THREAT_MODEL.md) e a
-[`resposta a incidentes`](docs/RESPOSTA_A_INCIDENTES.md).
+[`docs/operacao/HARDENING_PRODUCAO.md`](docs/operacao/HARDENING_PRODUCAO.md), o
+[`threat model`](docs/seguranca/THREAT_MODEL.md) e a
+[`resposta a incidentes`](docs/seguranca/RESPOSTA_A_INCIDENTES.md).
 
 O schema PostgreSQL versionado e a migracao legada SQLite -> PostgreSQL sao
 operacoes explicitas documentadas em
-[`docs/MIGRACOES_POSTGRESQL.md`](docs/MIGRACOES_POSTGRESQL.md). O launcher e o
+[`docs/dados/MIGRACOES_POSTGRESQL.md`](docs/dados/MIGRACOES_POSTGRESQL.md). O launcher e o
 dashboard autenticado usam `DASHBOARD_DATABASE_URL` com leitura somente; o
 fallback SQLite permanece apenas para uso local sem essa variável. A CLI separada de
-[importacao CSV PostgreSQL](docs/IMPORTACAO_POSTGRESQL.md) usa `DATABASE_URL` e
+[importacao CSV PostgreSQL](docs/dados/IMPORTACAO_POSTGRESQL.md) usa `DATABASE_URL` e
 oferece `--validate-only` para conferir uma entrada sem persistir.
 
 ## Upload autenticado de CSV
 
-A [area de upload autenticado](docs/UPLOAD_LOCAL.md) recebe um CSV por operacao
+A [area de upload autenticado](docs/dados/UPLOAD_LOCAL.md) recebe um CSV por operacao
 para o PostgreSQL, com limite de 5 MiB, validacao e descarte do temporario.
 Com OIDC, `DATABASE_URL`, `DASHBOARD_DATABASE_URL`, `AUTH_DATABASE_URL` e migrations configurados, execute
 `.venv/bin/python scripts/upload_local.py --local` e abra
 `http://127.0.0.1:8501`. Somente os perfis `importacao` e `administracao` veem
 essa area. Em operação PostgreSQL, o dashboard de resultados usa a credencial
-somente leitura descrita em [`docs/DASHBOARD_POSTGRESQL.md`](docs/DASHBOARD_POSTGRESQL.md).
+somente leitura descrita em [`docs/dados/DASHBOARD_POSTGRESQL.md`](docs/dados/DASHBOARD_POSTGRESQL.md).
 
 ## Arquivos
 
-- `stroop_go_nogo_ptbr.psyexp`: experimento para abrir no PsychoPy Builder.
-- `condicoes/pratica_stroop_go_nogo_ptbr.csv`: tentativas do bloco de pratica.
-- `condicoes/bloco_principal_stroop_go_nogo_ptbr.csv`: tentativas do bloco principal.
-- `condicoes/contagem_regressiva.csv`: telas breves de preparacao antes dos blocos.
-- `data/`: pasta onde o CSV unificado por execucao e salvo pelo PsychoPy.
-- `scripts/analisar_stroop.py`: script para validar e analisar um CSV unificado.
-- `scripts/importar_csv_sqlite.py`: script para validar e importar CSV unificado para SQLite local.
-- `scripts/db_schema.sql`: schema SQLite local da camada de importacao.
-- `scripts/migrations.py`: executor transacional das migrations PostgreSQL.
-- `scripts/migrar_sqlite_postgres.py`: migracao legada explicita e segura.
-- `scripts/gerenciar_usuarios.py`: bootstrap e recuperacao administrativa OIDC.
-- `scripts/backup_postgres.py`: backup criptografado e restauracao isolada.
-- `scripts/aplicar_retencao.py`: expurgo seletivo de auditorias vencidas.
-- `dashboard/app.py`: dashboard Streamlit autenticado para consulta descritiva do PostgreSQL.
-- `dashboard/requirements.txt`: dependencias do dashboard local.
-- `compose.yaml`: servicos locais separados do dashboard e PostgreSQL.
-- `compose.production.yaml`: perfil endurecido sem deploy ou secrets reais.
-- `compose.restore-test.yaml`: restauracao descartavel sem portas.
-- `Dockerfile.dashboard`: imagem de desenvolvimento do Streamlit.
-- `Dockerfile.proxy`: Nginx fixado e executado sem privilegio.
-- `docs/DASHBOARD_POSTGRESQL.md`: credencial somente leitura e consultas paginadas.
-- `docs/UX_DECISIONS.md`: notas sobre as decisoes de experiencia de usuario.
-- `docs/USO_POR_ZIP_GITHUB.md`: instalacao e uso a partir do Download ZIP do GitHub.
-- `docs/GUIA_DO_USUARIO.md`: fluxo cotidiano do experimento ao dashboard.
-- `AGENTS.md`: regras persistentes para agentes e contribuicoes futuras.
-- `docs/`: documentacao de governanca, decisoes e historico.
-- `assets/`: assets proprios do projeto.
-- `tests/`: espaco reservado para validacoes futuras.
+| Area | Responsabilidade |
+|---|---|
+| `stroop_go_nogo_ptbr.psyexp`, `condicoes/`, `assets/` | Experimento local e suas fontes |
+| `stroop/` | Dominio, ingestao, casos de uso e persistencia reutilizaveis |
+| `scripts/` | CLIs de importacao, migracoes, inicializacao e manutencao |
+| `dashboard/` | Interface Streamlit existente |
+| `api/` e `web/` | Adaptadores da nova versao WEB |
+| `tests/` | Regressao e fixtures sinteticas |
+| `docs/` | Contratos e guias agrupados por assunto |
+| `nginx/`, Dockerfiles e Compose | Configuracao da infraestrutura |
+| `data/`, `database/`, `backups/` | Artefatos locais ignorados pelo Git |
+
+Consulte o [indice da documentacao](docs/README.md), o
+[mapa de arquivos e compatibilidade](docs/ESTRUTURA_DO_PROJETO.md) e os
+[comandos dos scripts](scripts/README.md) para os detalhes de cada area.
 
 ## Como abrir no Builder
 
@@ -219,7 +234,7 @@ Depois de coletar dados, execute:
 python3 scripts/analisar_stroop.py data/PARTICIPANT_ID.csv
 ```
 
-O script valida o CSV unificado, calcula metricas descritivas do bloco principal e nao modifica o arquivo original. O contrato completo esta em `docs/CSV_UNIFICADO.md`.
+O script valida o CSV unificado, calcula metricas descritivas do bloco principal e nao modifica o arquivo original. O contrato completo esta em `docs/experimento/CSV_UNIFICADO.md`.
 
 ## Importacao SQLite
 
@@ -235,16 +250,16 @@ Banco padrao:
 database/stroop_results.sqlite3
 ```
 
-Use `--db` para escolher outro caminho e `--force` para reimportar um `assessment_id` ja existente. A pasta `database/` e local e ignorada pelo Git. A documentacao completa esta em `docs/IMPORTACAO_SQLITE.md`.
+Use `--db` para escolher outro caminho e `--force` para reimportar um `assessment_id` ja existente. A pasta `database/` e local e ignorada pelo Git. A documentacao completa esta em `docs/dados/IMPORTACAO_SQLITE.md`.
 
 ## Camada de dados e dashboard
 
 A arquitetura operacional é: PsychoPy -> CSV bruto unificado -> importador PostgreSQL -> dashboard Streamlit autenticado. O fluxo SQLite continua como fallback local.
 
-Os contratos tecnicos estao em `docs/DADOS_E_DASHBOARD.md`,
-`docs/MODELO_DE_DADOS.md`, `docs/CSV_UNIFICADO.md` e `docs/IMPORTACAO_SQLITE.md`.
+Os contratos tecnicos estao em `docs/dados/DADOS_E_DASHBOARD.md`,
+`docs/dados/MODELO_DE_DADOS.md`, `docs/experimento/CSV_UNIFICADO.md` e `docs/dados/IMPORTACAO_SQLITE.md`.
 As antigas fases sao historicas; nao exigem dados reais para aceite do workflow.
-Planejamento e progresso ficam somente no [backlog canonico](docs/Projeto%20Stroop%20Test.md).
+Planejamento e progresso ficam somente no [backlog canonico](docs/legado/Projeto%20Stroop%20Test.md).
 
 Para rodar o dashboard:
 
@@ -267,7 +282,7 @@ local em modo somente leitura.
 
 Antes da primeira tela, o experimento exibe um formulario local com `project`, `participant_id`, `participant_name`, `initials`, `visit` e `evaluator`. A data, hora, `assessment_id`, `test_code` e `test_version` sao gerados automaticamente.
 
-Use `participant_id` como identificador tecnico principal. `participant_name` e dado pessoal local e nao deve aparecer em nome de arquivo, screenshots, exemplos publicos, logs ou commits. Nao informe nome completo, CPF, e-mail, telefone, endereco, idade ou sexo. As regras completas estao em `docs/FORMULARIO_DE_SESSAO.md`.
+Use `participant_id` como identificador tecnico principal. `participant_name` e dado pessoal local e nao deve aparecer em nome de arquivo, screenshots, exemplos publicos, logs ou commits. Nao informe nome completo, CPF, e-mail, telefone, endereco, idade ou sexo. As regras completas estao em `docs/experimento/FORMULARIO_DE_SESSAO.md`.
 
 ## Interface pre-pratica
 
@@ -276,53 +291,32 @@ A primeira parte da interface visual conduz o participante por abertura, tutoria
 ## Estrutura do projeto
 
 ```text
-.
-├── AGENTS.md
-├── README.md
-├── .gitignore
+stroop-cognifit/
 ├── stroop_go_nogo_ptbr.psyexp
-├── assets/
-│   ├── README.md
-│   └── ui/
-├── condicoes/
-│   ├── AGENTS.md
-│   ├── README.md
-│   ├── bloco_principal_stroop_go_nogo_ptbr.csv
-│   ├── contagem_regressiva.csv
-│   └── pratica_stroop_go_nogo_ptbr.csv
-├── data/
-│   └── README.md
-├── dashboard/
-│   ├── AGENTS.md
-│   ├── README.md
-│   ├── app.py
-│   └── requirements.txt
+├── condicoes/                 # fontes das tentativas
+├── assets/                    # recursos proprios
+├── stroop/                    # domain, ingestion, application, persistence
+├── scripts/                   # comandos e migrations existentes
+├── dashboard/                 # Streamlit
+├── api/                       # HTTP
+├── web/                       # interface WEB
+├── tests/                     # testes e fixtures sinteticas
 ├── docs/
-│   ├── AGENTS.md
-│   ├── COPY_DAS_TELAS.md
-│   ├── CSV_UNIFICADO.md
-│   ├── DADOS_E_DASHBOARD.md
-│   ├── DECISOES_DO_EXPERIMENTO.md
-│   ├── ESPECIFICACAO_VISUAL_E_FLUXO.md
-│   ├── ESTRUTURA_DO_PROJETO.md
-│   ├── FORMULARIO_DE_SESSAO.md
-│   ├── MODELO_DE_DADOS.md
-│   ├── PADRAO_DE_COMMITS.md
-│   ├── PLANO_DE_IMPLEMENTACAO_DASHBOARD.md
-│   ├── REGISTRO_DE_ALTERACOES.md
-│   ├── UX_DECISIONS.md
-│   └── VALIDACAO_CONDICOES.md
-├── scripts/
-│   ├── AGENTS.md
-│   ├── README.md
-│   └── analisar_stroop.py
-└── tests/
-    ├── AGENTS.md
-    ├── README.md
-    ├── test_csv_unificado.py
-    ├── test_dashboard.py
-    ├── test_fase3_condicoes_tempos.py
-    └── test_interface_pre_pratica.py
+│   ├── README.md              # indice
+│   ├── arquitetura/
+│   ├── experimento/
+│   ├── dados/
+│   ├── seguranca/
+│   ├── operacao/
+│   ├── desenvolvimento/
+│   ├── legado/
+│   ├── ROADMAP_WEB.md
+│   ├── PROGRESS.md
+│   └── ESTRUTURA_DO_PROJETO.md
+├── nginx/
+├── compose*.yaml
+├── Dockerfile.*
+└── setup.* / abrir_dashboard.*
 ```
 
 Nota: a pasta existente `condicoes/` e preservada como diretoria de CSVs de condicoes do experimento. Ela cumpre o papel da pasta `conditions/` sem duplicar conteudo.

@@ -1,12 +1,16 @@
 # Condicoes do experimento
 
-Escopo: CSVs-fonte em `condicoes/`. Herda todas as regras da raiz.
+Escopo: CSVs-fonte e snapshot WEB em `condicoes/`. Herda todas as regras da raiz.
 
 - Estes CSVs sao fontes versionadas, nao dados coletados; a excecao de
   `.gitignore` e intencional.
 - Antes de mudar cabecalhos, valores ou linhas, localize todas as referencias no
   `.psyexp` e valide a compatibilidade de nomes e tipos.
 - Preserve as quatro classificacoes do paradigma e o balanceamento documentado
-  em `docs/VALIDACAO_CONDICOES.md`, salvo decisao metodologica explicita.
+  em `docs/experimento/VALIDACAO_CONDICOES.md`, salvo decisao metodologica explicita.
 - Execute os testes estaticos de condicoes e registre qualquer mudanca autorizada
-  no protocolo em `docs/DECISOES_DO_EXPERIMENTO.md`.
+  no protocolo em `docs/experimento/DECISOES_DO_EXPERIMENTO.md`.
+
+- `web_protocol.json` concentra o snapshot aprovado consumido pela API e pelo
+  frontend. Preserve tempos/cores/regras canonicos; mudancas metodologicas
+  exigem decisao explicita e registro no protocolo. Nao duplicar esse snapshot.

@@ -1,0 +1,197 @@
+# Dados e dashboard
+
+Data: 2026-07-15.
+
+Este documento define a arquitetura de coleta estruturada, consolidacao e visualizacao local de dados do experimento Stroop Go/No-Go. A Fase 1 foi implementada no PsychoPy com formulario local de sessao e metadados canonicos no `expInfo`. A Fase 2 implementou o CSV unificado por execucao e um analisador tecnico local. A Fase 7 implementou a importacao para SQLite local. A Fase 8 implementou o dashboard Streamlit local. Essas fases sao historicas; estado e aceite vigente ficam exclusivamente no [backlog canonico](../legado/Projeto%20Stroop%20Test.md), com validacao sintetica pelo [protocolo Codex CLI](../desenvolvimento/WORKFLOW_CODEX_CLI.md).
+
+## Objetivo
+
+A camada de dados deve permitir:
+
+- registrar metadados de cada sessao;
+- preservar dados brutos por tentativa;
+- calcular metricas consistentes;
+- consultar varias execucoes;
+- filtrar resultados;
+- acompanhar todas as avaliacoes realizadas;
+- manter rastreabilidade entre resultado agregado e arquivo bruto original.
+
+Os resultados devem permanecer descritivos. O projeto nao deve gerar diagnostico, escore clinico, percentil clinico, comparacao normativa, classificacao individual ou recomendacao de avaliacao clinica.
+
+## Arquitetura definida
+
+Fluxo padrao:
+
+1. Participante ou avaliador inicia o experimento.
+2. PsychoPy coleta metadados da sessao.
+3. O experimento executa pratica e bloco principal.
+4. PsychoPy salva um CSV bruto unificado por execucao em `data/`.
+5. Um script local valida o CSV e calcula metricas descritivas.
+6. O script importa a execucao para PostgreSQL.
+7. O dashboard Streamlit autenticado le PostgreSQL por credencial somente leitura.
+8. O dashboard permite filtros, visao geral, tabela de sessoes e detalhe de avaliacao.
+9. Dados brutos permanecem em `data/` e nao sao modificados pelo dashboard.
+
+A solução local legada continua funcionando sem servidor e sem internet:
+
+```text
+PsychoPy -> CSV bruto unificado -> script de importacao -> SQLite local -> dashboard Streamlit local
+```
+
+A operação atual do dashboard usa PostgreSQL por `DASHBOARD_DATABASE_URL`; o
+fluxo SQLite permanece somente como fallback local e compatibilidade legada. A
+credencial de leitura não recebe permissão de escrita e o importador continua
+usando `DATABASE_URL` separado.
+
+## Formulario da sessao
+
+Campos previstos por execucao:
+
+| Campo | Obrigatorio | Origem | Observacao |
+|---|---|---|---|
+| `project` | sim | formulario PsychoPy | nome ou codigo do projeto |
+| `participant_id` | sim | formulario PsychoPy | identificador principal, pseudonimizado |
+| `participant_name` | sim | formulario PsychoPy | dado pessoal local; nao usar como identificador tecnico |
+| `initials` | nao | formulario PsychoPy | opcional; tratar como potencialmente identificavel |
+| `assessment_date` | sim | sistema | data local gerada automaticamente no formato ISO `YYYY-MM-DD` |
+| `visit` | sim | formulario PsychoPy | visita, sessao ou momento de avaliacao |
+| `evaluator` | sim | formulario PsychoPy | preferir codigo ou iniciais profissionais |
+
+`assessment_date` nao deve depender de digitacao manual, salvo futura necessidade justificada e documentada.
+
+Nao coletar nome completo, CPF, e-mail, endereco, telefone, idade ou sexo nesta versao.
+
+Na implementacao da Fase 1, esses campos entram no `expInfo` com nomes canonicos e acompanham as linhas de tentativa exportadas pelo PsychoPy. `participant_name` e local, nao entra em nome de arquivo e nao substitui `participant_id`. Os campos legados `participant` e `session` deixaram de ser usados como identificadores oficiais.
+
+## Metricas obrigatorias
+
+As metricas obrigatorias da tarefa Stroop sao:
+
+| Codigo | Formula | Unidade |
+|---|---|---|
+| `accuracy` | `((hits + correct_rejections) / total_valid_trials) * 100` | porcentagem |
+| `accuracy_go_trials` | `(hits / total_go_trials) * 100` | porcentagem |
+| `accuracy_no_go_trials` | `(correct_rejections / total_no_go_trials) * 100` | porcentagem |
+| `omission_errors` | quantidade absoluta de tentativas Go sem resposta | contagem |
+| `omission_errors_percentage` | `(omission_errors / total_go_trials) * 100` | porcentagem |
+| `commission_errors` | quantidade absoluta de tentativas No-Go com pressionamento de Espaco | contagem |
+| `response_time` | mediana do tempo de reacao, em segundos, calculada apenas a partir de hits validos | segundos |
+
+Campos tecnicos de auditoria a registrar futuramente:
+
+- `assessment_id`
+- `test_code`
+- `test_version`
+- `started_at`
+- `ended_at`
+- `total_trials`
+- `total_go_trials`
+- `total_no_go_trials`
+- `hits`
+- `correct_rejections`
+- `source_file`
+- `imported_at`
+- `import_status`
+
+## Privacidade e minimizacao de dados
+
+- `participant_id` e obrigatorio e deve ser pseudonimizado.
+- `participant_name` e um dado pessoal local e nao deve aparecer em nomes de arquivo, logs, screenshots ou commits.
+- `initials` sao opcionais e devem ser tratadas como dado potencialmente identificavel.
+- Nao coletar nome completo.
+- Nao coletar dados demograficos sem justificativa, consentimento e documentacao.
+- Nao subir dados reais para GitHub.
+- Nao expor dados reais em prints, commits, README ou arquivos de exemplo.
+- Manter banco SQLite local e ignorado pelo Git.
+- Documentar qualquer futura coleta adicional de dados pessoais antes de implementacao.
+- Avaliador(a) deve preferencialmente usar codigo ou iniciais profissionais, nao nome completo.
+
+## Responsabilidades dos componentes
+
+### PsychoPy
+
+- Coletar metadados minimos da sessao.
+- Registrar automaticamente data e hora local da avaliacao.
+- Executar pratica e bloco principal sem alterar o paradigma.
+- Gerar CSV bruto unificado por execucao em `data/`.
+- Preservar uma linha por tentativa do bloco principal, com `block` em `main`.
+- Manter a pratica apenas no fluxo de treinamento e feedback, sem exporta-la no CSV oficial.
+
+### CSV bruto
+
+- Ser a fonte primaria de auditoria da execucao.
+- Permanecer local em `data/`.
+- Nao ser modificado por scripts de importacao ou dashboard.
+- Conter metadados, tentativas, respostas, tempos e classificacao por tentativa.
+- Usar o contrato documentado em `docs/experimento/CSV_UNIFICADO.md`.
+- Ser a fonte primária da auditoria da execução; o importador PostgreSQL é a
+  fonte operacional do dashboard.
+
+### Scripts de importacao
+
+- Validar estrutura e conteudo antes de importar.
+- Calcular metricas documentadas.
+- Impedir importacao duplicada sem confirmacao explicita.
+- Registrar erros sem alterar o CSV original.
+- Criar o destino PostgreSQL configurado; o importador SQLite permanece como
+  fallback local.
+- Reimportar `assessment_id` existente somente com `--force`.
+- Nao produzir interpretacoes clinicas.
+
+### SQLite legado
+
+- Armazenar avaliacoes, metricas calculadas e tentativas.
+- Manter relacao entre `assessment_id`, `source_file` e dados por tentativa.
+- Permanecer local e ignorado pelo Git.
+- Ser lido pelo dashboard somente quando `DASHBOARD_DATABASE_URL` não estiver
+  configurada.
+- Usar por padrao `database/stroop_results.sqlite3`.
+
+### Dashboard
+
+- Ler PostgreSQL por `DASHBOARD_DATABASE_URL` com credencial somente leitura;
+  manter fallback SQLite em modo somente leitura.
+- Permitir filtros e visualizacoes descritivas.
+- Nao modificar CSV bruto.
+- Nao alterar banco.
+- Exibir aviso de uso descritivo e nao clinico.
+- Consultar em lotes configuráveis e nunca abrir transações de escrita.
+- Tratar banco ausente, vazio ou com schema invalido com mensagem clara.
+- Permitir download manual apenas da tabela agregada filtrada e visivel.
+
+Na Fase 8, o dashboard implementado em `dashboard/app.py` inclui filtros por periodo, projeto, `participant_id`, `participant_name`, visita, avaliador, teste e versao. A visao geral mostra total de avaliacoes, participantes unicos, precisao media, precisao mediana, tempo de reacao mediano, total de omissoes e total de comissoes. A interface tambem inclui graficos descritivos, tabela de avaliacoes e detalhe por avaliacao com metadados, metricas completas, tabela de tentativas e contagem de `hit`, `omission`, `correct_rejection` e `commission`.
+
+Na Etapa 2 do workflow vigente, o comportamento visual foi preservado e a implementacao
+foi separada em `dashboard/app.py` (composicao), `dashboard/data_access.py`
+(PostgreSQL/SQLite somente leitura), `dashboard/transformations.py` (operacoes puras) e
+`dashboard/components.py` (componentes visuais). O launcher e o ponto de entrada
+publico permanecem inalterados.
+
+### Documentacao
+
+- Definir campos, formulas, restricoes e fluxo de trabalho.
+- Registrar decisoes metodologicas e de dados antes da implementacao.
+- Atualizar `docs/REGISTRO_DE_ALTERACOES.md` em mudancas relevantes.
+
+### Git
+
+- Versionar somente codigo-fonte, documentacao e arquivos de configuracao seguros.
+- Nunca versionar dados reais, bancos locais, exports, logs ou credenciais.
+- Manter `data/`, bancos SQLite e exports ignorados.
+
+## Regras de integridade
+
+Uma importacao deve falhar ou ficar marcada como invalida quando:
+
+- o CSV nao contiver as colunas exigidas;
+- houver linhas com numero de campos inconsistente;
+- `block` nao for `main` nas execucoes oficiais atuais;
+- `condition` for incompativel com `word` e `ink_color`;
+- `correct_response` for incompativel com `condition`;
+- `error_type` for incompativel com resposta e condicao;
+- `participant_id` estiver vazio;
+- `visit` estiver vazia;
+- `evaluator` estiver vazio;
+- a mesma execucao for importada duas vezes sem confirmacao explicita.
+
+Falhas de validacao devem ser registradas de forma clara, sem modificar o CSV bruto.

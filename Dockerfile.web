@@ -1,0 +1,28 @@
+FROM node:24.15.0-bookworm-slim@sha256:4e6b70dd6cbfc88c8157ba19aa3d9f9cce6ba4703576d55459e45efcbc9c5f5d AS build
+WORKDIR /app/web
+COPY web/package.json web/package-lock.json ./
+RUN npm ci
+COPY web/src ./src
+COPY web/index.html web/tsconfig.json web/vite.config.ts ./
+COPY web/security-headers.json ./security-headers.json
+COPY web/deploy/generate-headers.mjs ./deploy/generate-headers.mjs
+COPY condicoes/web_protocol.json condicoes/pratica_stroop_go_nogo_ptbr.csv condicoes/bloco_principal_stroop_go_nogo_ptbr.csv /app/condicoes/
+COPY tests/fixtures/web_results_summary.json /app/tests/fixtures/web_results_summary.json
+RUN npm run build && node deploy/generate-headers.mjs /generated
+
+FROM nginx:1.30.6@sha256:eb1c896deef834f4e056829fd6dadac8305501f16cc71ba65fb252c8d0aa168e
+COPY --from=build /app/web/dist /usr/share/nginx/html
+COPY --from=build /generated/ /etc/nginx/web/
+COPY web/deploy/nginx.conf.template web/deploy/proxy.conf web/deploy/closed-errors.conf web/deploy/origin.awk /etc/nginx/web/
+COPY web/deploy/start.sh /usr/local/bin/stroop-web
+RUN command -v nginx && command -v envsubst && command -v curl && command -v openssl && command -v cmp && command -v date \
+    && chmod 0555 /usr/local/bin/stroop-web \
+    && rm -rf /docker-entrypoint.d /etc/nginx/conf.d /usr/share/nginx/html/50x.html \
+    && find /usr/share/nginx/html /etc/nginx/web -type d -exec chmod 0555 {} + \
+    && find /usr/share/nginx/html /etc/nginx/web -type f -exec chmod 0444 {} +
+USER 101:101
+EXPOSE 8080 8443
+HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
+    CMD ["/usr/local/bin/stroop-web", "healthcheck"]
+ENTRYPOINT ["/usr/local/bin/stroop-web"]
+CMD ["serve"]
