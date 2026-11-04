@@ -13,6 +13,17 @@ from scripts import verify_web_ci as ci
 
 
 class WebCIRunnerTests(unittest.TestCase):
+    def test_auditoria_reprovada_impede_navegadores_e_integracao_longos(self):
+        with patch.object(ci, 'scan_sources'), patch.object(ci, 'secret_self_test'), \
+                patch.object(ci, 'python_suite', return_value=0), \
+                patch.object(ci, 'audit_dependencies', side_effect=ci.CheckFailure('Auditoria sintetica recusada.')) as audit, \
+                patch.object(ci, 'run') as run:
+            self.assertEqual(ci.main(['all']), 1)
+        audit.assert_called_once()
+        commands = [call.args[0] for call in run.call_args_list]
+        self.assertNotIn(['npm', 'run', 'test:browser'], commands)
+        self.assertNotIn(['npm', 'run', 'test:integration'], commands)
+
     @unittest.skipUnless(os.name == 'posix', 'Workflow Linux requer Bash')
     def test_workflow_escreve_url_de_banco_com_quebra_de_linha_real(self):
         workflow = (ci.ROOT / '.github/workflows/web.yml').read_text(encoding='utf8')

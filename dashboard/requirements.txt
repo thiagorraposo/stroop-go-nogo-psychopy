@@ -1,4 +1,4 @@
-streamlit[auth]==1.63.0
+streamlit[auth]==1.66.1
 pandas==3.0.5
 psycopg[binary]==3.3.5
 cryptography==50.0.1

@@ -6,6 +6,20 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-11-04 — Correcao da auditoria de dependencias no PR1
+
+- CI de4782ae6 passou suites Python/PostgreSQL, frontend, navegadores e HTTPS;
+  auditoria Python bloqueou a entrega. Atualizados Streamlit1.66.1,
+  Authlib1.9.4, certifi2026.10.18, joserfc1.7.6, Pillow13.0.0 e pyasn1 0.6.5
+  nos requisitos/locks pertinentes, sem excecoes de vulnerabilidade.
+- Auditoria npm/pip-audit repetida sem vulnerabilidades conhecidas; pip check,
+  12testes do runner e27focados aprovados. Actionlint, scanner339fontes e prova
+  negativa passaram. Auditoria antecipada antes dos navegadores/HTTPS no runner
+  e workflow, com teste de bloqueio e reproducao documentada em CI_WEB.
+- Regressao Python/PostgreSQL descartavel:369/369, zero skips, em69,246s.
+- Hunk preexistente de AGENTS preservado fora dos commits; nenhum deploy.
+  CI da HEAD final e merge conferiveis no PR1 e nas execucoes do Actions.
+
 ## 2026-11-04 — Diretriz permanente de GitHub Flow e CI
 
 - Responsavel autorizou git/gh para branches curtas, pushes, PRs e squash merge

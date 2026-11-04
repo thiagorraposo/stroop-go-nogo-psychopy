@@ -86,10 +86,10 @@ docker pull ghcr.io/gitleaks/gitleaks:v8.30.1
 .venv/bin/python scripts/verify_web_ci.py secret-self-test
 .venv/bin/python scripts/verify_web_ci.py python
 .venv/bin/python scripts/verify_web_ci.py frontend
+.venv/bin/python scripts/verify_web_ci.py audit
 (cd web && npx playwright install --with-deps chromium firefox)
 .venv/bin/python scripts/verify_web_ci.py browser
 .venv/bin/python scripts/verify_web_ci.py integration
-.venv/bin/python scripts/verify_web_ci.py audit
 ```
 
 Aguarde `docker exec stroop-web-ci-local pg_isready -U synthetic -d
@@ -97,7 +97,9 @@ stroop_etapa4_test_ci` retornar sucesso antes da suite. Ao terminar, remova
 somente esse container descartavel com `docker rm --force stroop-web-ci-local`.
 Os mesmos estagios podem ser executados sequencialmente com
 `.venv/bin/python scripts/verify_web_ci.py all`, apos instalar os navegadores.
-O primeiro erro encerra o runner com codigo diferente de zero.
+O primeiro erro encerra o runner com codigo diferente de zero. A auditoria
+executa depois do frontend e antes de instalar/executar navegadores e integrar
+HTTPS, evitando essas verificacoes longas quando as dependencias sao recusadas.
 
 ## Cobertura e limites
 

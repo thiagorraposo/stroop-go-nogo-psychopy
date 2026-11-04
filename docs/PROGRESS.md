@@ -5,6 +5,17 @@ Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 
 ## Atual — GitHub Flow permanente; proxima unidade de desenvolvimento W22
 
+- Retomada Git em2026-11-04: CI de4782ae6 passou suites Python/PostgreSQL,
+  frontend, navegadores e HTTPS, mas falhou na auditoria Python. Locks corrigidos:
+  Streamlit1.66.1, Authlib1.9.4, certifi2026.10.18, joserfc1.7.6,
+  Pillow13.0.0 e pyasn1 0.6.5. Auditoria npm/pip-audit repetida sem achados;
+  pip check,12testes do runner e27focados, actionlint e scanner339fontes com
+  prova negativa aprovados. Auditoria antecipada antes dos navegadores/HTTPS
+  no workflow e runner; reproducao documentada em CI_WEB.
+  Publicar correcao, aguardar verify na HEAD final, squash e conferir CI de main.
+  Regressao Python/PostgreSQL descartavel:369/369, zero skips, em69,246s.
+  Hunk AGENTS preservado; sem deploy ou avancar W22 nesta solicitacao.
+
 - Solicitacao autoriza permanentemente pushes, PRs e squash merges com CI/regras
   satisfeitas; sem force push, bypass, deploy ou operacoes destrutivas.
   Diretriz em AGENTS/CONTRIBUTING e protocolo alinhado, mantendo limites legados.

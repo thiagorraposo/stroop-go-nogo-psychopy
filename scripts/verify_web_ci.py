@@ -173,7 +173,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('stage', choices=['sources', 'python', 'frontend', 'browser', 'integration', 'audit', 'secret-self-test', 'all'])
     args = parser.parse_args(argv)
-    stages = ['sources', 'secret-self-test', 'python', 'frontend', 'browser', 'integration', 'audit'] if args.stage == 'all' else [args.stage]
+    stages = ['sources', 'secret-self-test', 'python', 'frontend', 'audit', 'browser', 'integration'] if args.stage == 'all' else [args.stage]
     try:
         for stage in stages:
             print(f'CI WEB: {stage}', flush=True)

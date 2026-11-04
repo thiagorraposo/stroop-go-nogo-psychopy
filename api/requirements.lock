@@ -3,7 +3,7 @@
 annotated-doc==0.0.5
 annotated-types==0.8.0
 anyio==4.15.1
-certifi==2026.7.22
+certifi==2026.10.18
 charset-normalizer==3.5.1
 click==8.5.0
 cryptography==50.0.1
@@ -19,7 +19,7 @@ psycopg==3.3.5
 psycopg-binary==3.3.5
 pydantic==2.14.1
 pydantic-core==2.50.1
-pyasn1==0.6.4
+pyasn1==0.6.5
 pyasn1-modules==0.4.2
 pycparser==3.0
 requests==2.34.2

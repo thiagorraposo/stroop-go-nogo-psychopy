@@ -70,6 +70,8 @@ jobs:
         run: .venv/bin/python scripts/verify_web_ci.py python
       - name: Frontend e build
         run: .venv/bin/python scripts/verify_web_ci.py frontend
+      - name: Vulnerabilidades conhecidas das dependencias
+        run: .venv/bin/python scripts/verify_web_ci.py audit
       - name: Navegadores oficiais Playwright
         working-directory: web
         run: npx playwright install --with-deps chromium firefox
@@ -77,5 +79,3 @@ jobs:
         run: .venv/bin/python scripts/verify_web_ci.py browser
       - name: HTTPS, API e PostgreSQL ponta a ponta reais
         run: .venv/bin/python scripts/verify_web_ci.py integration
-      - name: Vulnerabilidades conhecidas das dependencias
-        run: .venv/bin/python scripts/verify_web_ci.py audit
