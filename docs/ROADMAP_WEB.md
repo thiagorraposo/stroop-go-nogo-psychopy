@@ -40,7 +40,7 @@ Mapa de arquivos: [estrutura](ESTRUTURA_DO_PROJETO.md).
 | W21 | Concluida em 2026-10-28 no escopo homologado: runtime restrito corrigido, UI32/32, integracao36/36, carga/recuperacao/reboot real e evidencia agregada de sessao Google real; limites W16 preservados |
 | W23 | Guia e matriz de transicao preparados; aceite depende da implantacao/aceite W22 e revisao operacional |
 | W14 | Concluida em 2026-10-16; consulta/CSV autorizados, papel SELECT, mapa legado e testes PostgreSQL validados |
-| W22 | Publicacao sintetica existente; atualizacao do candidato homologado e replica externa automatica em execucao; sem liberacao de coleta real |
+| W22 | Transporte de replica externa validado em 2026-11-04; agenda, restauracao externa e atualizacao da publicacao pendentes; sem liberacao de coleta real |
 
 As evidencias anteriores de W00–W15 e W17–W20 permanecem validas para os escopos
 testados. O responsavel instruiu explicitamente presumir os aceites pendentes e

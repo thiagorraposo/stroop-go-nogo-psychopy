@@ -3,7 +3,46 @@
 Estado formal/aceite no [roadmap WEB](ROADMAP_WEB.md), evidencias no
 [registro](REGISTRO_DE_ALTERACOES.md), arquitetura nos ADRs.
 
-## Atual — W21 validada; preparacao operacional W22 em 2026-10-28
+## Checkpoint M3 — transporte restrito fechado em 2026-11-04
+
+- **Escopo encerrado:** menor unidade em andamento de W22: verificar a replica
+  externa por SSH restrito, testar e salvar contexto. Esta solicitacao nao avanca
+  para agenda, restauracao ou publicacao. M3 identifica este checkpoint, sem criar
+  outra etapa ou contabilidade paralela ao roadmap WEB.
+- **HEAD de codigo validado:** `39dbf378536c16f033152bffe0f6b1e7e6ae30ee`, branch
+  `prep-web`. Implementacao da replica em `bb938e8`; checkpoint documental em
+  commit posterior. Para resolver seu hash: `git log -1 --format=%H -- docs/PROGRESS.md`.
+  Alteracao preexistente de `AGENTS.md` preservada fora dos commits da tarefa.
+- **Entregas:** replicador/exportador e modelos systemd versionados; cliente
+  imutavel local e exportador remoto da release39dbf37 instalados anteriormente,
+  com configuracao0600 e identidade SSH exclusiva restrita a ciphertext.
+  Em28/10 houve primeira copia real; em04/11 o transporte foi revalidado sem
+  abrir backup em texto claro nem ler chave AES. Nenhum novo deploy nesta unidade.
+- **Resultados atuais:** `.venv/bin/python -m unittest tests.test_web_backup_replication -v`:
+  10/10 aprovados em0,089s, zero falhas/erros/skips. CLI real do cliente imutavel:
+  primeira execucao `copied`, segunda `already_current`, ambas codigo0/sem alerta;
+  69.269bytes e duas geracoes retidas, geracao com cerca de13,34h. Comando `id`
+  usando a mesma identidade foi recusado pelo exportador, sem saida de shell.
+  `systemctl --user is-enabled stroop-web-backup-pull.timer`: `not-found`.
+  Cliente imutavel confere com as fontes versionadas em dois arquivos;51links
+  locais validos, scanner338fontes sem achados e `git diff --check` aprovado.
+- **Evidencias:** exports/w22/20261104/restricted-transport.json (ignorado), copia
+  inicial em exports/w22/20261028/external-copy-first.json. Resultados W21 e
+  regressao anterior continuam historicos abaixo, sem serem reexecutados aqui.
+- **Pendencias:** instalar/testar timer local, restaurar isoladamente uma replica
+  externa usando a chave AES sob custodia separada; atualizar publicacao W22 com
+  backup/retorno compativel e smoke publico. W23 aguarda implantacao/aceite e
+  revisao operacional. Ultima publicacao documentada26fa9bf, nao revalidada aqui.
+  RPO depende da disponibilidade do computador externo/rede; novo login Google
+  interativo nao foi realizado nesta unidade. Nao conceder aceite geral.
+- **Proxima acao exata:** a partir deste checkpoint, preparar a unidade
+  `stroop-web-backup-pull.service` usando o modelo versionado e o cliente imutavel
+  `~/.local/share/stroop-web-backup-client/releases/39dbf37`, com config
+  `~/.local/share/stroop-web-backup-client/pull.json`; validar a unidade, executar
+  uma vez, confirmar resultado e so entao habilitar/testar o timer horario.
+  Depois validar restauracao da replica; nao antecipar deploy.
+
+## Historico — W21 validada; preparacao operacional W22 em 2026-10-28
 
 - Branch `prep-web`; AGENTS raiz preexistente preservado fora dos commits.
   Correcao `ad3a469`: administracao usa funcao SQL estreita da migration0010,

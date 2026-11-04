@@ -6,6 +6,25 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-11-04 — Checkpoint M3: transporte de replica externa validado
+
+- A pedido do responsavel, fechada somente a menor unidade em andamento:
+  verificacao do transporte SSH restrito da replica W22, sem instalar agenda,
+  restaurar banco, publicar candidato ou avancar etapas. Codigo validado em
+  `39dbf378536c16f033152bffe0f6b1e7e6ae30ee`; alteracao preexistente de AGENTS
+  raiz preservada. M3 registrado em PROGRESS, sem nova fonte de estado.
+- `.venv/bin/python -m unittest tests.test_web_backup_replication -v`:
+  10 testes aprovados em0,089s, zero falhas/erros/skips. Transporte real com
+  cliente imutavel: `copied` seguido de `already_current`, ambos codigo0,
+  sem alerta;69.269bytes, duas geracoes retidas e idade aproximada13,34h.
+  A mesma identidade recusou comando de shell `id`; nenhum dado descriptografado
+  ou chave AES foi aberto. Evidencia ignorada em exports/w22/20261104.
+- Timer local consultado: `not-found`. Permanecem agenda, restauracao isolada
+  da replica, atualizacao/smoke publico W22 e aceite de transicao W23. Checkpoint
+  inclui HEAD validado, entregas, resultados, limites e proxima acao exata.
+  Fontes do cliente imutavel conferidas;51links locais existentes, scanner de
+  338fontes sem achados e `git diff --check` aprovado. Sem push ou deploy.
+
 ## 2026-10-28 — W21: capacidade e recuperacao medidas na VPS; transicao preparada
 
 ### Homologacao fechada no alvo e integracao com privilegios minimos
