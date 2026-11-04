@@ -13,6 +13,23 @@ from scripts import verify_web_ci as ci
 
 
 class WebCIRunnerTests(unittest.TestCase):
+    @unittest.skipUnless(os.name == 'posix', 'Workflow Linux requer Bash')
+    def test_workflow_escreve_url_de_banco_com_quebra_de_linha_real(self):
+        workflow = (ci.ROOT / '.github/workflows/web.yml').read_text(encoding='utf8')
+        command = next(line.strip() for line in workflow.splitlines()
+                       if line.lstrip().startswith("printf 'TEST_DATABASE_URL="))
+        with tempfile.TemporaryDirectory(prefix='stroop-synthetic-ci-env-') as directory:
+            output = Path(directory) / 'github-env'
+            subprocess.run(['bash', '-euc', command], check=True,
+                           env={**os.environ, 'POSTGRES_TEST_PORT': '5432',
+                                'GITHUB_ENV': str(output)})
+            data = output.read_bytes()
+        self.assertTrue(data.endswith(b'\n'))
+        self.assertEqual(data.count(b'\n'), 1)
+        key, value = data.decode('ascii').rstrip('\n').split('=', 1)
+        self.assertEqual(key, 'TEST_DATABASE_URL')
+        ci.database_guard(value)
+
     def test_database_descartavel_local_explicito_sem_refletir_credencial(self):
         ci.database_guard('postgresql://synthetic:synthetic-only@127.0.0.1:5432/stroop_etapa4_test_ci')
         for value in ('', 'postgresql://synthetic:SECRET@remote.invalid:5432/stroop_etapa4_test_ci',

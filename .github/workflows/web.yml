@@ -2,6 +2,7 @@ name: WEB validada
 on:
   pull_request:
   push:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
@@ -14,7 +15,7 @@ jobs:
     timeout-minutes: 40
     services:
       postgres:
-        image: postgres:17.6
+        image: postgres:17.6-bookworm@sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3
         env:
           POSTGRES_USER: synthetic
           POSTGRES_PASSWORD: synthetic-ci-only

@@ -1,18 +1,30 @@
 # Verificacoes reproduziveis WEB
 
 O workflow [WEB validada](../../.github/workflows/web.yml) executa verificacoes em
-pull requests, pushes e disparos manuais. Nao faz deploy, publica artefatos,
+pull requests, pushes em `main` e disparos manuais. Push em branch de trabalho
+nao duplica a execucao do PR. Nao faz deploy, publica artefatos,
 configura VPS nem usa credenciais externas. O job falha diante de teste,
 skip Python, vulnerabilidade conhecida ou deteccao de secrets; nao existe
 `continue-on-error`. Regras de branch protegida devem exigir o check `verify`
 no repositorio remoto para bloquear merge; essa configuracao externa nao e
 criada pelo arquivo de workflow.
 
+Contribuicoes seguem [GitHub Flow](../../CONTRIBUTING.md). O agente aguarda CI
+e regras/revisoes exigidas antes de squash merge; nao usa bypass administrativo.
+O resultado integrado e verificado novamente por push em `main`.
+Em2026-11-04, protecao remota configurada: `verify` do app GitHub Actions,
+branch atualizada, PR obrigatorio, historico linear e conversas resolvidas,
+inclusive para administradores. Nao se adicionou aprovador externo obrigatorio;
+revisoes existentes continuam respeitadas. Force push/exclusao de main bloqueados;
+branches temporarias sao removidas automaticamente depois do merge permitido.
+
 ## Ambiente e isolamento
 
 Use Python 3.12.3, Node 24.15.0, Docker, OpenSSL, Git e Linux com os navegadores
 Chromium/Firefox do Playwright fixado em [package-lock.json](../../web/package-lock.json).
-As actions sao fixadas por SHA; PostgreSQL e fixado em 17.6. Dependencias Python
+As actions sao fixadas por SHA; PostgreSQL17.6-bookworm usa o mesmo digest do
+Compose. O build frontend ja executa typecheck, sem chamada duplicada ao tsc.
+Dependencias Python
 vêm dos locks [dashboard](../../dashboard/requirements.lock) e
 [API](../../api/requirements.lock), sem resolver novas versoes da aplicacao.
 O checkout do workflow usa sparse-checkout antes de materializar os arquivos:

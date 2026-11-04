@@ -185,7 +185,8 @@ def main(argv: list[str] | None = None) -> int:
                 if python_suite():
                     raise CheckFailure('Suite Python incompleta ou com falha; entrega bloqueada.')
             elif stage == 'frontend':
-                for command in (['npm', 'ci'], ['npm', 'test'], ['npm', 'run', 'typecheck'], ['npm', 'run', 'build']):
+                # build ja executa typecheck antes do bundle; nao duplicar tsc.
+                for command in (['npm', 'ci'], ['npm', 'test'], ['npm', 'run', 'build']):
                     run(command, cwd=ROOT / 'web')
             elif stage == 'browser':
                 # Porta exclusiva do runner; nao reutilizar uma previa aberta pelo usuario.
