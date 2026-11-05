@@ -60,12 +60,12 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 
 ### REQ-PAR-002
 
-- Descrição: Avaliar cadastro longitudinal separado de pessoas antes de implementá-lo.
+- Descrição: Participante pseudonimizado por projeto admite múltiplas visitas e avaliações com vínculos estáveis, sem cadastro longitudinal central.
 - Justificativa: Evita confundir metadados de sessão com cadastro global.
-- Prioridade: P2. Estado da especificação: **Proposto**.
-- Aceite verificável: DEC-01 registra necessidade, campos, escopo, retenção e aceite do proprietário; se rejeitado, documentar suficiência do modelo atual.
+- Prioridade: P0. Estado da especificação: **Confirmado** (DEC-01, 2026-11-05).
+- Aceite verificável: UUIDs e vínculos conforme modelo canônico; várias visitas e avaliações por visita sem duplicação/cruzamento de projetos; evolução longitudinal aditiva sem reescrever resultados. Diretriz aprovada; comportamento ainda requer implementação/ensaios.
 - Dependências: WEB-005 e pré-requisitos registrados no backlog.
-- Restrições conhecidas: Não criar tabela/nomes/identificador global antes da decisão.
+- Restrições conhecidas: Sem nomes/identificador pessoal global, agenda separada ou correlação automática; schema novo só após aprovação da estratégia definitiva e tarefa autorizada.
 - Origem: Missão de replanejamento do proprietário em 2026-11-04.
 
 ### REQ-PAR-003
@@ -92,13 +92,13 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 
 ### REQ-AVA-002
 
-- Descrição: Decidir se avaliação planejada requer entidade distinta do convite/sessão.
+- Descrição: Preparar avaliação por convite único vinculado a participante/visita/projeto, sem módulo separado de agendamento.
 - Justificativa: O código atual não representa agendamento independente.
-- Prioridade: P1. Estado da especificação: **Pendente de decisão**.
-- Aceite verificável: DEC-01 compara estados atuais, necessidade de agenda/reemissão e impactos; contrato aprovado antes de schema/rota nova.
+- Prioridade: P1. Estado da especificação: **Confirmado** (DEC-01, 2026-11-05).
+- Aceite verificável: Convite único, prazo, acesso e resgate único; reemissão cria sessão distinta e mantém vínculos/execuções anteriores; nenhuma unicidade artificial impede várias avaliações na mesma visita.
 - Dependências: WEB-005 e pré-requisitos registrados no backlog.
 - Restrições conhecidas: Não introduzir agendamento nem nova entidade por inferência.
-- Origem: Auditoria de código em AUDITORIA_REPLANEJAMENTO.md.
+- Origem: Auditoria de código em AUDITORIA_REPLANEJAMENTO.md e decisão do responsável de 2026-11-05.
 
 ### REQ-AVA-003
 
@@ -166,13 +166,13 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 
 ### REQ-INT-003
 
-- Descrição: Definir política de perda antes do envio e eventual checkpoint sem mudar D2.
+- Descrição: Persistir incrementalmente observações com confirmação e idempotência, preservando sessões incompletas/ inválidas sem retomada ou resultado oficial parcial.
 - Justificativa: RAM final-only não garante preservação de tentativas interrompidas.
-- Prioridade: P0. Estado da especificação: **Pendente de decisão**.
-- Aceite verificável: DEC-02 aprova envio final com perda explicitada ou especifica checkpoint técnico separado; testes de falha seguem decisão antes de código.
+- Prioridade: P0. Estado da especificação: **Diretriz confirmada; estratégia candidata a validar** (DEC-02, 2026-11-05).
+- Aceite verificável: Estratégia ADR-005, contrato HTTP e matriz D2/D5 validados explicitamente antes de implementação; ensaios de perda/recibo/replay/concorrência/expiração e impacto temporal comprovam o comportamento depois do código. RAM final-only rejeitada; riscos residuais informados.
 - Dependências: WEB-005 e pré-requisitos registrados no backlog.
 - Restrições conhecidas: Sem offline, localStorage ou retomada implícitos; decisão metodológica se afetar validade.
-- Origem: Auditoria de código em AUDITORIA_REPLANEJAMENTO.md.
+- Origem: Auditoria de código em AUDITORIA_REPLANEJAMENTO.md e decisão do responsável de 2026-11-05.
 
 ## F. Cálculo das métricas
 
@@ -414,17 +414,17 @@ já existe ou participa da regressão geral. WEB-000 é exclusivamente documenta
 | REQ-AUT-002 | ADR-004 | M6 | WEB-022 | `stroop/domain/auth.py, stroop/persistence/web_sessions.py` | `tests/test_web_auth.py` | PLANEJADA; consultar WEB-022 no backlog |
 | REQ-AUT-003 | ADR-004 | M6 | WEB-023 | `api/auth.py, api/sessions.py` | `tests/test_web_sessions.py` | PLANEJADA; consultar WEB-023 no backlog |
 | REQ-PAR-001 | ADR-004 | M4 | WEB-013 | `api/sessions.py, web/src/participant/` | `tests/test_web_sessions.py` | PLANEJADA; consultar WEB-013 no backlog |
-| REQ-PAR-002 | ADR-004 | M2 | WEB-005 | `Modelo lógico e formulário de sessão` | `PLANEJADO: revisão DEC-01` | PLANEJADA; consultar WEB-005 no backlog |
+| REQ-PAR-002 | ADR-004/005 | M2 | WEB-005 | `Modelo lógico e formulário de sessão` | `Revisão documental DEC-01 em 2026-11-05; ensaios PLANEJADOS` | PLANEJADA; consultar WEB-005 no backlog |
 | REQ-PAR-003 | ADR-004 | M4 | WEB-014 | `web/src/components/, api/models.py` | `tests/test_web_security_review.py` | PLANEJADA; consultar WEB-014 no backlog |
 | REQ-AVA-001 | ADR-004 | M4 | WEB-013 | `web/src/App.tsx, api/sessions.py` | `tests/test_web_sessions.py` | PLANEJADA; consultar WEB-013 no backlog |
-| REQ-AVA-002 | ADR-004 | M2 | WEB-005 | `Contrato HTTP e modelo lógico` | `PLANEJADO: revisão DEC-01` | PLANEJADA; consultar WEB-005 no backlog |
+| REQ-AVA-002 | ADR-004/005 | M2 | WEB-005 | `Contrato HTTP e modelo lógico` | `Revisão documental DEC-01 em 2026-11-05; ensaios PLANEJADOS` | PLANEJADA; consultar WEB-005 no backlog |
 | REQ-AVA-003 | ADR-004 | M4 | WEB-015 | `web/src/participant/ParticipantRun.ts, api/results.py` | `tests/test_web_results.py` | PLANEJADA; consultar WEB-015 no backlog |
 | REQ-EXP-001 | ADR-004 | M3 | WEB-009 | `condicoes/, web/src/experiment/` | `tests/test_fase3_condicoes_tempos.py` | PLANEJADA; consultar WEB-009 no backlog |
 | REQ-EXP-002 | ADR-004 | M3 | WEB-010 | `web/src/experiment/main-engine.ts, ExperimentHost.tsx` | `web/src/experiment/main.test.ts` | PLANEJADA; consultar WEB-010 no backlog |
 | REQ-EXP-003 | ADR-004 | M3 | WEB-011 | `web/src/experiment/environment.ts, web/pilots/` | `PLANEJADO: campanha de engenharia M3` | PLANEJADA; consultar WEB-011 no backlog |
 | REQ-INT-001 | ADR-004 | M2 | WEB-006 | `stroop/domain/web_results.py, api/results.py` | `tests/test_web_results.py` | PLANEJADA; consultar WEB-006 no backlog |
 | REQ-INT-002 | ADR-004 | M2 | WEB-007 | `stroop/persistence/web_sessions.py` | `tests/test_web_results.py` | PLANEJADA; consultar WEB-007 no backlog |
-| REQ-INT-003 | ADR-004 | M2 | WEB-005 | `ParticipantRun.ts e modelo lógico` | `PLANEJADO: análise de falhas DEC-02` | PLANEJADA; consultar WEB-005 no backlog |
+| REQ-INT-003 | ADR-004/005 | M2 | WEB-005 | `ParticipantRun.ts e modelo lógico` | `ADR-005 e matriz de falhas; validação definitiva PENDENTE` | PLANEJADA; consultar WEB-005 no backlog |
 | REQ-MET-001 | ADR-004 | M2 | WEB-008 | `stroop/domain/stroop.py, web_results.py` | `tests/test_nucleo_compartilhado.py` | PLANEJADA; consultar WEB-008 no backlog |
 | REQ-MET-002 | ADR-004 | M2 | WEB-008 | `stroop/domain/stroop.py, web/src/dashboard/analysis.ts` | `web/src/dashboard/analysis.test.ts` | PLANEJADA; consultar WEB-008 no backlog |
 | REQ-MET-003 | ADR-004 | M5 | WEB-019 | `web_assessments, api/assessments.py` | `tests/test_web_assessments.py` | PLANEJADA; consultar WEB-019 no backlog |

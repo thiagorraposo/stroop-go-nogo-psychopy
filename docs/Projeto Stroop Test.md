@@ -248,7 +248,7 @@ produção não comprovados por estes ensaios. Riscos R01–R10 permanecem abert
 
 - Objetivo: Fechar ambiguidades de produto/dados e revalidar API e persistência existentes.
 - Justificativa: Integridade e cálculo oficial são base do fluxo de pesquisa.
-- Inclui: Contratos atuais versus código, decisões DEC-01/02, transações, métricas e compatibilidade.
+- Inclui: Contratos atuais versus código, decisões DEC-01/02, transações, métricas e compatibilidade. CHG-002 acrescenta desenho de vínculos estáveis e persistência incremental; implementação dependente suspensa até validação definitiva.
 - Exclui: Novo cadastro global, offline ou schema por conveniência.
 - Pré-requisitos: M1 aceito; decisões para o trabalho que depender delas.
 - Dependências: M1.
@@ -265,10 +265,10 @@ produção não comprovados por estes ensaios. Riscos R01–R10 permanecem abert
 - Marco: M2. Prioridade: P0. Complexidade: M. Estado: BLOQUEADA.
 - Dependências: WEB-004; DEC-01 e DEC-02.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: Comparação contrato/código aprovada; decisões registram alternativa e impacto, incluindo RAM final-only e entidade de avaliação; nada inferido como novo requisito.
-- Testes/verificação: revisão estática contrato/código/schema lógico executada; achados em EV-M2-005. Aceite das decisões pelo responsável ainda pendente; suites funcionais não reexecutadas nesta revisão documental.
-- Evidências: EV-M2-005, 2026-11-05, código inspecionado em `bcd896b`. Comparação preparada para decisão; não constitui aceite funcional nem aprovação do responsável.
-- Riscos/bloqueios: R03, R07. DEC-01/02 solicitadas ao responsável nesta sessão; sem resposta registrada, não concluir o contrato nem iniciar WEB-006/007/008. Desbloqueio: responsável escolher as alternativas abaixo e registrar impactos se ampliar escopo.
+- Critérios de aceite: Comparação contrato/código e modelo por projeto aprovados; estratégia definitiva de persistência e matriz de invalidação explicitamente validadas pelo responsável antes de código/schema. Contratos de vínculos, recibo, replay, incompletude e risco residual fechados. RAM final-only não é alternativa aceita após CHG-002.
+- Testes/verificação: revisão estática contrato/código/schema lógico executada; achados em EV-M2-005. DEC-01 e diretriz DEC-02 respondidas; validação definitiva da estratégia/matriz ainda pendente. Suites funcionais não reexecutadas nesta revisão documental.
+- Evidências: EV-M2-005, código inspecionado em `bcd896b`; resposta e revisão documental em EV-M2-005-R1 (2026-11-05). Comparação histórica não constitui aceite funcional; direção aprovada é distinta da estratégia definitiva ainda em validação.
+- Riscos/bloqueios: R03, R07. DEC-01 respondida em 2026-11-05; DEC-02 aprova diretriz incremental e rejeita final-only, mas exige validação definitiva antes da implementação. Proposta ADR-005 e matriz do protocolo disponíveis; WEB-005 permanece BLOQUEADA para aceite até essa validação explícita. Não iniciar WEB-006/007/008 nem migrations por inferência. Revisão documental pode prosseguir.
 - Referências: REQ-PAR-002, REQ-AVA-002, REQ-INT-003; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch `docs/m2-contratos-participacao`, baseada em `bcd896b` para preservar M1 ainda não integrado à main; fechamento em Retomada.
 
@@ -297,12 +297,35 @@ contratos, testes e autorização de schema/método antes de implementação dep
 A contagem de aceites permanece inalterada; não há tarefa independente pronta
 em M2 enquanto WEB-005 aguarda as duas decisões.
 
+### EV-M2-005-R1 — resposta e proposta documental, 2026-11-05
+
+Responsável aprovou DEC-01 e rejeitou final-only em DEC-02 na mensagem desta
+sessão. Exigiu preservação incremental, recibo/idempotência, sessões incompletas/
+inválidas, nova sessão com prática após interrupção e validação antes de código.
+Não é aprovação presumida da estratégia que foi elaborada depois da resposta.
+
+Entregues: [ADR-005](arquitetura/ADR-005-persistencia-incremental.md), desenho
+lógico no [modelo](dados/MODELO_DE_DADOS.md), transporte candidato no
+[contrato HTTP](desenvolvimento/CONTRATO_API_WEB.md), matriz de invalidação no
+[protocolo](experimento/PROTOCOLO_WEB.md); requisitos e arquitetura alinhados.
+Revisão técnica documental: múltiplas visitas/avaliações, isolamento composto,
+evolução aditiva, fila/ACK, prefixo/hash, replay divergente, corridas, expiração
+sem aviso e perda residual conferidos. Worker não promete impacto temporal zero;
+sem rede a perda pode abranger todo sufixo não confirmado, inclusive o bloco todo.
+Nenhuma execução de worker, banco, navegador ou integração nessa revisão.
+
+Validação local: procedimento Python do workflow (links/âncoras, 42 tarefas,
+36 requisitos/matriz, 11 marcos, 10 riscos, 5 decisões, grafo e escopo Markdown)
+e `git diff --check`; resultados numéricos e Git no fechamento em Retomada.
+Conteúdo funcional de referência: `bc2f4b3` (somente documentação desde M1).
+Não altera contagem de aceites nem encerra WEB-005/M2.
+
 ### WEB-006 — Revalidar entrada de conclusão e proveniência do protocolo
 
 - Marco: M2. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
 - Dependências: WEB-005.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: Schema fechado, ordem/snapshot, unidades, versões e limites temporais cobrem casos válidos e adversos; contratos de start/abort/complete coincidem com código.
+- Critérios de aceite: Após validação DEC-02, schema fechado e vínculos participante/visita/projeto; ordem/snapshot, unidades e versões; contratos de checkpoint/start/abort/complete e invalidação tardia coincidem com código. Especificar migration aditiva e mapear sessões existentes sem inferir associação de legado. Validar partial versus oficial conforme ADR-005; não iniciar implementação antes do gate WEB-005.
 - Testes/verificação: `tests/test_web_results.py, test_web_sessions.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
 - Riscos/bloqueios: R02, R03; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
@@ -314,7 +337,7 @@ em M2 enquanto WEB-005 aguarda as duas decisões.
 - Marco: M2. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
 - Dependências: WEB-006.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: Banco real provisionado prova rollback pré-commit, retry igual, conflito divergente e concorrência sem duplicação; reader sem DML e writer sem owner.
+- Critérios de aceite: Banco real provisionado prova rollback pré-commit, checkpoint com ACK pós-commit, retry igual/sobreposto, conflito divergente, prefixo sem lacuna e concorrência checkpoint/abort/complete; expiração/invalidação preservam observações, resultado oficial é atômico e não duplica. Vínculos compostos e múltiplas avaliações por visita comprovados; reader sem DML e writer sem owner. Ensaios de CHG-002/ADR-005 são adicionais, não cobertos por teste histórico.
 - Testes/verificação: `tests/test_web_results.py, test_web_database_provision.py, test_postgres_migrations.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
 - Riscos/bloqueios: R03, R06; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
@@ -326,7 +349,7 @@ em M2 enquanto WEB-005 aguarda as duas decisões.
 - Marco: M2. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
 - Dependências: WEB-007.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: 12 métricas/unidades/classificações e no-hit conferidos nos adaptadores; nenhuma normalização destrutiva do histórico; M2 aceito.
+- Critérios de aceite: 12 métricas/unidades/classificações e no-hit conferidos nos adaptadores; nenhuma normalização destrutiva do histórico; M2 aceito. CHG-002: preservar fórmulas e comprovar exclusão de incompletos/ inválidos do resultado oficial.
 - Testes/verificação: `tests/test_nucleo_compartilhado.py, test_web_results.py, web/src/dashboard/analysis.test.ts`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
 - Riscos/bloqueios: R04; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
@@ -378,7 +401,7 @@ em M2 enquanto WEB-005 aguarda as duas decisões.
 - Marco: M3. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
 - Dependências: WEB-010; DEC-04 para matriz.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: 10 execuções sintéticas por ambiente selecionado, trilhas brutas/falhas preservadas, quadro e desvio total conferidos contra D5; sem substituir falha por rerun omitido.
+- Critérios de aceite: 10 execuções sintéticas por ambiente selecionado, trilhas brutas/falhas preservadas, quadro e desvio total conferidos contra D5; sem substituir falha por rerun omitido. CHG-002: incluir transporte incremental ativo, ACK lento/perdido, retries e falha de servidor, sem alongar tentativas; comparar impacto contra D5.
 - Testes/verificação: `PLANEJADO: campanha técnica D5; web/pilots/w16-local.spec.ts como ferramenta, não prova física`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
 - Riscos/bloqueios: R01; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
@@ -390,7 +413,7 @@ em M2 enquanto WEB-005 aguarda as duas decisões.
 - Marco: M3. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
 - Dependências: WEB-011.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: Relatório técnico discrimina automação/latência física e ambientes não medidos; responsável aceita suporte ou bloqueia motor; M3 atendido sem equivalência presumida.
+- Critérios de aceite: Relatório técnico discrimina automação/latência física e ambientes não medidos; responsável aceita suporte ou bloqueia motor; M3 atendido sem equivalência presumida. CHG-002: discriminar impacto medido do transporte e janela de perda observada, sem promessa de perda zero.
 - Testes/verificação: `PLANEJADO: revisão de evidências M3 e DEC-04`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
 - Riscos/bloqueios: R01, R02; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
@@ -418,7 +441,7 @@ em M2 enquanto WEB-005 aguarda as duas decisões.
 - Marco: M4. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
 - Dependências: WEB-008, WEB-012, WEB-024.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: Avaliador autorizado prepara/identifica sessão no React; código único, visita, revogação/expiração e isolamento comprovados com API/PG reais.
+- Critérios de aceite: Avaliador autorizado prepara/identifica sessão no React; código único, visita, revogação/expiração e isolamento comprovados com API/PG reais. CHG-002: múltiplas visitas e avaliações na mesma visita preservam UUIDs/vínculos, sem cadastro global ou agenda.
 - Testes/verificação: `tests/test_web_sessions.py; web/e2e/integrated/`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
 - Riscos/bloqueios: R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
@@ -442,7 +465,7 @@ em M2 enquanto WEB-005 aguarda as duas decisões.
 - Marco: M4. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
 - Dependências: WEB-014.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: Rede falha antes/depois de commit, retry, expiração, revogação e reload têm comportamento declarado; nenhuma confirmação sem recibo nem principal retomado.
+- Critérios de aceite: Rede falha antes/depois de commit, retry, expiração, revogação e reload têm comportamento declarado; nenhuma confirmação sem recibo nem principal retomado. CHG-002: fila/worker/ACK, prefixo preservado em interrupção, incompletude sem aviso e invalidação tardia; nova sessão exige prática; mensagens distinguem parcial recebido de resultado oficial.
 - Testes/verificação: `web/src/participant/; tests/test_web_results.py; E2E HTTPS real`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
 - Riscos/bloqueios: R03; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
@@ -454,7 +477,7 @@ em M2 enquanto WEB-005 aguarda as duas decisões.
 - Marco: M4. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
 - Dependências: WEB-015.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: E2E real confere 1 avaliação/16 tentativas/12 métricas e proveniência; logout limpa RAM e sessão, acesso cruzado nega; M4 aceito.
+- Critérios de aceite: E2E real confere 1 avaliação/16 tentativas/12 métricas e proveniência; logout limpa RAM e sessão, acesso cruzado nega; M4 aceito. CHG-002: sessão interrompida conserva observações e não gera resultado final; nenhuma mistura entre nova sessão e anterior.
 - Testes/verificação: `web/e2e/integrated/, tests/test_web_participant_logout.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
 - Riscos/bloqueios: R03, R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
@@ -482,7 +505,7 @@ em M2 enquanto WEB-005 aguarda as duas decisões.
 - Marco: M5. Prioridade: P1. Complexidade: M. Estado: PENDENTE.
 - Dependências: WEB-016.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: Filtros/paginação/contagens cobrem conjunto coerente; troca de projeto e respostas tardias não vazam dados; UI acessível fora do motor.
+- Critérios de aceite: Filtros/paginação/contagens cobrem conjunto coerente; troca de projeto e respostas tardias não vazam dados; UI acessível fora do motor. CHG-002: sessões incompletas e avaliações invalidadas não entram nos conjuntos válidos/agregações, com acesso a parciais separado e autorizado.
 - Testes/verificação: `tests/test_web_assessments.py, web/src/dashboard/analysis.test.ts; Playwright`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
 - Riscos/bloqueios: R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
@@ -867,7 +890,7 @@ de mitigação no código não elimina risco sem ensaio. Atualizar somente aqui.
 |---|---|---|---|---|---|---|---|---|
 | R01 | Timing de navegador varia com hardware, SO, carga e compositor | RT/onset incompatíveis com uso pretendido | Alta | Crítica | M3 cedo, trilhas/gates, matriz medida e campanha aprovada; não inferir latência física | M3/M9 | Técnico + metodológico | ABERTO |
 | R02 | Confundir PsychoPy, variante WEB e aceites históricos | Conclusões científicas indevidas | Alta | Crítica | D1–D6 e versões separadas, preservar falhas W16, validação metodológica distinta | M2/M3/M9 | Metodológico | ABERTO |
-| R03 | RAM até envio final, falha/reload/expiração e corrida de commit | Perda ou duplicação de tentativas/resultados | Alta | Crítica | DEC-02; atomicidade/replay/recibo; falhas pré/pós-commit e mensagem honesta de envio | M2/M4 | Backend + produto | ABERTO |
+| R03 | RAM até envio final, falha/reload/expiração e corrida de commit | Perda ou duplicação de tentativas/resultados | Alta | Crítica | CHG-002/ADR-005; validar estratégia incremental e matriz antes de código; ensaiar ACK/replay, perda do sufixo e corridas; final-only rejeitado | M2/M4 | Backend + produto | ABERTO |
 | R04 | Diferenças de sentinela RT, unidade, mediana/arredondamento entre consumidores | Regressão nos cálculos/análises | Média | Alta | Golden fixtures sintéticas e paridade núcleo/API/CSV/UI, sem mudança silenciosa | M1/M2/M5 | Técnico | ABERTO |
 | R05 | Alterar OIDC ou perfis/vínculos sem revalidar negações | Acesso cruzado, sessão indevida, perda de administração | Média | Crítica | Login real autorizado, CSRF/Origin/IDOR, revogação, último admin, reader/writer | M6/M4/M5 | Segurança/técnico | ABERTO |
 | R06 | Novo schema ou rótulo de projeto apropria/muda histórico | Corrupção ou acesso a coletas | Média | Crítica | Aditividade, mapa explícito, fixtures, nenhum dado real sem autorização | M2/M7 | Backend + proprietário | ABERTO |
@@ -887,8 +910,8 @@ versão experimental. Somente bloquear tarefa dependente, sem paralisar document
 
 | ID | Questão / hipótese preservada | Responsável | Condição objetiva / impacto | Tarefas relacionadas | Estado |
 |---|---|---|---|---|---|
-| DEC-01 | Pseudônimo/visita e preparação por convite atuais bastam? Cadastro longitudinal/avaliação agendada não presumidos | Proprietário + privacidade | Decisão documentada sobre entidades/campos/acesso/retenção; se ampliar, novos requisitos/tarefas antes de schema | WEB-005/013 | PENDENTE |
-| DEC-02 | Aceitar perda anterior ao envio e aborto sem retomada (D2 atual) ou checkpoint técnico separado? | Proprietário + metodológico | Política de perda e mensagem aprovadas; checkpoint/offline/retomada que mude D2 exige decisão científica/versionamento antes da implementação | WEB-005/007/015 | PENDENTE |
+| DEC-01 | Participante pseudonimizado por projeto, múltiplas visitas/avaliações e preparação por convite; sem cadastro central ou agenda separada nesta versão | Proprietário; decisão explícita em 2026-11-05 | APROVADA a direção; vínculos estáveis e evolução aditiva no modelo. Implementação/ensaios ainda não realizados; retenção institucional continua DEC-03 | WEB-005/006/007/013 | APROVADA |
+| DEC-02 | Final-only rejeitado; persistência incremental com recibo/idempotência e preservação de incompletas/ inválidas, sem retomada; nova sessão com prática | Proprietário + metodológico; diretriz explícita em 2026-11-05 | ADR-005, contrato e matriz de invalidação disponíveis; responsável exige validação definitiva antes de código/schema. Aceitar ou ajustar estratégia/janela de perda e critérios; depois executar ensaios técnicos/temporais, sem inferir aprovação do desenho | WEB-005/006/007/011/012/015 | DIRETRIZ APROVADA; ESTRATÉGIA EM VALIDAÇÃO |
 | DEC-03 | Regras institucionais de informação, consentimento aplicável, retenção e incidentes | Proprietário/instituição | Documento aprovado e responsabilidades/canal definidos; nenhuma base legal inventada pelo Codex | WEB-033/036 | PENDENTE |
 | DEC-04 | Matriz de hardware/SO/browser e validação física/metodológica necessária | Responsável metodológico | Plano e recursos aprovados, manter D1/D5 e limites W16; alterações de suporte/gate justificadas e aprovadas | WEB-011/012/034 | PENDENTE |
 | DEC-05 | Após prontidão M9, autorizar separadamente configuração research, deploy e eventual uso real | Proprietário + metodológico/operador | WEB-036 comprovada; registrar autorização específica antes de WEB-041 e, para produção/uso, de WEB-038/040; mudanças da candidata passam revalidação dos gates afetados; não retirar synthetic apenas por aprovação técnica | WEB-041/038/040 | PENDENTE |
@@ -906,6 +929,19 @@ não depende de reaprovação científica. Não há bloqueio documental remanesc
   invalidar aceites históricos. Impacta requisitos A–L, AGENTS/workflow e critérios
   de revalidação; nenhuma mudança em protocolo, fórmula, schema ou runtime.
   ADR-004 e auditoria fundamentam reutilização de React/FastAPI/jsPsych existentes.
+- CHG-002, 2026-11-05: resposta explícita do responsável aprova pseudônimos por
+  projeto com múltiplas visitas/avaliações, convite único/acesso/validade e evolução
+  longitudinal aditiva; sem cadastro central/agenda nesta versão. Rejeita RAM
+  final-only; requer checkpoints confirmados/idempotentes e preservação de dados
+  incompletos/ inválidos, sem retomada do principal. D2/D5, prática, métricas e CSV
+  preservados. ADR-005 é proposta posterior à resposta, a validar antes de código.
+  Impacta REQ-PAR-001/002, REQ-AVA-001/002/003, REQ-INT-001/002/003; modelo, HTTP,
+  arquitetura e protocolo alinhados. WEB-005 fecha desenho/aceite; WEB-006/007
+  passam a cobrir vínculos/schema aditivo e checkpoints; WEB-008 revalida paridade
+  e exclusão de parciais; WEB-011/012 medem transporte ativo; WEB-013/015 integram
+  vínculos, fila e mensagens; WEB-016/017 revalidam exclusão de inválidos nas
+  consultas. Ensaios adicionais no ADR-005, ainda PLANEJADOS. Nenhum novo aceite,
+  tarefa/denominador ou autorização de implementação/migration/produção inferidos.
 - Revisão futura: usar ID CHG novo com motivo, requisito alterado, componentes,
   testes a revisar, dependências afetadas e aprovação externa quando exigida.
   Não reabrir tarefa concluída sem regressão comprovada ou novo escopo registrado.
@@ -914,30 +950,32 @@ não depende de reaprovação científica. Não há bloqueio documental remanesc
 
 Marco autorizado atual: **M2**, pelo novo comando `continue o projeto` de
 2026-11-05. M1 permanece concluído (WEB-001 a WEB-004; EV-M1).
-WEB-005 teve comparação estática preparada em EV-M2-005 e está **BLOQUEADA**
-aguardando DEC-01 e DEC-02 do responsável, solicitadas nesta sessão.
-WEB-006/007/008 permanecem PENDENTES pela dependência; nenhum aceite novo.
+WEB-005 permanece **BLOQUEADA para aceite**: DEC-01 aprovada pelo responsável
+em 2026-11-05; DEC-02 tem diretriz aprovada e estratégia definitiva a validar.
+Proposta documental em EV-M2-005-R1 e ADR-005; WEB-006/007/008 PENDENTES.
+Nenhum código/schema alterado ou novo aceite; progresso preservado.
 
-Próxima ação: registrar as respostas sobre pseudônimo/visita/preparação por
-convite e RAM final-only/aborto sem retomada. Com decisões compatíveis, concluir
-WEB-005 e seguir WEB-006 dentro de M2; se ampliarem escopo, documentar impactos
-antes do trabalho dependente. Não avançar M3, integrar main ou publicar por inferência.
+Próxima ação: responsável validar ou ajustar ADR-005, contrato HTTP candidato e
+matriz de invalidação D2/D5, incluindo janela residual de perda. Essa validação
+prévia foi exigida explicitamente na mensagem de 2026-11-05. Depois fechar
+WEB-005 e executar o escopo replanejado de WEB-006 dentro de M2, com aprovação de
+schema na tarefa correspondente; não iniciar M3 nem produção por inferência.
 
-Git M2: branch `docs/m2-contratos-participacao`, baseada na entrega M1 `bcd896b`
-ainda não integrada à main; árvore limpa e branches locais/upstreams conferidos
-após `git fetch origin`. main/origin/main em `fe8f24f`; branch M1/origin em
-`bcd896b`. Commit deste registro identificável por
-`git log -1 --format=%H -- docs/REGISTRO_DE_ALTERACOES.md` nesta branch.
-Validação documental de 2026-11-05: procedimento Python do workflow aprovado
-(84 documentos, 488 links relativos, 3 âncoras; 42 tarefas, 36 requisitos,
-11 marcos, 10 riscos, 5 decisões e dependências sem ciclos); `git diff --check`
-aprovado. Escopo: somente backlog e registro de alterações. Consulta
-`gh run list --branch docs/m2-contratos-participacao` sem execuções; CI não
-executada, não equivale a aprovação. Primeiro envio previsto com upstream;
-resultado verificável por `git rev-parse HEAD`, `git rev-parse @{upstream}` e
-`git ls-remote --heads origin docs/m2-contratos-participacao` (SHAs devem coincidir).
-Falha de envio exige registrar a pendência; não criar PR/merge/deploy.
-Nenhuma suite funcional reexecutada; mudança exclusivamente documental.
+Git desta revisão: branch `docs/m2-contratos-participacao`, base `bc2f4b3`,
+upstream conferido após fetch; main/origin/main permanecem `fe8f24f`.
+Entrega anterior de preparação `bc2f4b3` já enviada. Commit desta entrega:
+`git log -1 --format=%H -- docs/arquitetura/ADR-005-persistencia-incremental.md`.
+Após commit, envio previsto ao upstream existente, com confirmação por
+`git rev-parse HEAD`, `git rev-parse @{upstream}` e `git ls-remote --heads origin
+docs/m2-contratos-participacao`; falha exige registrar pendência.
+Validação documental local em 2026-11-05: procedimento Python do workflow
+aprovado (85 documentos, 507 links relativos, 3 âncoras; 42 tarefas, 36
+requisitos/matriz, 11 marcos, 10 riscos, 5 decisões, sem ciclos);
+`git diff --check` aprovado. Escopo: nove arquivos Markdown.
+`gh run list --branch docs/m2-contratos-participacao --limit 5` retornou lista
+vazia: CI não executada na branch, sem aprovação inferida. Nenhuma suite
+funcional reexecutada; ensaios de implementação do ADR-005 são PLANEJADOS.
+Sem PR, merge, deploy, instalação ou acesso a dados reais.
 
 Checkout de desenvolvimento: `/home/raposo/Projetos/experimentos-psicopy/stroop-cognifit`.
 Worktree sintética M1 `/tmp/stroop-m1-baseline-20261104` preservada em HEAD

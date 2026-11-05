@@ -656,3 +656,102 @@ W07 ciclo e migrations aditivas; W08 recebimento atomico; W09–W13 cliente,
 motor e integracao; W14 consulta/exportacao profissional; W16 coleta evidencia
 temporal real. A aprovacao do contrato nao substitui os testes, o banco real
 ou os navegadores exigidos por essas etapas.
+
+
+## Revisão candidata — persistência incremental (2026-11-05)
+
+Esta seção especifica o alvo para DEC-02; **não descreve endpoints disponíveis**.
+As seções anteriores registram o contrato implementado final-only, rejeitado
+como política futura pelo responsável. Aprovação definitiva e validação prévia
+estão condicionadas ao [ADR-005](../arquitetura/ADR-005-persistencia-incremental.md).
+O modelo de vínculos está no [modelo canônico](../dados/MODELO_DE_DADOS.md).
+Não alterar prazos, cookies, OIDC, CSRF, grants ou escopo por projeto.
+
+### Convites e vínculos
+
+Preservar UUID único de convite, código secreto aleatório de pelo menos 256 bits,
+hash no servidor, exibição única, expiração absoluta de 24 h e resgate atômico de
+uso único. UUID identifica; código autoriza resgate, pseudônimo nunca autoriza.
+Emissão exige perfil importação/administração e vínculo ativo com projeto ativo;
+revogação bloqueia convite/sessão e preserva registros recebidos. Sessão de 30 min
+não é renovada pelos checkpoints. Manter rate limit, código somente no corpo,
+HTTPS, no-store e ausência de segredo em logs/URL. IDs de participante/visita
+são resolvidos no servidor na preparação, sem confiar em associações do cliente.
+Compatibilidade do corpo atual por rótulos deve ser preservada com resolução
+unívoca; UUIDs internos não mudam as 21 colunas do CSV.
+
+### Recepção incremental proposta
+
+- `POST /participant/session/checkpoints`: cookie participante + CSRF/Origin;
+  corpo fechado `{protocol_id,test_version,platform,app_version,frame_period_ms,
+  trials}`. `trials` contém de 1 a 16 registros completos com os mesmos campos,
+  tipos e unidades da conclusão atual; posições consecutivas em ordem crescente.
+  Não confiar em projeto/participante/sessão enviados no corpo. Limite 64 KiB.
+- Em running, o servidor aceita novo trecho somente se estende o prefixo
+  confirmado sem lacunas; sobreposição exige conteúdo canônico idêntico.
+  Conferir ordem/snapshot e continuidade temporal com o prefixo anterior.
+  Recebimento preservável não significa validade: falha temporal observável é
+  registrada e impede conclusão oficial. Corpo malformado/extra/inseguro: 422,
+  sem gravar o lote. Trecho fora da ordem: 409 `state_conflict`.
+- Transação bloqueia sessão, revalida acesso/prazo, grava lote e recibo, então
+  confirma commit. Resposta 200 fechada: `{session_id,confirmed_through,
+  prefix_hash,received_at}`; prefixo é contíguo, 0–16, hash SHA-256 calculado
+  pelo servidor pela canonização já definida, abrangendo proveniência e lista
+  ordenada de observações. `received_at` é UTC; não mede RT.
+- Idempotência por sessão/posição e hash canônico, com restrição única no banco.
+  Repetição idêntica não cria observação nova; retorna o prefixo confirmado
+  atual. Conteúdo diferente para posição já recebida: 409 `result_conflict`,
+  sem sobrescrever. Uma corrida divergente impede resultado válido até revisão;
+  não escolher silenciosamente a versão conveniente. Recibo só é sucesso após
+  commit durável conforme configuração PostgreSQL validada.
+- `GET /participant/session` acrescentará objeto fechado `checkpoint` com
+  `confirmed_through`, `prefix_hash`, `received_at` (hash/data nulos no prefixo 0).
+  Permite consultar recebimento após resposta perdida; não devolve tentativas
+  para reconstrução/retomada do principal. Credencial expirada/revogada não
+  consulta nem envia. Profissional autorizado pode conferir estado no projeto.
+- Checkpoint pode chegar após `abort`, antes do vencimento e sem revogação,
+  somente para preservar o prefixo já observado: nunca muda estado terminal,
+  nunca autoriza novo start/complete. Após completed, só replay idêntico de
+  observações existentes; qualquer acréscimo/divergência é 409. Expiração ou
+  revogação bloqueiam nova escrita; nada recebido é apagado por essa razão.
+
+### Conclusão, interrupção e concorrência
+
+`complete` conserva o corpo integral atual, suas validações e seu recibo oficial.
+Na mesma transação, confronta cada posição recebida, insere eventual sufixo
+faltante, valida integralidade/ordem/gates e materializa avaliação/métricas.
+Prefixo recebido pode sobreviver a rollback da conclusão; **nenhuma avaliação
+oficial parcial** sobrevive. Divergência não sobrescreve observações. Complete
+é permitido só em running válida, dentro do prazo, sem marca de interrupção,
+com confirmação local de encerramento de todas as tentativas. Retry de envio
+após término íntegro é transporte, não nova execução experimental.
+
+`abort`, checkpoint e complete serializam pelo mesmo bloqueio de sessão.
+Interrupção conhecida antes do encerramento principal proíbe o cliente de
+solicitar complete; abort vencedor impede complete. Complete já confirmado
+não é apagado por aviso tardio: evidência posterior de violação exige registro
+de invalidação auditável e exclusão dos resultados válidos, preservando linhas e
+recibo históricos. O contrato candidato prevê
+`POST /participant/session/invalidate`, corpo fechado `{reason,event_at_ms}`:
+razão enumerada D2/D5, tempo monotônico finito do evento (nulo quando não
+observável), mesma credencial/CSRF/Origin e prazo. É idempotente por sessão,
+retorna 200 `{session_id,valid_for_result:false}` após commit, inclusive se
+complete já venceu; preserva recibo e observações. Não reabre sessão nem aceita
+novo resultado. Evento posterior ao término íntegro não invalida o bloco.
+Após vencimento/revogação, canal participante permanece bloqueado; revisão
+profissional vinculada ao projeto registra invalidação auditável por operação
+`POST /projects/{project_id}/sessions/{session_id}/invalidate`, mesmo corpo,
+perfil importação/administração e CSRF. Consultas profissionais de resultado
+acrescentam `valid_for_result` e motivo, omitem inválidos por padrão de listas,
+resumos e exportações oficiais; acesso direto autorizado ao histórico mostra a
+marca sem resultado utilizável. Invalidação não é reversível pela API. Nenhum
+resultado pode continuar válido apenas porque a corrida favoreceu complete. Servidor não consegue provar que o
+cliente notificou todos os eventos. Falta de aviso não autoriza conclusão por
+quantidade de checkpoints ou tempo decorrido.
+
+Sessão sem conclusão válida ao fim do prazo é incompleta; expiração lógica deve
+ser respeitada imediatamente nas leituras e escritas, mesmo antes de uma rotina
+idempotente materializar o estado. Conservar motivo observado; sem aviso,
+registrar causa desconhecida. Não criar resultado automaticamente com prefixo 16.
+Nova execução exige novo convite/sessão e prática; mesma visita pode ser usada
+sem misturar observações de sessões diferentes.

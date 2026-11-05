@@ -211,3 +211,67 @@ Metadados técnicos WEB distinguem unidade bruta ms e RT canônico s; versão lo
 Resultados históricos não são associados a projeto por rótulo coincidente;
 [ADR-003](../arquitetura/ADR-003-escopo-legado-web.md) exige mapa explícito.
 Nenhuma coleta, importação, migration ou grant foi executado nesta revisão.
+
+
+## Participação por projeto — decisão de 2026-11-05
+
+Modelo de produto aprovado pelo responsável (DEC-01); desenho lógico alvo,
+sem DDL executado. O esquema atual ainda conserva pseudônimo/visita como rótulos.
+
+- Participante de projeto tem UUID técnico estável e pseudônimo único **dentro
+  do projeto**, sem cadastro central de pessoa. Mesmo pseudônimo em projetos
+  distintos não cria vínculo. Preservar a sensibilidade a maiúsculas dos rótulos
+  atuais; não fundir códigos por normalização implícita.
+- Visita tem UUID estável, pertence a um único participante/projeto e conserva
+  rótulo único nesse participante. Um participante admite várias visitas;
+  uma visita admite vários convites, sessões e avaliações, inclusive do mesmo
+  instrumento. Não impor unicidade de resultado por participante/visita/teste.
+- Convite tem UUID próprio, referencia projeto/participante/visita e instrumento/
+  versão preparados. Cada emissão reserva uma sessão distinta; reemissão não
+  reabre nem substitui a anterior. Avaliação oficial referencia a sessão única
+  que a originou. Chaves estrangeiras compostas ou restrições equivalentes
+  devem impedir vínculo cruzado entre projetos/participantes/visitas, inclusive
+  por escrita direta com o papel de runtime.
+- Identificadores técnicos e vínculos são imutáveis após emissão; correção de
+  preparação exige novo convite, preservando o anterior. Concorrência na criação
+  do mesmo pseudônimo/visita deve resolver para a mesma entidade, sem duplicação.
+- Futuro cadastro longitudinal poderá acrescentar entidade e associação explícita
+  aos participantes de projeto, com governança própria. Os UUIDs de visitas,
+  sessões e avaliações permanecem. Não reservar identificador pessoal global,
+  inferir correspondência ou coletar dados nominais nesta versão.
+
+A futura alteração é aditiva, com mapeamento auditável das sessões WEB existentes;
+sem apropriar legado por texto coincidente. Migrations existentes são imutáveis.
+Retenção e eventual eliminação seguem decisão institucional DEC-03; preservação
+operacional dos parciais não significa retenção ilimitada.
+
+## Observações incrementais — desenho candidato de 2026-11-05
+
+Separar armazenamento de observações de execução das tabelas de resultados
+oficiais. A sessão existe antes da primeira tentativa e permanece identificável
+mesmo com zero observações. Cada observação principal pertence à sessão e à
+posição 1–16 na ordem fixada; unicidade por sessão/posição, conteúdo imutável,
+hash canônico e horário de recebimento no servidor. Proveniência inclui snapshot,
+versões e relógio monotônico original, sem inventar campos ausentes.
+
+Recibos e prefixo confirmado são persistidos na mesma transação das observações.
+Estado de transporte (pendente/confirmado) é distinto da validade experimental.
+Sessões não concluídas conservam observações recebidas, motivo conhecido,
+origem do motivo (motor, servidor ou expiração), último recebimento e quantidade
+confirmada. Ausência de aviso é incompletude de causa desconhecida, não prova de
+blur, fechamento ou violação temporal específica. Sessão inválida pode também
+estar incompleta; registrar ambos sem transformar isso em avaliação oficial.
+
+Somente conclusão integral validada materializa `assessments`, tentativas e
+métricas oficiais na transação existente adaptada. Dados parciais/ inválidos não
+entram nas listagens, agregações, métricas ou CSV oficiais. Inspeção de parciais
+exige canal profissional separado e autorização pelo mesmo projeto; sem nova
+exportação de pesquisa implícita. Prática continua fora dos registros principais
+e resultados oficiais. Payloads inseguros ou fora do schema são recusados; dados
+estruturalmente válidos com falha metodológica podem ser preservados como
+observações inválidas, sem aprovação para resultado.
+
+Sem tabelas ou estados físicos novos definidos por inferência: o contrato de
+transporte candidato está no [contrato HTTP](../desenvolvimento/CONTRATO_API_WEB.md),
+a estratégia no [ADR-005](../arquitetura/ADR-005-persistencia-incremental.md),
+e critérios de validade no [protocolo](../experimento/PROTOCOLO_WEB.md).

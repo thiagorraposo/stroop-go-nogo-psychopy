@@ -81,10 +81,13 @@ reenvio. Nenhum resultado oficial parcial ou CSV parcial.
 Interrupção do principal invalida execução e exige nova sessão/prática conforme
 D2 já aprovado. Queda de rede após tarefa pode ser recuperada enquanto RAM/sessão
 válidas; reload não recupera dados intermediários. Não persistir cookies,
-credenciais, resultados ou convites em localStorage/IndexedDB/URL. Proposta de
-checkpoint incremental fica em DEC-02; exige avaliar privacidade, validade,
-ordem, custo de IO e nova semântica, sem enfraquecer D2. Não há autorização
-implícita para retomada de principal interrompido.
+credenciais, resultados ou convites em localStorage/IndexedDB/URL. O responsável rejeitou final-only em
+2026-11-05. O
+[ADR-005](arquitetura/ADR-005-persistencia-incremental.md) propõe checkpoints
+por worker e preservação no servidor; estratégia definitiva e critérios de
+invalidação precisam validação antes de código/schema. O parágrafo “Atual”
+descreve a implementação existente, não o alvo aprovado. Não retomar principal
+interrompido; parcial recebido não se torna resultado oficial.
 
 Relógio civil UTC identifica eventos no servidor; relógio monotônico identifica
 intervalos locais. Conferência server-side de coerência não prova onset físico.
@@ -141,7 +144,10 @@ Entidades existentes, sem plano de recriação:
 - Compatibilidade: mapa explícito web_legacy_project_links, auditoria de importações.
 
 Nomes completos/DDL são os das migrations 0001–0010, não uma proposta de schema.
-Modelo de participante longitudinal é pendente (DEC-01). Não há migração automática
+DEC-01 aprovou participante por projeto, visitas e múltiplas avaliações por
+convite; entidades e evolução aditiva futura estão no
+[modelo](dados/MODELO_DE_DADOS.md). Não há cadastro longitudinal central nesta versão.
+Não há migração automática
 de dados históricos por coincidência textual. Migrations são imutáveis/aditivas,
 executadas separadamente por owner/migrador; runtime writer/reader restritos.
 Contrato de retorno de ausência de RT distingue sentinela persistida e null/traço

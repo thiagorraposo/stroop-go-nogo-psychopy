@@ -148,3 +148,22 @@ respectivas etapas; o formulario e os dados locais existentes sao preservados.
 - Validação física/matriz e eventual estudo de equivalência dependem de DEC-04;
   não inventar limiar ou equivalência. Política institucional e liberação de
   coleta real dependem de DEC-03/05, sem supor consentimento ou autorização ética.
+
+
+## Decisão do responsável em 2026-11-05 — participação e preservação
+
+Aprovados pseudônimos por projeto, múltiplas visitas/avaliações com vínculos
+consistentes e preparação por convite único, com acesso/validade controlados;
+sem cadastro longitudinal central nem módulo de agendamento nesta versão.
+Preservar evolução longitudinal aditiva. Entidades no
+[modelo canônico](../dados/MODELO_DE_DADOS.md).
+
+Rejeitado armazenamento exclusivamente em RAM até envio final. Requerida
+persistência incremental segura, confirmação de recebimento, idempotência e
+preservação de sessões incompletas/ inválidas. Reafirmada D2: interrupção que
+comprometa protocolo exige nova sessão com prática, sem retomar principal.
+A estratégia definitiva e critérios metodológicos devem ser documentados e
+validados **antes da implementação**, por exigência expressa do responsável.
+A proposta é [ADR-005](../arquitetura/ADR-005-persistencia-incremental.md), com
+matriz no [protocolo](PROTOCOLO_WEB.md). A observação de RAM final-only na auditoria
+acima descreve código histórico, não aprovação atual desse comportamento.

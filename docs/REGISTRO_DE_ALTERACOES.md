@@ -4,6 +4,20 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-05 — Decisões de participação e proposta incremental
+
+- Registrada aprovação explícita do responsável para participantes por projeto,
+  múltiplas visitas/avaliações, convites únicos com controle de acesso/validade
+  e evolução longitudinal aditiva, sem cadastro central ou agenda separada.
+- Registrada rejeição de RAM final-only e exigência de persistência incremental,
+  recibos, idempotência e preservação de sessões incompletas/ inválidas; D2 mantém
+  nova sessão com prática e proíbe retomar bloco interrompido.
+- Elaborado ADR-005 com worker, riscos residuais e ensaios planejados; modelo,
+  contrato HTTP candidato e matriz metodológica alinhados. Validação definitiva
+  anterior ao código exigida pelo responsável; proposta não foi aprovada por
+  antecipação. Impactos rastreados em CHG-002, somente no backlog.
+- Nenhuma alteração de runtime, migration, métrica, CSV, dependência ou produção.
+
 ## 2026-11-05 — Comparação dos contratos de participação e perda
 
 - Comparados contrato HTTP, modelo lógico e implementação de convite, sessão,

@@ -218,3 +218,30 @@ O nome de arquivo segue codigo do teste e timestamp, sem identificadores
 pessoais. Exportacao web, acesso e minimizacao seguem as decisoes aprovadas e
 dependem dos contratos e controles de W02/W03; a correcao documental nao altera
 o CSV oficial nem autoriza nova coleta real.
+
+
+## Esclarecimento D2 e critérios para persistência incremental — 2026-11-05
+
+O responsável reafirmou: interrupção que comprometa o protocolo invalida a
+execução para resultado final e exige nova sessão com prática aprovada; é
+proibida retomada do bloco interrompido. Dados já recebidos devem ser preservados
+como incompletos/ inválidos. “Sem resultado parcial” em D2 significa sem métricas
+ou exportação **oficiais**, e não descarte obrigatório de observações técnicas.
+A aprovação histórica D2 permanece; envio final-only não é mais política aceita.
+
+Matriz proposta para validação explícita antes de implementar DEC-02:
+
+| Evento | Validade e ação |
+|---|---|
+| Blur, aba oculta/trocada, Escape, recarga ou fechamento durante principal | Invalidar sessão; conservar prefixo recebido; não retomar; novo convite/sessão e prática |
+| Transição ou duração fora dos gates D5; relógio/ordem incompatível | Invalidar execução, preservar observações seguras e motivo; não corrigir timestamps; nova sessão com prática |
+| Interrupção durante prática | Descartar rodada para desempenho e repetir rodada completa conforme D2/D3; não iniciar principal sem prática completa. Recarregar não autoriza reaproveitar treino sem comprovação |
+| Rede/ACK indisponível, sem falha D2/D5 | Somente transporte pendente; não pausar/alongar principal. Após término íntegro pode reenviar os mesmos dados dentro do prazo; não executar tentativas novamente na sessão |
+| Prazo ou revogação antes da conclusão válida | Sessão sem resultado final, dados recebidos preservados; expiração não prova causa metodológica específica; novo convite/sessão com prática |
+| Sessão abandonada sem aviso | Incompleta por ausência de conclusão; motivo desconhecido. Mesmo 16 observações não bastam para declarar sucesso |
+| Violação anterior ao fim conhecida após recibo | Preservar dados/recibo histórico e registrar invalidação auditável, excluindo resultado dos conjuntos válidos; não transformar corrida de rede em validade |
+
+Checkpoint não altera duração, estímulos, HUD, prática, métricas ou CSV.
+[ADR-005](../arquitetura/ADR-005-persistencia-incremental.md) define a estratégia
+candidata e seus limites; aprovação da diretriz pelo responsável não equivale
+à validação definitiva dessa matriz nem aos ensaios de timing com transporte.
