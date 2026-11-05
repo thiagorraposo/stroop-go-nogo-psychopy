@@ -194,7 +194,11 @@ iniciar as Etapas 11 e 12 nem limita o workflow WEB continuo acima.
   somente arquivos/hunks da tarefa; preserve alteracoes alheias fora dos commits.
 - Execute os checks pertinentes, publique a branch e abra PR com problema,
   comportamento e validacao objetivos. Corrija falhas antes de integrar.
-  Aguarde CI/checks obrigatorios e revisoes exigidas; prefira squash merge.
+  Aguarde CI/checks obrigatorios e revisoes exigidas; integre o PR por Merge
+  Commit tradicional (`gh pr merge --merge`), preservando os commits originais.
+  Nunca use Squash Merge, Rebase Merge, push direto em main ou bypass.
+  Se auto-merge estiver habilitado, pode usar `gh pr merge --merge --auto`;
+  se indisponivel, aguarde os checks e efetue o merge normal permitido.
 - Apos merge permitido, atualize `main` por fast-forward e remova branches
   temporarias integradas. Nao remova trabalho local nao integrado ou alteracoes
   preexistentes; registre qualquer impedimento real.

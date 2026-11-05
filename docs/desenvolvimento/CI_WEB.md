@@ -10,13 +10,47 @@ no repositorio remoto para bloquear merge; essa configuracao externa nao e
 criada pelo arquivo de workflow.
 
 Contribuicoes seguem [GitHub Flow](../../CONTRIBUTING.md). O agente aguarda CI
-e regras/revisoes exigidas antes de squash merge; nao usa bypass administrativo.
+e regras/revisoes exigidas antes de Merge Commit tradicional por PR; nao usa
+bypass administrativo, Squash Merge, Rebase Merge ou push direto em main.
 O resultado integrado e verificado novamente por push em `main`.
-Em2026-11-04, protecao remota configurada: `verify` do app GitHub Actions,
+Registro historico de 2026-11-04 (historico linear substituido abaixo): `verify` do app GitHub Actions,
 branch atualizada, PR obrigatorio, historico linear e conversas resolvidas,
 inclusive para administradores. Nao se adicionou aprovador externo obrigatorio;
 revisoes existentes continuam respeitadas. Force push/exclusao de main bloqueados;
 branches temporarias sao removidas automaticamente depois do merge permitido.
+
+## Metodo de merge e protecoes — 2026-11-05
+
+Auditoria via API autenticada com permissao administrativa: Merge Commit ja
+habilitado, Squash e Rebase habilitados, historico linear obrigatorio. Alterados
+somente `allow_squash_merge` para false e `required_linear_history` para false;
+Merge Commit permanece habilitado. Rebase permanece habilitado na configuracao
+do repositorio, mas o workflow do Codex usa exclusivamente Merge Commit.
+
+A reconsulta confirmou PR obrigatorio, `verify` do GitHub Actions (app 15368),
+branch atualizada (`strict`), descarte de revisoes obsoletas, conversas resolvidas
+e aplicacao das regras a administradores. Quantidade de aprovacoes exigidas
+continua zero; code owners e ultima aprovacao por outro autor continuam como
+antes. Force push e exclusao de main continuam bloqueados; assinaturas continuam
+sem exigencia. Nenhum ruleset de repositorio ou herdado foi encontrado, nem regra
+adicional efetiva; proprietario e conta pessoal. Auto-merge continua desabilitado:
+aguardar checks e usar `gh pr merge --merge`, sem alterar essa configuracao.
+Workflows, permissoes de usuarios e demais configuracoes foram preservados.
+
+Exportacao original, alvo, resultado verificado e rollback estao no diretorio
+local `/home/raposo/.local/state/stroop-merge-commit/20261105T172953Z`, fora do Git.
+Regra afetada: protecao classica de `main`, endpoint
+`repos/thiagorraposo/stroop-go-nogo-psychopy/branches/main/protection`; sem ruleset
+para alterar. Para rollback, reconsultar a API e comparar alteracoes concorrentes;
+restaurar os dois valores originais conforme `ROLLBACK.txt`, usando os payloads
+`rollback-repository.json` (PATCH do repositorio) e `rollback-protection.json`
+(PUT da protecao). Nao restaurar cegamente sobre mudancas posteriores. Nenhum
+historico de commit e alterado pelo rollback de configuracao.
+
+Validacao da configuracao feita por API e comparacao integral da protecao:
+a unica diferenca foi historico linear. Metodos de merge e configuracoes nao
+relacionadas conferidos separadamente. Isso nao equivale a CI aprovada nem a
+ensaio de merge: resultados de Actions devem ser consultados por SHA no PR.
 
 ## Ambiente e isolamento
 
