@@ -1,8 +1,9 @@
 # Contribuição e GitHub Flow adaptado
 
 Leia [AGENTS](AGENTS.md), [workflow](docs/WORKFLOW_CODEX_CLI.md) e a tarefa do
-[backlog único](docs/Projeto%20Stroop%20Test.md). A missão documental atual não
-autoriza implementação funcional nem produção.
+[backlog único](docs/Projeto%20Stroop%20Test.md). A missão documental original M0 não
+autorizava implementação funcional; o marco e a autorização vigentes devem ser
+consultados no backlog. Produção sempre exige autorização específica.
 
 Use main estável e branch coesa docs/feat/fix/refactor/test/chore por entrega ou
 marco. Antes, confira status/branch/remotos/HEAD/upstream, preserve alterações
@@ -20,6 +21,11 @@ impedimento. Não versionar secrets, dados reais, SQLite, exports, logs ou backu
 existentes. Se main exigir PR, não contornar nem reduzir proteção; o proprietário
 definirá procedimento de integração. Sem force push, exclusão remota ou bypass.
 Deploy, tags, alterações destrutivas e dados reais exigem autorização específica.
+Quando autorizada a integração por PR, usar **Merge Commit tradicional**,
+preservando os commits originais; sem Squash Merge em novas integrações. A
+preferência não autoriza criar PR/merge automaticamente ou alterar proteções.
+Configuração remota conferida em 2026-11-05: Merge Commit habilitado, Squash Merge
+desabilitado; Rebase Merge habilitado não substitui a preferência do proprietário.
 
 CI existente em [.github/workflows/web.yml](.github/workflows/web.yml) executa
 verify em PR, push main e disparo manual; push de branch normalmente não dispara.

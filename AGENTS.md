@@ -51,6 +51,10 @@ principal integra e confere aceite. Não paralelizar edições conflitantes.
   [protocolo](docs/experimento/PROTOCOLO_WEB.md); campos/fórmulas:
   [modelo](docs/dados/MODELO_DE_DADOS.md); payloads:
   [contrato HTTP](docs/desenvolvimento/CONTRATO_API_WEB.md). Não duplicar contratos.
+- CHG-003 integra UX ao backlog, sem fluxo paralelo. Remover precisão da UI não
+  remove cálculos científicos. Apresentação revisada depende de aprovação frente
+  a D3/D4; campanha DEC-04 usa layout final e transporte ativo. Consultar fichas
+  WEB-042/043/044 antes de alterar o motor.
 - Não alterar paradigma, tempos, estímulos, regras, métricas, CSV ou validade
   científica sem decisão documentada do responsável. Versão local e WEB distintas.
   Medição do browser/gates não provam latência física ou equivalência psicométrica.
@@ -86,7 +90,9 @@ Reutilizar branch adequada. Não descartar trabalho para obter árvore limpa.
 Commits e pushes autônomos autorizados após unidade coerente validada, Conventional
 Commits em português, staging só de arquivos/hunks da tarefa. Primeiro push com
 upstream; sem push direto em main, force push, bypass ou exclusão remota.
-**Não criar PR automaticamente e não executar merge automático.** Integração à
+**Não criar PR automaticamente e não executar merge automático.** Quando a
+integração for autorizada, usar Merge Commit tradicional preservando commits;
+sem Squash Merge em novas integrações, conforme preferência do proprietário. Integração à
 main exige autorização específica e proteções/revisões vigentes; não alterá-las.
 Se houver bloqueio de envio, preservar commits, registrar causa e pendência.
 

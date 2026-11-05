@@ -94,7 +94,9 @@ pode ser preservada com justificativa, sem descartar commits para partir de main
 Depois de validar unidade coerente: diff --check, revisar diff/status, adicionar
 somente tarefa, commit Conventional Commits em português e push com upstream.
 Push falhou: investigar sem sobrescrever histórico, registrar causa/pendência;
-não força, não altera proteção. PR e merge não são automáticos. main não recebe
+não força, não altera proteção. PR e merge não são automáticos. Quando autorizada a integração, usar Merge Commit
+tradicional, preservando commits originais, sem Squash Merge; não alterar
+proteções/configurações remotas. main não recebe
 push direto. Deploy, integração, tags, dados reais e operações destrutivas têm
 aprovação específica e não decorrem de commit/push.
 
@@ -119,88 +121,56 @@ identificar intenção e mapear tarefa WEB/marco vigente com escopo explícito.
 Na ausência de mapeamento seguro, informar referência histórica e pedir apenas a
 clarificação indispensável. Nunca retomar antigas ações W22/VPS por um alias.
 
-## Verificação documental reproduzível de M0
+## Verificação documental reproduzível
 
-Executado na raiz com python3, sem instalar dependências. O bloco abaixo verifica
-links locais/âncoras Markdown, IDs/estados/campos, matriz, ciclos técnicos e escopo
-somente documental. É procedimento de validação, não utilitário do produto.
-Os tamanhos esperados descrevem o catálogo inicial de M0, não progresso; futuras
-mudanças de catálogo exigem atualizar asserções com CHG rastreada. Não comprova
-correção científica nem detecta sozinho ciclos semânticos de decisões externas;
-esses receberam revisão independente. Para implementação, não aplicar a asserção
-de escopo exclusivamente Markdown. Também executar `git diff --check`.
+Executar na raiz, com Python padrão e sem instalar dependências:
 
 ```bash
-python3 - <<'PY'
-from pathlib import Path
-import re, subprocess, unicodedata
-from urllib.parse import unquote, urlsplit
-root=Path.cwd()
-files=[root/p for p in subprocess.check_output(['git','ls-files','--cached','--others','--exclude-standard'],text=True).splitlines() if p.endswith('.md')]
-errors=[];links=0;anchors=0
-for p in files:
- s=re.sub(r'^```.*?^```[^\n]*','',p.read_text(),flags=re.M|re.S)
- # Existing docs may use inline code for sample placeholders; real Markdown links still parsed.
- for m in re.finditer(r'\]\(([^)]+)\)',s):
-  target=m[1].strip().strip('<>')
-  if target.startswith(('http:','https:','mailto:','plugin:','app:')):continue
-  url=urlsplit(target); path=unquote(url.path); frag=unquote(url.fragment)
-  q=(p.parent/path).resolve() if path else p
-  links+=1
-  if not q.exists():errors.append(f'{p.relative_to(root)}: missing {target}');continue
-  if frag and q.is_file() and q.suffix=='.md':
-   anchors+=1
-   headings=[];counts={}
-   for line in q.read_text().splitlines():
-    if re.match(r'^#{1,6} ',line):
-     h=re.sub(r'^#{1,6} ','',line).strip().lower()
-     h=re.sub(r'<[^>]+>','',h)
-     h=''.join(c for c in h if c.isalnum() or c in ' _-')
-     h=h.replace(' ','-'); n=counts.get(h,0);counts[h]=n+1;headings.append(h+(f'-{n}' if n else ''))
-   explicit=re.findall(r'(?:id|name)=["\']([^"\']+)',q.read_text())
-   if frag not in headings+explicit:errors.append(f'{p.relative_to(root)}: missing anchor {target}')
-print(f'Markdown: {len(files)} files; {links} relative links; {anchors} anchors; {len(errors)} errors')
-for e in errors:print(e)
-b=(root/'docs/Projeto Stroop Test.md').read_text();r=(root/'docs/REQUISITOS_E_RASTREABILIDADE.md').read_text()
-parts=re.split(r'^### (WEB-\d{3}) — ',b,flags=re.M);tasks={parts[i]:parts[i+1] for i in range(1,len(parts),2)}
-ids=re.findall(r'^### (WEB-\d{3}) — ',b,re.M)
-reqs=re.findall(r'^### (REQ-[A-Z]+-\d{3})$',r,re.M)
-assert len(ids)==len(set(ids))==42,(len(ids),len(set(ids)))
-assert len(reqs)==len(set(reqs))==36
-assert set(ids)=={f'WEB-{i:03}' for i in range(42)}
-allowed={'PENDENTE','PRONTA','EM_ANDAMENTO','BLOQUEADA','EM_VALIDACAO','CONCLUIDA'}
-graph={}
-for tid,card in tasks.items():
- dep=re.search(r'^- Dependências: (.+)',card,re.M).group(1)
- refs=re.findall(r'WEB-\d{3}',dep);graph[tid]=refs
- for v in refs:assert v in tasks,(tid,v)
- for field in ['Marco:','Prioridade:','Estado:','Dependências:','Responsável:','Critérios:','Evidências:','Riscos/bloqueios:','Referências:']:
-  # Task acceptance uses Critérios de aceite, WEB-000 uses Critérios.
-  if field=='Critérios:':assert ('Critérios:' in card or 'Critérios de aceite:' in card),tid
-  else:assert field in card,(tid,field)
- state=re.search(r'Estado: ([A-Z_]+)',card).group(1);assert state in allowed,(tid,state)
-visited=set();active=set()
-def visit(t):
- assert t not in active,('cycle',t)
- if t in visited:return
- active.add(t)
- for v in graph[t]:visit(v)
- active.remove(t);visited.add(t)
-for t in tasks:visit(t)
-traces=re.findall(r'^\| (REQ-[A-Z]+-\d{3}) \| ([^|]+) \| (M\d+) \| (WEB-\d{3}) \|',r,re.M)
-assert len(traces)==len(reqs)
-assert set(t[0] for t in traces)==set(reqs)
-for req,adr,marco,task in traces:
- assert task in tasks,(req,task)
- assert re.search(r'Marco: '+marco+r'\.',tasks[task]),(req,marco,task)
-for ref in set(re.findall(r'WEB-\d{3}',r)):assert ref in tasks,ref
-for i in range(11):assert re.search(r'^## M'+str(i)+r' — ',b,re.M)
-assert len(re.findall(r'^\| R\d\d \|',b,re.M))==10
-assert len(re.findall(r'^\| DEC-\d\d \|',b,re.M))==5
-print('Structure: 11 milestones; 42 unique tasks; 36 requirements/trace rows; 10 risks; 5 decisions; acyclic task dependencies')
-changed=subprocess.check_output(['git','diff','--name-only','HEAD'],text=True).splitlines()+subprocess.check_output(['git','ls-files','--others','--exclude-standard'],text=True).splitlines()
-assert all(p.endswith('.md') for p in changed),changed
-print(f'Scope: {len(changed)} changed/new files, all Markdown; no functional/config/schema change')
-if errors:raise SystemExit(1)
-PY
+python3 scripts/verify_web_docs.py
+python3 -m unittest tests.test_verify_web_docs -v
+git diff --check
 ```
+
+O [validador](../scripts/verify_web_docs.py) substitui o bloco inline inicial de
+M0 que fixava 42 tarefas/36 requisitos/10 riscos/5 decisões/11 marcos. Contagens
+agora derivam das fichas/tabelas canônicas; IDs existentes em HEAD não podem
+sumir. Expansão exige CHG com motivo e atualização do denominador. Valida IDs
+únicos/sequenciais, estados/campos, referências existentes, grafo acíclico,
+matriz requisito→tarefa/marco, links/âncoras e painel/progresso contra fichas.
+Não lê dados identificáveis nem considera dados/artefatos ignorados como fixtures.
+A inspeção de escopo Git continua obrigatória: somente Markdown era uma restrição
+da missão original M0, não uma regra para futuras missões com código autorizado.
+Asserções relevantes não devem ser removidas para permitir expansão passar.
+
+Isso não comprova critério funcional ou científico, ciclos semânticos externos,
+qualidade visual ou aprovação de DEC-04. Revisar critérios, testes e evidência/SHA.
+Os números históricos de M0 ficam preservados no backlog.
+
+## Integração UX no fluxo vigente — CHG-003
+
+Nenhum comando novo, marco de redesign ou segundo backlog. Consultar as fichas
+WEB-042/043/044, REQ-UX-001…011 e [UX](experimento/UX_DECISIONS.md).
+
+- `mostrar status`: incluir novas dependências e impedimentos; requisito
+  documentado não significa barra de precisão removida. Consultar runtime e
+  evidências atuais; não reinterpretar os aceites anteriores como teste do visual
+  novo. Não confundir progresso do backlog com indicador de tentativas.
+- `continue o projeto`: somente tarefas do marco autorizado com dependências,
+  critérios/testes e decisões satisfeitos. Priorizar risco científico. CHG-003
+  não aprova D3 revisado, identificação D4 ou matriz DEC-04. Escolhas A puramente
+  visuais só são independentes quando não burlam aprovação B/C da apresentação.
+  Executar prontas de M3, sem antecipar instruções/fluxo M4 ou dashboard M5.
+  WEB-011 deve usar layout final aprovado/testado e transporte DEC-02 ativo;
+  não aceitar campanha exclusivamente do visual antigo ou reduzir gates D5.
+- `validar marco atual`: conferir funcionalidade, screenshots das dez cores,
+  ausência real de caixa/precisão agregada em prática/principal (DOM e árvore
+  acessível), feedback individual da prática e cálculos/persistência preservados,
+  cronômetro monotônico/progresso real, timing, integridade documental e SHA.
+  Vitest/typecheck/build e Playwright/Python conforme fichas, incluindo integração
+  real nos marcos próprios. CSS/screenshot não prova validade experimental.
+- `replanejar`: registrar próximas solicitações em CHG sequencial, preservar
+  fonte única, IDs/aceites/evidências e recalcular entregáveis aceitos/vigentes.
+
+A direção de UX remove informação agregada potencialmente distrativa; não é
+promessa de melhoria científica. Implementação, teste, aceite e decisão metodológica
+são evidências distintas. Não encerrar M3 sem WEB-011/012 e demais gates.

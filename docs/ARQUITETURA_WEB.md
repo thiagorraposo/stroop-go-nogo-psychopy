@@ -196,3 +196,22 @@ Rollback usa imagem anterior compatível com schema aditivo e revalidação de
 consulta/exportação; não executar down migration destrutiva. Restauração ocorre
 primeiro em ambiente isolado, com chave separada e ensaio de RPO/RTO; não afirmar
 recuperabilidade só porque um arquivo de backup existe.
+
+## Apresentação experimental — integração de CHG-003
+
+Alvo de UX em [UX_DECISIONS](experimento/UX_DECISIONS.md), contratos preservados
+em D1–D6; aprovação e execução somente no backlog. `main-engine.ts` e
+`practice-engine.ts` continuam donos do DOM/HUD e do relógio monotônico, sob
+plugins `main.ts`/`practice.ts`; `ExperimentHost` apenas monta/limpa. Contorno por
+token visual uniforme, preenchimento do snapshot e centro do estímulo preservados.
+HUD futuro expõe somente progresso/tempo/etapa quando aprovados; nenhum nó ou
+conteúdo acessível de precisão agregada. Não levar cronômetro ou quadros ao React.
+
+A retirada da precisão é de apresentação: domínio Python, resumo técnico em RAM,
+persistência, API, exportação e gráficos administrativos mantêm métricas oficiais.
+Contadores locais que servem ao feedback individual da prática não devem ser
+eliminados com o componente. Não há HUD React compartilhado com o dashboard;
+evitar refatoração ampla para unificá-los. Componentes/tokens compartilhados de
+UI são revalidados em M5 somente onde reutilizados. M4 integra instruções e
+estados de envio/recibo com ADR-005. M9 valida protocolo visual e limitações;
+CHG-003 não altera fronteiras, schema, transporte, segurança ou libera produção.

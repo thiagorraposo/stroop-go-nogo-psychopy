@@ -246,3 +246,25 @@ Checkpoint não altera duração, estímulos, HUD, prática, métricas ou CSV.
 [ADR-005](../arquitetura/ADR-005-persistencia-incremental.md) define a estratégia
 validada e seus limites. A validação documental dessa matriz e da estratégia
 não comprova ensaios de timing com transporte nem prontidão para coleta real.
+
+## CHG-003 — apresentação WEB proposta, sem alteração de D1–D6
+
+Solicitação de 2026-11-05: palavras sem retângulo branco e com contorno branco,
+HUD discreto de progresso/tempo e retirada completa de precisão agregada durante
+prática/principal, mantendo feedback individual da prática e cálculos oficiais.
+Direção detalhada em [UX_DECISIONS](UX_DECISIONS.md); execução e aprovação no
+[backlog único](../Projeto%20Stroop%20Test.md).
+
+**Divergência explícita:** D3 aprovado exige HUD atual com precisão ao vivo.
+A solicitação autoriza direção UX, mas não alteração silenciosa de D3. Antes do
+runtime, o responsável metodológico deve aprovar a apresentação revisada,
+visibilidade de progresso/cronômetro, escopo do feedback e identificação/versionamento
+da variante frente a D4, sem misturar evidências anteriores e posteriores.
+Até isso ocorrer, os contratos e o código anteriores continuam vigentes.
+DEC-04 segue pendente para matriz/equipamento/campanha; não é aprovada por CHG-003.
+
+Tempos, condições, dez cores, resposta, métricas/CSV e D1/D2/D5/D6 permanecem.
+A campanha WEB-011 deve usar o layout final aprovado e transporte incremental
+ativo (DEC-02/ADR-005), com falhas/retries e limites D5 intactos; medição apenas
+na apresentação antiga não comprova esta alteração. WEB-034 avalia percepção,
+saliência, atenção e protocolo visual, sem presumir equivalência com PsychoPy.

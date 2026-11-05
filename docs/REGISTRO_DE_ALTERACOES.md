@@ -4,6 +4,22 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-05 — Integração de refinamento UX ao planejamento canônico
+
+- CHG-003 integra UX-01–08 ao backlog, requisitos REQ-UX-001…011, arquitetura,
+  protocolo/decisões, fonte UX e workflow; IDs e evidências anteriores preservados.
+- Acrescentadas entregas M3 WEB-042/043/044 e ampliados critérios de campanha,
+  fluxo M4, componentes/regressão M5 e validação M9, sem marco paralelo.
+- Especificada ausência da precisão agregada na prática/principal e preservação
+  dos cálculos, feedback individual, persistência, relatórios e CSV. Identificado
+  conflito com D3 aprovado e necessidade de identificação da variante frente a D4.
+- Validador documental reproduzível passou a calcular catálogo/progresso a partir
+  das fontes canônicas e conferir estabilidade de IDs contra HEAD.
+- Preferência de integração alinhada: Merge Commit tradicional com commits
+  preservados, sem Squash Merge; nenhuma configuração/proteção remota alterada.
+- Alterações experimentais permanecem condicionadas às decisões metodológicas;
+  documentação de alvo não é implementação, teste ou aceite funcional.
+
 ## 2026-11-05 — Revalidação do motor experimental em M3
 
 - Iniciado M3 por `continue o projeto`; preservada base M2 sem integrar main.

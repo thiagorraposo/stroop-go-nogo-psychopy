@@ -236,3 +236,99 @@ confirmacao de encerramento oferece retorno as orientacoes e deixa outro convite
 como opcao secundaria. O foco programatico permanece visivel. Essas telas nao
 alteram motor, estimulos, condicoes, tempos, feedback cronometrado, teclas,
 tratamento de foco/Escape ou CSV.
+
+## WEB — direção UX de CHG-003 (2026-11-05)
+
+Especificação alvo, ainda sem implementação ou aceite experimental. As seções
+locais e Wxx acima preservam seu contexto histórico; não governam esta mudança.
+Execução, riscos, decisões e evidências somente no
+[backlog canônico](../Projeto%20Stroop%20Test.md); vínculos na
+[matriz](../REQUISITOS_E_RASTREABILIDADE.md), REQ-UX-001 a REQ-UX-011.
+
+**Durante o teste, a interface do participante deverá apresentar os estímulos
+sem a barra de precisão dos acertos ou indicadores agregados de desempenho.
+A barra de progresso e o cronômetro poderão permanecer, conforme o protocolo
+aprovado.** A direção de UX foi solicitada pelo responsável; D3 ainda exige o
+HUD anterior. Essa divergência requer aprovação metodológica explícita antes
+de alterar a execução. D1–D6 não são modificadas por esta especificação.
+
+### Estímulos e hierarquia (UX-01/05)
+
+Retirar o retângulo branco, sem substituir por caixa/cartão. Aplicar contorno
+branco diretamente aos caracteres para delimitar a forma das letras sobre o
+fundo experimental escuro; essa é uma hipótese de legibilidade, não prova de
+percepção equivalente das cores. Preservar o preenchimento das dez cores do
+snapshot, fundo geral, família/peso/tamanho experimental e centro geométrico.
+Não usar sombra pesada, gradiente ou volume; não ajustar cores automaticamente
+nem criar tratamentos por cor. Qualquer ajuste tipográfico exige justificativa.
+
+Avaliar `-webkit-text-stroke` e alternativa de contorno compatível nos navegadores
+de D1. Definir token único de espessura após revisão sintética das dez cores,
+sem fixar valor experimental por conveniência; comprovar que o contorno não
+encobre a tinta. Registrar alternativa, limites de renderização, screenshots
+sintéticos e dimensões em Chromium/Firefox. Nenhum suporte inferido de CSS.
+Estímulo permanece no centro experimental; HUD periférico não desloca seu centro.
+Remover espaços reservados à precisão. Sem menus, sidebar ou controles flutuantes.
+Não alterar escala por responsividade, duração, ordem, composição ou intervalos.
+
+### Progresso e cronômetro (UX-02/03)
+
+Progresso minimalista: traço fino, geometria consistente, cantos discretos,
+contraste controlado, rótulo legível e alinhado. Derivar etapa e total do contrato
+vigente e contar tentativas **concluídas**, sem número fixo ou avanço no início
+da tentativa. Exemplo ilustrativo: `Bloco principal · 8 / 16`. Distinguir prática e
+principal; sem animação durante estímulos. Confirmar visibilidade e localização
+na aprovação da apresentação e na campanha DEC-04.
+
+Cronômetro mantém tempo **decorrido** do principal, iniciado na primeira tentativa
+até o fim da última, formato `MM:SS`, algarismos tabulares e largura numérica
+estável, alinhamento discreto e sem decoração. O placeholder da prática não
+autoriza criar relógio de prática: sua retirada/apresentação integra a aprovação
+do HUD. Usar origem monotônica do motor; atualizar DOM somente quando necessário,
+sem novo intervalo React, relógio científico paralelo, ticks acumulativos ou
+re-render por quadro. RT e registros científicos permanecem independentes.
+
+### Ausência de desempenho agregado (UX-04)
+
+Retirar nós, rótulos, percentuais, barras, tooltips e conteúdo acessível de
+precisão, taxa de acertos/erros, classificação, ranking ou equivalentes na prática
+e no principal. Não basta ocultar com CSS/aria-hidden; não substituir por outro
+indicador de qualidade nem deixar espaço vazio. Feedback **individual** da
+prática e repetição sem limiar permanecem conforme protocolo; sem classificação.
+Accuracy total/Go/No-Go, omissões, comissões e RT continuam calculados, persistidos
+e disponíveis nos relatórios/CSV/dashboard aos profissionais autorizados.
+
+### Instruções e transições (UX-06/07)
+
+Hierarquia clara da regra Go/No-Go, tecla de resposta destacada e confirmação de
+início, distinguindo prática e principal. Preservar semântica aprovada, sem dicas
+novas de estratégia cognitiva. Reutilizar textos de COPY_DAS_TELAS como fonte de
+copy; revisão aprovada antes de mudança semântica. Organizar instruções, prática,
+feedback, preparação, execução e encerramento sem tempos adicionais implícitos.
+
+Distinguir execução concluída, dados aguardando envio, envio em andamento,
+confirmação do servidor, falha de envio e sessão interrompida/inválida. Somente
+recibo válido autoriza afirmar recebimento/sucesso. Preservar ADR-005, idempotência,
+ACKs incrementais, observações parciais separadas de resultado oficial e D2:
+nenhuma retomada do principal. Resultado individual ao participante somente se
+autorizado no protocolo; revisar o resumo agregado existente em WEB-015 sem
+supor que removê-lo durante execução autorize mudar a tela final.
+
+### Acessibilidade e regressão (UX-08)
+
+Reutilizar tokens/componentes existentes de styles.css; sem biblioteca nova.
+Teclado, foco visível, legibilidade, contraste não experimental, erros/loading,
+resoluções permitidas, ausência de scroll e perda de foco devem ser verificados.
+Não recolorir estímulos para satisfazer contrastes de UI, não alterar modalidade
+de resposta nem restrições de ambiente/fullscreen vigentes em D1 (fullscreen
+não obrigatório). Não prometer acessibilidade experimental por ajuste automático.
+
+Regressão planejada em WEB-044: DOM e árvore acessível sem desempenho agregado;
+feedback individual preservado; dez cores/centralização/tipografia/contorno sem
+caixa em Chromium e Firefox nas resoluções aprovadas; screenshots sintéticos;
+progresso real e sem animação; relógio monotônico sem duplicação/deriva; Go/No-Go,
+congruência, quatro resultados, janelas, sequência, lifecycle e interrupções
+inalterados. WEB-016/019/020 verificam persistência, dashboard e exportações.
+WEB-011 mede D5 com o layout final e transporte ativo; WEB-034 avalia saliência,
+atenção, protocolo visual e limitações de equivalência com PsychoPy. Testes
+CSS/automatizados não comprovam validade psicométrica nem latência física.
