@@ -1,5 +1,6 @@
 import csv
 import io
+import json
 import unittest
 import xml.etree.ElementTree as ET
 from collections import Counter
@@ -93,6 +94,34 @@ class Fase3CondicoesTemposTests(unittest.TestCase):
         cls.practice_rows = read_condition_csv(PRACTICE_PATH)
         cls.main_rows = read_condition_csv(MAIN_PATH)
         cls.psyexp = parse_psyexp()
+
+    def test_snapshot_web_preserva_paleta_efetiva_distinta_do_csv_historico(self):
+        snapshot = json.loads((ROOT / "condicoes/web_protocol.json").read_text())
+        self.assertEqual(snapshot["colors"], DISPLAY_PALETTE)
+        for row in self.practice_rows + self.main_rows:
+            self.assertNotEqual(snapshot["colors"][row["ink_color"]], row["ink_color_display"])
+
+    def test_snapshot_web_preserva_tempos_da_fonte_builder(self):
+        snapshot = json.loads((ROOT / "condicoes/web_protocol.json").read_text())
+        for block, name, response_name, hold_name, rows in [
+            ("practice", "trial_pratica", "resp_pratica", "hold_pratica", self.practice_rows),
+            ("main", "trial_principal", "resp_principal", "hold_principal", self.main_rows),
+        ]:
+            trial = routine(self.psyexp, name)
+            response = component(trial, "KeyboardComponent", response_name)
+            hold = component(trial, "TextComponent", hold_name)
+            config = snapshot[block]
+            fixation = float(param(response, "startVal")) * 1000
+            window = float(param(response, "stopVal")) * 1000
+            duration = float(param(hold, "stopVal")) * 1000
+            self.assertEqual(config["trials"], len(rows))
+            self.assertEqual(config["fixation_ms"], fixation)
+            self.assertEqual(config["stimulus_window_ms"], window)
+            self.assertEqual(config["blank_interval_ms"], duration - fixation - window)
+        self.assertEqual(snapshot["main"]["trial_ms"], 3750)
+        self.assertEqual(snapshot["main"]["duration_ms"], 16 * 3750)
+        feedback = component(routine(self.psyexp, "feedback_pratica"), "TextComponent", "texto_feedback")
+        self.assertEqual(snapshot["practice"]["feedback_ms"], float(param(feedback, "stopVal")) * 1000)
 
     def assert_condition_rules(self, rows):
         for index, row in enumerate(rows, start=1):

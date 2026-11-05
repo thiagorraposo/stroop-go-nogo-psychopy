@@ -102,6 +102,26 @@ function syntheticResult(): MainResult {
 }
 
 describe('bloco principal imperativo', () => {
+  it('renderiza as dez cores efetivas e todas as palavras na ordem canonica', () => {
+    start()
+    const origin = mainStart()
+    const colors = new Set<string>()
+    for (const [index, condition] of MAIN_CONDITIONS.entries()) {
+      clock.advance(origin + index * 3750 + 300 - clock.time)
+      expect(container.dataset.phase).toBe('stimulus')
+      expect(container.dataset.conditionId).toBe(String(condition.condition_id))
+      const card = container.querySelector<HTMLElement>('.main-stimulus-card')!
+      const expectedColor = document.createElement('span')
+      expectedColor.style.color = condition.ink_color_display
+      expect(card.textContent).toBe(condition.word)
+      expect(card.style.color).toBe(expectedColor.style.color)
+      expect(card.style.background).toBe('rgb(248, 250, 252)')
+      colors.add(card.style.color)
+    }
+    expect(colors.size).toBe(10)
+    expect(finish(origin).trials).toHaveLength(16)
+  })
+
   it('captura tempos sinteticos completos e tentativas interrompidas somente quando habilitado', () => {
     const onTimingTrace = vi.fn<NonNullable<MainOptions['onTimingTrace']>>()
     start({ onTimingTrace })

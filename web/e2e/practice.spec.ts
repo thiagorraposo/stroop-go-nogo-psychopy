@@ -25,8 +25,12 @@ async function prepare(page: Page) {
 
 test('navegacao por teclado nao inicia treino sem confirmar e testar o teclado', async ({ page }) => {
   await page.goto('/')
+  // O foco inicial e aplicado pelo effect que sucede a instalacao dos listeners.
+  // goto aguarda load, mas nao garante que o React ja montou a navegacao.
+  await expect(page.getByRole('main')).toBeFocused()
   await page.keyboard.press('Space')
   await expect(page).toHaveURL('/instrucoes')
+  await expect(page.getByRole('main')).toBeFocused()
   await page.keyboard.press('Enter')
   await expect(page).toHaveURL('/pratica')
   await page.getByLabel('Estou usando um computador ou notebook com teclado físico.').check()
