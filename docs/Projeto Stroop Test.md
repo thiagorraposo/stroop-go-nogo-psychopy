@@ -33,9 +33,10 @@ de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
 Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
 não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
 
-Progresso atual: **4/42 entregáveis aceitos (WEB-000 a WEB-003);
-3/41 entregáveis de implementação/revalidação funcional aceitos no novo plano**.
-Marcos funcionais não concluídos. Este número só se atualiza aqui, após evidência.
+Progresso atual: **5/42 entregáveis aceitos (WEB-000 a WEB-004);
+4/41 entregáveis de implementação/revalidação funcional aceitos no novo plano**.
+M1 concluído; demais marcos funcionais não concluídos. Este número só se atualiza
+aqui, após evidência.
 
 ## Ordem, caminho crítico e paralelismo
 
@@ -159,15 +160,15 @@ Google, produção e CI remota não executados para este marco documental.
 
 ### WEB-004 — Ensaiar desenvolvimento local e retomada do marco
 
-- Marco: M1. Prioridade: P0. Complexidade: M. Estado: EM_VALIDACAO.
+- Marco: M1. Prioridade: P0. Complexidade: M. Estado: CONCLUIDA.
 - Dependências: WEB-002, WEB-003.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Segundo percurso documentado encontra estado/tarefa sem investigação global; local API/React/PG reproduzido; M1 atende sua ficha.
-- Testes/verificação: `PLANEJADO: ensaio de retomada e smoke local isolado`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R09; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Testes/verificação: `scripts/verify_web_ci.py browser` e `integration`; segundo percurso de retomada pelas fontes canônicas, conforme EV-M1.
+- Evidências: EV-M1, 2026-11-04; React/API/PG e HTTPS reais, Chromium/Firefox, retomada localizada e critérios M1 conferidos.
+- Riscos/bloqueios: R09 preservado; nenhum recurso externo necessário ao ensaio sintético local.
 - Referências: REQ-EXT-003; [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega: branch `test/m1-baseline-sintetica`; versão funcional ensaiada e fechamento em EV-M1/Retomada.
 
 ### EV-M1 — baseline sintética, 2026-11-04
 
@@ -198,7 +199,10 @@ e `TEST_DATABASE_URL` apontando exclusivamente para esse banco:
 - `frontend`: `npm ci`, **273 testes em 16 arquivos**, typecheck e build aprovados.
 - `browser`: **98 casos gerais (2,4 min) e quatro temporais seriais (3,6 min)
   aprovados**, Chromium 156.0.8078.4 e Firefox 157.0, em Linux.
-- `integration`: ensaio HTTPS em andamento; resultado final ao encerrar.
+- `integration`: **36 casos aprovados em 11,5 min** em Chromium/Firefox com build React,
+  API FastAPI, PostgreSQL e HTTPS locais reais. Cookies restritos, convites,
+  resultados, importação/exportação, revogação, perda de recibo e reenvio
+  sem duplicação exercitados; processos/certificados efêmeros encerrados pelo harness.
 
 WEB-002: descoberta integral exercitou `test_nucleo_compartilhado`,
 `test_csv_unificado`, `test_importar_csv_sqlite`, `test_casos_uso_importacao`,
@@ -219,6 +223,20 @@ de aplicação e ingestão existentes, sem nova abstração. Contratos
 coexistência do demo sintético testada em `test_multiplos_instrumentos`.
 Mapa e receita reproduzível: [baseline local](desenvolvimento/BASELINE_LOCAL.md).
 Nenhuma necessidade de refatoração identificada nesta conferência.
+O scanner foi repetido incluindo a receita adicionada: 350 fontes aprovadas.
+
+WEB-004: segundo percurso em processo novo leu apenas AGENTS → workflow →
+Retomada/ficha → receita local e localizou M1/WEB-004 sem repetir inventário.
+O ensaio integrado acima reproduziu API/React/PG; todos os critérios das quatro
+tarefas e da ficha M1 foram conferidos. M1 aceito em 2026-11-04; nenhuma quebra
+legada observada nas suites executadas. Verificação documental: 83 Markdown
+materializados, 485 links relativos e três âncoras sem erros; 11 marcos,
+42 tarefas, 36 requisitos/linhas de matriz, 10 riscos e cinco decisões, grafo sem
+ciclos. Validador do workflow adaptado ao checkout sparse: destinos excluídos
+confirmados por metadados Git, sem abrir dados; staged incluído por diff HEAD.
+Container descartável removido após o ensaio, sem tocar em serviços alheios.
+`git diff --check` e verificação do diff staged aprovados. Os cinco arquivos
+da entrega são Markdown; nenhuma alteração funcional/config/schema/lock.
 
 Limites: evidência local da SHA funcional acima, sem mudança de runtime/locks/schema.
 Auditorias públicas de dependências e Actions não executadas nesta baseline;
@@ -869,16 +887,27 @@ não depende de reaprovação científica. Não há bloqueio documental remanesc
 ## Retomada
 
 Marco autorizado atual: **M1**, pelo comando posterior `continue o projeto` de
-2026-11-04. WEB-001/002/003 concluídas; WEB-004 em validação, aguardando término
-do HTTPS local para conferência final. Evidência, ambiente e SHA
+2026-11-04. **M1 concluído, WEB-001 a WEB-004 aceitas**. Evidência, ambiente e SHA
 funcional em EV-M1; [receita local](desenvolvimento/BASELINE_LOCAL.md).
 
 Branch de entrega `test/m1-baseline-sintetica`, worktree isolada
-`/tmp/stroop-m1-baseline-20261104`; checkout original preservado em
-`docs/replanejamento-stroop-web`. Não criar frontend/API do zero, repetir auditoria
-global, avançar M2, integrar main nem publicar por inferência. Após M1, próxima
-tarefa é WEB-005 em M2, com autorização posterior e DEC-01/02 documentadas antes
-do trabalho dependente.
+`/tmp/stroop-m1-baseline-20261104`. Checkout de desenvolvimento para retomada:
+`/home/raposo/Projetos/experimentos-psicopy/stroop-cognifit`, na branch da entrega.
+Worktree isolada preservada em HEAD destacada; ambientes preexistentes preservados.
+Não criar frontend/API do zero, repetir auditoria global, avançar M2, integrar
+main nem publicar por inferência. Próximo marco após autorização posterior:
+**M2, WEB-005**. Antes do trabalho
+dependente, documentar DEC-01 (pseudônimo/visita/preparação por convite) e DEC-02
+(perda antes do envio, RAM final-only e aborto sem retomada conforme D2).
+WEB-005 permanece PENDENTE; não houve avanço de M2 nesta sessão.
+
+Git M1: baseline versionada em `e15892c5d8a396223b5f33d842a003e882e4ee6d`,
+enviada com upstream e confirmada por `git ls-remote --heads origin
+test/m1-baseline-sintetica` na mesma SHA. O commit posterior de aceite de
+WEB-004/M1 é identificável por `git log -1 --format=%H -- 'docs/Projeto Stroop Test.md'`
+e usa o mesmo upstream; conferir HEAD/remoto no encerramento. Consulta
+`gh run list --branch test/m1-baseline-sintetica` retornou nenhuma execução: CI
+remota não executada nesta branch; testes acima são locais. Sem PR/merge/deploy.
 
 Histórico de fechamento de M0 (preservado, não descreve a sessão M1):
 
