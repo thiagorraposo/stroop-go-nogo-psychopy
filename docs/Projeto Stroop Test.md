@@ -1490,7 +1490,15 @@ Screenshots novos não foram produzidos nem alegados como evidência.
 Git da integração: branch adequada `feat/m3-motor-experimental`, base `0fdca9d`;
 entrega identificável por `git log -1 --format=%H
 --grep='docs: integra refinamento UX ao planejamento canônico'`.
-Commit/envio/consulta CI efetivos serão registrados no fechamento após a entrega.
+Entrega documental e validador em **`85f95ac971a489da8e570ef58151ba9d32a68975`**;
+push confirmado por igualdade HEAD/upstream/`git ls-remote --heads origin
+feat/m3-motor-experimental` na mesma SHA. `gh run list --branch
+feat/m3-motor-experimental --limit 5 --json headSha,status,conclusion,url` retornou
+`[]`: nenhuma execução Actions encontrada, não equivale a CI aprovada.
+Validador reexecutado após o commit para conferir preservação dos novos IDs
+contra HEAD. Registro de fechamento identificável por `git log -1 --format=%H
+--grep='docs: registra evidências da integração UX'`; seu envio deve ser conferido
+por HEAD/upstream/remoto, sem commit artificial de autorreferência.
 Nenhum PR/merge/deploy autorizado ou executado.
 
 ### Retomada anterior — revalidação funcional M3 (histórico preservado)
