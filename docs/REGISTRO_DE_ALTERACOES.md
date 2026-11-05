@@ -4,6 +4,16 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-05 — Aprovação DEC-04 e preparação da campanha local
+
+- Proprietário aprovou expressamente o alcance local de engenharia DEC-04;
+  validação física/metodológica permanece gate M9. Matriz/evidência no backlog.
+- Preparados Dedicated Worker/fila em RAM e entrega de cópia imutável de tentativa
+  completa após início da próxima fixação, sem esperar HTTP/JSON no motor.
+- Campanha sintética isolada exercita motores reais com transporte ativo,
+  ACK lento/perdido e indisponibilidade; produto/fluxo integrado continua M4.
+- Sem alteração de tempos, estímulos, gates, métricas/CSV, schema ou dependências.
+
 ## 2026-11-05 — Regressão consolidada da apresentação experimental
 
 - Conferidos os critérios de WEB-044 na apresentação aprovada: dez cores,

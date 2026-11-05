@@ -47,6 +47,7 @@ export type MainOptions = {
   onComplete(result: MainResult): void
   onInterrupted(reason: InterruptionReason): void
   onTimingTrace?(trace: MainTimingTrace): void
+  onTrialComplete?(trial: Readonly<MainTrial>, framePeriod: number): void
 }
 export type MainClock = {
   now(): number
@@ -293,6 +294,11 @@ export function createMainRuntime(container: HTMLElement, options: MainOptions,
     phase = 'fixation'
     render(start)
   }
+  function deliverTrial(trial: MainTrial): boolean {
+    try { options.onTrialComplete?.(Object.freeze({ ...trial }), framePeriod!); return true }
+    catch { interrupt('timing_invalid'); return false }
+  }
+
   function tick(stamp: number) {
     if (!active) return
     const observed = now()
@@ -357,6 +363,7 @@ export function createMainRuntime(container: HTMLElement, options: MainOptions,
         if (completed === 16) {
           const result: MainResult = { frame_period_ms: framePeriod!, trials: trials.map(row => ({ ...row })), order }
           if (!validMainResult(result)) { interrupt('timing_invalid'); return }
+          if (!deliverTrial(trial)) return
           emitTimingTrace('completed', null)
           cleanup()
           options.onComplete(result)
@@ -365,6 +372,7 @@ export function createMainRuntime(container: HTMLElement, options: MainOptions,
         index += 1
         if (!within([elapsed, -index * 3750], framePeriod!)) { interrupt('timing_invalid'); return }
         startTrial(elapsed, stamp)
+        if (!deliverTrial(trial)) return
       } else presentation.update(completed, elapsed)
     }
     if (active) handle = clock.requestFrame(tick)

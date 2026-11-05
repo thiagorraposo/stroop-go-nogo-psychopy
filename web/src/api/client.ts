@@ -114,7 +114,7 @@ export type ApiPath = '/api/v1/assessments/export' | '/api/v1/admin/users' | `/a
   `/api/v1/projects/${string}/assessments${string}` | '/api/v1/auth/me' | '/api/v1/auth/logout' |
   '/api/v1/participant/redeem' | '/api/v1/participant/session' |
   '/api/v1/participant/start' | '/api/v1/participant/complete' | '/api/v1/participant/abort' |
-  '/api/v1/participant/logout';
+  '/api/v1/participant/logout' | '/api/v1/participant/session/checkpoints';
 
 export async function request<T>(path: ApiPath,
   init: RequestInit, decode: (response: Response) => Promise<T>, signal?: AbortSignal,

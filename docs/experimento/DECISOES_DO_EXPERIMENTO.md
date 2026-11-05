@@ -213,3 +213,17 @@ feedback individual da prática preservado. Protocolo cognitivo, métricas,
 persistência e limites D5 intactos. Não se atribui aprovação a terceiro:
 o proprietário já se declarou responsável pela pesquisa/validação/operação.
 DEC-04 e validação final M9 continuam independentes e pendentes.
+
+
+## DEC-04 — alcance local de engenharia aprovado em 2026-11-05
+
+O proprietário/responsável respondeu “eu aprovo esse alcance para DEC-04” à
+proposta de campanha no equipamento local com Chromium e Firefox visíveis,
+dez sessões sintéticas por ambiente, layout stroop-web-outline/1.0.0 aprovado,
+transporte incremental ativo e falhas de rede. D1/D5, durações, tolerâncias,
+interrupções e preservação de falhas permanecem. A aprovação não altera a
+exceção histórica W16 nem a transfere para M3; não concede aceite por antecipação.
+Validação física/metodológica permanece pendente em M9. Equipamento, versões,
+recursos, execução, resultados e limites ficam somente em DEC-04/EV-M3-011 no
+[backlog canônico](../Projeto%20Stroop%20Test.md#ev-m3-011--aprovação-do-alcance-e-campanha-local-2026-11-05).
+Não autoriza equivalência, coleta real, suporte universal ou deploy.

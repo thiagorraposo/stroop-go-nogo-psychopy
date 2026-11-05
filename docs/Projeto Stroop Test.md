@@ -17,7 +17,9 @@ critérios comprovados). Não há crédito parcial. Autorização de sessão é 
 de prontidão técnica. A missão documental encerrou em M0; o comando posterior
 `continue o projeto`, em 2026-11-04, autorizou M1 até seu encerramento.
 O comando de 2026-11-05 autorizou M2, já concluído. Novo `continue o projeto`
-autoriza M3, condicionado às decisões de suas tarefas; DEC-04 continua pendente.
+autoriza M3, condicionado às decisões de suas tarefas. Em 2026-11-05, o proprietário
+aprovou DEC-04 no alcance local de engenharia descrito em EV-M3-011; validação
+física/metodológica permanece pendente para M9.
 
 Uma tarefa CONCLUIDA tem todos critérios, comandos/resultados/data, componente,
 referências de teste e Git. Documento é evidência suficiente apenas para entrega
@@ -46,7 +48,7 @@ Atualizado em **2026-11-05**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **14 de 45 · 31,1%** | **31** | **M3 · regressão aceita; DEC-04 pendente** | Responsável aprovar matriz DEC-04 para liberar [WEB-011](#web-011--executar-campanha-de-engenharia-temporal-em-ambientes-declarados) |
+| **14 de 45 · 31,1%** | **31** | **M3 · campanha de engenharia em preparação** | Executar campanha local aprovada em [WEB-011](#web-011--executar-campanha-de-engenharia-temporal-em-ambientes-declarados) |
 
 ```text
 Aceites   ██████░░░░░░░░░░░░░░   31,1%
@@ -69,7 +71,7 @@ A ordem da tabela segue os IDs; dependências e paralelismo estão na
 | [M0](#m0--auditoria-e-replanejamento-documental) | Auditoria e replanejamento documental | 🟩 **1/1** | ✅ Concluído |
 | [M1](#m1--fundação-e-baseline-reproduzível) | Fundação e baseline reproduzível | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M2](#m2--backend-e-contratos-de-dados-consolidados) | Backend e contratos de dados consolidados | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
-| [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | 🟩🟩⬜⬜🟩🟩🟩 **5/7** | ◐ Regressão aceita; DEC-04 pendente |
+| [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | 🟩🟩⬜⬜🟩🟩🟩 **5/7** | ◐ Campanha local em preparação |
 | [M4](#m4--fluxo-ponta-a-ponta-de-avaliações) | Fluxo ponta a ponta de avaliações | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
@@ -101,7 +103,7 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 
 ### Foco do marco atual
 
-| ✅ Aceito | ✅ Aceito | ⬜ Bloqueado | ⬜ Sem aceite |
+| ✅ Aceito | ✅ Aceito | ⬜ Em andamento | ⬜ Sem aceite |
 |---|---|---|---|
 | [WEB-009](#web-009--conferir-snapshot-condições-e-paleta-efetiva-da-web): condições e paleta | [WEB-010](#web-010--revalidar-plugins-jspsych-ciclo-de-vida-e-janela-de-resposta): plugins e lifecycle | [WEB-011](#web-011--executar-campanha-de-engenharia-temporal-em-ambientes-declarados): campanha temporal | [WEB-012](#web-012--registrar-viabilidade-e-limites-de-suporte-do-motor): suporte |
 
@@ -112,9 +114,9 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 M2 permanece concluído em EV-M2 e EV-M2-007/008. M3 autorizado;
 WEB-009/010 preservam aceite. CHG-003 adiciona WEB-042/043 (CONCLUIDAS após revisão D3/D4 aprovada explicitamente pelo
 proprietário e critérios conferidos em EV-M3-042/043) e WEB-044 (CONCLUIDA,
-EV-M3-044). WEB-011 continua BLOQUEADA por DEC-04; layout final testado.
-WEB-012 permanece PENDENTE. Nenhuma tarefa pronta no marco até aprovação da
-matriz DEC-04 pelo responsável; próxima funcional após desbloqueio: WEB-011.
+EV-M3-044). DEC-04 aprovada no alcance local de engenharia em 2026-11-05;
+WEB-011 EM_ANDAMENTO, preparando worker e campanha na apresentação final.
+WEB-012 permanece PENDENTE da campanha e aceitação dos limites de suporte.
 
 **Acompanhar impedimentos:** [riscos](#registro-de-riscos) ·
 [decisões externas](#decisões-externas-e-condições-de-desbloqueio).
@@ -671,13 +673,13 @@ sessão removido ao fechar; recursos preexistentes preservados.
 
 ### WEB-011 — Executar campanha de engenharia temporal em ambientes declarados
 
-- Marco: M3. Prioridade: P0. Complexidade: G. Estado: BLOQUEADA.
+- Marco: M3. Prioridade: P0. Complexidade: G. Estado: EM_ANDAMENTO.
 - Dependências: WEB-010, WEB-044; DEC-04 para matriz.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: 10 execuções sintéticas por ambiente selecionado, trilhas brutas/falhas preservadas, quadro e desvio total conferidos contra D5; sem substituir falha por rerun omitido. CHG-002: incluir transporte incremental ativo, ACK lento/perdido, retries e falha de servidor, sem alongar tentativas; comparar impacto contra D5. CHG-003: campanha na SHA do layout final aprovado, com contorno branco uniforme, sem retângulo/precisão agregada, progresso/cronômetro revisados e transporte incremental ativo. Registrar custo observado de renderização/HUD/retries; campanha somente no visual anterior não basta. Limites D5 e tolerâncias intactos.
 - Testes/verificação: `PLANEJADO: campanha técnica D5; web/pilots/w16-local.spec.ts como ferramenta, não prova física`. Arquivos citados existem; verificações PLANEJADAS não têm resultado. Adicional PLANEJADO: trilhas antes/depois identificadas por versão/SHA e falhas preservadas; comparar tempos e condições aprovadas DEC-04.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R01. Bloqueio observado: matriz/equipamento DEC-04 ainda não aprovados; pergunta ao responsável enviada nesta sessão sem resposta até o fechamento. Responsável metodológico deve declarar ambientes/versões/recursos e alcance da campanha; Codex então prepara transporte ativo e executa os ensaios autorizados. WEB-012 depende desta entrega.
+- Riscos/bloqueios: R01/R02/R11. DEC-04 desbloqueada para engenharia local pela resposta explícita do proprietário em 2026-11-05; matriz identificada em EV-M3-011. Não aprova validação física/metodológica M9, suporte ou redução de gates. WEB-012 depende da campanha e decisão de suporte.
 - Referências: REQ-EXP-003; [arquitetura](ARQUITETURA_WEB.md). REQ-UX-001 a REQ-UX-007; R11.
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 
@@ -1333,7 +1335,7 @@ versão experimental. Somente bloquear tarefa dependente, sem paralisar document
 | DEC-01 | Participante pseudonimizado por projeto, múltiplas visitas/avaliações e preparação por convite; sem cadastro central ou agenda separada nesta versão | Proprietário; decisão explícita em 2026-11-05 | APROVADA a direção; vínculos estáveis e evolução aditiva no modelo. Implementação/ensaios ainda não realizados; retenção institucional continua DEC-03 | WEB-005/006/007/013 | APROVADA |
 | DEC-02 | Final-only rejeitado; persistência incremental com recibo/idempotência e preservação de incompletas/ inválidas, sem retomada; nova sessão com prática | Proprietário + metodológico; diretriz e validação explícitas em 2026-11-05 | Resposta “valido” à proposta `270377b` aprova ADR-005, contrato alvo, matriz D2/D5 e perda residual; gate documental WEB-005 satisfeito. Implementação/ensaios técnicos e temporais ainda exigidos | WEB-005/006/007/011/012/015 | APROVADA |
 | DEC-03 | Regras institucionais de informação, consentimento aplicável, retenção e incidentes | Proprietário/instituição | Documento aprovado e responsabilidades/canal definidos; nenhuma base legal inventada pelo Codex | WEB-033/036 | PENDENTE |
-| DEC-04 | Matriz de hardware/SO/browser e validação física/metodológica necessária | Responsável metodológico | Plano e recursos aprovados para layout final CHG-003, manter D1/D5 e limites W16; alterações de suporte/gate justificadas e aprovadas | WEB-011/012/034 | PENDENTE |
+| DEC-04 | Matriz local e alcance de engenharia; validação física/metodológica permanece gate M9 | Proprietário/responsável metodológico; aprovação explícita em 2026-11-05 | Resposta “eu aprovo esse alcance para DEC-04” aprova proposta de dez sessões sintéticas por ambiente local Chromium/Firefox visíveis, layout final e transporte/falhas ativos. Equipamento observado em EV-M3-011; D1/D5 intactos. Não aprova suporte por antecipação nem validação física/metodológica WEB-034 | WEB-011/012/034 | APROVADA |
 | DEC-05 | Após prontidão M9, autorizar separadamente configuração research, deploy e eventual uso real | Proprietário + metodológico/operador | WEB-036 comprovada; registrar autorização específica antes de WEB-041 e, para produção/uso, de WEB-038/040; mudanças da candidata passam revalidação dos gates afetados; não retirar synthetic apenas por aprovação técnica | WEB-041/038/040 | PENDENTE |
 
 Recursos externos não decisórios: conta/cliente OIDC de teste WEB-021; destino de
@@ -1459,7 +1461,50 @@ WEB-034 mantêm critérios próprios. Histórico inicial CHG-003 acima preservad
 
 ## Retomada
 
-### Retomada vigente — regressão WEB-044 aceita, 2026-11-05
+### Retomada vigente — DEC-04 local aprovada, 2026-11-05
+
+Marco autorizado M3, 14/45 aceitos, M3 5/7; sem avanço para M4.
+Proprietário respondeu “eu aprovo esse alcance para DEC-04” à proposta local
+explicitada na sessão. WEB-011 EM_ANDAMENTO; WEB-012 PENDENTE. Próxima ação:
+preparar Dedicated Worker e executar dez sessões sintéticas em cada ambiente
+local Chromium/Firefox visível, preservando falhas e D5; depois conferir suporte.
+Validação física/metodológica permanece pendente para M9, sem coleta/deploy.
+
+### EV-M3-011 — aprovação do alcance e campanha local, 2026-11-05
+
+Aprovação explícita pelo proprietário/responsável de pesquisa e operação:
+“eu aprovo esse alcance para DEC-04”. Proposta aprovada: equipamento local,
+Chromium e Firefox visíveis, dez sessões sintéticas por ambiente, apresentação
+final, transporte incremental ativo e falhas de rede, D5 e todas falhas
+preservados; validação física/metodológica pendente. Não aprova equivalência,
+suporte universal, uso real ou deploy. DEC-03/05 independentes.
+
+Matriz identificada por inspeção somente técnica: Intel Core i5-1334U,
+12 CPUs lógicas, cerca de 16 GiB RAM (15 GiB exibidos por free), Linux
+7.0.0-42-generic x86_64, X11 DISPLAY :0; xrandr confirma tela eDP-1 primária
+1920×1080 a 60,00 Hz. Viewport da campanha 1280×720; browsers/versões e período
+real de quadro serão registrados por execução. Não é medição física de tela.
+Sem carga artificial concorrente; carga normal do desktop não é controlada.
+
+Git inicial limpo, branch feat/m3-motor-experimental, HEAD/upstream a32b896,
+main fe8f24f e origin/main db56b40; fetch acessível, base M2/M3 preservada sem
+merge/rebase. Não repetida baseline global. Preparação autorizada inclui worker
+ADR-005 e ponto de entrega de tentativa completa no motor; fluxo produto/UX
+integrado e HTTPS/API/PG continuam M4. Campanha usa fixture sintética com motores
+jsPsych e Dedicated Worker reais e receptor HTTP double, sem alegar banco real.
+App da fixture identifica transporte como web-0.1.0+visual.1.0.0.transport.1;
+app de produto continua na versão visual anterior até integração em M4.
+
+Preparação local: 292/292 Vitest aprovados, typecheck/build aprovados; cobre
+cópia imutável após fim observado e próxima fixação, fila contígua/um voo,
+ACK lento/perdido, replay original, 1/2/4/8 s e Retry-After, expiração e erros
+401/403/409/410. Inicialmente uma asserção do teste assumiu atributo de tentativa
+na fixação (só existe no estímulo); corrigida para verificar o sinal de fixação,
+sem mudar o runtime. Duas tipagens iniciais corrigidas (assinaturas distintas
+onerror/onmessageerror e parâmetro não utilizado). Campanha ainda PLANEJADA;
+nenhum aceite novo deriva desses testes ou da aprovação documental.
+
+### Retomada anterior — regressão WEB-044 aceita, 2026-11-05
 
 Marco autorizado **M3**, ainda não encerrado. WEB-044 **CONCLUIDA** em EV-M3-044;
 **14/45 entregáveis aceitos (31,1%)**, 31 sem aceite; M3 **5/7**.
