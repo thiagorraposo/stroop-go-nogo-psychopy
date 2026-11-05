@@ -1557,6 +1557,27 @@ Entrega identificável por `git log -1 --format=%H
 não é o commit documental. Conferir envio por HEAD/upstream/remoto e Actions por
 SHA; push de branch não implica execução de CI.
 
+### Fechamento EV-M3-044 — 2026-11-05
+
+Entrega documental em **`21891431e64a1ef3e3eb5659246946019837e747`**, branch
+`feat/m3-motor-experimental`, enviada: HEAD, upstream e `git ls-remote --heads
+origin feat/m3-motor-experimental` conferidos na mesma SHA. Consulta
+`gh run list --branch feat/m3-motor-experimental --limit 5
+--json headSha,status,conclusion,url` retornou `[]`: nenhuma execução Actions
+na branch; CI não executada para essa SHA, sem alegar aprovação remota.
+
+Validador final: **11 marcos, 45 tarefas, 47 requisitos, 11 riscos, cinco decisões,
+14 aceitos, 84 documentos, 566 links e 46 âncoras**, grafo sem ciclos.
+Sete testes do validador e `git diff --check` aprovados. Revisão Git restrita a
+três documentos; screenshots/trilhas sintéticos permanecem ignorados. Nenhuma
+falha/skips nesta sessão; falhas históricas explicitamente mantidas acima.
+WEB-044 concluída; próxima ação é aprovação DEC-04, sem tarefa pronta adicional
+em M3. Nenhum avanço M4, PR, merge ou deploy.
+
+Este fechamento é identificável por `git log -1 --format=%H
+--grep='docs: registra envio e limites da regressão WEB-044'`; conferir seu
+próprio envio por HEAD/upstream/remoto, sem commit artificial de autorreferência.
+
 ### Retomada anterior — D3 visual implementada, 2026-11-05
 
 Marco autorizado M3; missão atual limitada à revisão D3 e WEB-042/043, agora
