@@ -40,6 +40,74 @@ permanecem, sem atribuir funcionamento à nova persistência por aprovação do 
 M1 concluído; demais marcos funcionais não concluídos. Este número só se atualiza
 aqui, após evidência.
 
+## Painel visual de acompanhamento
+
+Atualizado em **2026-11-05**, a partir das fichas deste backlog.
+
+| Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima tarefa pronta |
+|---|---|---|---|
+| **6 de 42 · 14,3%** | **36** | **M2** | [WEB-006](#web-006--revalidar-entrada-de-conclusão-e-proveniência-do-protocolo) |
+
+```text
+Aceites   ███░░░░░░░░░░░░░░░░░░░   14,3%
+```
+
+A barra global é aproximada; os números são exatos, com percentual arredondado.
+O indicador conta entregáveis aceitos, sem pesos ou crédito parcial; não mede
+percentual de código pronto, prazo restante ou prontidão para pesquisa/produção.
+M0 e WEB-005 são documentais; a baseline de M1 tem os limites descritos em EV-M1.
+
+### Visão por marco
+
+Cada quadrado representa **um entregável** do respectivo marco:
+🟩 aceito · ⬜ sem aceite. Clique no marco para consultar escopo e critérios.
+A ordem da tabela segue os IDs; dependências e paralelismo estão na
+[ordem de execução](#ordem-caminho-crítico-e-paralelismo).
+
+| Marco | Entrega principal | Aceites | Situação |
+|---|---|---|---|
+| [M0](#m0--auditoria-e-replanejamento-documental) | Auditoria e replanejamento documental | 🟩 **1/1** | ✅ Concluído |
+| [M1](#m1--fundação-e-baseline-reproduzível) | Fundação e baseline reproduzível | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
+| [M2](#m2--backend-e-contratos-de-dados-consolidados) | Backend e contratos de dados consolidados | 🟩⬜⬜⬜ **1/4** | 🔵 Marco atual |
+| [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
+| [M4](#m4--fluxo-ponta-a-ponta-de-avaliações) | Fluxo ponta a ponta de avaliações | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
+| [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
+| [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
+| [M7](#m7--integração-compatibilidade-histórica-e-transição) | Integração, compatibilidade histórica e transição | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
+| [M8](#m8--ci-infraestrutura-e-preparação-operacional) | CI, infraestrutura e preparação operacional | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
+| [M9](#m9--validação-técnica-e-metodológica) | Validação técnica e metodológica | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
+| [M10](#m10--implantação-controlada-e-documentação-operacional) | Implantação controlada e documentação operacional | ⬜⬜⬜⬜⬜ **0/5** | ○ Pendente |
+
+### Entregáveis aceitos
+
+Clique no ID para conferir critérios, evidências e limites do aceite.
+
+| Entregável | O que foi aceito | Natureza da evidência |
+|---|---|---|
+| ✅ [WEB-000](#web-000--base-documental-auditada-e-plano-executável) | Base documental auditada e plano executável | Documental |
+| ✅ [WEB-001](#web-001--reproduzir-baseline-sintética-do-código-auditado) | Reproduzir baseline sintética do código auditado | Baseline funcional sintética |
+| ✅ [WEB-002](#web-002--conferir-preservação-das-métricas-e-clis-na-baseline) | Conferir preservação das métricas e CLIs na baseline | Baseline funcional sintética |
+| ✅ [WEB-003](#web-003--verificar-fronteiras-modulares-e-contratos-de-extensão) | Verificar fronteiras modulares e contratos de extensão | Baseline funcional sintética |
+| ✅ [WEB-004](#web-004--ensaiar-desenvolvimento-local-e-retomada-do-marco) | Ensaiar desenvolvimento local e retomada do marco | Baseline funcional sintética |
+| ✅ [WEB-005](#web-005--fechar-contratos-de-participante-preparação-e-política-de-perda) | Fechar contratos de participante, preparação e política de perda | Documental |
+
+### Foco do marco atual
+
+| ✅ Aceito | ▶ Pronto para executar | ○ Aguarda WEB-006 | ○ Aguarda WEB-007 |
+|---|---|---|---|
+| [WEB-005](#web-005--fechar-contratos-de-participante-preparação-e-política-de-perda): contratos | [WEB-006](#web-006--revalidar-entrada-de-conclusão-e-proveniência-do-protocolo): entrada e proveniência | [WEB-007](#web-007--comprovar-atomicidade-replay-e-papéis-postgresql): atomicidade e replay | [WEB-008](#web-008--comprovar-paridade-oficial-de-métricas-e-ausência-de-medida): paridade de métricas |
+
+WEB-006 está **PRONTA**, ainda sem execução registrada. A aprovação documental de
+WEB-005 não comprova a implementação da persistência incremental.
+
+**Acompanhar impedimentos:** [riscos](#registro-de-riscos) ·
+[decisões externas](#decisões-externas-e-condições-de-desbloqueio).
+**Acompanhar a continuidade:** [Retomada](#retomada), com próxima ação, Git e limites.
+
+Este painel integra o backlog canônico. Ao registrar um novo aceite, atualizar
+os totais, barras e tabelas desta seção junto com as fichas e a Retomada;
+validar que as contagens continuam correspondendo aos estados das tarefas.
+
 ## Ordem, caminho crítico e paralelismo
 
 Prioridade inicial: WEB-001 → WEB-002/003 → WEB-004. Depois M2 e M3 podem seguir
@@ -1029,3 +1097,24 @@ por `git diff --name-only 87f6a9c..a644e2c`.
 Commit/push documental não autorizam integração à main. CI remota desta entrega
 não executada/não verificada; workflow existente só dispara PR/main/manual.
 Não há PR nem merge autorizado. Produção e dados reais permanecem fora do escopo autorizado.
+
+
+### Entrega documental — painel visual, 2026-11-05
+
+Por solicitação do responsável, acrescentados painel de aceites, barras por marco
+e navegação visual em PROGRESS, com índice e registro de alterações alinhados.
+Nenhum estado, aceite, requisito ou próxima tarefa funcional foi alterado.
+Validação local: procedimento documental do workflow aprovado com 85 documentos,
+542 links relativos, 36 âncoras, 42 tarefas, 36 requisitos/matriz, 11 marcos,
+10 riscos, cinco decisões e grafo sem ciclos; contagens visuais conferidas contra
+as fichas. `git diff --check` aprovado; quatro arquivos Markdown no escopo.
+Suites funcionais não reexecutadas para esta alteração de apresentação.
+
+Git: branch `docs/m2-contratos-participacao`, base `fc56d93`, inicialmente limpa e
+alinhada ao upstream após fetch; main/origin/main em `fe8f24f`, sem integração.
+Commit desta entrega identificável por `git log -1 --format=%H
+--grep='docs: adiciona painel visual de acompanhamento'`.
+Envio verificável pela igualdade de HEAD, upstream e referência remota dessa
+branch; eventual falha deve ser registrada sem force push. CI remota desta entrega
+não verificada; validação acima é local. Sem PR, merge ou deploy.
+Próxima tarefa funcional permanece WEB-006, conforme Retomada acima.

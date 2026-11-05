@@ -4,6 +4,15 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-05 — Painel visual de acompanhamento
+
+- Acrescentado painel ao backlog com resumo de aceites, barras por marco,
+  acesso às fichas concluídas e sequência do marco atual, por solicitação do responsável.
+- PROGRESS passou a oferecer navegação visual para o painel e suas evidências;
+  índice documental atualizado. Contabilidade permanece no backlog único.
+- Alteração de apresentação e navegação, sem novo aceite, mudança de escopo,
+  requisito, contrato, runtime ou autorização de execução.
+
 ## 2026-11-05 — Validação da estratégia incremental pelo responsável
 
 - O responsável respondeu “valido” à proposta versionada em `270377b`, aprovando
