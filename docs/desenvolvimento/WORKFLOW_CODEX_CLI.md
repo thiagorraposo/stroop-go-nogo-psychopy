@@ -46,14 +46,15 @@ somente no roadmap. Nao gerar prompts nem copias de tabelas de progresso.
 
 Trabalhar em branch de desenvolvimento separada e fazer commits locais pequenos
 apos validacao, conforme o AGENTS raiz e `PADRAO_DE_COMMITS.md`, sem incluir
-alteracoes preexistentes. A diretriz permanente do responsavel autoriza pushes,
-PRs e merges conforme [GitHub Flow](../../CONTRIBUTING.md), com CI aprovada e
+alteracoes preexistentes. A diretriz permanente do responsavel autoriza pushes
+e criacao/atualizacao de PRs conforme [GitHub Flow](../../CONTRIBUTING.md).
+Merge exige autorizacao explicita do responsavel, com CI aprovada e
 regras/revisoes obrigatorias satisfeitas. PR para main e obrigatorio; integrar
 exclusivamente por Merge Commit tradicional (`gh pr merge --merge`), preservando
 os commits originais. Nunca usar Squash Merge, Rebase Merge, push direto para
-main, force push ou bypass administrativo. Se auto-merge estiver disponivel,
-`gh pr merge --merge --auto` pode aguardar as protecoes; caso contrario, aguardar
-os checks/aprovacoes e usar merge normal. Conferir o SHA validado antes de
+main, force push ou bypass administrativo. Manter auto-merge desabilitado e
+nunca usar `--auto`. Apos checks/aprovacoes, deixar o PR aberto e pronto para
+revisao; integrar somente com autorizacao explicita. Conferir o SHA validado antes de
 integrar e sua ancestralidade em origin/main depois do merge. Falhas, conflitos
 ou aprovacoes pendentes mantem o PR aberto, sem reduzir protecoes.
 Tags, deploy e operacoes destrutivas exigem autorizacao especifica.

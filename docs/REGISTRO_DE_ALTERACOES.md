@@ -13,6 +13,9 @@ O estado da nova versao web e mantido separadamente no
   estava habilitado. Reconsulta da API confirmou PR, verify, regras de revisao,
   administradores e bloqueios de force push/exclusao preservados. Sem rulesets
   adicionais; Rebase e auto-merge mantidos como estavam.
+- Orientacao posterior do responsavel: sem automerge. GitHub auto-merge
+  permanece desabilitado; Codex pode abrir/atualizar PRs, mas so integra apos
+  autorizacao explicita, mesmo com CI aprovada. PR desta entrega fica aberto.
 - AGENTS, contribuicao, workflow Codex e CI_WEB alinhados ao merge tradicional
   por PR. Exportacao/rollback e validacao remota descritos em CI_WEB.
 - Alteracao exclusivamente de governanca Git; sem codigo, workflows Actions,

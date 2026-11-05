@@ -34,7 +34,9 @@ continua zero; code owners e ultima aprovacao por outro autor continuam como
 antes. Force push e exclusao de main continuam bloqueados; assinaturas continuam
 sem exigencia. Nenhum ruleset de repositorio ou herdado foi encontrado, nem regra
 adicional efetiva; proprietario e conta pessoal. Auto-merge continua desabilitado:
-aguardar checks e usar `gh pr merge --merge`, sem alterar essa configuracao.
+aguardar checks e autorizacao explicita do responsavel antes de usar
+`gh pr merge --merge`. Por instrucao posterior nesta sessao, nao automatizar
+merges nem usar `--auto`; PRs podem ser criados/atualizados automaticamente.
 Workflows, permissoes de usuarios e demais configuracoes foram preservados.
 
 Exportacao original, alvo, resultado verificado e rollback estao no diretorio
