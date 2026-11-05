@@ -1,6 +1,6 @@
 # Projeto Stroop Test — backlog canônico da plataforma WEB
 
-Última verificação documental: **2026-11-04**. Missão e limites:
+Última verificação documental: **2026-11-05**. Missão e limites:
 [arquitetura](ARQUITETURA_WEB.md); inventário: [auditoria](AUDITORIA_REPLANEJAMENTO.md);
 especificação: [requisitos e matriz](REQUISITOS_E_RASTREABILIDADE.md).
 Este é o único registro executável de marcos, tarefas, estados, dependências,
@@ -15,7 +15,8 @@ decisões satisfeitas, falta execução/autorização de sessão), EM_ANDAMENTO
 EM_VALIDACAO (entrega disponível, critérios em conferência), CONCLUIDA (todos
 critérios comprovados). Não há crédito parcial. Autorização de sessão é distinta
 de prontidão técnica. A missão documental encerrou em M0; o comando posterior
-`continue o projeto`, em 2026-11-04, autoriza M1 até seu encerramento.
+`continue o projeto`, em 2026-11-04, autorizou M1 até seu encerramento.
+O novo comando de 2026-11-05 autoriza M2, condicionado às decisões de suas tarefas.
 
 Uma tarefa CONCLUIDA tem todos critérios, comandos/resultados/data, componente,
 referências de teste e Git. Documento é evidência suficiente apenas para entrega
@@ -261,15 +262,40 @@ produção não comprovados por estes ensaios. Riscos R01–R10 permanecem abert
 
 ### WEB-005 — Fechar contratos de participante, preparação e política de perda
 
-- Marco: M2. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Marco: M2. Prioridade: P0. Complexidade: M. Estado: BLOQUEADA.
 - Dependências: WEB-004; DEC-01 e DEC-02.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Comparação contrato/código aprovada; decisões registram alternativa e impacto, incluindo RAM final-only e entidade de avaliação; nada inferido como novo requisito.
-- Testes/verificação: `PLANEJADO: revisão de contratos/decisões e schema lógico`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R03, R07; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Testes/verificação: revisão estática contrato/código/schema lógico executada; achados em EV-M2-005. Aceite das decisões pelo responsável ainda pendente; suites funcionais não reexecutadas nesta revisão documental.
+- Evidências: EV-M2-005, 2026-11-05, código inspecionado em `bcd896b`. Comparação preparada para decisão; não constitui aceite funcional nem aprovação do responsável.
+- Riscos/bloqueios: R03, R07. DEC-01/02 solicitadas ao responsável nesta sessão; sem resposta registrada, não concluir o contrato nem iniciar WEB-006/007/008. Desbloqueio: responsável escolher as alternativas abaixo e registrar impactos se ampliar escopo.
 - Referências: REQ-PAR-002, REQ-AVA-002, REQ-INT-003; [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega: branch `docs/m2-contratos-participacao`, baseada em `bcd896b` para preservar M1 ainda não integrado à main; fechamento em Retomada.
+
+### EV-M2-005 — comparação preparada para decisão, 2026-11-05
+
+Revisão estática na HEAD `bcd896b`,
+sem executar banco, acessar dados reais ou alterar runtime/schema. Fontes:
+[contrato HTTP](desenvolvimento/CONTRATO_API_WEB.md),
+[modelo](dados/MODELO_DE_DADOS.md), [arquitetura](ARQUITETURA_WEB.md) e
+[D2](experimento/PROTOCOLO_WEB.md). A revisão abaixo descreve implementação;
+não substitui as decisões de produto/metodologia nem os ensaios WEB-006/007/008.
+
+| Aspecto | Contrato e evidência no código | Consequência para decisão |
+|---|---|---|
+| Participante | `api/sessions.py::CreateInvitation` admite apenas participant_id/visit; RequestModel fecha campos. `stroop/application/web_sessions.py::_label` valida rótulos; migration 0005 vincula convite a projeto/emissor. | Alternativa DEC-01: manter pseudônimo/visita por projeto, sem pessoa global, demografia ou cadastro longitudinal. |
+| Preparação | `stroop/persistence/web_sessions.py::create_invitation` grava convite e reserva session_id; `redeem` cria a sessão preparing e ordem. Migration 0005 confirma vínculo, expiração e uso único. | Avaliação planejada é representada pelo convite; não há agenda autônoma. Nova emissão gera outro convite/sessão, sem reabrir a execução anterior. |
+| Resultado | `complete_participant_session` cria assessment_id e grava avaliação/tentativas/métricas/proveniência/recibo na transação. Migration 0006 liga resultado à sessão de forma única. | Avaliação oficial só existe após conclusão integral válida; não criar linha oficial para preparação, aborto ou expiração. Atomicidade real permanece a comprovar em WEB-007. |
+| Perda e interrupção | `web/src/participant/ParticipantRun.ts` conserva payload em memória, aborta running carregada com reload, descarta payload ao encerrar/expirar e só confirma após recibo/consulta. | Alternativa DEC-02: manter RAM final-only e D2, aceitando perda antes do envio, sem checkpoint/offline/retomada. |
+| Falha após envio | O contrato prevê consulta/reenvio idêntico enquanto credencial válida; ParticipantRun.send consulta recibo após falha incerta e conserva o corpo para retry. | Falta de resposta não prova ausência de commit. Após expiração, resultado eventualmente salvo só é consultável pelo profissional autorizado. |
+| Informação ao participante | `web/src/components/ResultSummary.tsx` distingue enviando/pendente/recebido e avisa que sair sem confirmação não conserva o resultado. | Informação antes da execução e cenários de interrupção devem ser conferidos na tarefa de fluxo WEB-015 após a decisão; não presumir que o aviso tardio cobre toda perda pré-envio. |
+
+DEC-01/02 foram apresentadas ao responsável com alternativas explícitas de
+preservar o modelo atual ou descrever ampliação. Nenhuma resposta foi inferida
+do comando genérico de continuidade. Se houver ampliação, registrar requisitos,
+contratos, testes e autorização de schema/método antes de implementação dependente.
+A contagem de aceites permanece inalterada; não há tarefa independente pronta
+em M2 enquanto WEB-005 aguarda as duas decisões.
 
 ### WEB-006 — Revalidar entrada de conclusão e proveniência do protocolo
 
@@ -886,20 +912,36 @@ não depende de reaprovação científica. Não há bloqueio documental remanesc
 
 ## Retomada
 
-Marco autorizado atual: **M1**, pelo comando posterior `continue o projeto` de
-2026-11-04. **M1 concluído, WEB-001 a WEB-004 aceitas**. Evidência, ambiente e SHA
-funcional em EV-M1; [receita local](desenvolvimento/BASELINE_LOCAL.md).
+Marco autorizado atual: **M2**, pelo novo comando `continue o projeto` de
+2026-11-05. M1 permanece concluído (WEB-001 a WEB-004; EV-M1).
+WEB-005 teve comparação estática preparada em EV-M2-005 e está **BLOQUEADA**
+aguardando DEC-01 e DEC-02 do responsável, solicitadas nesta sessão.
+WEB-006/007/008 permanecem PENDENTES pela dependência; nenhum aceite novo.
 
-Branch de entrega `test/m1-baseline-sintetica`, worktree isolada
-`/tmp/stroop-m1-baseline-20261104`. Checkout de desenvolvimento para retomada:
-`/home/raposo/Projetos/experimentos-psicopy/stroop-cognifit`, na branch da entrega.
-Worktree isolada preservada em HEAD destacada; ambientes preexistentes preservados.
-Não criar frontend/API do zero, repetir auditoria global, avançar M2, integrar
-main nem publicar por inferência. Próximo marco após autorização posterior:
-**M2, WEB-005**. Antes do trabalho
-dependente, documentar DEC-01 (pseudônimo/visita/preparação por convite) e DEC-02
-(perda antes do envio, RAM final-only e aborto sem retomada conforme D2).
-WEB-005 permanece PENDENTE; não houve avanço de M2 nesta sessão.
+Próxima ação: registrar as respostas sobre pseudônimo/visita/preparação por
+convite e RAM final-only/aborto sem retomada. Com decisões compatíveis, concluir
+WEB-005 e seguir WEB-006 dentro de M2; se ampliarem escopo, documentar impactos
+antes do trabalho dependente. Não avançar M3, integrar main ou publicar por inferência.
+
+Git M2: branch `docs/m2-contratos-participacao`, baseada na entrega M1 `bcd896b`
+ainda não integrada à main; árvore limpa e branches locais/upstreams conferidos
+após `git fetch origin`. main/origin/main em `fe8f24f`; branch M1/origin em
+`bcd896b`. Commit deste registro identificável por
+`git log -1 --format=%H -- docs/REGISTRO_DE_ALTERACOES.md` nesta branch.
+Validação documental de 2026-11-05: procedimento Python do workflow aprovado
+(84 documentos, 488 links relativos, 3 âncoras; 42 tarefas, 36 requisitos,
+11 marcos, 10 riscos, 5 decisões e dependências sem ciclos); `git diff --check`
+aprovado. Escopo: somente backlog e registro de alterações. Consulta
+`gh run list --branch docs/m2-contratos-participacao` sem execuções; CI não
+executada, não equivale a aprovação. Primeiro envio previsto com upstream;
+resultado verificável por `git rev-parse HEAD`, `git rev-parse @{upstream}` e
+`git ls-remote --heads origin docs/m2-contratos-participacao` (SHAs devem coincidir).
+Falha de envio exige registrar a pendência; não criar PR/merge/deploy.
+Nenhuma suite funcional reexecutada; mudança exclusivamente documental.
+
+Checkout de desenvolvimento: `/home/raposo/Projetos/experimentos-psicopy/stroop-cognifit`.
+Worktree sintética M1 `/tmp/stroop-m1-baseline-20261104` preservada em HEAD
+destacada; não repetir baseline global sem divergência concreta.
 
 Git M1: baseline versionada em `e15892c5d8a396223b5f33d842a003e882e4ee6d`,
 enviada com upstream e confirmada por `git ls-remote --heads origin

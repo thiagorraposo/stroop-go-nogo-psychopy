@@ -4,6 +4,16 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-05 — Comparação dos contratos de participação e perda
+
+- Comparados contrato HTTP, modelo lógico e implementação de convite, sessão,
+  conclusão e envio em memória para preparar as decisões do responsável.
+- Documentada a distinção entre convite preparado, sessão criada no resgate e
+  avaliação oficial criada na conclusão. Registrados os limites do aviso de
+  perda exibido no envio pendente e da recuperação após resposta incerta.
+- Nenhum contrato científico, payload, schema ou runtime alterado. Achados,
+  dependências e próxima ação ficam exclusivamente no backlog canônico.
+
 ## 2026-11-04 — Reprodução sintética da fundação WEB
 
 - Reproduzida implementação existente em worktree sparse isolada, com locks
