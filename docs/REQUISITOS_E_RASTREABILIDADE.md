@@ -423,10 +423,10 @@ já existe ou participa da regressão geral. WEB-000 é exclusivamente documenta
 | REQ-EXP-002 | ADR-004 | M3 | WEB-010 | `web/src/experiment/main-engine.ts, ExperimentHost.tsx` | `web/src/experiment/main.test.ts` | PLANEJADA; consultar WEB-010 no backlog |
 | REQ-EXP-003 | ADR-004 | M3 | WEB-011 | `web/src/experiment/environment.ts, web/pilots/` | `PLANEJADO: campanha de engenharia M3` | PLANEJADA; consultar WEB-011 no backlog |
 | REQ-INT-001 | ADR-004 | M2 | WEB-006 | `stroop/domain/web_results.py, api/results.py` | `tests/test_web_results.py, tests/test_web_sessions.py, tests/test_web_checkpoints.py` | EXECUTADA em WEB-006; EV-M2 no backlog |
-| REQ-INT-002 | ADR-004 | M2 | WEB-007 | `stroop/persistence/web_sessions.py` | `tests/test_web_checkpoints.py, tests/test_web_sessions.py` | Ensaios locais em EV-M2; aceite WEB-007 pendente |
+| REQ-INT-002 | ADR-004 | M2 | WEB-007 | `stroop/persistence/web_sessions.py, web_checkpoints.py` | `tests/test_web_checkpoints.py, tests/test_web_sessions.py, tests/test_web_database_provision.py, tests/test_postgres_migrations.py` | EXECUTADA em WEB-007; EV-M2-007/008 no backlog |
 | REQ-INT-003 | ADR-004/005 | M2 | WEB-005 | `ParticipantRun.ts e modelo lógico` | `ADR-005 e matriz de falhas validados pelo responsável em 2026-11-05` | Aceite documental em EV-M2-005-R2; receptor/banco em EV-M2, worker/timing ainda planejados em M3/M4 |
-| REQ-MET-001 | ADR-004 | M2 | WEB-008 | `stroop/domain/stroop.py, web_results.py` | `tests/test_nucleo_compartilhado.py, tests/test_web_export.py, tests/test_web_checkpoints.py` | Regressão executada em EV-M2; aceite WEB-008 pendente |
-| REQ-MET-002 | ADR-004 | M2 | WEB-008 | `stroop/domain/stroop.py, web/src/dashboard/analysis.ts` | `tests/test_web_results.py, web/src/dashboard/analysis.test.ts` | Regressão executada em EV-M2; aceite WEB-008 pendente |
+| REQ-MET-001 | ADR-004 | M2 | WEB-008 | `stroop/domain/stroop.py, web_results.py` | `tests/test_nucleo_compartilhado.py, tests/test_web_export.py, tests/test_web_checkpoints.py` | EXECUTADA em WEB-008; EV-M2-007/008 no backlog |
+| REQ-MET-002 | ADR-004 | M2 | WEB-008 | `stroop/domain/stroop.py, web/src/dashboard/analysis.ts` | `tests/test_web_results.py, web/src/dashboard/analysis.test.ts` | EXECUTADA em WEB-008; EV-M2-007/008 no backlog |
 | REQ-MET-003 | ADR-004 | M5 | WEB-019 | `web_assessments, api/assessments.py` | `tests/test_web_assessments.py` | PLANEJADA; consultar WEB-019 no backlog |
 | REQ-REL-001 | ADR-004 | M5 | WEB-017 | `web/src/components/, api/assessments.py` | `tests/test_web_assessments.py` | PLANEJADA; consultar WEB-017 no backlog |
 | REQ-REL-002 | ADR-004 | M5 | WEB-019 | `web/src/components/, web/src/dashboard/` | `tests/test_web_results.py` | PLANEJADA; consultar WEB-019 no backlog |

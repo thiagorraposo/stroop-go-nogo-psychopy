@@ -4,6 +4,17 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-05 — Comprovação de atomicidade e paridade de M2
+
+- Acrescentada prova de ACK após commit com constraint trigger adiado e leitura
+  independente, asserções de cardinalidade nas corridas e inspeção dos papéis PG.
+- Reforçada a referência independente das 12 métricas/unidades e a conferência
+  dos valores persistidos após exportação/reimportação CSV sintética.
+- Conferidos critérios WEB-007/008 e matriz ADR-005 aplicável ao backend;
+  evidências locais e vínculos REQ-INT-002/REQ-MET-001/002 no backlog único.
+  Runtime, migrations, fórmulas, dependências e protocolo preservados.
+- Nenhum trabalho de M3, pesquisa real, integração à main ou deploy nesta sessão.
+
 ## 2026-11-05 — Receptor incremental e vínculos WEB
 
 - Implementada migration aditiva 0011 para participantes/visitas por projeto,
