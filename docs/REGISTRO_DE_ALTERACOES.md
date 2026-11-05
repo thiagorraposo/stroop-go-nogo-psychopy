@@ -4,6 +4,16 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-05 — Regressão consolidada da apresentação experimental
+
+- Conferidos os critérios de WEB-044 na apresentação aprovada: dez cores,
+  contorno/centro, HUD sem precisão, feedback, lifecycle, regras e métricas/CSV.
+- Executadas regressões frontend/Python e screenshots sintéticos; observação
+  temporal preparatória com navegador visível e trilhas preservadas.
+- Evidências, ambientes, resultados e limites em EV-M3-044 no backlog; campanha
+  DEC-04 com transporte ativo e aceite de suporte continuam gates próprios.
+- Runtime, protocolo, dependências, dados e serviços externos preservados.
+
 ## 2026-11-05 — Aprovação visual de D3 pelo proprietário
 
 - Registrada aprovação explícita para contorno branco sem cartão, progresso e
