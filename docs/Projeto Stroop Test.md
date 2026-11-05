@@ -1539,8 +1539,14 @@ abertas para campanha; estes novos passes não determinam sua causa/estabilidade
 Aceites restritos às fichas WEB-042/043; WEB-044 mantém regressão consolidada e
 WEB-011/012 os gates científicos/técnicos. M4/M5 não antecipados. Sem alteração
 de regras, fórmulas, schema, persistência, CSV, produção ou recursos externos.
-Sem PR/merge/deploy. SHA, push e CI efetivos serão registrados após versionar;
-entrega identificável por `git log -1 --format=%H
+Sem PR/merge/deploy. Entrega em **`e17a7b90d88f14acfb9707e3636ea05faa388832`**,
+push confirmado por HEAD/upstream/ls-remote na mesma SHA. Consulta `gh run list
+--branch feat/m3-motor-experimental --limit 5 --json headSha,status,conclusion,url`
+retornou `[]`: nenhuma execução Actions, não é CI aprovada. Fechamento documental
+identificável por `git log -1 --format=%H
+--grep='docs: registra aceite visual de WEB-042 e WEB-043'`; conferir seu envio
+por HEAD/upstream/remoto. Validador final preserva IDs/aceites contra a HEAD nova.
+A implementação é identificável por `git log -1 --format=%H
 --grep='feat(web): aplica apresentação visual aprovada na revisão D3'`.
 
 ### Retomada anterior — integração CHG-003 (histórico)
