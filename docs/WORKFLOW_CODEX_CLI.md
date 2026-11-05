@@ -156,8 +156,9 @@ WEB-042/043/044, REQ-UX-001…011 e [UX](experimento/UX_DECISIONS.md).
   evidências atuais; não reinterpretar os aceites anteriores como teste do visual
   novo. Não confundir progresso do backlog com indicador de tentativas.
 - `continue o projeto`: somente tarefas do marco autorizado com dependências,
-  critérios/testes e decisões satisfeitos. Priorizar risco científico. CHG-003
-  não aprova D3 revisado, identificação D4 ou matriz DEC-04. Escolhas A puramente
+  critérios/testes e decisões satisfeitos. Priorizar risco científico. A revisão visual D3/D4
+  de 2026-11-05 pelo proprietário aprova stroop-web-outline/1.0.0 e desbloqueia
+  a implementação de WEB-042/043; não aprova a matriz DEC-04. Escolhas A puramente
   visuais só são independentes quando não burlam aprovação B/C da apresentação.
   Executar prontas de M3, sem antecipar instruções/fluxo M4 ou dashboard M5.
   WEB-011 deve usar layout final aprovado/testado e transporte DEC-02 ativo;

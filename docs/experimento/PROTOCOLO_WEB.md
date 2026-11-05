@@ -148,18 +148,20 @@ nao comprova equivalencia com o PsychoPy.
 
 ## Decisoes aprovadas para o MVP
 
-Todas as decisoes D1–D6 foram **aprovadas explicitamente pelo usuario em
+As decisões originais D1–D6 foram **aprovadas explicitamente pelo usuario em
 2026-10-16**, em resposta a proposta de decisoes da sessao. O usuario tambem
 confirmou ser o responsavel pela pesquisa, validacao e operacao. A aprovacao
 remove a pendencia metodologica; a implementacao e as evidencias dos gates
 continuam sob as respectivas etapas do roadmap, que concentra o aceite formal.
+D3 visual e identificação complementar D4 foram revisadas pelo proprietário em
+2026-11-05, conforme tabela vigente e registro detalhado abaixo.
 
 | ID | Decisao aprovada | Motivo e limite |
 |---|---|---|
 | D1 — Dispositivos e navegadores | MVP em computador desktop/notebook com teclado fisico, Windows ou Linux, usando Chrome/Edge Chromium ou Firefox estaveis na data da validacao. Verificar ambiente antes de iniciar, sem exigir tela cheia. Celular, tablet, toque, Safari e macOS ficam fora do MVP ate validacao propria | Preserva Espaco como resposta e limita combinacoes de ambiente; versoes e combinacoes efetivamente homologadas devem ser enumeradas a partir dos testes, sem declarar suporte universal |
 | D2 — Foco e interrupcao | Antes da pratica, aguardar foco/aba visivel. Durante o principal, perda de foco (`blur`), troca de aba/aba oculta, fechamento, recarga ou Escape invalida a execucao; nao pausar/retomar a mesma serie nem gerar resultado parcial. Novo inicio exige nova sessao e pratica. Durante a pratica, descartar a rodada interrompida e exigir nova rodada completa antes do principal | Evita continuidade silenciosa com exposicao/intervalos alterados; o backend devera representar interrupcao sem metricas finais ou exportacao oficial parcial. Fechamento/recarga nao garantem entrega de aviso ao servidor; W02 devera prever expiracao |
-| D3 — Repeticao da pratica | Manter rodadas de 4 tentativas, sem limiar de desempenho; permitir repetir opcionalmente antes do principal, com nova ordem aleatoria e descarte das tentativas de treino para o resultado oficial. Manter 16 tentativas principais, tempos, contagens, cores e HUD atuais, incluindo precisao ao vivo e cronometro; principal sem feedback por tentativa | A repeticao opcional altera a dose de treino e foi aprovada metodologicamente para a WEB; sua implementacao nao altera o Builder local |
-| D4 — Identificacao | Usar `test_version=0.2.2-web.1`, mantendo `test_code=stroop_go_nogo_ptbr`; versao do aplicativo e plataforma `web` ficam em metadados separados a especificar em W02 | Identifica a variante de coleta sem prometer equivalencia. Nao adicionar colunas ao CSV oficial de 21 campos nem reutilizar silenciosamente `0.2.2` para tecnologia de medicao diferente |
+| D3 — Prática e apresentação visual (revisada em 2026-11-05 pelo proprietário) | Manter rodadas de 4 tentativas, sem limiar de desempenho; permitir repetir opcionalmente antes do principal, com nova ordem aleatoria e descarte das tentativas de treino para o resultado oficial. Manter 16 tentativas principais, tempos, contagens e cores. Adotar stroop-web-outline/1.0.0: palavras com contorno branco fino sem retângulo, progresso periférico e cronômetro principal; sem precisão agregada na prática/principal, feedback individual só na prática. Política de visibilidade na revisão visual abaixo | A repeticao opcional altera a dose de treino e foi aprovada metodologicamente para a WEB; sua implementacao nao altera o Builder local |
+| D4 — Identificacao | Preservar `test_version=0.2.2-web.1` e identificar também a variante visual/versão via snapshot e app_version conforme revisão D3; manter `test_code=stroop_go_nogo_ptbr`; versao do aplicativo e plataforma `web` ficam em metadados separados a especificar em W02 | Identifica a variante de coleta sem prometer equivalencia. Nao adicionar colunas ao CSV oficial de 21 campos nem reutilizar silenciosamente `0.2.2` para tecnologia de medicao diferente |
 | D5 — Criterio temporal | Adotar os ensaios instrumentados e limites abaixo como gate de engenharia: 10 execucoes sinteticas por ambiente de referencia, ate um quadro por transicao e ate 100 ms de desvio no bloco principal de 60 s | RT do navegador nao mede latencia fisica completa; aprovacao do criterio nao comprova seu atendimento nem equivalencia psicometrica |
 | D6 — Fronteiras do teclado | Aplicar as regras web da matriz: somente a primeira nova pressao de Espaco, RT estritamente positivo e fim exclusivo; tecla mantida/repeticao automatica nao responde e a resposta nao abrevia estimulo ou tentativa | Torna os casos limite verificaveis e evita transportar respostas de navegacao para estimulos. O XML local sozinho nao comprova paridade de tecla mantida |
 
@@ -171,7 +173,7 @@ esta registrado no [historico de decisoes](DECISOES_DO_EXPERIMENTO.md#historico-
 Essa excecao modifica o aceite da etapa, sem alterar os limites de validade
 abaixo nem transformar medicoes de software em latencia fisica comprovada.
 
-1. Preservar duracoes nominais, contagens, HUD e sequencia atuais. Registrar
+1. Preservar duracoes nominais, contagens e sequencia; HUD segue D3 revisada. Registrar
    instantes planejados e observados de apresentacao/retirada do estimulo com
    relogio monotono no navegador; registrar eventos do teclado no mesmo dominio
    temporal. Data/hora civil identifica a sessao, sem calcular RT.
@@ -247,7 +249,7 @@ Checkpoint não altera duração, estímulos, HUD, prática, métricas ou CSV.
 validada e seus limites. A validação documental dessa matriz e da estratégia
 não comprova ensaios de timing com transporte nem prontidão para coleta real.
 
-## CHG-003 — apresentação WEB proposta, sem alteração de D1–D6
+## CHG-003 — proposta inicial (histórico anterior à aprovação visual)
 
 Solicitação de 2026-11-05: palavras sem retângulo branco e com contorno branco,
 HUD discreto de progresso/tempo e retirada completa de precisão agregada durante
@@ -255,7 +257,9 @@ prática/principal, mantendo feedback individual da prática e cálculos oficiai
 Direção detalhada em [UX_DECISIONS](UX_DECISIONS.md); execução e aprovação no
 [backlog único](../Projeto%20Stroop%20Test.md).
 
-**Divergência explícita:** D3 aprovado exige HUD atual com precisão ao vivo.
+Registro histórico, superado pela aprovação visual abaixo.
+
+**Divergência explícita à época:** D3 aprovado exige HUD atual com precisão ao vivo.
 A solicitação autoriza direção UX, mas não alteração silenciosa de D3. Antes do
 runtime, o responsável metodológico deve aprovar a apresentação revisada,
 visibilidade de progresso/cronômetro, escopo do feedback e identificação/versionamento
@@ -268,3 +272,71 @@ A campanha WEB-011 deve usar o layout final aprovado e transporte incremental
 ativo (DEC-02/ADR-005), com falhas/retries e limites D5 intactos; medição apenas
 na apresentação antiga não comprova esta alteração. WEB-034 avalia percepção,
 saliência, atenção e protocolo visual, sem presumir equivalência com PsychoPy.
+
+## Revisão visual D3 — aprovação explícita do proprietário, 2026-11-05
+
+O proprietário aprovou expressamente nesta missão a substituição da apresentação
+incompatível anterior: remover retângulo branco, contorno branco fino nas letras
+com as dez tintas preservadas, progresso minimalista/periférico e cronômetro
+estável, sem precisão acumulada na prática/principal. Feedback individual da
+prática, repetição opcional sem limiar e todo o protocolo cognitivo permanecem.
+Essa aprovação é atribuída **ao proprietário**, que já se declarou responsável
+pela pesquisa, validação e operação em 2026-10-16. Não há requisito documentado
+de anuência adicional de um responsável distinto para esse gate; não se atribui
+aprovação a terceiro. DEC-04 continua pendente para campanha/suporte; DEC-03/05
+continuam independentes, sem autorização de coleta real ou deploy.
+
+### Identificação e comparabilidade da apresentação
+
+- Identificador estável da variante visual: **`stroop-web-outline`**.
+- Versão do protocolo visual: **`1.0.0`**; fonte executável:
+  `condicoes/web_protocol.json`, seção `visual` (`id`, `version`).
+- Identificação cognitiva D4 preservada: `test_code=stroop_go_nogo_ptbr`,
+  `test_version=0.2.2-web.1`, `protocol_id=stroop_go_nogo_ptbr/0.2.2-web.1`.
+  D4 passa a exigir também identificação visual: não reutilizar isoladamente
+  esses campos para inferir a apresentação usada.
+- Aplicativo com esta apresentação: `app_version=web-<versão do pacote>+visual.1.0.0`.
+  A versão visual fica assim nos metadados já fixados em start/complete/recibo e
+  detalhe/exportação técnica, sem coluna nova no CSV de 21 campos ou schema novo.
+  Snapshot/SHA complementam a proveniência. Não mudar resultados anteriores.
+- Anterior: apresentação com retângulo claro e precisão ao vivo, sem versão visual
+  explícita, presente até `3d9d515`. Não atribuir retroativamente `1.0.0` a dados
+  antigos. Dados só com test_version ou CSV sem app_version não distinguem os dois
+  visuais: exigir proveniência técnica externa; não combinar silenciosamente.
+- Incrementar versão visual quando mudar apresentação relevante; nova aprovação
+  se afetar percepção/atenção. Testes anteriores continuam históricos, sem provar
+  a nova apresentação. Não há comparabilidade/equivalência psicométrica ou
+  temporal demonstrada pela revisão documental.
+
+### Política do HUD e apresentação aprovada
+
+| Estado | Estímulo / HUD |
+|---|---|
+| Prática: fixação, estímulo e intervalo | Progresso discreto de tentativas concluídas/total; sem precisão agregada ou cronômetro novo de prática |
+| Prática: lembrete, contagem e feedback individual | HUD oculto; feedback de cada tentativa preservado, sem avaliação agregada |
+| Principal: fixação, estímulo e intervalo | Progresso e cronômetro decorrido MM:SS visíveis e periféricos, sem precisão ou feedback individual |
+| Principal: contagem | HUD oculto e relógio do principal ainda não iniciado |
+| Fim/interrupção | Motor limpa HUD/listeners; fluxo posterior mantém regras de recibo/D2 e protocolo de resultados já existente |
+
+Durante estímulos: palavras sobre o fundo experimental atual, sem caixa; contorno
+branco fino/uniforme por token, tinta/fonte/peso/escala/centro preservados. Progresso
+real de concluídas, sem valores fixos ou animação. Cronômetro tem números tabulares,
+largura estável e usa origem monotônica existente; não mede RT nem usa timer React.
+Nenhuma accuracy acumulada, taxa de erros, ranking, tooltip ou conteúdo equivalente
+no DOM/árvore acessível. Não altera cálculos, persistência, métricas administrativas
+ou exportações. A espessura será conferida nas dez cores em Chromium/Firefox,
+sem tratamento por cor ou inferência de equivalência a partir de screenshots.
+
+D1/D2/D5/D6, ordem, Go/No-Go, janelas, durações, condições, feedback individual e
+repetição da prática preservados. Campanha WEB-011 deve avaliar esta variante com
+transporte incremental ativo e limites D5 inalterados; WEB-034 mantém revisão
+metodológica final. Aprovação visual libera implementação autorizada de
+WEB-042/043, não os gates de campanha, suporte ou encerramento de M3.
+
+
+### D3/D4 anteriores — transcrição histórica preservada
+
+| ID | Decisão anterior | Motivo e limite histórico |
+|---|---|---|
+| D3 — Repeticao da pratica | Manter rodadas de 4 tentativas, sem limiar de desempenho; permitir repetir opcionalmente antes do principal, com nova ordem aleatoria e descarte das tentativas de treino para o resultado oficial. Manter 16 tentativas principais, tempos, contagens, cores e HUD atuais, incluindo precisao ao vivo e cronometro; principal sem feedback por tentativa | A repeticao opcional altera a dose de treino e foi aprovada metodologicamente para a WEB; sua implementacao nao altera o Builder local |
+| D4 — Identificacao | Usar `test_version=0.2.2-web.1`, mantendo `test_code=stroop_go_nogo_ptbr`; versao do aplicativo e plataforma `web` ficam em metadados separados a especificar em W02 | Identifica a variante de coleta sem prometer equivalencia. Nao adicionar colunas ao CSV oficial de 21 campos nem reutilizar silenciosamente `0.2.2` para tecnologia de medicao diferente |

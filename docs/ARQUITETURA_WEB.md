@@ -200,11 +200,14 @@ recuperabilidade só porque um arquivo de backup existe.
 ## Apresentação experimental — integração de CHG-003
 
 Alvo de UX em [UX_DECISIONS](experimento/UX_DECISIONS.md), contratos preservados
-em D1–D6; aprovação e execução somente no backlog. `main-engine.ts` e
+em D1/D2/D5/D6; D3/D4 revisadas pelo proprietário no protocolo. Execução somente
+no backlog. Variante `stroop-web-outline/1.0.0` no snapshot e sufixo visual em
+app_version preservam proveniência sem alterar schema/persistência. `main-engine.ts` e
 `practice-engine.ts` continuam donos do DOM/HUD e do relógio monotônico, sob
 plugins `main.ts`/`practice.ts`; `ExperimentHost` apenas monta/limpa. Contorno por
 token visual uniforme, preenchimento do snapshot e centro do estímulo preservados.
-HUD futuro expõe somente progresso/tempo/etapa quando aprovados; nenhum nó ou
+HUD aprovado expõe somente progresso/etapa em prática e principal e tempo
+decorrido apenas no principal, conforme D3; nenhum nó ou
 conteúdo acessível de precisão agregada. Não levar cronômetro ou quadros ao React.
 
 A retirada da precisão é de apresentação: domínio Python, resumo técnico em RAM,
@@ -215,3 +218,10 @@ evitar refatoração ampla para unificá-los. Componentes/tokens compartilhados 
 UI são revalidados em M5 somente onde reutilizados. M4 integra instruções e
 estados de envio/recibo com ADR-005. M9 valida protocolo visual e limitações;
 CHG-003 não altera fronteiras, schema, transporte, segurança ou libera produção.
+
+`web/src/experiment/presentation.ts` agora concentra somente o DOM de progresso
+e cronômetro dos dois plugins; não contém timers, captura ou fórmula científica.
+Motores entregam número de concluídas e elapsed, preservando agendamento/RT.
+Estilos em `styles.css` aplicam contorno apenas durante a palavra-estímulo,
+com token uniforme. Metadados `visual` no snapshot e sufixo visual em app_version
+identificam esta revisão; a persistência e os contratos fechados não mudam.

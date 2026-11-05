@@ -69,6 +69,9 @@ A aprovação histórica D1–D6 permanece; não é evidência de equivalência 
 
 ## Variante WEB aprovada em 2026-10-16
 
+Registro original preservado. A apresentação vigente segue a revisão visual D3
+do proprietário de 2026-11-05 e identificação complementar de D4 no protocolo.
+
 O usuario aprovou explicitamente os itens 1–19 apresentados na sessao, incluindo
 as decisoes D1–D6 detalhadas no [protocolo WEB](PROTOCOLO_WEB.md). A finalidade e
 coleta de dados pelo grupo de pesquisa ao qual pertence; o publico sao os
@@ -174,7 +177,7 @@ matriz de invalidação antes da implementação. D1–D6, métricas, prática e
 continuam preservados. Ensaios técnicos e temporais continuam exigidos;
 a validação documental não autoriza migração operacional, deploy ou coleta real.
 
-## CHG-003 — apresentação WEB proposta, sem alteração de D1–D6
+## CHG-003 — proposta inicial (histórico anterior à aprovação visual)
 
 Solicitação de 2026-11-05: palavras sem retângulo branco e com contorno branco,
 HUD discreto de progresso/tempo e retirada completa de precisão agregada durante
@@ -182,7 +185,9 @@ prática/principal, mantendo feedback individual da prática e cálculos oficiai
 Direção detalhada em [UX_DECISIONS](UX_DECISIONS.md); execução e aprovação no
 [backlog único](../Projeto%20Stroop%20Test.md).
 
-**Divergência explícita:** D3 aprovado exige HUD atual com precisão ao vivo.
+Registro histórico, superado pela revisão visual de D3.
+
+**Divergência explícita à época:** D3 aprovado exige HUD atual com precisão ao vivo.
 A solicitação autoriza direção UX, mas não alteração silenciosa de D3. Antes do
 runtime, o responsável metodológico deve aprovar a apresentação revisada,
 visibilidade de progresso/cronômetro, escopo do feedback e identificação/versionamento
@@ -195,3 +200,16 @@ A campanha WEB-011 deve usar o layout final aprovado e transporte incremental
 ativo (DEC-02/ADR-005), com falhas/retries e limites D5 intactos; medição apenas
 na apresentação antiga não comprova esta alteração. WEB-034 avalia percepção,
 saliência, atenção e protocolo visual, sem presumir equivalência com PsychoPy.
+
+## D3 visual revisada pelo proprietário — 2026-11-05
+
+Aprovação explícita do proprietário substitui somente a apresentação incompatível
+na D3 histórica acima. A decisão vigente, identificação `stroop-web-outline/1.0.0`,
+complemento de D4 e política de visibilidade estão no
+[protocolo](PROTOCOLO_WEB.md#revisão-visual-d3--aprovação-explícita-do-proprietário-2026-11-05).
+Sem retângulo branco; contorno branco fino/tinta original; progresso periférico e
+cronômetro principal estáveis; nenhuma precisão agregada na prática/principal;
+feedback individual da prática preservado. Protocolo cognitivo, métricas,
+persistência e limites D5 intactos. Não se atribui aprovação a terceiro:
+o proprietário já se declarou responsável pela pesquisa/validação/operação.
+DEC-04 e validação final M9 continuam independentes e pendentes.

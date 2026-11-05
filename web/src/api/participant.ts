@@ -5,7 +5,7 @@ import type { MainResult, MainTrial } from '../experiment/main-engine'
 import { validMainResult } from '../experiment/main-engine'
 import packageInfo from '../../package.json'
 
-export const APP_VERSION = `web-${packageInfo.version}`
+export const APP_VERSION = `web-${packageInfo.version}+visual.${PROTOCOL.visual.version}`
 export const PROTOCOL_ID = 'stroop_go_nogo_ptbr/0.2.2-web.1'
 export const TEST_VERSION = '0.2.2-web.1'
 type CommonSession = { session_id: string; activated_at: string; expires_at: string; csrf_token: string }

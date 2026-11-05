@@ -35,7 +35,7 @@ de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
 Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
 não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
 
-Progresso atual: **11/45 entregáveis aceitos (WEB-000 a WEB-010)**.
+Progresso atual: **13/45 entregáveis aceitos (WEB-000 a WEB-010 e WEB-042/043)**.
 WEB-005 é documental; WEB-006 aceita o receptor backend e contratos em banco
 sintético. M1 e M2 concluídos; atomicidade e paridade aceitas em EV-M2-007/008.
 A captura incremental no motor e seus gates temporais continuam em M3/M4.
@@ -46,10 +46,10 @@ Atualizado em **2026-11-05**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **11 de 45 · 24,4%** | **34** | **M3 · apresentação e DEC-04 pendentes** | Aprovar apresentação/D3 e identificação/D4 → WEB-042/043; campanha [WEB-011](#web-011--executar-campanha-de-engenharia-temporal-em-ambientes-declarados) ainda exige DEC-04 |
+| **13 de 45 · 28,9%** | **32** | **M3 · apresentação aceita; DEC-04 pendente** | WEB-044 pronta; campanha [WEB-011](#web-011--executar-campanha-de-engenharia-temporal-em-ambientes-declarados) ainda exige DEC-04 |
 
 ```text
-Aceites   █████░░░░░░░░░░░░░░░   24,4%
+Aceites   ██████░░░░░░░░░░░░░░   28,9%
 ```
 
 A barra global é aproximada; os números são exatos, com percentual arredondado.
@@ -69,7 +69,7 @@ A ordem da tabela segue os IDs; dependências e paralelismo estão na
 | [M0](#m0--auditoria-e-replanejamento-documental) | Auditoria e replanejamento documental | 🟩 **1/1** | ✅ Concluído |
 | [M1](#m1--fundação-e-baseline-reproduzível) | Fundação e baseline reproduzível | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M2](#m2--backend-e-contratos-de-dados-consolidados) | Backend e contratos de dados consolidados | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
-| [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | 🟩🟩⬜⬜⬜⬜⬜ **2/7** | ◐ Apresentação e DEC-04 pendentes |
+| [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | 🟩🟩⬜⬜🟩🟩⬜ **4/7** | ◐ Regressão pronta; DEC-04 pendente |
 | [M4](#m4--fluxo-ponta-a-ponta-de-avaliações) | Fluxo ponta a ponta de avaliações | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
@@ -95,6 +95,8 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 | ✅ [WEB-008](#web-008--comprovar-paridade-oficial-de-métricas-e-ausência-de-medida) | Paridade das 12 métricas e ausência de medida | Domínio/API/CSV/PG/SQLite/UI e HTTPS focado |
 | ✅ [WEB-009](#web-009--conferir-snapshot-condições-e-paleta-efetiva-da-web) | Condições, paleta efetiva e tempos do snapshot WEB | Fontes Builder/CSV/JSON, DOM e testes de motor |
 | ✅ [WEB-010](#web-010--revalidar-plugins-jspsych-ciclo-de-vida-e-janela-de-resposta) | Plugins, ciclo de vida e regras de resposta/interrupção | jsPsych real, StrictMode, testes de teclado e navegadores visíveis; estabilidade de suporte ainda não aceita |
+| ✅ [WEB-042](#web-042--refinar-estímulos-e-hierarquia-visual-experimental) | Palavras com contorno branco sem cartão e centro preservado | DOM, dez cores/screenshots Chromium/Firefox e regressão funcional |
+| ✅ [WEB-043](#web-043--reformular-hud-e-retirar-precisão-agregada-do-participante) | HUD sem precisão, progresso real e cronômetro estável | DOM/árvore acessível, unidade e navegadores; gates de campanha separados |
 
 ### Foco do marco atual
 
@@ -102,15 +104,15 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 |---|---|---|---|
 | [WEB-009](#web-009--conferir-snapshot-condições-e-paleta-efetiva-da-web): condições e paleta | [WEB-010](#web-010--revalidar-plugins-jspsych-ciclo-de-vida-e-janela-de-resposta): plugins e lifecycle | [WEB-011](#web-011--executar-campanha-de-engenharia-temporal-em-ambientes-declarados): campanha temporal | [WEB-012](#web-012--registrar-viabilidade-e-limites-de-suporte-do-motor): suporte |
 
-| ⬜ Bloqueado | ⬜ Bloqueado | ⬜ Sem aceite |
+| ✅ Aceito | ✅ Aceito | ○ Pronta |
 |---|---|---|
 | WEB-042: estímulos/centro | WEB-043: HUD sem precisão | WEB-044: regressão visual/funcional/temporal |
 
 M2 permanece concluído em EV-M2 e EV-M2-007/008. M3 autorizado;
-WEB-009/010 preservam aceite. CHG-003 adiciona WEB-042/043 (BLOQUEADAS pela
-aprovação da apresentação frente a D3/D4) e WEB-044 (PENDENTE).
+WEB-009/010 preservam aceite. CHG-003 adiciona WEB-042/043 (CONCLUIDAS após revisão D3/D4 aprovada explicitamente pelo
+proprietário e critérios conferidos em EV-M3-042/043) e WEB-044 (PRONTA).
 WEB-011 continua BLOQUEADA por DEC-04 e depende agora do layout final testado;
-WEB-012 permanece PENDENTE. Nenhuma tarefa funcional pronta nesta conferência.
+WEB-012 permanece PENDENTE. Próxima executável: WEB-044; DEC-04 não aprovada.
 
 **Acompanhar impedimentos:** [riscos](#registro-de-riscos) ·
 [decisões externas](#decisões-externas-e-condições-de-desbloqueio).
@@ -800,37 +802,37 @@ D5 e suporte exigem evidências próprias; nenhuma reutilização da exceção W
 
 ### WEB-042 — Refinar estímulos e hierarquia visual experimental
 
-- Marco: M3. Prioridade: P0. Complexidade: M. Estado: BLOQUEADA.
-- Dependências: WEB-009, WEB-010; aprovação metodológica CHG-003 frente a D3/D4.
-- Responsável: Codex na execução; responsável metodológico aprova apresentação, HUD e identificação da variante.
+- Marco: M3. Prioridade: P0. Complexidade: M. Estado: CONCLUIDA.
+- Dependências: WEB-009, WEB-010; revisão D3/D4 aprovada explicitamente pelo proprietário nesta missão em 2026-11-05, variante stroop-web-outline/1.0.0.
+- Responsável: Codex na execução; proprietário aprovou apresentação, HUD e identificação visual; nenhuma aprovação atribuída a terceiro.
 - Critérios de aceite: Remover retângulo branco sem caixa substituta; contorno branco uniforme por token com tinta das dez cores/fundo/tipografia preservados. Avaliar stroke e alternativa compatível; centro geométrico inalterado e HUD periférico sem deslocamento. Nenhuma mudança em condições, tempos, ordem, escala por responsividade ou cores. Registrar versão aprovada e screenshots sintéticos de todas as cores em Chromium/Firefox e resoluções permitidas.
-- Testes/verificação: PLANEJADO: ampliar web/src/experiment/main.test.ts, practice.test.ts e web/e2e/main.spec.ts/practice.spec.ts para DOM, geometria e screenshots; testes novos terão caminhos registrados quando criados.
-- Evidências: PLANEJADAS; nenhum runtime alterado/teste funcional reexecutado para CHG-003. Evidência da auditoria em EV-CHG-003.
-- Riscos/bloqueios: R01/R02/R11; impedimento observado: D3 exige HUD anterior; falta aprovação metodológica explícita e definição de identificação/versionamento frente a D4. Ação: responsável aprovar apresentação e registrar decisão antes de código. DEC-04 da campanha permanece pendente.
+- Testes/verificação: web/src/experiment/main.test.ts, practice.test.ts, presentation.test.ts; web/e2e/presentation.spec.ts e fluxos main.spec.ts/practice.spec.ts. Comandos/resultados, screenshots e limites em EV-M3-042/043.
+- Evidências: EV-M3-042/043, 2026-11-05; critérios funcionais/visuais desta ficha comprovados em testes e inspeção de screenshots. Nenhum aceite de WEB-044/011/012 ou M3 por implicação.
+- Riscos/bloqueios: R01/R02/R11 abertos; gate de apresentação satisfeito pela aprovação explícita do proprietário, que já responde pela pesquisa/validação/operação. WEB-009/010 concluídas. DEC-04 continua pendente para campanha/suporte; não bloqueia esta implementação. Sem exigência documentada de aprovador distinto.
 - Referências: REQ-UX-001/002/007; UX-01/05; componentes main-engine.ts/practice-engine.ts e tokens visuais existentes. [UX](experimento/UX_DECISIONS.md); CHG-003.
-- Git da entrega: implementação/commit/testes ainda não aplicáveis; registrar SHA, push e CI quando executada.
+- Git da entrega: feat/m3-motor-experimental, base 3d9d515; SHA, push e CI no fechamento EV-M3-042/043. Fonte e testes validados juntos.
 
 ### WEB-043 — Reformular HUD e retirar precisão agregada do participante
 
-- Marco: M3. Prioridade: P0. Complexidade: M. Estado: BLOQUEADA.
-- Dependências: WEB-009, WEB-010; aprovação metodológica CHG-003 frente a D3/D4 e visibilidade de progresso/tempo.
-- Responsável: Codex na execução; responsável metodológico aprova apresentação, HUD e identificação da variante.
+- Marco: M3. Prioridade: P0. Complexidade: M. Estado: CONCLUIDA.
+- Dependências: WEB-009, WEB-010; revisão D3/D4 aprovada explicitamente pelo proprietário nesta missão em 2026-11-05, variante stroop-web-outline/1.0.0.
+- Responsável: Codex na execução; proprietário aprovou apresentação, HUD e identificação visual; nenhuma aprovação atribuída a terceiro.
 - Critérios de aceite: Remover nós, barras, percentuais, rótulos, tooltips e equivalentes de desempenho na prática/principal, sem resíduo na árvore acessível/espaçamento. Não substituir por ranking/taxa de erros. Preservar feedback individual da prática, cálculos oficiais e métricas. Progresso fino/discreto deriva etapa/total e tentativas concluídas do contrato, sem números fixos/animação. Cronômetro decorrido MM:SS/tabular/largura estável usa origem monotônica existente; sem relógio React, timer duplicado, deriva ou alteração de RT. Não criar relógio de prática por inferência.
-- Testes/verificação: PLANEJADO: main.test.ts/practice.test.ts verificam ausência e feedback, total real/completadas, relógio/lifecycle; E2E verifica DOM/árvore acessível, geometria e resoluções em Chromium/Firefox.
-- Evidências: PLANEJADAS; nenhum runtime alterado/teste funcional reexecutado para CHG-003. Evidência da auditoria em EV-CHG-003.
-- Riscos/bloqueios: R01/R02/R11; impedimento observado: D3 exige HUD anterior; falta aprovação metodológica explícita e definição de identificação/versionamento frente a D4. Ação: responsável aprovar apresentação e registrar decisão antes de código. DEC-04 da campanha permanece pendente.
+- Testes/verificação: web/src/experiment/main.test.ts, practice.test.ts, presentation.test.ts; web/e2e/presentation.spec.ts e fluxos main.spec.ts/practice.spec.ts. Comandos/resultados, screenshots e limites em EV-M3-042/043.
+- Evidências: EV-M3-042/043, 2026-11-05; critérios funcionais/visuais desta ficha comprovados em testes e inspeção de screenshots. Nenhum aceite de WEB-044/011/012 ou M3 por implicação.
+- Riscos/bloqueios: R01/R02/R11 abertos; gate de apresentação satisfeito pela aprovação explícita do proprietário, que já responde pela pesquisa/validação/operação. WEB-009/010 concluídas. DEC-04 continua pendente para campanha/suporte; não bloqueia esta implementação. Sem exigência documentada de aprovador distinto.
 - Referências: REQ-UX-003/004/005/006; UX-02/03/04; componentes main-engine.ts/practice-engine.ts, protocol.ts e summary.ts (preservado). [UX](experimento/UX_DECISIONS.md); CHG-003.
-- Git da entrega: implementação/commit/testes ainda não aplicáveis; registrar SHA, push e CI quando executada.
+- Git da entrega: feat/m3-motor-experimental, base 3d9d515; SHA, push e CI no fechamento EV-M3-042/043. Fonte e testes validados juntos.
 
 ### WEB-044 — Validar regressão da apresentação experimental refinada
 
-- Marco: M3. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Marco: M3. Prioridade: P0. Complexidade: M. Estado: PRONTA.
 - Dependências: WEB-042, WEB-043.
-- Responsável: Codex na execução; responsável metodológico aprova apresentação, HUD e identificação da variante.
+- Responsável: Codex na execução; aprovação visual do proprietário já registrada; gates DEC-04/M9 mantêm responsáveis e critérios próprios.
 - Critérios de aceite: Conferir dez cores, contorno/tinta/ausência da caixa, centro/fonte/escala e HUD nas resoluções aprovadas em Chromium/Firefox com screenshots sintéticos. Ausência real de precisão em prática/principal, inclusive árvore acessível, sem espaço residual/substituto; feedback individual permanece. Progresso/cronômetro corretos, sem timers duplicados. Go/No-Go, congruência, quatro resultados, janelas, sequência, lifecycle, interrupções e versão preservados. Paridade das métricas/CSV em fixtures; persistência/relatórios/admin continuam gates reais WEB-016/019/020. Registrar observação temporal preparatória sem aprovar campanha WEB-011/DEC-04. CSS não comprova validade científica.
 - Testes/verificação: PLANEJADO: npm test, npm run typecheck, npm run build; Playwright Chromium/Firefox (visual/funcional/temporal proporcional); tests/test_fase3_condicoes_tempos.py, tests/test_nucleo_compartilhado.py e tests/test_web_export.py. Reusar fixtures sintéticas, sem dados reais. Matriz completa na fonte UX e requisitos; registrar comandos, ambiente, falhas/skips e SHA.
-- Evidências: PLANEJADAS; nenhum runtime alterado/teste funcional reexecutado para CHG-003. Evidência da auditoria em EV-CHG-003.
-- Riscos/bloqueios: R01/R02/R11; dependências de implementação pendentes; DEC-04 continua necessária para campanha/suporte, sem aprovação presumida.
+- Evidências: Consolidação PLANEJADA; implementação/testes dos pré-requisitos em EV-M3-042/043. Reusar evidências na mesma SHA quando aplicáveis e executar apenas lacunas/mudanças justificadas, sem crédito automático para esta ficha.
+- Riscos/bloqueios: R01/R02/R11; WEB-042/043 aceitas; regressão consolidada ainda não executada/aceita como entrega própria; DEC-04 continua necessária para campanha/suporte, sem aprovação presumida.
 - Referências: REQ-UX-001 a REQ-UX-007/011; REQ-EXP-001/002/003; main/practice/Host/summary e testes existentes; integração de métricas em M4/M5. [UX](experimento/UX_DECISIONS.md); CHG-003.
 - Git da entrega: implementação/commit/testes ainda não aplicáveis; registrar SHA, push e CI quando executada.
 
@@ -1313,7 +1315,7 @@ de mitigação no código não elimina risco sem ensaio. Atualizar somente aqui.
 | R09 | Dependências de VPS/DNS/TLS/OIDC/chaves/destino externo ou CI sem PR | Bloqueio de homologação/recuperação e falsa prontidão | Média | Alta | Preparar local independente; inventário de recursos e validação por SHA, sem mudar proteção para contornar bloqueio | M1/M8/M10 | Operador + técnico | ABERTO |
 | R10 | Reescrever o que existe, ampliar instrumentos e manter backlogs concorrentes | Retrabalho e escopo sem controle | Alta | Alta | Auditoria, backlog único, critérios pequenos, IDs e controle de mudança; sem crédito histórico automático | Todos | Coordenador técnico | ABERTO |
 
-| R11 | Contorno/retirada da caixa e precisão, HUD e diferenças de renderização alteram percepção/saliência/atenção | Versões experimentais incompatíveis e evidência anterior insuficiente | Média | Alta | Aprovar apresentação frente a D3/D4; dez cores/screenshots sintéticos Chromium/Firefox, versão/SHA distinta, WEB-044/011 e revisão WEB-034 com DEC-04. Não inferir melhoria de desempenho/validade pela redução de informação potencialmente distrativa | M3/M4/M9 | Técnico + metodológico | ABERTO |
+| R11 | Contorno/retirada da caixa e precisão, HUD e diferenças de renderização alteram percepção/saliência/atenção | Versões experimentais incompatíveis e evidência anterior insuficiente | Média | Alta | Aprovação visual D3/D4 pelo proprietário registrada; conferir dez cores/screenshots sintéticos Chromium/Firefox, versão/SHA distinta, WEB-044/011 e revisão WEB-034 com DEC-04. Não inferir melhoria de desempenho/validade pela redução de informação potencialmente distrativa | M3/M4/M9 | Técnico + metodológico | ABERTO |
 
 Risco mais importante: R01, com R02 como limite de interpretação. R03 é o
 principal risco de integridade do fluxo atual e precisa decisão antes de ampliar captura.
@@ -1431,13 +1433,117 @@ preservando commits; sem squash em novas integrações. Rebase habilitado no
 remoto não muda essa preferência; nenhuma configuração/proteção foi alterada.
 PR continua não automático conforme AGENTS/Contribuição.
 
+### CHG-003 — revisão D3 e liberação visual, 2026-11-05
+
+Nova solicitação explícita do proprietário aprova apresentação/HUD e substitui
+requisitos visuais incompatíveis da D3 anterior. A fonte metodológica já registra
+o proprietário como responsável pela pesquisa/validação/operação; não exige
+aprovação de terceiro para este gate. Aprovação atribuída somente ao proprietário.
+D3 revisada e D4 complementada no protocolo: variante `stroop-web-outline`, versão
+visual `1.0.0`, identificada também pelo sufixo `+visual.1.0.0` no app_version já
+persistido. Protocolo cognitivo/test_version preservados; comparabilidade não
+comprovada, dados antigos não recebem identificação retroativa. Não cria CHG,
+requisito, tarefa ou denominador redundante; é aprovação da mudança já registrada.
+
+WEB-042/043: BLOQUEADA → PRONTA → EM_ANDAMENTO, dependências WEB-009/010 aceitas;
+esta missão autoriza implementação após validação documental. Sem aprovação de
+DEC-04, estudo psicométrico, coleta real, produção ou encerramento de M3. Campanha
+WEB-011 exige a variante revisada, transporte ativo e D5 intacto; WEB-044 e
+WEB-034 mantêm critérios próprios. Histórico inicial CHG-003 acima preservado.
+
 - Revisão futura: usar ID CHG novo com motivo, requisito alterado, componentes,
   testes a revisar, dependências afetadas e aprovação externa quando exigida.
   Não reabrir tarefa concluída sem regressão comprovada ou novo escopo registrado.
 
 ## Retomada
 
-### Retomada vigente — CHG-003, 2026-11-05
+### Retomada vigente — D3 visual implementada, 2026-11-05
+
+Marco autorizado M3; missão atual limitada à revisão D3 e WEB-042/043, agora
+CONCLUIDAS. Variante `stroop-web-outline/1.0.0`, snapshot identificado e
+`app_version=web-0.1.0+visual.1.0.0`. Progresso **13/45 (28,9%)**, 32 sem aceite;
+M3 **4/7**, ainda não encerrado. WEB-044 **PRONTA**, próxima tarefa executável
+pelo futuro `continue o projeto`; não antecipada como aceite nesta missão.
+WEB-011 continua BLOQUEADA por DEC-04 e dependente de WEB-044/layout final com
+transporte incremental ativo; WEB-012 PENDENTE. R01/R02/R11 continuam abertos.
+Nenhuma validação física, equivalência psicométrica, pesquisa real ou deploy.
+
+### EV-M3-042/043 — revisão D3 e apresentação visual, 2026-11-05
+
+Autorização: esta missão aprova explicitamente a apresentação pelo proprietário
+e permite implementar WEB-042/043 se o gate for satisfeito. Fonte científica
+registra o proprietário como responsável por pesquisa/validação/operação desde
+2026-10-16; nenhuma exigência vigente de aprovador distinto foi encontrada, nem
+aprovação atribuída a terceiro. Histórico D3 anterior transcrito/preservado;
+D3 revisada e D4 complementada por versão visual. DEC-04 continua PENDENTE.
+
+Inicialização: branch `feat/m3-motor-experimental`, worktree limpa, HEAD/upstream
+`3d9d515c1f3269b418d5416cd0f4d55005c212dd` após fetch; main local `fe8f24f`,
+origin/main `db56b40`, base M2/M3 não integrada preservada sem merge/rebase.
+Auditoria direcionada: D3/D4, fichas WEB-042/043, snapshot/HUD, motores, Host,
+metadados app_version, contratos e testes. Documentação validada **antes** do
+runtime: 45 tarefas/47 requisitos/11 riscos/cinco decisões/11 marcos; links e
+grafo válidos, diff check aprovado. Não foi repetida auditoria global M0/M1.
+
+Critérios conferidos:
+
+| Entrega | Evidência atual e limite |
+|---|---|
+| WEB-042: sem retângulo/caixa, contorno fino e tinta preservada | CSS `--experiment-outline-width:.02em`, stroke branco e paint-order stroke fill; nenhum tratamento por cor. Unidade verifica palavras/tintas; Playwright confere dez cores, fonte/peso, fundo transparente, contorno uniforme e centro geométrico em 1280×720/1920×1080, Chromium/Firefox. 40 screenshots sintéticos, amostras inspecionadas incluindo todas as dez cores entre os dois navegadores. Não é validação perceptiva/psicométrica. |
+| WEB-042: geometria/escala/tempos preservados | Dimensões/fonte/fundo geral originais mantidos; HUD absoluto periférico; sem scroll na fixture isolada. Testes de tempos/condições e motores passam; nenhuma mudança em agendamento, condição, teclado ou ordem. |
+| WEB-043: retirada real da precisão | Motores deixam de criar nós/rótulos/barras/percentuais; DOM/árvore acessível de prática e principal não contêm agregados/substitutos. Removidos apenas contadores/formatadores que desenhavam o HUD principal; cálculo oficial em summary/domínio, exportações e métricas administrativas intactos. Contador de treino/feedback individual preservado. |
+| WEB-043: progresso/tempo | HUD imperativo compartilhado presentation.ts recebe total do order validado e número de concluídas; sem total fixo no indicador. Barra 3px sem transição/animação; relógio principal MM:SS com números tabulares/largura estável e origem monotônica existente. Teste de MutationObserver confirma ausência de escrita por quadro no mesmo segundo. Sem novo timer/relógio de prática ou render React por quadro. |
+| WEB-043: feedback e lifecycle | Prática mantém os quatro resultados/feedbacks, repetição e sem limiar; testes reais Chromium/Firefox concluem 16 principais sem encurtar resposta. Suite Vitest cobre Host/cleanup, métricas, relatórios e janelas já existentes. Esses ensaios não substituem integração real M4/M5 ou campanha DEC-04. |
+
+Ambiente: Linux `7.0.0-42-generic`, Node `24.15.0`, npm `11.16.0`, Python
+`3.12.3`, Playwright `1.64.1`; Chromium **156.0.8078.4**, Firefox **157.0**.
+Sem instalação/atualização de dependências; apenas fontes/fixtures sintéticas.
+
+Comandos e resultados desta sessão:
+
+- `npm --prefix web test`: **281/281 aprovados**, 17 arquivos, incluindo novo
+  presentation.test.ts e regressões de cálculos/painel. Sem skips.
+- `npm --prefix web run typecheck` e `npm --prefix web run build`: aprovados.
+- Em web: `WEB_TEST_PORT=4273 npx playwright test e2e/presentation.spec.ts
+  --workers=1 --trace=off --output=test-results/d3-visual-final`: **6/6 aprovados**,
+  headless, motores reais com relógio controlado. Confere DOM/árvore acessível,
+  dez cores, centro, contorno, progresso, fonte tabular/largura, ausência de
+  animações e feedback da prática. Artefatos sintéticos ignorados em
+  `web/test-results/d3-visual-final/` (40 PNGs); não são coletas nem exportações.
+- Em web: `WEB_TEST_PORT=4273 npx playwright test e2e/main.spec.ts
+  e2e/practice.spec.ts --grep 'principal executa|rodada real' --workers=1
+  --trace=off --headed --output=test-results/d3-flow`: **4/4 aprovados**, prática
+  e principal completos por navegador com relógio real. API double em HTTP/Vite;
+  não é integração HTTPS/API/PG, ensaio de latência física ou campanha D5 de
+  dez execuções por ambiente com transporte incremental ativo.
+- `.venv/bin/python -m unittest tests.test_fase3_condicoes_tempos
+  tests.test_nucleo_compartilhado tests.test_web_export tests.test_verify_web_docs
+  -q`: **32 aprovados**, sem skips; fontes locais/cores/tempos, métricas e CSV
+  preservados. Nenhuma migration ou suíte PG necessária para este escopo.
+- Validador documental e `git diff --check`: aprovados; **45 tarefas, 47 requisitos,
+  11 riscos, cinco decisões, 11 marcos, 13 aceitos, 84 documentos, 565 links e
+  45 âncoras**, sem ciclos. Documentação não valida experimento.
+
+Falhas preservadas: primeira tipagem acusou chamada residual updateHud; rodada
+focada subsequente teve 34 falhas/57 aprovações pelo mesmo ReferenceError.
+Corrigida a chamada no tick, seguida da suite completa aprovada. Primeira rodada
+visual headed: 3 falhas/3 aprovações, por fixture que mantinha página com scroll
+(deslocando centro em 1280) e timeout/fechamento Firefox no setViewportSize antes
+da execução. Fixture passou a isolar DOM e fixar viewport no contexto. Rodada
+headless intermediária: 6 aprovados, mas listener remanescente gerou mensagem de
+interrupção ao fechar página; acrescentado cleanup explícito afterEach. Rodada
+final acima: 6 aprovados sem aquela mensagem; sem afrouxar tolerância geométrica,
+interrupções ou limites D5. Falhas históricas Firefox de EV-M3-009/010 permanecem
+abertas para campanha; estes novos passes não determinam sua causa/estabilidade.
+
+Aceites restritos às fichas WEB-042/043; WEB-044 mantém regressão consolidada e
+WEB-011/012 os gates científicos/técnicos. M4/M5 não antecipados. Sem alteração
+de regras, fórmulas, schema, persistência, CSV, produção ou recursos externos.
+Sem PR/merge/deploy. SHA, push e CI efetivos serão registrados após versionar;
+entrega identificável por `git log -1 --format=%H
+--grep='feat(web): aplica apresentação visual aprovada na revisão D3'`.
+
+### Retomada anterior — integração CHG-003 (histórico)
 
 Marco autorizado **M3**, sem avanço implícito. Integração documental de CHG-003
 não implementa UX: barra/cartão anteriores continuam presentes no runtime.

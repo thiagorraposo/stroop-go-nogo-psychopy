@@ -122,7 +122,7 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 - Dependências: WEB-009 e pré-requisitos registrados no backlog.
 - Restrições conhecidas: Local 0.2.2; WEB 0.2.2-web.1; regras completas só no protocolo.
 - Origem: experimento/DECISOES_DO_EXPERIMENTO.md e PROTOCOLO_WEB.md (D1–D6).
-- Impacto CHG-003: Apresentação alvo em REQ-UX-001/002/003/005/007 e WEB-042/043; aceite WEB-009 preservado para fontes/tempos/paleta, sem crédito para visual novo. D3 continua vigente até aprovação explícita.
+- Impacto CHG-003: Apresentação alvo em REQ-UX-001/002/003/005/007 e WEB-042/043; aceite WEB-009 preservado para fontes/tempos/paleta, sem crédito para visual novo. D3 visual revisada pelo proprietário; validação experimental não presumida.
 
 ### REQ-EXP-002
 
@@ -213,7 +213,7 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 - Dependências: WEB-019 e pré-requisitos registrados no backlog.
 - Restrições conhecidas: Nenhuma declaração de equivalência local/WEB.
 - Origem: dados/MODELO_DE_DADOS.md e stroop/domain/stroop.py.
-- Impacto CHG-003: WEB-019 e WEB-034 devem identificar apresentação anterior/posterior por versão aprovada e SHA; identificação da variante frente a D4 exige responsável.
+- Impacto CHG-003: WEB-019 e WEB-034 devem identificar apresentação anterior/posterior por versão aprovada e SHA; identificação visual complementa D4 conforme aprovação do proprietário no protocolo.
 
 ## G. Dashboard e relatórios
 
@@ -411,16 +411,16 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 
 ## M. Apresentação e experiência do participante — CHG-003
 
-Direção UX confirmada pela solicitação de 2026-11-05. Aprovação metodológica
-da apresentação revisada e identificação da variante ainda necessárias frente
-a D3/D4; DEC-04 não aprovada. Especificação visual detalhada na
+Direção UX confirmada pela solicitação de 2026-11-05. Apresentação e
+identificação stroop-web-outline/1.0.0 aprovadas explicitamente pelo proprietário
+na revisão D3/D4 de 2026-11-05; DEC-04 não aprovada. Especificação visual detalhada na
 [fonte UX](experimento/UX_DECISIONS.md). Nenhum aceite retroativo.
 
 ### REQ-UX-001
 
 - Descrição: Contorno branco dos caracteres. Aplicar contorno branco uniforme por token, preservando preenchimento das dez cores e tipografia experimental; avaliar stroke e alternativa compatível.
 - Justificativa: Integrar UX-01–08 da missão à plataforma existente, reduzindo informação potencialmente distrativa sem inferir benefício científico.
-- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental pendente de aprovação metodológica.
+- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental aprovada pelo proprietário em D3 revisada; validações funcionais/temporais ainda exigidas.
 - Aceite verificável: Dez cores, token, tinta interna e screenshots sintéticos em Chromium/Firefox, sem efeitos decorativos.
 - Dependências: WEB-042, CHG-003 e gates do marco no backlog.
 - Restrições conhecidas: D1–D6, DEC-02/04, R01/R02/R11; sem equivalência, fórmula nova ou autorização de outro marco.
@@ -430,7 +430,7 @@ a D3/D4; DEC-04 não aprovada. Especificação visual detalhada na
 
 - Descrição: Ausência do fundo retangular. Retirar fundo branco das palavras sem cartão substituto; manter fundo geral e centralização.
 - Justificativa: Integrar UX-01–08 da missão à plataforma existente, reduzindo informação potencialmente distrativa sem inferir benefício científico.
-- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental pendente de aprovação metodológica.
+- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental aprovada pelo proprietário em D3 revisada; validações funcionais/temporais ainda exigidas.
 - Aceite verificável: Nenhuma caixa de fundo no DOM renderizado; centro/tamanho/fonte conferidos nas resoluções aprovadas.
 - Dependências: WEB-042, CHG-003 e gates do marco no backlog.
 - Restrições conhecidas: D1–D6, DEC-02/04, R01/R02/R11; sem equivalência, fórmula nova ou autorização de outro marco.
@@ -440,7 +440,7 @@ a D3/D4; DEC-04 não aprovada. Especificação visual detalhada na
 
 - Descrição: Progresso experimental real. Reformular indicador discreto com etapa e tentativas concluídas derivadas do contrato, distinguindo prática e principal.
 - Justificativa: Integrar UX-01–08 da missão à plataforma existente, reduzindo informação potencialmente distrativa sem inferir benefício científico.
-- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental pendente de aprovação metodológica.
+- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental aprovada pelo proprietário em D3 revisada; validações funcionais/temporais ainda exigidas.
 - Aceite verificável: Sem totais fixos/avanço antecipado/animação; valores 0..total coerentes com eventos reais.
 - Dependências: WEB-043, CHG-003 e gates do marco no backlog.
 - Restrições conhecidas: D1–D6, DEC-02/04, R01/R02/R11; sem equivalência, fórmula nova ou autorização de outro marco.
@@ -450,7 +450,7 @@ a D3/D4; DEC-04 não aprovada. Especificação visual detalhada na
 
 - Descrição: Cronômetro monotônico discreto. Preservar tempo decorrido do principal e MM:SS, com números tabulares/largura estável e fonte monotônica do motor.
 - Justificativa: Integrar UX-01–08 da missão à plataforma existente, reduzindo informação potencialmente distrativa sem inferir benefício científico.
-- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental pendente de aprovação metodológica.
+- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental aprovada pelo proprietário em D3 revisada; validações funcionais/temporais ainda exigidas.
 - Aceite verificável: Sem timer React/duplicado/deriva; origem e término preservados; RT independente e alinhamento estável.
 - Dependências: WEB-043, CHG-003 e gates do marco no backlog.
 - Restrições conhecidas: D1–D6, DEC-02/04, R01/R02/R11; sem equivalência, fórmula nova ou autorização de outro marco.
@@ -460,7 +460,7 @@ a D3/D4; DEC-04 não aprovada. Especificação visual detalhada na
 
 - Descrição: Ausência de precisão em tempo real. Remover precisão agregada, percentuais, barras, rótulos e equivalentes da prática/principal, incluindo árvore acessível.
 - Justificativa: Integrar UX-01–08 da missão à plataforma existente, reduzindo informação potencialmente distrativa sem inferir benefício científico.
-- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental pendente de aprovação metodológica.
+- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental aprovada pelo proprietário em D3 revisada; validações funcionais/temporais ainda exigidas.
 - Aceite verificável: Sem nó, tooltip, espaço residual ou substituto de acertos/erros/ranking; feedback individual da prática permanece.
 - Dependências: WEB-043, CHG-003 e gates do marco no backlog.
 - Restrições conhecidas: D1–D6, DEC-02/04, R01/R02/R11; sem equivalência, fórmula nova ou autorização de outro marco.
@@ -470,7 +470,7 @@ a D3/D4; DEC-04 não aprovada. Especificação visual detalhada na
 
 - Descrição: Preservação das métricas científicas. Retirada visual não altera accuracy total/Go/No-Go, omissões, comissões, RT, métricas persistidas, relatórios e CSV.
 - Justificativa: Integrar UX-01–08 da missão à plataforma existente, reduzindo informação potencialmente distrativa sem inferir benefício científico.
-- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental pendente de aprovação metodológica.
+- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental aprovada pelo proprietário em D3 revisada; validações funcionais/temporais ainda exigidas.
 - Aceite verificável: Paridade das 12 métricas, persistência e exportações; dashboard autorizado conserva precisão e ausência de RT.
 - Dependências: WEB-044, CHG-003 e gates do marco no backlog.
 - Restrições conhecidas: D1–D6, DEC-02/04, R01/R02/R11; sem equivalência, fórmula nova ou autorização de outro marco.
@@ -480,7 +480,7 @@ a D3/D4; DEC-04 não aprovada. Especificação visual detalhada na
 
 - Descrição: Hierarquia experimental estável. Priorizar palavra no centro, HUD periférico autorizado, sem precisão ou espaço reservado; preservar escala experimental.
 - Justificativa: Integrar UX-01–08 da missão à plataforma existente, reduzindo informação potencialmente distrativa sem inferir benefício científico.
-- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental pendente de aprovação metodológica.
+- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental aprovada pelo proprietário em D3 revisada; validações funcionais/temporais ainda exigidas.
 - Aceite verificável: Centro não se desloca com HUD; teclado/foco/ambiente preservados; sem scroll e controles distrativos.
 - Dependências: WEB-042, CHG-003 e gates do marco no backlog.
 - Restrições conhecidas: D1–D6, DEC-02/04, R01/R02/R11; sem equivalência, fórmula nova ou autorização de outro marco.
@@ -490,7 +490,7 @@ a D3/D4; DEC-04 não aprovada. Especificação visual detalhada na
 
 - Descrição: Instruções e prática claras. Melhorar hierarquia Go/No-Go, tecla e confirmação; diferenciar prática/principal sem alterar estratégia ou semântica.
 - Justificativa: Integrar UX-01–08 da missão à plataforma existente, reduzindo informação potencialmente distrativa sem inferir benefício científico.
-- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental pendente de aprovação metodológica.
+- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental aprovada pelo proprietário em D3 revisada; validações funcionais/temporais ainda exigidas.
 - Aceite verificável: Feedback individual e repetição opcional sem limiar preservados; teclado/foco e confirmação testados.
 - Dependências: WEB-014, CHG-003 e gates do marco no backlog.
 - Restrições conhecidas: D1–D6, DEC-02/04, R01/R02/R11; sem equivalência, fórmula nova ou autorização de outro marco.
@@ -500,7 +500,7 @@ a D3/D4; DEC-04 não aprovada. Especificação visual detalhada na
 
 - Descrição: Transições previsíveis. Organizar instruções, prática, feedback, preparação e execução, sem mudar durações nem dar desempenho agregado.
 - Justificativa: Integrar UX-01–08 da missão à plataforma existente, reduzindo informação potencialmente distrativa sem inferir benefício científico.
-- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental pendente de aprovação metodológica.
+- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental aprovada pelo proprietário em D3 revisada; validações funcionais/temporais ainda exigidas.
 - Aceite verificável: Etapas distintas, layout estável e foco correto; nenhum início por tecla mantida ou sem confirmação.
 - Dependências: WEB-014, CHG-003 e gates do marco no backlog.
 - Restrições conhecidas: D1–D6, DEC-02/04, R01/R02/R11; sem equivalência, fórmula nova ou autorização de outro marco.
@@ -510,7 +510,7 @@ a D3/D4; DEC-04 não aprovada. Especificação visual detalhada na
 
 - Descrição: Encerramento e entrega verdadeiros. Distinguir concluído, aguardando envio, enviando, confirmado, falha, interrompido/inválido conforme ADR-005.
 - Justificativa: Integrar UX-01–08 da missão à plataforma existente, reduzindo informação potencialmente distrativa sem inferir benefício científico.
-- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental pendente de aprovação metodológica.
+- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental aprovada pelo proprietário em D3 revisada; validações funcionais/temporais ainda exigidas.
 - Aceite verificável: Sem sucesso antes de recibo válido; replay/idempotência e parciais preservados, sem retomada; resultado individual só autorizado.
 - Dependências: WEB-015, CHG-003 e gates do marco no backlog.
 - Restrições conhecidas: D1–D6, DEC-02/04, R01/R02/R11; sem equivalência, fórmula nova ou autorização de outro marco.
@@ -520,7 +520,7 @@ a D3/D4; DEC-04 não aprovada. Especificação visual detalhada na
 
 - Descrição: Acessibilidade e consistência visual. Reutilizar design system, revisar teclado/foco, contraste não experimental, erros/loading, resolução e perda de foco.
 - Justificativa: Integrar UX-01–08 da missão à plataforma existente, reduzindo informação potencialmente distrativa sem inferir benefício científico.
-- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental pendente de aprovação metodológica.
+- Prioridade: P0. Estado da especificação: **Confirmado** como direção UX; apresentação experimental aprovada pelo proprietário em D3 revisada; validações funcionais/temporais ainda exigidas.
 - Aceite verificável: Sem recolorir estímulos/modificar resposta; sem scroll; componentes compartilhados e métricas administrativas preservados.
 - Dependências: WEB-019, CHG-003 e gates do marco no backlog.
 - Restrições conhecidas: D1–D6, DEC-02/04, R01/R02/R11; sem equivalência, fórmula nova ou autorização de outro marco.
@@ -574,17 +574,17 @@ já existe ou participa da regressão geral. WEB-000 é exclusivamente documenta
 | REQ-EXT-001 | ADR-004 | M1 | WEB-003 | `stroop/, api/, web/` | `tests/test_nucleo_compartilhado.py, tests/test_casos_uso_importacao.py, tests/test_multiplos_instrumentos.py` | EV-M1 real em WEB-003; fronteiras/contratos revalidados em 2026-11-04 |
 | REQ-EXT-002 | ADR-004 | M8 | WEB-030 | `scripts/verify_web_ci.py, .github/workflows/web.yml` | `tests/test_verify_web_ci.py` | PLANEJADA; consultar WEB-030 no backlog |
 | REQ-EXT-003 | ADR-004 | M1 | WEB-004 | `AGENTS.md, docs/WORKFLOW_CODEX_CLI.md` | `Receita BASELINE_LOCAL.md; scripts/verify_web_ci.py integration; ensaio de retomada WEB-004` | EV-M1 real em WEB-004; percurso local/retomada revalidados em 2026-11-04 |
-| REQ-UX-001 | ADR-004/005; CHG-003; D3/D4 a aprovar | M3 | WEB-042 | `web/src/experiment/main-engine.ts, web/src/experiment/practice-engine.ts` | `PLANEJADO: extensão main.test.ts/practice.test.ts e screenshots nos E2E` | PLANEJADO; evidência/aceite futuro em WEB-042; sem SHA de implementação |
-| REQ-UX-002 | ADR-004/005; CHG-003; D3/D4 a aprovar | M3 | WEB-042 | `web/src/experiment/main-engine.ts, web/src/experiment/practice-engine.ts` | `PLANEJADO: DOM e screenshots Chromium/Firefox` | PLANEJADO; evidência/aceite futuro em WEB-042; sem SHA de implementação |
-| REQ-UX-003 | ADR-004/005; CHG-003; D3/D4 a aprovar | M3 | WEB-043 | `web/src/experiment/main-engine.ts, web/src/experiment/practice-engine.ts, web/src/experiment/protocol.ts` | `PLANEJADO: motores unitários e E2E de progresso` | PLANEJADO; evidência/aceite futuro em WEB-043; sem SHA de implementação |
-| REQ-UX-004 | ADR-004/005; CHG-003; D3/D4 a aprovar | M3 | WEB-043 | `web/src/experiment/main-engine.ts, web/src/experiment/practice-engine.ts` | `PLANEJADO: testes de relógio, DOM, lifecycle e E2E` | PLANEJADO; evidência/aceite futuro em WEB-043; sem SHA de implementação |
-| REQ-UX-005 | ADR-004/005; CHG-003; D3/D4 a aprovar | M3 | WEB-043 | `web/src/experiment/main-engine.ts, web/src/experiment/practice-engine.ts` | `PLANEJADO: ausência DOM/árvore acessível e feedback em main/practice unitários e E2E` | PLANEJADO; evidência/aceite futuro em WEB-043; sem SHA de implementação |
-| REQ-UX-006 | ADR-004/005; CHG-003; D3/D4 a aprovar | M3 | WEB-044 | `web/src/experiment/summary.ts, stroop/domain/stroop.py, web/src/participant/ParticipantRun.ts` | `PLANEJADO: summary.test.ts, tests/test_nucleo_compartilhado.py e tests/test_web_export.py; integração WEB-016/019/020` | PLANEJADO; evidência/aceite futuro em WEB-044; sem SHA de implementação |
-| REQ-UX-007 | ADR-004/005; CHG-003; D3/D4 a aprovar | M3 | WEB-042 | `web/src/experiment/main-engine.ts, web/src/experiment/practice-engine.ts, web/src/styles.css` | `PLANEJADO: geometria/screenshots nas resoluções aprovadas e regressão temporal WEB-011` | PLANEJADO; evidência/aceite futuro em WEB-042; sem SHA de implementação |
-| REQ-UX-008 | ADR-004/005; CHG-003; D3/D4 a aprovar | M4 | WEB-014 | `web/src/App.tsx, web/src/experiment/practice-engine.ts, docs/experimento/COPY_DAS_TELAS.md, web/src/components/PracticePreparation.tsx, web/src/components/ParticipantFlow.tsx` | `PLANEJADO: practice.test.ts, web/e2e/practice.spec.ts e integração real` | PLANEJADO; evidência/aceite futuro em WEB-014; sem SHA de implementação |
-| REQ-UX-009 | ADR-004/005; CHG-003; D3/D4 a aprovar | M4 | WEB-014 | `web/src/App.tsx, web/src/experiment/ExperimentHost.tsx, web/src/participant/ParticipantRun.ts, web/src/components/PracticePreparation.tsx, web/src/components/ParticipantFlow.tsx` | `PLANEJADO: ExperimentHost.test.tsx, web/e2e/practice.spec.ts e integração real` | PLANEJADO; evidência/aceite futuro em WEB-014; sem SHA de implementação |
-| REQ-UX-010 | ADR-004/005; CHG-003; D3/D4 a aprovar | M4 | WEB-015 | `web/src/participant/ParticipantRun.ts, web/src/components/ResultSummary.tsx, api/results.py` | `PLANEJADO: ParticipantRun.test.ts, ResultSummary.test.tsx e web/e2e/integrated/` | PLANEJADO; evidência/aceite futuro em WEB-015; sem SHA de implementação |
-| REQ-UX-011 | ADR-004/005; CHG-003; D3/D4 a aprovar | M5 | WEB-019 | `web/src/styles.css, web/src/App.tsx, web/src/components/, web/src/dashboard/` | `PLANEJADO: componentes Vitest, teclado/árvore acessível e E2E M5; cobertura experimental WEB-044` | PLANEJADO; evidência/aceite futuro em WEB-019; sem SHA de implementação |
+| REQ-UX-001 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M3 | WEB-042 | `web/src/experiment/main-engine.ts, web/src/experiment/practice-engine.ts` | `web/src/experiment/main.test.ts, practice.test.ts, presentation.test.ts; web/e2e/presentation.spec.ts; main.spec.ts/practice.spec.ts` | IMPLEMENTADO/TESTADO; aceite do escopo WEB-042/043 em EV-M3-042/043; validações WEB-044/011/034 continuam próprias |
+| REQ-UX-002 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M3 | WEB-042 | `web/src/experiment/main-engine.ts, web/src/experiment/practice-engine.ts` | `web/src/experiment/main.test.ts, practice.test.ts, presentation.test.ts; web/e2e/presentation.spec.ts; main.spec.ts/practice.spec.ts` | IMPLEMENTADO/TESTADO; aceite do escopo WEB-042/043 em EV-M3-042/043; validações WEB-044/011/034 continuam próprias |
+| REQ-UX-003 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M3 | WEB-043 | `web/src/experiment/main-engine.ts, web/src/experiment/practice-engine.ts, web/src/experiment/protocol.ts` | `web/src/experiment/main.test.ts, practice.test.ts, presentation.test.ts; web/e2e/presentation.spec.ts; main.spec.ts/practice.spec.ts` | IMPLEMENTADO/TESTADO; aceite do escopo WEB-042/043 em EV-M3-042/043; validações WEB-044/011/034 continuam próprias |
+| REQ-UX-004 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M3 | WEB-043 | `web/src/experiment/main-engine.ts, web/src/experiment/practice-engine.ts` | `web/src/experiment/main.test.ts, practice.test.ts, presentation.test.ts; web/e2e/presentation.spec.ts; main.spec.ts/practice.spec.ts` | IMPLEMENTADO/TESTADO; aceite do escopo WEB-042/043 em EV-M3-042/043; validações WEB-044/011/034 continuam próprias |
+| REQ-UX-005 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M3 | WEB-043 | `web/src/experiment/main-engine.ts, web/src/experiment/practice-engine.ts` | `web/src/experiment/main.test.ts, practice.test.ts, presentation.test.ts; web/e2e/presentation.spec.ts; main.spec.ts/practice.spec.ts` | IMPLEMENTADO/TESTADO; aceite do escopo WEB-042/043 em EV-M3-042/043; validações WEB-044/011/034 continuam próprias |
+| REQ-UX-006 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M3 | WEB-044 | `web/src/experiment/summary.ts, stroop/domain/stroop.py, web/src/participant/ParticipantRun.ts` | `PLANEJADO: summary.test.ts, tests/test_nucleo_compartilhado.py e tests/test_web_export.py; integração WEB-016/019/020` | Regressão unitária nesta revisão em EV-M3-042/043; aceite consolidado WEB-044 e integração WEB-016/019/020 ainda PLANEJADOS |
+| REQ-UX-007 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M3 | WEB-042 | `web/src/experiment/main-engine.ts, web/src/experiment/practice-engine.ts, web/src/styles.css` | `web/src/experiment/main.test.ts, practice.test.ts, presentation.test.ts; web/e2e/presentation.spec.ts; main.spec.ts/practice.spec.ts` | IMPLEMENTADO/TESTADO; aceite do escopo WEB-042/043 em EV-M3-042/043; validações WEB-044/011/034 continuam próprias |
+| REQ-UX-008 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M4 | WEB-014 | `web/src/App.tsx, web/src/experiment/practice-engine.ts, docs/experimento/COPY_DAS_TELAS.md, web/src/components/PracticePreparation.tsx, web/src/components/ParticipantFlow.tsx` | `PLANEJADO: practice.test.ts, web/e2e/practice.spec.ts e integração real` | PLANEJADO; evidência/aceite futuro em WEB-014; sem SHA de implementação |
+| REQ-UX-009 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M4 | WEB-014 | `web/src/App.tsx, web/src/experiment/ExperimentHost.tsx, web/src/participant/ParticipantRun.ts, web/src/components/PracticePreparation.tsx, web/src/components/ParticipantFlow.tsx` | `PLANEJADO: ExperimentHost.test.tsx, web/e2e/practice.spec.ts e integração real` | PLANEJADO; evidência/aceite futuro em WEB-014; sem SHA de implementação |
+| REQ-UX-010 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M4 | WEB-015 | `web/src/participant/ParticipantRun.ts, web/src/components/ResultSummary.tsx, api/results.py` | `PLANEJADO: ParticipantRun.test.ts, ResultSummary.test.tsx e web/e2e/integrated/` | PLANEJADO; evidência/aceite futuro em WEB-015; sem SHA de implementação |
+| REQ-UX-011 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M5 | WEB-019 | `web/src/styles.css, web/src/App.tsx, web/src/components/, web/src/dashboard/` | `PLANEJADO: componentes Vitest, teclado/árvore acessível e E2E M5; cobertura experimental WEB-044` | PLANEJADO; evidência/aceite futuro em WEB-019; sem SHA de implementação |
 
 Estados de evidência UX: **PLANEJADO** (critério sem execução), **IMPLEMENTADO**
 (código disponível), **TESTADO** (comandos/resultados/SHA registrados), **ACEITO**

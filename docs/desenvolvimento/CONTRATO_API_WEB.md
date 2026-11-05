@@ -777,3 +777,14 @@ sempre falsa; prazo vencido em preparing/running aparece como expired, sem
 fabricar motivo. Não devolve observações brutas, métricas ou credenciais.
 Rejeita corpo/query e usa os mesmos erros seguros e no-store. Este canal não
 concede retomada nem exportação parcial; a interface de inspeção pertence a M4/M5.
+
+### Identificação visual complementar de D3/D4 — 2026-11-05
+
+Variante visual `stroop-web-outline`, versão `1.0.0`, definida no protocolo.
+Snapshot compartilhado `condicoes/web_protocol.json` passa a incluir seção
+`visual` e `hud.live_accuracy=false`; tempos/cores/resposta permanecem.
+`test_version` e `protocol_id` continuam identificando o protocolo cognitivo;
+`app_version=web-<versão do pacote>+visual.1.0.0` distingue a apresentação usando
+os metadados já fixados em start/conclusão/recibo. Não acrescentar campos ao
+payload fechado, schema ou CSV de 21 colunas. Recibos/resultados antigos mantêm
+app_version original; não atribuir versão visual com base só em test_version.

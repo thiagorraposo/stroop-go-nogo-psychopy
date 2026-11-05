@@ -52,8 +52,8 @@ principal integra e confere aceite. Não paralelizar edições conflitantes.
   [modelo](docs/dados/MODELO_DE_DADOS.md); payloads:
   [contrato HTTP](docs/desenvolvimento/CONTRATO_API_WEB.md). Não duplicar contratos.
 - CHG-003 integra UX ao backlog, sem fluxo paralelo. Remover precisão da UI não
-  remove cálculos científicos. Apresentação revisada depende de aprovação frente
-  a D3/D4; campanha DEC-04 usa layout final e transporte ativo. Consultar fichas
+  remove cálculos científicos. Apresentação stroop-web-outline/1.0.0 aprovada pelo proprietário na revisão
+  D3/D4 de 2026-11-05; campanha DEC-04 segue pendente e usa layout final e transporte ativo. Consultar fichas
   WEB-042/043/044 antes de alterar o motor.
 - Não alterar paradigma, tempos, estímulos, regras, métricas, CSV ou validade
   científica sem decisão documentada do responsável. Versão local e WEB distintas.

@@ -4,6 +4,21 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-05 — Aprovação visual de D3 pelo proprietário
+
+- Registrada aprovação explícita para contorno branco sem cartão, progresso e
+  cronômetro principal discretos, sem precisão agregada; feedback da prática mantido.
+- D3 visual revisada com histórico preservado; D4 complementada por identificação
+  stroop-web-outline/1.0.0 e proveniência via app_version, sem schema novo.
+- Gate visual de WEB-042/043 satisfeito pelo proprietário conforme responsabilidade
+  já documentada; nenhuma aprovação atribuída a terceiro. DEC-04 permanece pendente.
+- Dependências, rastreabilidade e workflow alinhados sem novos IDs/denominador.
+- Implementados contorno branco uniforme sem cartão e HUD imperativo com progresso
+  real/cronômetro estável; retirados nós de precisão nos dois motores, sem alterar
+  núcleo de métricas, janelas, agendamento ou transporte. Prática mantém feedback.
+- Criados testes de apresentação/ausência/relógio e screenshots sintéticos em
+  Chromium/Firefox; comandos, falhas e limites registrados no backlog.
+
 ## 2026-11-05 — Integração de refinamento UX ao planejamento canônico
 
 - CHG-003 integra UX-01–08 ao backlog, requisitos REQ-UX-001…011, arquitetura,

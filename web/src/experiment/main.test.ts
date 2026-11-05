@@ -115,7 +115,9 @@ describe('bloco principal imperativo', () => {
       expectedColor.style.color = condition.ink_color_display
       expect(card.textContent).toBe(condition.word)
       expect(card.style.color).toBe(expectedColor.style.color)
-      expect(card.style.background).toBe('rgb(248, 250, 252)')
+      expect(card.style.background).toBe('transparent')
+      expect(card.dataset.stimulus).toBe('true')
+      expect(card.classList.contains('experiment-word')).toBe(true)
       colors.add(card.style.color)
     }
     expect(colors.size).toBe(10)
@@ -173,7 +175,7 @@ describe('bloco principal imperativo', () => {
     }
     expect(container.dataset.phase).toBe('fixation')
     expect(container.querySelector('[data-hud="time"]')?.textContent).toBe('Tempo: 00:00')
-    expect(container.querySelector('[data-hud="accuracy"]')?.textContent).toBe('Precisão: —')
+    expect(container.querySelector('[data-hud="accuracy"]')).toBeNull()
     expect(container.querySelector<HTMLElement>('.main-hud')!.hidden).toBe(false)
     const result = finish(clock.time)
     expect(result.frame_period_ms).toBe(10)
@@ -203,19 +205,19 @@ describe('bloco principal imperativo', () => {
     clock.time += 100
     keyboard('keydown')
     expect(container.dataset.phase).toBe('stimulus')
-    expect(container.textContent).toContain('Precisão: —')
+    expect(container.textContent).not.toMatch(/Precisão|%/)
     clock.advance(2394) // Antes do quadro mais proximo do offset.
     expect(container.dataset.phase).toBe('stimulus')
     clock.tickAt(origin + 2800)
     expect(container.dataset.phase).toBe('blank')
     expect(container.querySelector<HTMLElement>('.main-stimulus-card')!.style.background).toBe('transparent')
-    expect(container.textContent).toContain('Precisão: —')
+    expect(container.textContent).not.toMatch(/Precisão|%/)
     clock.advance(944) // Antes do quadro mais proximo do fim.
     expect(container.dataset.phase).toBe('blank')
     clock.tickAt(origin + 3750)
     expect(container.dataset.phase).toBe('fixation')
-    expect(container.querySelector('[data-hud="accuracy"]')?.textContent).toBe('Precisão: 100%')
-    expect(container.querySelector('[data-hud="progress"]')?.textContent).toContain('tentativa 2 de 16')
+    expect(container.querySelector('[data-hud="accuracy"]')).toBeNull()
+    expect(container.querySelector('[data-hud="progress"]')?.textContent).toBe('Bloco principal · 1 / 16')
     expect(container.querySelector('[data-hud="time"]')?.textContent).toBe('Tempo: 00:03')
     const result = finish(origin)
     expect(result.trials[0]!.reaction_time_ms).toBe(100)

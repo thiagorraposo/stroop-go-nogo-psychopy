@@ -1,3 +1,4 @@
+import { createExperimentHud } from './presentation'
 import { MAIN_CONDITIONS, PROTOCOL } from './protocol'
 import type { Condition, InterruptionReason } from './protocol'
 
@@ -120,10 +121,6 @@ export function validMainResult(result: MainResult): boolean {
 }
 
 function keyId(value: string) { return ['Space', ' ', 'Spacebar'].includes(value) ? 'Space' : value }
-function evenRound(value: number) {
-  const floor = Math.floor(value)
-  return value - floor === 0.5 ? floor + floor % 2 : Math.round(value)
-}
 
 /** Sequencia inteira ancorada a uma origem monotona, sem somar atrasos por fase. */
 export function createMainRuntime(container: HTMLElement, options: MainOptions,
@@ -140,10 +137,6 @@ export function createMainRuntime(container: HTMLElement, options: MainOptions,
   let index = 0
   let current: MainTrial | undefined
   let completed = 0
-  let correct = 0
-  let renderedCompleted = -1
-  let renderedIndex = -1
-  let renderedSecond = -1
   let framePeriod: number | undefined
   let lastFrameStamp: number | undefined
   const frameIntervals: number[] = []
@@ -154,50 +147,21 @@ export function createMainRuntime(container: HTMLElement, options: MainOptions,
   const previousCursor = container.style.cursor
   const surface = document.createElement('section')
   surface.className = 'main-runtime'
+  surface.dataset.visualVariant = PROTOCOL.visual.id
+  surface.dataset.visualVersion = PROTOCOL.visual.version
   surface.setAttribute('aria-label', 'Bloco principal')
   Object.assign(surface.style, { background: '#0B1020', color: '#F8FAFC',
     minHeight: '100dvh', height: '100dvh', width: '100%', position: 'relative',
     display: 'grid', placeItems: 'center', fontFamily: 'system-ui, sans-serif' })
-  const hud = document.createElement('div')
-  hud.className = 'main-hud'
-  Object.assign(hud.style, { display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '16px',
-    position: 'absolute', top: '24px', left: '24px', right: '24px', fontSize: 'min(2.8vh, 20px)' })
-  const accuracy = document.createElement('span')
-  accuracy.dataset.hud = 'accuracy'
-  const bar = document.createElement('span')
-  bar.dataset.hud = 'accuracy-bar'
-  bar.setAttribute('aria-hidden', 'true')
-  const progress = document.createElement('span')
-  progress.dataset.hud = 'progress'
-  const time = document.createElement('span')
-  time.dataset.hud = 'time'
-  hud.append(accuracy, bar, progress, time)
+  const presentation = createExperimentHud('main', order.length)
+  const hud = presentation.element
   const card = document.createElement('div')
-  card.className = 'main-stimulus-card'
+  card.className = 'main-stimulus-card experiment-word'
   Object.assign(card.style, { display: 'flex', alignItems: 'center', justifyContent: 'center',
     fontWeight: '700', textAlign: 'center', lineHeight: '1.2', boxSizing: 'border-box' })
   surface.append(hud, card)
   container.replaceChildren(surface)
   container.style.cursor = 'none'
-
-  function updateHud(elapsed: number) {
-    if (renderedCompleted !== completed) {
-      accuracy.textContent = completed === 0 ? 'Precisão: —'
-        : `Precisão: ${evenRound(correct / completed * 100).toString().padStart(2, '0')}%`
-      const count = completed === 0 ? 0 : evenRound(correct / completed * 10)
-      bar.textContent = `[${'#'.repeat(count)}${'-'.repeat(10 - count)}]`
-      renderedCompleted = completed
-    }
-    if (renderedIndex !== index) {
-      progress.textContent = `Bloco principal — tentativa ${Math.min(index + 1, 16)} de 16`
-      renderedIndex = index
-    }
-    const seconds = Math.floor(Math.min(60000, Math.max(0, elapsed)) / 1000)
-    if (renderedSecond !== seconds) {
-      time.textContent = `Tempo: ${Math.floor(seconds / 60).toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`
-      renderedSecond = seconds
-    }
-  }
 
   function render(elapsed: number) {
     container.dataset.phase = phase
@@ -206,7 +170,8 @@ export function createMainRuntime(container: HTMLElement, options: MainOptions,
     delete container.dataset.trialNumber
     hud.hidden = phase === 'countdown'
     hud.style.display = phase === 'countdown' ? 'none' : 'flex'
-    card.style.background = phase === 'stimulus' ? '#F8FAFC' : 'transparent'
+    card.style.background = 'transparent'
+    card.dataset.stimulus = String(phase === 'stimulus')
     card.style.color = '#F8FAFC'
     card.style.width = phase === 'stimulus' ? 'min(82vh, calc(100vw - 48px))' : 'min(90vw, 1100px)'
     card.style.height = phase === 'stimulus' ? '24vh' : 'auto'
@@ -222,7 +187,7 @@ export function createMainRuntime(container: HTMLElement, options: MainOptions,
       container.dataset.condition = condition.condition
       container.dataset.trialNumber = String(index + 1)
     }
-    updateHud(elapsed)
+    presentation.update(completed, elapsed)
   }
 
   function cleanup() {
@@ -389,7 +354,6 @@ export function createMainRuntime(container: HTMLElement, options: MainOptions,
         }
         trials.push(trial)
         completed += 1
-        if ((order[index]!.condition === 'congruent') === (trial.key_pressed === 'space')) correct += 1
         if (completed === 16) {
           const result: MainResult = { frame_period_ms: framePeriod!, trials: trials.map(row => ({ ...row })), order }
           if (!validMainResult(result)) { interrupt('timing_invalid'); return }
@@ -401,7 +365,7 @@ export function createMainRuntime(container: HTMLElement, options: MainOptions,
         index += 1
         if (!within([elapsed, -index * 3750], framePeriod!)) { interrupt('timing_invalid'); return }
         startTrial(elapsed, stamp)
-      } else updateHud(elapsed)
+      } else presentation.update(completed, elapsed)
     }
     if (active) handle = clock.requestFrame(tick)
   }

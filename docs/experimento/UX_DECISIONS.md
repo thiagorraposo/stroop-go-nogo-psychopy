@@ -239,7 +239,8 @@ tratamento de foco/Escape ou CSV.
 
 ## WEB — direção UX de CHG-003 (2026-11-05)
 
-Especificação alvo, ainda sem implementação ou aceite experimental. As seções
+Especificação visual aprovada explicitamente pelo proprietário na revisão D3 de
+2026-11-05; implementação e aceite por tarefa no backlog. As seções
 locais e Wxx acima preservam seu contexto histórico; não governam esta mudança.
 Execução, riscos, decisões e evidências somente no
 [backlog canônico](../Projeto%20Stroop%20Test.md); vínculos na
@@ -248,9 +249,9 @@ Execução, riscos, decisões e evidências somente no
 **Durante o teste, a interface do participante deverá apresentar os estímulos
 sem a barra de precisão dos acertos ou indicadores agregados de desempenho.
 A barra de progresso e o cronômetro poderão permanecer, conforme o protocolo
-aprovado.** A direção de UX foi solicitada pelo responsável; D3 ainda exige o
-HUD anterior. Essa divergência requer aprovação metodológica explícita antes
-de alterar a execução. D1–D6 não são modificadas por esta especificação.
+aprovado.** A apresentação foi aprovada explicitamente pelo proprietário; D3/D4 revisadas
+e identificação `stroop-web-outline/1.0.0` no [protocolo](PROTOCOLO_WEB.md).
+D1/D2/D5/D6 e protocolo cognitivo preservados. DEC-04 continua pendente.
 
 ### Estímulos e hierarquia (UX-01/05)
 
@@ -277,14 +278,14 @@ Progresso minimalista: traço fino, geometria consistente, cantos discretos,
 contraste controlado, rótulo legível e alinhado. Derivar etapa e total do contrato
 vigente e contar tentativas **concluídas**, sem número fixo ou avanço no início
 da tentativa. Exemplo ilustrativo: `Bloco principal · 8 / 16`. Distinguir prática e
-principal; sem animação durante estímulos. Confirmar visibilidade e localização
-na aprovação da apresentação e na campanha DEC-04.
+principal; sem animação durante estímulos. Visibilidade aprovada na D3 revisada: progresso em prática/principal, cronômetro
+somente no principal; HUD oculto em contagens/lembrete/feedback individual.
+Conferir localização e impacto na campanha DEC-04.
 
 Cronômetro mantém tempo **decorrido** do principal, iniciado na primeira tentativa
 até o fim da última, formato `MM:SS`, algarismos tabulares e largura numérica
-estável, alinhamento discreto e sem decoração. O placeholder da prática não
-autoriza criar relógio de prática: sua retirada/apresentação integra a aprovação
-do HUD. Usar origem monotônica do motor; atualizar DOM somente quando necessário,
+estável, alinhamento discreto e sem decoração. O placeholder da prática será retirado, conforme política D3 aprovada, sem criar
+relógio de prática. Usar origem monotônica do motor; atualizar DOM somente quando necessário,
 sem novo intervalo React, relógio científico paralelo, ticks acumulativos ou
 re-render por quadro. RT e registros científicos permanecem independentes.
 
@@ -332,3 +333,21 @@ inalterados. WEB-016/019/020 verificam persistência, dashboard e exportações.
 WEB-011 mede D5 com o layout final e transporte ativo; WEB-034 avalia saliência,
 atenção, protocolo visual e limitações de equivalência com PsychoPy. Testes
 CSS/automatizados não comprovam validade psicométrica nem latência física.
+
+### Concretização de D3 visual 1.0.0
+
+O token `--experiment-outline-width: .02em` aplica contorno branco uniforme
+com `-webkit-text-stroke`; `paint-order: stroke fill` desenha o preenchimento
+sobre o contorno, preservando a tinta e a fonte existentes. Referência técnica:
+[WHATWG Compatibility — text stroking](https://compat.spec.whatwg.org/#text-stroke).
+A avaliação de alternativa com sombras deslocadas foi descartada por gerar
+aproximação direcional do contorno; não há fallback que altere silenciosamente
+cores/tipografia. A capacidade stroke/paint-order é verificada nos navegadores
+ensaiados, sem prometer compatibilidade com versões não medidas.
+
+HUD imperativo compartilhado entre motores por `presentation.ts`, fora do React;
+progresso de 3 px, sem animação, e contador MM:SS com números tabulares e largura
+estável. O cronômetro mantém a origem monotônica principal; não há relógio novo
+na prática. Nenhum elemento de desempenho agregado é criado. Tokens e centro
+experimental independem da quantidade de itens no HUD. Evidências e ambientes
+reais dos ensaios, incluindo falhas, ficam apenas no backlog canônico.
