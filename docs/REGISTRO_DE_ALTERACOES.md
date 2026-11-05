@@ -4,6 +4,16 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-04 — Reprodução sintética da fundação WEB
+
+- Reproduzida implementação existente em worktree sparse isolada, com locks
+  preservados, PostgreSQL descartável em tmpfs e fixtures sintéticas.
+- Revalidados cálculos, unidades, ausência de hits, roundtrip CSV/SQLite,
+  reexports/CLIs e fronteiras entre domínio, ingestão, aplicação e persistência.
+  Nenhuma refatoração ou mudança experimental necessária para essa conferência.
+- Acrescentada receita local de reprodução/retomada, vinculada ao workflow;
+  resultados, ambiente, SHA e Git ficam em EV-M1/Retomada do backlog canônico.
+
 ## 2026-11-04 — Replanejamento documental da plataforma Stroop Web
 
 - Auditados código/runtime, método, condições, métricas, migrations, OIDC, Docker,

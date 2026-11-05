@@ -31,8 +31,12 @@ sobre estado remoto, informar que não foi atualizado.
 ## continue o projeto
 
 Autoriza implementação no marco vigente selecionado pelo backlog, salvo escopo
-expresso mais restrito. Após M0, a primeira autorização futura selecionará M1 e
-WEB-001. Durante a missão documental atual não há autorização para isso.
+expresso mais restrito. Após M0, a primeira autorização posterior seleciona M1 e
+WEB-001. A missão documental original não concedia essa autorização; consultar
+o registro da sessão e o marco vigente na Retomada do backlog.
+
+Para reproduzir a base existente em M1, seguir a
+[receita local](desenvolvimento/BASELINE_LOCAL.md), com evidência apenas no backlog.
 
 Selecionar tarefa PRONTA ou dependência interna coesa pronta. Verificar decisões
 externas antes do trabalho dependente. Mudar para EM_ANDAMENTO quando iniciar.
@@ -194,7 +198,7 @@ for i in range(11):assert re.search(r'^## M'+str(i)+r' — ',b,re.M)
 assert len(re.findall(r'^\| R\d\d \|',b,re.M))==10
 assert len(re.findall(r'^\| DEC-\d\d \|',b,re.M))==5
 print('Structure: 11 milestones; 42 unique tasks; 36 requirements/trace rows; 10 risks; 5 decisions; acyclic task dependencies')
-changed=subprocess.check_output(['git','diff','--name-only'],text=True).splitlines()+subprocess.check_output(['git','ls-files','--others','--exclude-standard'],text=True).splitlines()
+changed=subprocess.check_output(['git','diff','--name-only','HEAD'],text=True).splitlines()+subprocess.check_output(['git','ls-files','--others','--exclude-standard'],text=True).splitlines()
 assert all(p.endswith('.md') for p in changed),changed
 print(f'Scope: {len(changed)} changed/new files, all Markdown; no functional/config/schema change')
 if errors:raise SystemExit(1)

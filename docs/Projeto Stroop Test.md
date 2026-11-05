@@ -14,7 +14,8 @@ decisões satisfeitas, falta execução/autorização de sessão), EM_ANDAMENTO
 (trabalho ativo), BLOQUEADA (impedimento identificado com ação de desbloqueio),
 EM_VALIDACAO (entrega disponível, critérios em conferência), CONCLUIDA (todos
 critérios comprovados). Não há crédito parcial. Autorização de sessão é distinta
-de prontidão técnica; esta sessão autoriza apenas M0 e deve parar ao concluí-lo.
+de prontidão técnica. A missão documental encerrou em M0; o comando posterior
+`continue o projeto`, em 2026-11-04, autoriza M1 até seu encerramento.
 
 Uma tarefa CONCLUIDA tem todos critérios, comandos/resultados/data, componente,
 referências de teste e Git. Documento é evidência suficiente apenas para entrega
@@ -32,8 +33,8 @@ de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
 Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
 não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
 
-Progresso atual: **1/42 entregáveis aceitos, exclusivamente documental (WEB-000);
-0/41 entregáveis de implementação/revalidação funcional aceitos no novo plano**.
+Progresso atual: **4/42 entregáveis aceitos (WEB-000 a WEB-003);
+3/41 entregáveis de implementação/revalidação funcional aceitos no novo plano**.
 Marcos funcionais não concluídos. Este número só se atualiza aqui, após evidência.
 
 ## Ordem, caminho crítico e paralelismo
@@ -122,43 +123,43 @@ Google, produção e CI remota não executados para este marco documental.
 
 ### WEB-001 — Reproduzir baseline sintética do código auditado
 
-- Marco: M1. Prioridade: P0. Complexidade: G. Estado: PRONTA.
+- Marco: M1. Prioridade: P0. Complexidade: G. Estado: CONCLUIDA.
 - Dependências: WEB-000.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Checkout isolado, comandos/versões/SHA e resultados Python/PG, frontend/tipos/build registrados; skips de PG não aceitam baseline.
-- Testes/verificação: `unittest com PG descartável; npm test e npm run build`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R04; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Testes/verificação: `unittest com PG descartável; npm test e npm run build`. Executados na descoberta integral; ver EV-M1.
+- Evidências: EV-M1, 2026-11-04; baseline real e verificações de preservação/fronteiras na SHA a644e2c0c53bf6da27630c8179ee887c6436ff1e.
+- Riscos/bloqueios: R04 preservado; nenhum impedimento observado na baseline sintética.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega: branch `test/m1-baseline-sintetica`; versão funcional ensaiada e fechamento em EV-M1/Retomada.
 
 ### WEB-002 — Conferir preservação das métricas e CLIs na baseline
 
-- Marco: M1. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Marco: M1. Prioridade: P0. Complexidade: M. Estado: CONCLUIDA.
 - Dependências: WEB-001.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Fixtures main, sem hits e roundtrip confirmam fórmulas/unidades e comandos/reexports preservados; divergências classificadas.
-- Testes/verificação: `tests/test_nucleo_compartilhado.py, test_csv_unificado.py, test_importar_csv_sqlite.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R04; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Testes/verificação: `tests/test_nucleo_compartilhado.py, test_csv_unificado.py, test_importar_csv_sqlite.py`. Executados na descoberta integral; ver EV-M1.
+- Evidências: EV-M1, 2026-11-04; baseline real e verificações de preservação/fronteiras na SHA a644e2c0c53bf6da27630c8179ee887c6436ff1e.
+- Riscos/bloqueios: R04 preservado; nenhum impedimento observado na baseline sintética.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega: branch `test/m1-baseline-sintetica`; versão funcional ensaiada e fechamento em EV-M1/Retomada.
 
 ### WEB-003 — Verificar fronteiras modulares e contratos de extensão
 
-- Marco: M1. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Marco: M1. Prioridade: P0. Complexidade: M. Estado: CONCLUIDA.
 - Dependências: WEB-001.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Dependências atuais mapeadas e testes de fronteira aprovados; somente refatoração necessária registrada, sem instrumento novo.
-- Testes/verificação: `tests/test_nucleo_compartilhado.py, test_casos_uso_importacao.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R10; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Testes/verificação: `tests/test_nucleo_compartilhado.py, test_casos_uso_importacao.py`. Executados na descoberta integral; ver EV-M1.
+- Evidências: EV-M1, 2026-11-04; baseline real e verificações de preservação/fronteiras na SHA a644e2c0c53bf6da27630c8179ee887c6436ff1e.
+- Riscos/bloqueios: R10 preservado; nenhuma refatoração necessária para esta entrega.
 - Referências: REQ-EXT-001; [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega: branch `test/m1-baseline-sintetica`; versão funcional ensaiada e fechamento em EV-M1/Retomada.
 
 ### WEB-004 — Ensaiar desenvolvimento local e retomada do marco
 
-- Marco: M1. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Marco: M1. Prioridade: P0. Complexidade: M. Estado: EM_VALIDACAO.
 - Dependências: WEB-002, WEB-003.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Segundo percurso documentado encontra estado/tarefa sem investigação global; local API/React/PG reproduzido; M1 atende sua ficha.
@@ -167,6 +168,62 @@ Google, produção e CI remota não executados para este marco documental.
 - Riscos/bloqueios: R09; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: REQ-EXT-003; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### EV-M1 — baseline sintética, 2026-11-04
+
+Autorização posterior à missão M0: comando `continue o projeto` do responsável.
+Branch `test/m1-baseline-sintetica`, derivada de
+`a644e2c0c53bf6da27630c8179ee887c6436ff1e` após fetch e confirmação de que main e
+origin/main, assim como a branch documental e seu upstream, estavam alinhados.
+Base documental preservada com implementação anterior ainda não integrada à main;
+nenhum merge implícito. Worktree sparse `/tmp/stroop-m1-baseline-20261104`, sem
+materializar data/, database/, production-secrets/ ou ambientes operacionais.
+
+Ambiente observado: Linux 7.0.0-42-generic, Python 3.12.3, Node 24.15.0,
+npm 11.16.0, Docker 29.9.2, PostgreSQL 17.6-bookworm na imagem fixada
+`sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3`.
+Container exclusivo `stroop-m1-baseline-20261104`, tmpfs, loopback 32769,
+banco `stroop_etapa4_test_m1`, credencial sintética pública de CI. Dois locks
+Python e package-lock existentes instalados sem atualização; `pip check` aprovado.
+
+Comandos executados na raiz isolada com `.venv/bin/python scripts/verify_web_ci.py`
+e `TEST_DATABASE_URL` apontando exclusivamente para esse banco:
+
+- `sources`: 349 fontes aprovadas pelo Gitleaks 8.30.1; sem dados/histórico Git.
+- `secret-self-test`: fonte inócua aceita e token falso bloqueado; sem expor valor.
+- `python`: **369 testes aprovados em 97,742s, zero falhas/erros/skips**,
+  PostgreSQL real, incluindo migrations e provisionamento restrito em bases sintéticas.
+  A mensagem `Auditoria sintetica recusada` é uma prova negativa do runner,
+  não execução da auditoria de dependências nem falha da regressão.
+- `frontend`: `npm ci`, **273 testes em 16 arquivos**, typecheck e build aprovados.
+- `browser`: **98 casos gerais (2,4 min) e quatro temporais seriais (3,6 min)
+  aprovados**, Chromium 156.0.8078.4 e Firefox 157.0, em Linux.
+- `integration`: ensaio HTTPS em andamento; resultado final ao encerrar.
+
+WEB-002: descoberta integral exercitou `test_nucleo_compartilhado`,
+`test_csv_unificado`, `test_importar_csv_sqlite`, `test_casos_uso_importacao`,
+`test_web_results` e `test_web_export`. Cinco fixtures compartilhadas incluem
+medianas par/ímpar, ausência de hits e RT positivo pequeno. Exportação → leitura
+CSV → recálculo → SQLite preserva 21 colunas, 16 tentativas principais e 12
+métricas. Sentinela legada 0.0 e ausência HTTP null continuam distintas;
+conversão ms→s acontece uma vez. Reexports mantêm identidade de funções/exceções;
+CLI por caminho/módulo, fora da raiz, duplicidade/force e launchers verificados
+pela suite sintética. Nenhuma fórmula, CSV ou regra experimental alterada.
+
+WEB-003: revisão AST dos imports em 31 módulos (8 domain, 3 ingestion,
+11 application, 9 persistence) e testes de subprocesso aprovados. Domínio só
+importa domínio/biblioteca padrão; ingestão depende do domínio; aplicação e
+persistência não importam CLI/dashboard/framework HTTP. Persistência usa erros
+de aplicação e ingestão existentes, sem nova abstração. Contratos
+`NormalizedAssessment`, `InstrumentAdapter`, `test_code`/`test_version` preservados;
+coexistência do demo sintético testada em `test_multiplos_instrumentos`.
+Mapa e receita reproduzível: [baseline local](desenvolvimento/BASELINE_LOCAL.md).
+Nenhuma necessidade de refatoração identificada nesta conferência.
+
+Limites: evidência local da SHA funcional acima, sem mudança de runtime/locks/schema.
+Auditorias públicas de dependências e Actions não executadas nesta baseline;
+OIDC externo, latência física, equivalência psicométrica, homologação M9 e
+produção não comprovados por estes ensaios. Riscos R01–R10 permanecem abertos.
 
 ## M2 — Backend e contratos de dados consolidados
 
@@ -811,11 +868,19 @@ não depende de reaprovação científica. Não há bloqueio documental remanesc
 
 ## Retomada
 
-A sessão atual termina em M0. **Próximo marco executável após autorização futura:
-M1; primeira tarefa WEB-001**, baseline sintética em checkout isolado do código
-existente. Não criar frontend/API do zero. Ler AGENTS → WORKFLOW_CODEX_CLI →
-esta ficha → requisitos/fontes/testes pertinentes; não repetir auditoria global
-sem divergência concreta. Nenhum trabalho funcional está em andamento no novo plano.
+Marco autorizado atual: **M1**, pelo comando posterior `continue o projeto` de
+2026-11-04. WEB-001/002/003 concluídas; WEB-004 em validação, aguardando término
+do HTTPS local para conferência final. Evidência, ambiente e SHA
+funcional em EV-M1; [receita local](desenvolvimento/BASELINE_LOCAL.md).
+
+Branch de entrega `test/m1-baseline-sintetica`, worktree isolada
+`/tmp/stroop-m1-baseline-20261104`; checkout original preservado em
+`docs/replanejamento-stroop-web`. Não criar frontend/API do zero, repetir auditoria
+global, avançar M2, integrar main nem publicar por inferência. Após M1, próxima
+tarefa é WEB-005 em M2, com autorização posterior e DEC-01/02 documentadas antes
+do trabalho dependente.
+
+Histórico de fechamento de M0 (preservado, não descreve a sessão M1):
 
 Git documental: branch `docs/replanejamento-stroop-web`, baseada na HEAD auditada
 87f6a9c (contém main fe8f24f e trabalho não integrado). Os commits desta entrega
@@ -824,12 +889,12 @@ o registro de fechamento acrescenta o SHA real sem tentar autorreferenciar o
 próprio commit. Conferir worktree, upstream e commits locais antes de retomar.
 Entrega documental: commit `e652f2c1be664241364609443356b0277622c242`, enviado e
 confirmado por `git ls-remote --heads origin docs/replanejamento-stroop-web` na
-mesma SHA em 2026-11-04. O commit de fechamento desta evidência é identificável
-por `git log -1 --format=%H -- 'docs/Projeto Stroop Test.md'`; verificar que coincide
-com upstream no fim da sessão. M0 documental concluído; nenhum marco funcional
-iniciado. Os 33 arquivos da entrega são todos Markdown (diferença desde a HEAD
-auditada); inventário recuperável por `git diff --name-only 87f6a9c..HEAD`.
+mesma SHA em 2026-11-04. O commit de fechamento de M0 foi
+`a644e2c0c53bf6da27630c8179ee887c6436ff1e`, conferido com upstream na inicialização
+de M1. M0 documental concluído; nenhum marco funcional havia sido iniciado naquele
+fechamento. Os 33 arquivos da entrega eram todos Markdown; inventário recuperável
+por `git diff --name-only 87f6a9c..a644e2c`.
 
 Commit/push documental não autorizam integração à main. CI remota desta entrega
 não executada/não verificada; workflow existente só dispara PR/main/manual.
-Não há PR nem merge autorizado. Produção e dados reais permanecem fora desta sessão.
+Não há PR nem merge autorizado. Produção e dados reais permanecem fora do escopo autorizado.

@@ -401,11 +401,12 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 ## Matriz de rastreabilidade
 
 Cada linha é o vínculo principal; relações complementares aparecem nas fichas.
-Testes com caminho são **EXISTENTES, NÃO REEXECUTADOS** nesta fase. Referências
-PLANEJADAS são verificações ainda sem arquivo/resultado; não inventam testes.
+Testes com caminho são existentes; resultados atuais só estão comprovados quando
+a linha aponta para uma evidência datada no backlog. Referências PLANEJADAS são
+verificações ainda sem resultado de aceite; não inventam testes.
 Evidência e aceite são consultados por WEB no backlog, sem duplicar estado.
-Todos os vínculos de validação funcional abaixo são planejados, mesmo quando o
-componente já existe. WEB-000 é exclusivamente documental.
+Vínculos sem evidência datada permanecem planejados, mesmo quando o componente
+já existe ou participa da regressão geral. WEB-000 é exclusivamente documental.
 
 | Requisito | Decisão | Marco | Tarefa | Componente | Teste/verificação | Evidência → aceite |
 |---|---|---|---|---|---|---|
@@ -442,7 +443,7 @@ componente já existe. WEB-000 é exclusivamente documental.
 | REQ-INF-001 | ADR-002 + ADR-004 | M2 | WEB-007 | `scripts/migrations/, provision_web_database.py` | `tests/test_web_database_provision.py` | PLANEJADA; consultar WEB-007 no backlog |
 | REQ-INF-002 | ADR-002 + ADR-004 | M8 | WEB-029 | `compose.web.yaml, Dockerfile.api, Dockerfile.web` | `tests/test_web_proxy_config.py` | PLANEJADA; consultar WEB-029 no backlog |
 | REQ-INF-003 | ADR-002 + ADR-004 | M8 | WEB-031 | `scripts/backup_postgres.py, deploy/` | `tests/test_web_backup_replication.py` | PLANEJADA; consultar WEB-031 no backlog |
-| REQ-EXT-001 | ADR-004 | M1 | WEB-003 | `stroop/, api/, web/` | `tests/test_nucleo_compartilhado.py` | PLANEJADA; consultar WEB-003 no backlog |
+| REQ-EXT-001 | ADR-004 | M1 | WEB-003 | `stroop/, api/, web/` | `tests/test_nucleo_compartilhado.py, tests/test_casos_uso_importacao.py, tests/test_multiplos_instrumentos.py` | EV-M1 real em WEB-003; fronteiras/contratos revalidados em 2026-11-04 |
 | REQ-EXT-002 | ADR-004 | M8 | WEB-030 | `scripts/verify_web_ci.py, .github/workflows/web.yml` | `tests/test_verify_web_ci.py` | PLANEJADA; consultar WEB-030 no backlog |
 | REQ-EXT-003 | ADR-004 | M1 | WEB-004 | `AGENTS.md, docs/WORKFLOW_CODEX_CLI.md` | `PLANEJADO: ensaio de retomada WEB-004` | PLANEJADA; consultar WEB-004 no backlog |
 
