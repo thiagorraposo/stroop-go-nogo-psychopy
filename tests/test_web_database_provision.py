@@ -105,6 +105,16 @@ class ProvisionPostgresTests(unittest.TestCase):
             self.denied(self.writer_dsn, statement)
         with psycopg.connect(self.owner_dsn) as connection:
             self.assertEqual(connection.execute("SELECT count(*) FROM pg_auth_members WHERE member=(SELECT oid FROM pg_roles WHERE rolname=%s)", (self.writer,)).fetchone()[0], 0)
+            self.assertEqual(connection.execute('''SELECT rolsuper,rolcreatedb,rolcreaterole,rolbypassrls
+                FROM pg_roles WHERE rolname=%s''', (self.writer,)).fetchone(),
+                (False, False, False, False))
+            self.assertEqual(connection.execute('''SELECT count(*) FROM pg_tables
+                WHERE schemaname='public' AND tableowner=%s''', (self.writer,)).fetchone()[0], 0)
+            self.assertEqual(connection.execute('''SELECT count(*) FROM pg_class c
+                JOIN pg_namespace n ON n.oid=c.relnamespace
+                WHERE n.nspname='public' AND c.relkind IN ('r','p')
+                AND has_table_privilege(%s,c.oid,'INSERT,UPDATE,DELETE,TRUNCATE')''',
+                (self.reader,)).fetchone()[0], 0)
 
     def test_fluxo_real_writer_grava_resultado_e_reader_consulta(self):
         issuer, subject = 'https://accounts.google.com', f'synthetic-admin-{uuid4().hex[:8]}'

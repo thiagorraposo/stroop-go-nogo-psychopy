@@ -139,6 +139,48 @@ class WebCheckpointPostgresTests(Fixtures, unittest.TestCase):
             connection.execute('DROP TRIGGER synthetic_final_failure ON web_trial_observations')
         self.assertEqual(participant.post('/api/v1/participant/complete',json=payload).status_code,201)
 
+    def test_ack_waits_for_commit_and_is_visible_to_independent_connection(self):
+        participant, payload, issued = self._completion()
+        # Bloquear o commit com um trigger adiado ate o fim da transacao. Uma
+        # segunda conexao nao pode ver prefixo nem receber ACK antes do commit.
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute("""CREATE FUNCTION synthetic_hold_receipt() RETURNS trigger
+                LANGUAGE plpgsql AS $$ BEGIN
+                PERFORM pg_advisory_xact_lock(7007, 1); RETURN NEW; END $$""")
+            connection.execute('''CREATE CONSTRAINT TRIGGER synthetic_hold_receipt AFTER INSERT
+                ON web_session_checkpoints DEFERRABLE INITIALLY DEFERRED
+                FOR EACH ROW EXECUTE FUNCTION synthetic_hold_receipt()''')
+        with psycopg.connect(self.database_url, autocommit=True) as blocker:
+            blocker.execute('SELECT pg_advisory_lock(7007, 1)')
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                pending = pool.submit(self.send, participant, payload, 0, 3)
+                try:
+                    deadline = time.monotonic() + 5
+                    while time.monotonic() < deadline:
+                        waiting = blocker.execute("""SELECT count(*) FROM pg_locks
+                            WHERE locktype='advisory' AND classid=7007 AND objid=1
+                            AND NOT granted""").fetchone()[0]
+                        if waiting:
+                            break
+                        time.sleep(0.01)
+                    self.assertEqual(waiting, 1, 'Escrita nao chegou ao bloqueio pre-commit')
+                    self.assertFalse(pending.done())
+                    self.assertEqual(self.observed(), 0)
+                    self.assertEqual(blocker.execute(
+                        'SELECT count(*) FROM web_session_checkpoints WHERE session_id=%s',
+                        (issued['session_id'],)).fetchone()[0], 0)
+                finally:
+                    blocker.execute('SELECT pg_advisory_unlock(7007, 1)')
+                response = pending.result(timeout=5)
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual(self.observed(), 3)
+        with psycopg.connect(self.database_url) as connection:
+            stored = connection.execute('''SELECT confirmed_through,prefix_hash
+                FROM web_session_checkpoints WHERE session_id=%s''',
+                (issued['session_id'],)).fetchone()
+        self.assertEqual(stored, (3, response.json()['prefix_hash']))
+        self.assertEqual(self.send(participant, payload, 0, 3).json(), response.json())
+
     def test_abort_accepts_pending_prefix_without_reopening(self):
         participant,payload,_=self._completion()
         self.assertEqual(self.send(participant,payload,0,2).status_code,200)
@@ -216,6 +258,22 @@ class WebCheckpointPostgresTests(Fixtures, unittest.TestCase):
             with ThreadPoolExecutor(max_workers=2) as pool:
                 statuses=sorted(response.status_code for response in pool.map(send,operations))
             self.assertEqual(statuses,[200,409] if pair=='divergent' else [200,201] if pair=='complete' else [200,200],pair)
+            with psycopg.connect(self.database_url) as connection:
+                count, distinct = connection.execute('''SELECT count(*),count(DISTINCT trial_number)
+                    FROM web_session_observations WHERE session_id=%s''',
+                    (issued['session_id'],)).fetchone()
+                confirmed, = connection.execute('''SELECT confirmed_through
+                    FROM web_session_checkpoints WHERE session_id=%s''',
+                    (issued['session_id'],)).fetchone()
+                official, = connection.execute('SELECT count(*) FROM web_assessments WHERE session_id=%s',
+                                               (issued['session_id'],)).fetchone()
+            self.assertEqual(count, distinct, pair)
+            self.assertEqual(confirmed, count, pair)
+            if pair == 'divergent':
+                self.assertIn(count, (4, 6), pair)
+            else:
+                self.assertEqual(count, {'complete': 16, 'abort': 4, 'equal': 6}[pair], pair)
+            self.assertEqual(official, int(pair == 'complete'), pair)
         # Corrida abort/complete pode preservar um resultado historico, mas abort nao
         # autoriza complete. Violacao tardia passa pela invalidacao explicita.
 
