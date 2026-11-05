@@ -32,15 +32,27 @@ A descricao deve explicar o problema, o comportamento entregue, a validacao
 executada e limites relevantes. Para textos multilinha, use arquivo com
 `--body-file`; nao interpole secrets ou dados em comandos/comentarios.
 
-Integre somente com CI aprovada, revisoes exigidas e regras satisfeitas.
-Prefira squash e confira o SHA revisado antes do merge:
+Integre somente apos autorizacao explicita do responsavel, com CI aprovada,
+revisoes exigidas e regras satisfeitas. PRs podem ser abertos/atualizados
+automaticamente; merges nao sao automaticos.
+Use exclusivamente Merge Commit tradicional, preservando todos os commits
+originais. Confira o SHA revisado antes do merge:
 
 ```bash
 gh pr view --json headRefOid
-gh pr merge --squash --delete-branch --match-head-commit SHA-REVISADO
+gh pr merge --merge --match-head-commit SHA-REVISADO
 git switch main
 git pull --ff-only
 ```
+
+PR e check `verify` sao obrigatorios, inclusive para administradores. Nunca
+integre por Squash Merge, Rebase Merge ou push direto em `main`. Mantenha o auto-merge do GitHub
+desabilitado. Nunca use `--auto`. Aguarde as verificacoes, aprovacoes exigidas e
+a autorizacao explicita de merge antes do comando acima, sem excecoes. Se a
+branch mudar, valide o novo SHA; se `main` avancar, atualize a branch por merge
+normal quando exigido e aguarde novamente os checks. Conflitos, falhas ou
+conversas obrigatorias pendentes impedem a integracao. Apos o merge, confirme
+que os commits originais sao ancestrais de `origin/main` e registre o resultado.
 
 Se a worktree tiver alteracoes alheias, preserve-as antes da troca; nunca use
 reset destrutivo ou force push. Nao use `--admin` para contornar protecoes.

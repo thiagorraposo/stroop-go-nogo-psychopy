@@ -183,8 +183,10 @@ iniciar as Etapas 11 e 12 nem limita o workflow WEB continuo acima.
 ## Git
 
 - Diretriz permanente do responsavel: seguir GitHub Flow, usando `git` e `gh`.
-  Pushes, criacao de PRs e merges estao autorizados para tarefas de desenvolvimento,
-  sem nova confirmacao para operacoes rotineiras. Respeite limites de escopo e
+  Pushes e criacao/atualizacao de PRs estao autorizados para tarefas de
+  desenvolvimento, sem nova confirmacao para operacoes rotineiras. Merge exige
+  autorizacao explicita do responsavel; nao integrar automaticamente mesmo com
+  CI aprovada. Respeite limites de escopo e
   aprovacoes/protecoes obrigatorias; nunca use force push ou bypass administrativo.
 - Mantenha `main` estavel. Trabalhe em branch curta `feat/`, `fix/`, `refactor/`,
   `docs/` ou `chore/`, sem branches redundantes. Confira estado e preserve todas
@@ -194,7 +196,11 @@ iniciar as Etapas 11 e 12 nem limita o workflow WEB continuo acima.
   somente arquivos/hunks da tarefa; preserve alteracoes alheias fora dos commits.
 - Execute os checks pertinentes, publique a branch e abra PR com problema,
   comportamento e validacao objetivos. Corrija falhas antes de integrar.
-  Aguarde CI/checks obrigatorios e revisoes exigidas; prefira squash merge.
+  Aguarde CI/checks obrigatorios e revisoes exigidas; integre o PR por Merge
+  Commit tradicional (`gh pr merge --merge`), preservando os commits originais.
+  Nunca use Squash Merge, Rebase Merge, push direto em main ou bypass.
+  Manter auto-merge do GitHub desabilitado; nunca usar `--auto`. Apos CI e
+  regras satisfeitas, deixar o PR pronto e aguardar autorizacao de merge.
 - Apos merge permitido, atualize `main` por fast-forward e remova branches
   temporarias integradas. Nao remova trabalho local nao integrado ou alteracoes
   preexistentes; registre qualquer impedimento real.

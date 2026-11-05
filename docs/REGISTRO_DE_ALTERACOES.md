@@ -6,6 +6,22 @@ Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
 O estado da nova versao web e mantido separadamente no
 [roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
 
+## 2026-11-05 — Merge Commit tradicional com Pull Requests
+
+- Por instrucao do responsavel, Squash Merge desabilitado e exigencia de
+  historico linear retirada da protecao classica de main; Merge Commit ja
+  estava habilitado. Reconsulta da API confirmou PR, verify, regras de revisao,
+  administradores e bloqueios de force push/exclusao preservados. Sem rulesets
+  adicionais; Rebase e auto-merge mantidos como estavam.
+- Orientacao posterior do responsavel: sem automerge. GitHub auto-merge
+  permanece desabilitado; Codex pode abrir/atualizar PRs, mas so integra apos
+  autorizacao explicita, mesmo com CI aprovada. PR desta entrega fica aberto.
+- AGENTS, contribuicao, workflow Codex e CI_WEB alinhados ao merge tradicional
+  por PR. Exportacao/rollback e validacao remota descritos em CI_WEB.
+- Alteracao exclusivamente de governanca Git; sem codigo, workflows Actions,
+  arquitetura, requisitos, roadmap, dados ou deploy. Entregas anteriores de
+  outras branches permanecem fora deste PR.
+
 ## 2026-11-04 — Correcao da auditoria de dependencias no PR1
 
 - CI de4782ae6 passou suites Python/PostgreSQL, frontend, navegadores e HTTPS;
