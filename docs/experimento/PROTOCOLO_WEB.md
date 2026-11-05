@@ -229,7 +229,8 @@ como incompletos/ inválidos. “Sem resultado parcial” em D2 significa sem m�
 ou exportação **oficiais**, e não descarte obrigatório de observações técnicas.
 A aprovação histórica D2 permanece; envio final-only não é mais política aceita.
 
-Matriz proposta para validação explícita antes de implementar DEC-02:
+Matriz validada explicitamente pelo responsável em 2026-11-05, na resposta
+“valido” à proposta apresentada em `270377b`, antes da implementação de DEC-02:
 
 | Evento | Validade e ação |
 |---|---|
@@ -243,5 +244,5 @@ Matriz proposta para validação explícita antes de implementar DEC-02:
 
 Checkpoint não altera duração, estímulos, HUD, prática, métricas ou CSV.
 [ADR-005](../arquitetura/ADR-005-persistencia-incremental.md) define a estratégia
-candidata e seus limites; aprovação da diretriz pelo responsável não equivale
-à validação definitiva dessa matriz nem aos ensaios de timing com transporte.
+validada e seus limites. A validação documental dessa matriz e da estratégia
+não comprova ensaios de timing com transporte nem prontidão para coleta real.

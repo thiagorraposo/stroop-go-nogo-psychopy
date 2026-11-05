@@ -658,12 +658,14 @@ temporal real. A aprovacao do contrato nao substitui os testes, o banco real
 ou os navegadores exigidos por essas etapas.
 
 
-## Revisão candidata — persistência incremental (2026-11-05)
+## Contrato alvo validado — persistência incremental (2026-11-05)
 
 Esta seção especifica o alvo para DEC-02; **não descreve endpoints disponíveis**.
 As seções anteriores registram o contrato implementado final-only, rejeitado
-como política futura pelo responsável. Aprovação definitiva e validação prévia
-estão condicionadas ao [ADR-005](../arquitetura/ADR-005-persistencia-incremental.md).
+como política futura pelo responsável. O responsável validou expressamente
+esta estratégia e a matriz metodológica em 2026-11-05, após apresentação de
+`270377b`, conforme [ADR-005](../arquitetura/ADR-005-persistencia-incremental.md).
+Contrato alvo aprovado não é evidência de implementação ou integração.
 O modelo de vínculos está no [modelo canônico](../dados/MODELO_DE_DADOS.md).
 Não alterar prazos, cookies, OIDC, CSRF, grants ou escopo por projeto.
 
@@ -731,7 +733,7 @@ Interrupção conhecida antes do encerramento principal proíbe o cliente de
 solicitar complete; abort vencedor impede complete. Complete já confirmado
 não é apagado por aviso tardio: evidência posterior de violação exige registro
 de invalidação auditável e exclusão dos resultados válidos, preservando linhas e
-recibo históricos. O contrato candidato prevê
+recibo históricos. O contrato alvo validado prevê
 `POST /participant/session/invalidate`, corpo fechado `{reason,event_at_ms}`:
 razão enumerada D2/D5, tempo monotônico finito do evento (nulo quando não
 observável), mesma credencial/CSRF/Origin e prazo. É idempotente por sessão,

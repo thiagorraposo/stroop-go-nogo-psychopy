@@ -4,6 +4,16 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-05 — Validação da estratégia incremental pelo responsável
+
+- O responsável respondeu “valido” à proposta versionada em `270377b`, aprovando
+  ADR-005, contrato alvo, matriz de invalidação e limites residuais de perda.
+- Registrada a validação prévia à implementação e alinhadas as fontes canônicas;
+  contratos alvo continuam distintos do comportamento implementado. Evidência
+  de aceite e próxima ação permanecem exclusivamente no backlog.
+- Nenhuma alteração de runtime, schema ou regra experimental; ensaios de banco,
+  motor e transporte continuam exigidos antes do aceite funcional.
+
 ## 2026-11-05 — Decisões de participação e proposta incremental
 
 - Registrada aprovação explícita do responsável para participantes por projeto,

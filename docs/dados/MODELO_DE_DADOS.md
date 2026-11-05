@@ -245,7 +245,7 @@ sem apropriar legado por texto coincidente. Migrations existentes são imutávei
 Retenção e eventual eliminação seguem decisão institucional DEC-03; preservação
 operacional dos parciais não significa retenção ilimitada.
 
-## Observações incrementais — desenho candidato de 2026-11-05
+## Observações incrementais — desenho validado em 2026-11-05
 
 Separar armazenamento de observações de execução das tabelas de resultados
 oficiais. A sessão existe antes da primeira tentativa e permanece identificável
@@ -272,6 +272,6 @@ estruturalmente válidos com falha metodológica podem ser preservados como
 observações inválidas, sem aprovação para resultado.
 
 Sem tabelas ou estados físicos novos definidos por inferência: o contrato de
-transporte candidato está no [contrato HTTP](../desenvolvimento/CONTRATO_API_WEB.md),
+transporte alvo validado pelo responsável está no [contrato HTTP](../desenvolvimento/CONTRATO_API_WEB.md),
 a estratégia no [ADR-005](../arquitetura/ADR-005-persistencia-incremental.md),
 e critérios de validade no [protocolo](../experimento/PROTOCOLO_WEB.md).

@@ -1,9 +1,10 @@
 # ADR-005 — Participação por projeto e persistência incremental
 
-Data: 2026-11-05. Documento de decisão técnica candidata, sem implementação.
-Diretrizes de participação e preservação aprovadas pelo responsável nesta data;
-aprovação da estratégia definitiva e critérios metodológicos antes do código
-é exigência expressa do responsável. Estado, bloqueios e aceite somente no
+Data: 2026-11-05. Decisão técnica validada pelo responsável, sem implementação.
+Após apresentação da proposta versionada em `270377b`, o responsável respondeu
+“valido”, aprovando a estratégia, os limites de perda e a matriz de invalidação.
+Essa resposta satisfaz a exigência de validação documental anterior ao código;
+não constitui evidência dos ensaios técnicos/temporais ainda planejados. Estado, bloqueios e aceite somente no
 [backlog](../Projeto%20Stroop%20Test.md), DEC-01/02 e WEB-005.
 
 ## Contexto e decisão de produto
@@ -19,7 +20,7 @@ Dados recebidos devem sobreviver à interrupção, identificados como incompleto
 ou inválidos. Isso não autoriza retomar bloco nem produzir resultado parcial.
 D2 e os gates aprovados permanecem no [protocolo](../experimento/PROTOCOLO_WEB.md).
 
-## Estratégia proposta para validação
+## Estratégia validada em 2026-11-05
 
 1. Criar a sessão no resgate, antes da prática, com vínculos e protocolo fixados.
    Antes do principal, confirmar conectividade, autorização, prazo e prontidão
@@ -43,7 +44,7 @@ D2 e os gates aprovados permanecem no [protocolo](../experimento/PROTOCOLO_WEB.m
    cliente mantém dados sem confirmação e consulta o recibo em erro incerto.
    Checkpoint só confirma armazenamento parcial, nunca sucesso experimental.
    Recepção, replay, expiração, conclusão e concorrência têm sua fonte única no
-   [contrato HTTP candidato](../desenvolvimento/CONTRATO_API_WEB.md).
+   [contrato HTTP alvo validado](../desenvolvimento/CONTRATO_API_WEB.md).
 5. Ao terminar integralmente, enviar complete e esperar recibo oficial em tela
    de envio, fora do trecho cronometrado. Só então apresentar resultado recebido.
    Interrupção comprometendo o protocolo encerra a execução; tentar entregar
@@ -88,9 +89,10 @@ não degradar silenciosamente para final-only.
 
 ## Validação anterior à implementação
 
-Revisão documental desta proposta não é ensaio do worker ou do banco. Antes de
-código/schema dependentes, o responsável deve validar explicitamente a estratégia,
-a janela residual de perda e a matriz de invalidação do protocolo. A revisão
+A resposta “valido” do responsável em 2026-11-05 aprovou a estratégia, a janela
+residual de perda e a matriz de invalidação do protocolo apresentadas em
+`270377b`. Revisão e aprovação documentais não são ensaio do worker ou do banco.
+A revisão
 técnica deve fechar schema aditivo, contratos e tratamento de invalidação tardia,
 sem delegar ao desenvolvedor escolhas científicas. Se houver efeito metodológico
 novo ou pausa proposta, obter decisão e versionamento antes de implementar.

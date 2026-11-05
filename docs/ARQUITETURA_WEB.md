@@ -84,8 +84,9 @@ válidas; reload não recupera dados intermediários. Não persistir cookies,
 credenciais, resultados ou convites em localStorage/IndexedDB/URL. O responsável rejeitou final-only em
 2026-11-05. O
 [ADR-005](arquitetura/ADR-005-persistencia-incremental.md) propõe checkpoints
-por worker e preservação no servidor; estratégia definitiva e critérios de
-invalidação precisam validação antes de código/schema. O parágrafo “Atual”
+por worker e preservação no servidor; estratégia e matriz de invalidação
+foram validadas pelo responsável em 2026-11-05, após a proposta `270377b`.
+Implementação e ensaios técnicos/temporais permanecem por executar. O parágrafo “Atual”
 descreve a implementação existente, não o alvo aprovado. Não retomar principal
 interrompido; parcial recebido não se torna resultado oficial.
 

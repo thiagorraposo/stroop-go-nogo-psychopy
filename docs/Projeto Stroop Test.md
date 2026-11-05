@@ -34,8 +34,9 @@ de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
 Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
 não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
 
-Progresso atual: **5/42 entregáveis aceitos (WEB-000 a WEB-004);
-4/41 entregáveis de implementação/revalidação funcional aceitos no novo plano**.
+Progresso atual: **6/42 entregáveis aceitos (WEB-000 a WEB-005)**.
+WEB-005 é aceite documental de contratos; os quatro aceites funcionais de M1
+permanecem, sem atribuir funcionamento à nova persistência por aprovação do desenho.
 M1 concluído; demais marcos funcionais não concluídos. Este número só se atualiza
 aqui, após evidência.
 
@@ -248,7 +249,7 @@ produção não comprovados por estes ensaios. Riscos R01–R10 permanecem abert
 
 - Objetivo: Fechar ambiguidades de produto/dados e revalidar API e persistência existentes.
 - Justificativa: Integridade e cálculo oficial são base do fluxo de pesquisa.
-- Inclui: Contratos atuais versus código, decisões DEC-01/02, transações, métricas e compatibilidade. CHG-002 acrescenta desenho de vínculos estáveis e persistência incremental; implementação dependente suspensa até validação definitiva.
+- Inclui: Contratos atuais versus código, decisões DEC-01/02, transações, métricas e compatibilidade. CHG-002 acrescenta desenho de vínculos estáveis e persistência incremental, validado pelo responsável em 2026-11-05; ensaios de implementação ainda exigidos.
 - Exclui: Novo cadastro global, offline ou schema por conveniência.
 - Pré-requisitos: M1 aceito; decisões para o trabalho que depender delas.
 - Dependências: M1.
@@ -262,13 +263,13 @@ produção não comprovados por estes ensaios. Riscos R01–R10 permanecem abert
 
 ### WEB-005 — Fechar contratos de participante, preparação e política de perda
 
-- Marco: M2. Prioridade: P0. Complexidade: M. Estado: BLOQUEADA.
+- Marco: M2. Prioridade: P0. Complexidade: M. Estado: CONCLUIDA.
 - Dependências: WEB-004; DEC-01 e DEC-02.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Comparação contrato/código e modelo por projeto aprovados; estratégia definitiva de persistência e matriz de invalidação explicitamente validadas pelo responsável antes de código/schema. Contratos de vínculos, recibo, replay, incompletude e risco residual fechados. RAM final-only não é alternativa aceita após CHG-002.
-- Testes/verificação: revisão estática contrato/código/schema lógico executada; achados em EV-M2-005. DEC-01 e diretriz DEC-02 respondidas; validação definitiva da estratégia/matriz ainda pendente. Suites funcionais não reexecutadas nesta revisão documental.
-- Evidências: EV-M2-005, código inspecionado em `bcd896b`; resposta e revisão documental em EV-M2-005-R1 (2026-11-05). Comparação histórica não constitui aceite funcional; direção aprovada é distinta da estratégia definitiva ainda em validação.
-- Riscos/bloqueios: R03, R07. DEC-01 respondida em 2026-11-05; DEC-02 aprova diretriz incremental e rejeita final-only, mas exige validação definitiva antes da implementação. Proposta ADR-005 e matriz do protocolo disponíveis; WEB-005 permanece BLOQUEADA para aceite até essa validação explícita. Não iniciar WEB-006/007/008 nem migrations por inferência. Revisão documental pode prosseguir.
+- Testes/verificação: revisão estática contrato/código/schema lógico executada; achados em EV-M2-005. DEC-01 e DEC-02 respondidas; estratégia/matriz validadas expressamente na resposta “valido” do responsável em 2026-11-05. Suites funcionais não reexecutadas nesta revisão documental.
+- Evidências: EV-M2-005, código inspecionado em `bcd896b`; resposta e revisão documental em EV-M2-005-R1 (2026-11-05). EV-M2-005-R2 registra validação definitiva pelo responsável. Aceite é documental; comparação e aprovação não constituem aceite funcional.
+- Riscos/bloqueios: DEC-01/02 satisfeitas para o aceite documental com a resposta “valido” de 2026-11-05. R03/R07 continuam abertos e exigem ensaios e governança próprios; não impedem encerrar o contrato. WEB-006 está pronta para detalhamento técnico conforme dependências; nenhuma migration operacional, M3 ou produção autorizada por esta validação.
 - Referências: REQ-PAR-002, REQ-AVA-002, REQ-INT-003; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch `docs/m2-contratos-participacao`, baseada em `bcd896b` para preservar M1 ainda não integrado à main; fechamento em Retomada.
 
@@ -320,9 +321,29 @@ e `git diff --check`; resultados numéricos e Git no fechamento em Retomada.
 Conteúdo funcional de referência: `bc2f4b3` (somente documentação desde M1).
 Não altera contagem de aceites nem encerra WEB-005/M2.
 
+### EV-M2-005-R2 — validação explícita e aceite documental, 2026-11-05
+
+Após a apresentação do ADR-005, contrato alvo e matriz D2/D5 versionados em
+`270377b89ea477bf864114d0e8a3017e3520a84f`, o responsável respondeu **“valido”**.
+Aprova a estratégia definitiva, a janela residual de perda explicitada e os
+critérios metodológicos, satisfazendo a validação prévia exigida na sua mensagem.
+Aprovação não implica ensaios implementados, schema operacional ou produção.
+
+Critérios WEB-005 conferidos: comparação atual/alvo em EV-M2-005; participante
+por projeto e vínculos estáveis no modelo, aprovados por DEC-01; persistência por
+worker com prefixo/ACK, idempotência, corridas/invalidação e incompletude no
+ADR-005/contrato; matriz metodológica e nova sessão com prática no protocolo;
+limitações e perda residual explicitadas e validadas por DEC-02. Nenhum critério
+funcional transferido a esta entrega documental. WEB-005 CONCLUIDA;
+WEB-006 PRONTA, WEB-007/008 PENDENTES; M2 permanece não concluído.
+
+Validação documental atual: procedimento Python do workflow e `git diff --check`;
+resultados e Git na Retomada. Não reexecutadas suites de código, PG ou browser.
+Históricos EV-M2-005/R1 preservam o contexto anterior à validação, agora superado.
+
 ### WEB-006 — Revalidar entrada de conclusão e proveniência do protocolo
 
-- Marco: M2. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Marco: M2. Prioridade: P0. Complexidade: M. Estado: PRONTA.
 - Dependências: WEB-005.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Após validação DEC-02, schema fechado e vínculos participante/visita/projeto; ordem/snapshot, unidades e versões; contratos de checkpoint/start/abort/complete e invalidação tardia coincidem com código. Especificar migration aditiva e mapear sessões existentes sem inferir associação de legado. Validar partial versus oficial conforme ADR-005; não iniciar implementação antes do gate WEB-005.
@@ -911,7 +932,7 @@ versão experimental. Somente bloquear tarefa dependente, sem paralisar document
 | ID | Questão / hipótese preservada | Responsável | Condição objetiva / impacto | Tarefas relacionadas | Estado |
 |---|---|---|---|---|---|
 | DEC-01 | Participante pseudonimizado por projeto, múltiplas visitas/avaliações e preparação por convite; sem cadastro central ou agenda separada nesta versão | Proprietário; decisão explícita em 2026-11-05 | APROVADA a direção; vínculos estáveis e evolução aditiva no modelo. Implementação/ensaios ainda não realizados; retenção institucional continua DEC-03 | WEB-005/006/007/013 | APROVADA |
-| DEC-02 | Final-only rejeitado; persistência incremental com recibo/idempotência e preservação de incompletas/ inválidas, sem retomada; nova sessão com prática | Proprietário + metodológico; diretriz explícita em 2026-11-05 | ADR-005, contrato e matriz de invalidação disponíveis; responsável exige validação definitiva antes de código/schema. Aceitar ou ajustar estratégia/janela de perda e critérios; depois executar ensaios técnicos/temporais, sem inferir aprovação do desenho | WEB-005/006/007/011/012/015 | DIRETRIZ APROVADA; ESTRATÉGIA EM VALIDAÇÃO |
+| DEC-02 | Final-only rejeitado; persistência incremental com recibo/idempotência e preservação de incompletas/ inválidas, sem retomada; nova sessão com prática | Proprietário + metodológico; diretriz e validação explícitas em 2026-11-05 | Resposta “valido” à proposta `270377b` aprova ADR-005, contrato alvo, matriz D2/D5 e perda residual; gate documental WEB-005 satisfeito. Implementação/ensaios técnicos e temporais ainda exigidos | WEB-005/006/007/011/012/015 | APROVADA |
 | DEC-03 | Regras institucionais de informação, consentimento aplicável, retenção e incidentes | Proprietário/instituição | Documento aprovado e responsabilidades/canal definidos; nenhuma base legal inventada pelo Codex | WEB-033/036 | PENDENTE |
 | DEC-04 | Matriz de hardware/SO/browser e validação física/metodológica necessária | Responsável metodológico | Plano e recursos aprovados, manter D1/D5 e limites W16; alterações de suporte/gate justificadas e aprovadas | WEB-011/012/034 | PENDENTE |
 | DEC-05 | Após prontidão M9, autorizar separadamente configuração research, deploy e eventual uso real | Proprietário + metodológico/operador | WEB-036 comprovada; registrar autorização específica antes de WEB-041 e, para produção/uso, de WEB-038/040; mudanças da candidata passam revalidação dos gates afetados; não retirar synthetic apenas por aprovação técnica | WEB-041/038/040 | PENDENTE |
@@ -950,32 +971,33 @@ não depende de reaprovação científica. Não há bloqueio documental remanesc
 
 Marco autorizado atual: **M2**, pelo novo comando `continue o projeto` de
 2026-11-05. M1 permanece concluído (WEB-001 a WEB-004; EV-M1).
-WEB-005 permanece **BLOQUEADA para aceite**: DEC-01 aprovada pelo responsável
-em 2026-11-05; DEC-02 tem diretriz aprovada e estratégia definitiva a validar.
-Proposta documental em EV-M2-005-R1 e ADR-005; WEB-006/007/008 PENDENTES.
-Nenhum código/schema alterado ou novo aceite; progresso preservado.
+WEB-005 **CONCLUIDA**, por validação explícita do responsável em 2026-11-05
+(EV-M2-005-R2). DEC-01/02 aprovadas; estratégia ADR-005, contrato alvo, matriz de
+invalidação e risco residual validados na resposta “valido” à proposta `270377b`.
+WEB-006 **PRONTA**; WEB-007/008 PENDENTES. M2 não concluído.
 
-Próxima ação: responsável validar ou ajustar ADR-005, contrato HTTP candidato e
-matriz de invalidação D2/D5, incluindo janela residual de perda. Essa validação
-prévia foi exigida explicitamente na mensagem de 2026-11-05. Depois fechar
-WEB-005 e executar o escopo replanejado de WEB-006 dentro de M2, com aprovação de
-schema na tarefa correspondente; não iniciar M3 nem produção por inferência.
+Próxima ação: detalhar e executar WEB-006 dentro de M2, conforme autorização do
+marco já registrada, preservando a separação entre contrato alvo e código atual.
+Especificar schema aditivo, mapeamento de sessões WEB e testes de entrada/
+proveniência/checkpoint; alteração de schema só no escopo autorizado da tarefa,
+sem operação em dados reais. A validação não exige nova aprovação das decisões
+DEC-01/02 já tomadas, nem autoriza M3, deploy ou integração main.
+Esta sessão registra e valida o aceite documental; WEB-006 ainda não iniciada.
 
-Git desta revisão: branch `docs/m2-contratos-participacao`, base `bc2f4b3`,
-upstream conferido após fetch; main/origin/main permanecem `fe8f24f`.
-Entrega anterior de preparação `bc2f4b3` já enviada. Commit desta entrega:
+Git do aceite: branch `docs/m2-contratos-participacao`, base `270377b`, worktree
+inicial limpa, upstream conferido após fetch; main/origin/main em `fe8f24f`.
+Proposta `270377b89ea477bf864114d0e8a3017e3520a84f` enviada e confirmada no
+upstream/remoto antes desta revisão. Commit deste aceite identificável por
 `git log -1 --format=%H -- docs/arquitetura/ADR-005-persistencia-incremental.md`.
-Após commit, envio previsto ao upstream existente, com confirmação por
-`git rev-parse HEAD`, `git rev-parse @{upstream}` e `git ls-remote --heads origin
-docs/m2-contratos-participacao`; falha exige registrar pendência.
+Envio ao upstream existente verificável por igualdade entre `git rev-parse HEAD`,
+`git rev-parse @{upstream}` e `git ls-remote --heads origin
+ docs/m2-contratos-participacao`; registrar falha se ocorrer, sem force push.
 Validação documental local em 2026-11-05: procedimento Python do workflow
-aprovado (85 documentos, 507 links relativos, 3 âncoras; 42 tarefas, 36
-requisitos/matriz, 11 marcos, 10 riscos, 5 decisões, sem ciclos);
-`git diff --check` aprovado. Escopo: nove arquivos Markdown.
-`gh run list --branch docs/m2-contratos-participacao --limit 5` retornou lista
-vazia: CI não executada na branch, sem aprovação inferida. Nenhuma suite
-funcional reexecutada; ensaios de implementação do ADR-005 são PLANEJADOS.
-Sem PR, merge, deploy, instalação ou acesso a dados reais.
+(85 documentos, 507 links relativos, 3 âncoras; 42 tarefas, 36 requisitos/matriz,
+11 marcos, 10 riscos, 5 decisões, sem ciclos) e `git diff --check` aprovados.
+Escopo: nove documentos Markdown; nenhuma suite funcional reexecutada.
+CI da branch consultada: nenhuma execução; não equivale a aprovação funcional.
+Sem PR, merge, deploy, instalação, migration ou acesso a dados reais.
 
 Checkout de desenvolvimento: `/home/raposo/Projetos/experimentos-psicopy/stroop-cognifit`.
 Worktree sintética M1 `/tmp/stroop-m1-baseline-20261104` preservada em HEAD

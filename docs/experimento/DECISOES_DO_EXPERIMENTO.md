@@ -164,6 +164,12 @@ preservação de sessões incompletas/ inválidas. Reafirmada D2: interrupção 
 comprometa protocolo exige nova sessão com prática, sem retomar principal.
 A estratégia definitiva e critérios metodológicos devem ser documentados e
 validados **antes da implementação**, por exigência expressa do responsável.
-A proposta é [ADR-005](../arquitetura/ADR-005-persistencia-incremental.md), com
+A estratégia é [ADR-005](../arquitetura/ADR-005-persistencia-incremental.md), com
 matriz no [protocolo](PROTOCOLO_WEB.md). A observação de RAM final-only na auditoria
 acima descreve código histórico, não aprovação atual desse comportamento.
+
+Após a proposta versionada em `270377b`, o responsável respondeu “valido” em
+2026-11-05, validando a estratégia definitiva, a janela residual de perda e a
+matriz de invalidação antes da implementação. D1–D6, métricas, prática e CSV
+continuam preservados. Ensaios técnicos e temporais continuam exigidos;
+a validação documental não autoriza migração operacional, deploy ou coleta real.

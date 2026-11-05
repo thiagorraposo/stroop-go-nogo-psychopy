@@ -168,7 +168,7 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 
 - Descrição: Persistir incrementalmente observações com confirmação e idempotência, preservando sessões incompletas/ inválidas sem retomada ou resultado oficial parcial.
 - Justificativa: RAM final-only não garante preservação de tentativas interrompidas.
-- Prioridade: P0. Estado da especificação: **Diretriz confirmada; estratégia candidata a validar** (DEC-02, 2026-11-05).
+- Prioridade: P0. Estado da especificação: **Confirmado** (DEC-02; estratégia e matriz validadas em 2026-11-05).
 - Aceite verificável: Estratégia ADR-005, contrato HTTP e matriz D2/D5 validados explicitamente antes de implementação; ensaios de perda/recibo/replay/concorrência/expiração e impacto temporal comprovam o comportamento depois do código. RAM final-only rejeitada; riscos residuais informados.
 - Dependências: WEB-005 e pré-requisitos registrados no backlog.
 - Restrições conhecidas: Sem offline, localStorage ou retomada implícitos; decisão metodológica se afetar validade.
@@ -414,17 +414,17 @@ já existe ou participa da regressão geral. WEB-000 é exclusivamente documenta
 | REQ-AUT-002 | ADR-004 | M6 | WEB-022 | `stroop/domain/auth.py, stroop/persistence/web_sessions.py` | `tests/test_web_auth.py` | PLANEJADA; consultar WEB-022 no backlog |
 | REQ-AUT-003 | ADR-004 | M6 | WEB-023 | `api/auth.py, api/sessions.py` | `tests/test_web_sessions.py` | PLANEJADA; consultar WEB-023 no backlog |
 | REQ-PAR-001 | ADR-004 | M4 | WEB-013 | `api/sessions.py, web/src/participant/` | `tests/test_web_sessions.py` | PLANEJADA; consultar WEB-013 no backlog |
-| REQ-PAR-002 | ADR-004/005 | M2 | WEB-005 | `Modelo lógico e formulário de sessão` | `Revisão documental DEC-01 em 2026-11-05; ensaios PLANEJADOS` | PLANEJADA; consultar WEB-005 no backlog |
+| REQ-PAR-002 | ADR-004/005 | M2 | WEB-005 | `Modelo lógico e formulário de sessão` | `Revisão documental DEC-01 em 2026-11-05; ensaios PLANEJADOS` | Aceite documental em EV-M2-005-R2; ensaios funcionais PLANEJADOS |
 | REQ-PAR-003 | ADR-004 | M4 | WEB-014 | `web/src/components/, api/models.py` | `tests/test_web_security_review.py` | PLANEJADA; consultar WEB-014 no backlog |
 | REQ-AVA-001 | ADR-004 | M4 | WEB-013 | `web/src/App.tsx, api/sessions.py` | `tests/test_web_sessions.py` | PLANEJADA; consultar WEB-013 no backlog |
-| REQ-AVA-002 | ADR-004/005 | M2 | WEB-005 | `Contrato HTTP e modelo lógico` | `Revisão documental DEC-01 em 2026-11-05; ensaios PLANEJADOS` | PLANEJADA; consultar WEB-005 no backlog |
+| REQ-AVA-002 | ADR-004/005 | M2 | WEB-005 | `Contrato HTTP e modelo lógico` | `Revisão documental DEC-01 em 2026-11-05; ensaios PLANEJADOS` | Aceite documental em EV-M2-005-R2; ensaios funcionais PLANEJADOS |
 | REQ-AVA-003 | ADR-004 | M4 | WEB-015 | `web/src/participant/ParticipantRun.ts, api/results.py` | `tests/test_web_results.py` | PLANEJADA; consultar WEB-015 no backlog |
 | REQ-EXP-001 | ADR-004 | M3 | WEB-009 | `condicoes/, web/src/experiment/` | `tests/test_fase3_condicoes_tempos.py` | PLANEJADA; consultar WEB-009 no backlog |
 | REQ-EXP-002 | ADR-004 | M3 | WEB-010 | `web/src/experiment/main-engine.ts, ExperimentHost.tsx` | `web/src/experiment/main.test.ts` | PLANEJADA; consultar WEB-010 no backlog |
 | REQ-EXP-003 | ADR-004 | M3 | WEB-011 | `web/src/experiment/environment.ts, web/pilots/` | `PLANEJADO: campanha de engenharia M3` | PLANEJADA; consultar WEB-011 no backlog |
 | REQ-INT-001 | ADR-004 | M2 | WEB-006 | `stroop/domain/web_results.py, api/results.py` | `tests/test_web_results.py` | PLANEJADA; consultar WEB-006 no backlog |
 | REQ-INT-002 | ADR-004 | M2 | WEB-007 | `stroop/persistence/web_sessions.py` | `tests/test_web_results.py` | PLANEJADA; consultar WEB-007 no backlog |
-| REQ-INT-003 | ADR-004/005 | M2 | WEB-005 | `ParticipantRun.ts e modelo lógico` | `ADR-005 e matriz de falhas; validação definitiva PENDENTE` | PLANEJADA; consultar WEB-005 no backlog |
+| REQ-INT-003 | ADR-004/005 | M2 | WEB-005 | `ParticipantRun.ts e modelo lógico` | `ADR-005 e matriz de falhas validados pelo responsável em 2026-11-05` | Aceite documental em EV-M2-005-R2; ensaios funcionais PLANEJADOS |
 | REQ-MET-001 | ADR-004 | M2 | WEB-008 | `stroop/domain/stroop.py, web_results.py` | `tests/test_nucleo_compartilhado.py` | PLANEJADA; consultar WEB-008 no backlog |
 | REQ-MET-002 | ADR-004 | M2 | WEB-008 | `stroop/domain/stroop.py, web/src/dashboard/analysis.ts` | `web/src/dashboard/analysis.test.ts` | PLANEJADA; consultar WEB-008 no backlog |
 | REQ-MET-003 | ADR-004 | M5 | WEB-019 | `web_assessments, api/assessments.py` | `tests/test_web_assessments.py` | PLANEJADA; consultar WEB-019 no backlog |
