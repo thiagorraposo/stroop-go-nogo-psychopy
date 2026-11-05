@@ -1,5 +1,11 @@
 # Decisoes do experimento
 
+Revisão documental em 2026-11-04: regras científicas preservadas. A direção de
+produto/infraestrutura está em [ARQUITETURA_WEB](../ARQUITETURA_WEB.md) e
+[ADR-004](../arquitetura/ADR-004-replanejamento-plataforma.md), sem decidir
+validade científica. Estado e validação atuais somente no [backlog](../Projeto%20Stroop%20Test.md).
+A aprovação histórica D1–D6 permanece; não é evidência de equivalência ou coleta real.
+
 ## Decisoes estabelecidas
 
 - O paradigma e Stroop Go/No-Go.
@@ -7,7 +13,7 @@
 - Tentativas incongruentes devem ser inibidas, sem resposta.
 - A pratica e separada do bloco principal.
 - As cores previstas para o experimento sao verde, amarelo, rosa, preto, vermelho, laranja, marrom, roxo, azul e cinza.
-- A lista oficial de palavras futuras e `VERDE`, `AMARELO`, `ROSA`, `PRETO`, `VERMELHO`, `LARANJA`, `MARROM`, `ROXO`, `AZUL` e `CINZA`.
+- A lista oficial de palavras e `VERDE`, `AMARELO`, `ROSA`, `PRETO`, `VERMELHO`, `LARANJA`, `MARROM`, `ROXO`, `AZUL` e `CINZA`.
 - O bloco principal deve permanecer sem feedback por tentativa.
 - No Builder local, a pratica tem uma unica rodada. A variante WEB aprovada
   permite repetir rodadas completas antes do principal conforme o protocolo abaixo.
@@ -27,8 +33,8 @@
 - As telas de navegacao pre-pratica aceitam clique, `Espaco` e `Enter`; cliques nao contam como respostas experimentais.
 - Resultados exibidos ao participante devem ser apenas descritivos.
 - Idade e sexo nao devem ser usados para pontuacao, classificacao ou comparacao normativa.
-- A arquitetura de dados futura adotara SQLite local como armazenamento inicial.
-- O dashboard futuro sera local, em Streamlit, lendo apenas SQLite.
+- Decisão histórica de 2026-07-06: SQLite como armazenamento inicial local; preservado no legado, superado como alvo operacional pelo ADR-004.
+- Decisão histórica de 2026-07-06: dashboard local Streamlit; preservado na transição, substituído como interface final por React conforme ADR-004.
 - `participant_id` sera o identificador principal da pessoa.
 - `initials` serao opcionais e tratadas como dado potencialmente identificavel.
 - `assessment_date` sera gerada automaticamente pelo sistema.
@@ -126,3 +132,19 @@ respectivas etapas; o formulario e os dados locais existentes sao preservados.
 - 2026-07-06: formulario local de sessao definido como fonte canonica de metadados da execucao.
 - 2026-07-06: especificacao visual futura definida como documentacao, sem alterar o experimento atual.
 - 2026-07-05: estrutura inicial de governanca e versionamento criada sem alterar a logica experimental.
+
+## Contratos e limites identificados na auditoria de 2026-11-04
+
+- A paleta lógica e o balanceamento são preservados. Valores ink_color_display
+  antigos nos CSVs não governam renderização atual: Builder usa INK_COLOR_DISPLAY_MAP;
+  WEB usa o snapshot condicoes/web_protocol.json. Não mudar cores nesta revisão.
+- Persistência histórica usa response_time=0.0 quando nenhum hit existe; resumo
+  WEB usa null e tela usa traço. Essa diferença de representação não significa
+  medida igual a zero. Convenção detalhada no [modelo](../dados/MODELO_DE_DADOS.md).
+- Identificação WEB usa pseudônimo/visita do convite, sem nome/iniciais; cadastro
+  longitudinal não está definido. Envio atual é final e em RAM; principal
+  interrompido é inválido conforme D2. DEC-01/02 do backlog distinguem lacunas de
+  produto/dados de decisões científicas já aprovadas.
+- Validação física/matriz e eventual estudo de equivalência dependem de DEC-04;
+  não inventar limiar ou equivalência. Política institucional e liberação de
+  coleta real dependem de DEC-03/05, sem supor consentimento ou autorização ética.

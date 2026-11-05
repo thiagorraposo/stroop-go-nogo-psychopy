@@ -1,13 +1,17 @@
+# Referência histórica substituída — não executável
+
+Governança vigente: [backlog único](../Projeto%20Stroop%20Test.md) e
+[workflow atual](../WORKFLOW_CODEX_CLI.md). Orientações abaixo são históricas.
+
 # Workflow de evolucao — referencia substituida
 
 A evolucao para a nova versao web usa [ROADMAP_WEB.md](../ROADMAP_WEB.md) e o
 [ADR-001](../arquitetura/ADR-001-evolucao-web.md). O redirecionamento abaixo trata
 do fluxo legado PsychoPy/Streamlit; os estados dos dois escopos sao separados.
 
-Este documento deixou de governar o planejamento em 2026-09-13. A unica fonte
-canonica de etapas, pesos, dependencias, escopo, criterios de aceite, estado,
-progresso, proxima etapa e decisoes externas pendentes e
-[Projeto Stroop Test.md](../legado/Projeto%20Stroop%20Test.md).
+Este documento deixou de governar o planejamento em 2026-09-13. A fonte então canônica era o
+[plano legado hoje congelado](../legado/Projeto%20Stroop%20Test.md); a fonte vigente
+é o [backlog da plataforma](../Projeto%20Stroop%20Test.md).
 
 O processo operacional esta em [WORKFLOW_CODEX_CLI.md](WORKFLOW_CODEX_CLI.md).
 Nao gerar prompts externos por etapa. A distribuicao anterior de entregas e a

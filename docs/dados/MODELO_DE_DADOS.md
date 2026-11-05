@@ -1,6 +1,10 @@
 # Modelo de dados
 
-Data: 2026-07-09.
+Base histórica: 2026-07-09. Revisão documental: 2026-11-04.
+Schema e migrations não alterados nesta revisão. PostgreSQL é o banco operacional
+alvo da plataforma; SQLite permanece adaptador local histórico. Modelo atual/alvo
+em [ARQUITETURA_WEB](../ARQUITETURA_WEB.md), execução somente no
+[backlog canônico](../Projeto%20Stroop%20Test.md).
 
 Este documento define o modelo logico originalmente implementado no SQLite
 local por `scripts/db_schema.sql`. A Etapa 4 reproduziu as mesmas tres tabelas no
@@ -176,3 +180,34 @@ WEB. A FK impede que reimportacao `--force` sobrescreva uma conclusao WEB.
 Semantica, idempotencia e unidades seguem o
 [contrato HTTP](../desenvolvimento/CONTRATO_API_WEB.md); formulas continuam neste
 modelo e em `stroop/domain/stroop.py`. Nao ha alteracao no CSV de 21 colunas.
+
+## Consolidação da plataforma — estado observado em 2026-11-04
+
+O modelo de três tabelas acima descreve o núcleo legado reutilizado. Não é todo
+o banco operacional. As migrations 0002–0010 já acrescentam identidade/auditoria,
+projetos e vínculos, transações/sessões OIDC, convites/sessões participantes,
+proveniência WEB, mapa de legado e importações/gestão de contas. DDL e nomes
+completos permanecem exclusivamente em `scripts/migrations/`; não recriar schema.
+
+No fluxo WEB atual, sessão/convite precede resultado. A avaliação oficial só é
+gravada após conclusão integral validada; 16 tentativas, 12 métricas, proveniência,
+hash e recibo pertencem à mesma transação. Reenvio idêntico recupera recibo;
+conteúdo diferente conflita. Não existe persistência de tentativas intermediárias
+ou cadastro longitudinal autônomo de pessoas. Alterar isso depende de DEC-01/02,
+não de completar tabelas supostamente ausentes. Projeto synthetic continua barreira.
+
+### Ausência de tempo de resposta e apresentação
+
+`stroop/domain/stroop.py` calcula métricas somente de main. Sem hits, response_time
+persistido é a sentinela histórica **0.0 segundos**; não representa reação física
+zero. O analisador CLI histórico retorna None; o resumo WEB retorna
+response_time_seconds=null e a UI deve mostrar ausência (traço), sem imputar RT.
+Arredondamento é apresentação; não quantizar medidas originais para hash/gate.
+Não mudar sentinela, nulabilidade, fórmula ou unidade sem decisão de compatibilidade
+explícita, requisitos e testes de regressão correspondentes.
+
+Metadados técnicos WEB distinguem unidade bruta ms e RT canônico s; versão local
+0.2.2 e WEB 0.2.2-web.1 são distintas, assim como versão de app e snapshot.
+Resultados históricos não são associados a projeto por rótulo coincidente;
+[ADR-003](../arquitetura/ADR-003-escopo-legado-web.md) exige mapa explícito.
+Nenhuma coleta, importação, migration ou grant foi executado nesta revisão.

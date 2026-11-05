@@ -1,7 +1,9 @@
 # Contrato HTTP da versao WEB
 
-Data: 2026-10-16. Especificacao implementavel de W02; nao representa rotas ja
-implementadas. Usa as decisoes aprovadas em
+Base: 2026-10-16 (W02 histórico). Revisão documental: 2026-11-04.
+Há routers implementados em api/ para as operações descritas; esta é a fonte de
+contrato a confrontar com código em WEB-005/006, não evidência de teste aprovado.
+Estado e aceite atuais ficam somente no backlog canônico via a ponte ROADMAP_WEB. Usa as decisoes aprovadas em
 [PROTOCOLO_WEB.md](../experimento/PROTOCOLO_WEB.md), os perfis de
 [AUTENTICACAO_E_PERMISSOES.md](../seguranca/AUTENTICACAO_E_PERMISSOES.md) e os contratos de
 [CSV](../experimento/CSV_UNIFICADO.md) e [dados](../dados/MODELO_DE_DADOS.md). Formulas e metodo

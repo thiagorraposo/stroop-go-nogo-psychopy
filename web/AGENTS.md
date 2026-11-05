@@ -18,6 +18,6 @@ Herda as instrucoes da raiz. Fontes: [roadmap](../docs/ROADMAP_WEB.md),
   `package-lock.json` juntos, com necessidade comprovada e fonte primaria.
 - Validar `npm ci`, `npm test`, `npm run typecheck`, `npm run build` e
   `npm run test:browser` conforme escopo. Testes de navegador usam somente
-  dados sinteticos; mocks HTTP nao concedem aceite da integracao real W13.
+  dados sinteticos; mocks HTTP nao concedem aceite da integracao real M4.
 - Registrar navegador/versao/SO observados, sem inferir suporte universal nem
   equivalencia temporal. Evidencia fisica e homologacao continuam gates proprios.

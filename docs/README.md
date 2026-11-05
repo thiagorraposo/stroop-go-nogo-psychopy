@@ -1,41 +1,24 @@
-# Documentacao
+# Índice documental
 
-Comece pelo [guia do usuario](operacao/GUIA_DO_USUARIO.md) para executar o
-fluxo existente, ou pelo [mapa do projeto](ESTRUTURA_DO_PROJETO.md) para
-localizar codigo, comandos publicos e contratos.
+Leitura inicial: [README do produto](../README.md) → [auditoria](AUDITORIA_REPLANEJAMENTO.md)
+→ [arquitetura](ARQUITETURA_WEB.md) → [requisitos/matriz](REQUISITOS_E_RASTREABILIDADE.md).
 
-Para entender o projeto sem conhecer o codigo, leia o
-[relatorio tecnico de funcionamento](desenvolvimento/RELATORIO_TECNICO.md):
-experimento, calculos, arquitetura, dados, acesso e limites de validacao.
+| Fonte | Papel exclusivo |
+|---|---|
+| [Projeto Stroop Test](Projeto%20Stroop%20Test.md) | Único backlog: marcos/tarefas/estados/progresso/aceite/riscos/decisões/retomada |
+| [WORKFLOW_CODEX_CLI](WORKFLOW_CODEX_CLI.md) | Protocolo dos quatro comandos e Git autônomo sem PR/merge automático |
+| [AGENTS raiz](../AGENTS.md) e [docs](AGENTS.md) | Instruções estáveis e limites |
+| [ARQUITETURA_WEB](ARQUITETURA_WEB.md), [ADRs](arquitetura/) | Visão atual/alvo e decisões; [ADR-004](arquitetura/ADR-004-replanejamento-plataforma.md) consolida a nova direção |
+| [REQUISITOS_E_RASTREABILIDADE](REQUISITOS_E_RASTREABILIDADE.md) | Catálogo A–L, origem e vínculos; não mantém progresso |
+| [Decisões metodológicas](experimento/DECISOES_DO_EXPERIMENTO.md), [protocolo](experimento/PROTOCOLO_WEB.md), [CSV](experimento/CSV_UNIFICADO.md) | Regras científicas, limites e intercâmbio |
+| [Modelo](dados/MODELO_DE_DADOS.md), [migrations](dados/MIGRACOES_POSTGRESQL.md), [HTTP](desenvolvimento/CONTRATO_API_WEB.md) | Contratos técnicos canônicos, sem cópias |
+| [Segurança](seguranca/), [acesso WEB](seguranca/ACESSO_WEB.md) | Autorização, privacidade, ameaças e incidentes |
+| [Operação](operacao/), [WEB Docker](operacao/WEB_DOCKER.md), [VPS](operacao/DEPLOY_WEB_VPS.md), [recuperação](operacao/WEB_RECUPERACAO.md) | Runbooks existentes; não autorizam execução |
+| [CI](desenvolvimento/CI_WEB.md), [validação](VALIDACAO_WEB.md), [homologação](operacao/HOMOLOGACAO_WEB.md) | Reprodução e evidências históricas datadas, não reexecução atual |
+| [Registro de alterações](REGISTRO_DE_ALTERACOES.md) | Fatos datados, sem contabilidade paralela |
+| [Estrutura](ESTRUTURA_DO_PROJETO.md), [API](../api/README.md), [Web](../web/README.md), [scripts](../scripts/README.md) | Mapa e comandos existentes |
+| [Legado](legado/), [etapas 1–12](legado/Projeto%20Stroop%20Test.md), [Wxx](legado/ROADMAP_WEB_2026-11-04.md), [retomada anterior](legado/RETOMADA_2026-11-04.md) | Arquivos congelados, histórico e aceites anteriores; não executar como backlog |
 
-## Desenvolvimento e retomada
-
-- [Roadmap WEB](ROADMAP_WEB.md): escopo, dependencias, criterios e estado.
-- [Progresso e retomada](PROGRESS.md): ultima unidade e proxima acao.
-- [Protocolo de trabalho](desenvolvimento/WORKFLOW_CODEX_CLI.md).
-- [Validacao WEB e piloto](VALIDACAO_WEB.md).
-- [Homologacao WEB e capacidade observada](operacao/HOMOLOGACAO_WEB.md).
-- [Transicao WEB, cobertura e manutencao](operacao/TRANSICAO_WEB.md).
-- [CI WEB reproduzivel](desenvolvimento/CI_WEB.md).
-- [Contrato HTTP WEB](desenvolvimento/CONTRATO_API_WEB.md).
-- [Padrao de commits](desenvolvimento/PADRAO_DE_COMMITS.md).
-- [Contribuicao e GitHub Flow](../CONTRIBUTING.md).
-- [Registro de alteracoes](REGISTRO_DE_ALTERACOES.md): evidencias datadas.
-- [Instrucoes de documentacao](AGENTS.md).
-
-## Mapa por assunto
-
-| Pasta | Conteudo | Fontes principais |
-|---|---|---|
-| [arquitetura/](arquitetura/) | Decisoes e seus motivos | [Monolito modular](arquitetura/ADR-001-evolucao-web.md), [hospedagem na VPS](arquitetura/ADR-002-hospedagem-vps.md), [escopo legado WEB](arquitetura/ADR-003-escopo-legado-web.md) |
-| [experimento/](experimento/) | Paradigma, tempos, condicoes, interface e exportacao | [Decisoes](experimento/DECISOES_DO_EXPERIMENTO.md), [protocolo WEB](experimento/PROTOCOLO_WEB.md), [CSV oficial](experimento/CSV_UNIFICADO.md), [UX](experimento/UX_DECISIONS.md) |
-| [dados/](dados/) | Modelo, instrumentos, importacao, migracoes e consulta | [Modelo](dados/MODELO_DE_DADOS.md), [SQLite](dados/IMPORTACAO_SQLITE.md), [PostgreSQL](dados/IMPORTACAO_POSTGRESQL.md), [migrations](dados/MIGRACOES_POSTGRESQL.md) |
-| [seguranca/](seguranca/) | Acesso, ameacas, tratamento de dados e incidentes | [Acesso WEB](seguranca/ACESSO_WEB.md), [autenticacao](seguranca/AUTENTICACAO_E_PERMISSOES.md), [threat model](seguranca/THREAT_MODEL.md), [tratamento](seguranca/TRATAMENTO_DE_DADOS.md) |
-| [operacao/](operacao/) | Instalacao, uso, Docker e preparacao de producao | [Instalacao](operacao/INSTALACAO_MULTIPLATAFORMA.md), [uso por ZIP](operacao/USO_POR_ZIP_GITHUB.md), [Docker](operacao/INFRAESTRUTURA_DOCKER.md), [Docker WEB](operacao/WEB_DOCKER.md), [VPS publicada](operacao/DEPLOY_WEB_VPS.md), [recuperacao WEB](operacao/WEB_RECUPERACAO.md), [hardening](operacao/HARDENING_PRODUCAO.md) |
-| [desenvolvimento/](desenvolvimento/) | Workflow, contrato da API, commits e templates | [Protocolo](desenvolvimento/WORKFLOW_CODEX_CLI.md), [contrato HTTP](desenvolvimento/CONTRATO_API_WEB.md), [templates](desenvolvimento/prompts/) |
-| [legado/](legado/) | Backlog da operacao existente, baselines e propostas anteriores | [Backlog legado](legado/Projeto%20Stroop%20Test.md), [baseline](legado/BASELINE_ETAPA_1.md), [consulta OCI historica](legado/OCI_ETAPA11.md) |
-
-Cada contrato permanece em uma unica fonte. Este indice orienta a navegacao;
-nao replica regras, tabelas de progresso ou criterios de aceite. O backlog
-legado ainda rege suas etapas; a pasta `legado/` nao significa descontinuacao
-do PsychoPy ou do Streamlit.
+ROADMAP_WEB.md, PROGRESS.md e desenvolvimento/WORKFLOW_CODEX_CLI.md são pontes de
+compatibilidade. DECISOES_DO_EXPERIMENTO.md e MODELO_DE_DADOS.md nesta raiz apontam
+para suas fontes científicas nas subpastas; não duplicam contratos.

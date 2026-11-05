@@ -2,8 +2,9 @@
 
 Esta configuracao prepara a exposicao futura do sistema sem realizar deploy,
 configurar dominio, certificado real, destino externo ou OCI. O
-[backlog canonico](../legado/Projeto%20Stroop%20Test.md) continua sendo a unica fonte de
-estado e aceite. O dashboard de resultados usa PostgreSQL por
+[backlog canônico](../Projeto%20Stroop%20Test.md) é a única fonte de estado e aceite.
+Este guia descreve a pilha Streamlit legada, preservada na transição; a pilha WEB
+tem runbook próprio em [WEB_DOCKER](WEB_DOCKER.md). O dashboard de resultados usa PostgreSQL por
 `DASHBOARD_DATABASE_URL`; SQLite permanece apenas como fallback local.
 
 ## Configuracoes separadas

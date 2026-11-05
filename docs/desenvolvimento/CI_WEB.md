@@ -9,10 +9,11 @@ skip Python, vulnerabilidade conhecida ou deteccao de secrets; nao existe
 no repositorio remoto para bloquear merge; essa configuracao externa nao e
 criada pelo arquivo de workflow.
 
-Contribuicoes seguem [GitHub Flow](../../CONTRIBUTING.md). O agente aguarda CI
-e regras/revisoes exigidas antes de squash merge; nao usa bypass administrativo.
-O resultado integrado e verificado novamente por push em `main`.
-Em2026-11-04, protecao remota configurada: `verify` do app GitHub Actions,
+Contribuições seguem [GitHub Flow adaptado](../../CONTRIBUTING.md): commits/pushes
+autônomos em branch, sem PR/merge automático. Integração à main exige autorização
+específica e proteções/revisões vigentes; sem bypass. O pipeline verifica main
+quando houver integração autorizada. Não se exige CI remota para esta fase documental.
+Registro histórico anterior de 2026-11-04, não reconsultado nesta auditoria: proteção configurada com `verify` do app GitHub Actions,
 branch atualizada, PR obrigatorio, historico linear e conversas resolvidas,
 inclusive para administradores. Nao se adicionou aprovador externo obrigatorio;
 revisoes existentes continuam respeitadas. Force push/exclusao de main bloqueados;

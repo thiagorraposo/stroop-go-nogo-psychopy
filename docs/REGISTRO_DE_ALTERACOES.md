@@ -1,10 +1,26 @@
-# Registro de alteracoes
+# Registro de alterações
 
-Este arquivo preserva fatos datados; nao define estado ou aceite vigente.
-Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
+Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20Stroop%20Test.md).
+Entradas antigas preservam política e evidências de suas datas; não constituem
+comandos atuais nem resultados reexecutados.
 
-O estado da nova versao web e mantido separadamente no
-[roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
+## 2026-11-04 — Replanejamento documental da plataforma Stroop Web
+
+- Auditados código/runtime, método, condições, métricas, migrations, OIDC, Docker,
+  proxy, CI e Git na HEAD 87f6a9c52043625a3474805dfc6680390ddfc151. React/FastAPI/
+  jsPsych/PG já existem; plano de consolidação/revalidação, sem reconstrução presumida.
+- Nova missão, inventário/classificação, requisitos A–L/matriz, arquitetura e ADR-004,
+  M0–M10/WEB com dependências, critérios, riscos/decisões e próximo trabalho canônicos.
+- Backlog único em Projeto Stroop Test.md; snapshots congelados de Wxx/retomada e
+  etapas 1–12 preservam histórico, sem transferir 87% nem aceites para novo escopo.
+- AGENTS/workflow/contribuição alinhados à última autorização: commit/push autônomos
+  em branch coesa, sem PR/merge automáticos; produção/dados reais separados. Conteúdo
+  preexistente de AGENTS sobre pesquisa/público/VPS preservado na revisão autorizada.
+- Corrigidas descrições documentais de arquitetura antiga, routers já implementados,
+  paleta CSV versus renderização e ausência de RT. Nenhuma regra científica, código,
+  schema, configuração operacional, dependência ou dado real alterado.
+- Validação desta sessão exclusivamente documental; comandos/resultados e Git final
+  em EV-M0/Retomada do backlog. Suites funcionais/CI/medição física não reexecutadas.
 
 ## 2026-11-04 — Correcao da auditoria de dependencias no PR1
 

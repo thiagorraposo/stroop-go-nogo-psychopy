@@ -1,0 +1,826 @@
+# Projeto Stroop Test — backlog canônico da plataforma WEB
+
+Última verificação documental: **2026-11-04**. Missão e limites:
+[arquitetura](ARQUITETURA_WEB.md); inventário: [auditoria](AUDITORIA_REPLANEJAMENTO.md);
+especificação: [requisitos e matriz](REQUISITOS_E_RASTREABILIDADE.md).
+Este é o único registro executável de marcos, tarefas, estados, dependências,
+aceite, progresso, riscos, bloqueios e próxima tarefa. Documentos históricos não
+concedem autorização nem mantêm progresso atual. IDs WEB nunca são renumerados.
+
+## Governança e cálculo
+
+Estados: PENDENTE (dependência/escopo ainda não pronto), PRONTA (dependências e
+decisões satisfeitas, falta execução/autorização de sessão), EM_ANDAMENTO
+(trabalho ativo), BLOQUEADA (impedimento identificado com ação de desbloqueio),
+EM_VALIDACAO (entrega disponível, critérios em conferência), CONCLUIDA (todos
+critérios comprovados). Não há crédito parcial. Autorização de sessão é distinta
+de prontidão técnica; esta sessão autoriza apenas M0 e deve parar ao concluí-lo.
+
+Uma tarefa CONCLUIDA tem todos critérios, comandos/resultados/data, componente,
+referências de teste e Git. Documento é evidência suficiente apenas para entrega
+explicitamente documental; código/push não prova integração. Skips, testes com
+double e piloto automatizado não substituem verificações reais exigidas.
+Marcos encerram somente com todas suas tarefas e gate da ficha atendidos. Não
+avançar automaticamente para outro marco; encerrar unidade no marco autorizado,
+indicar o próximo e aguardar instrução que o autorize. Bloqueios locais permitem
+outras tarefas independentes do mesmo marco autorizado.
+
+Unidade de progresso: contagem de entregáveis WEB aceitos / tarefas vigentes,
+sem pesos nem prazo artificial. Cada ficha abaixo é um entregável; complexidades
+não são pesos. M0 conta preparação documental, não implementação WEB. Mudanças
+de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
+Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
+não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
+
+Progresso atual: **0/42 entregáveis aceitos; WEB-000 em validação documental;
+0/41 entregáveis de implementação/revalidação funcional aceitos no novo plano**.
+Marcos funcionais não concluídos. Este número só se atualiza aqui, após evidência.
+
+## Ordem, caminho crítico e paralelismo
+
+Prioridade inicial: WEB-001 → WEB-002/003 → WEB-004. Depois M2 e M3 podem seguir
+em paralelo, e M8 pode preparar pilha isolada. M6 depende de M2 e antecede M4.
+Caminho crítico de integração: M0 → M1 → M2 → M6 → M4 → M5 → M7 → M8(gate final)
+→ M9 → M10 (WEB-041 → WEB-037/038/039/040). Ramo temporal M1 → M3 → M4/M9 é igualmente impeditivo; M3 deve ser
+validado cedo. M8 inicia após M1, mas WEB-032 depende de M7. Em M9, WEB-033,
+WEB-034 e WEB-035 são independentes após seus pré-requisitos e convergem em WEB-036.
+Nenhum paralelismo autoriza editar o mesmo componente ou avançar marco sem escopo.
+Os pré-requisitos de cada marco também se aplicam às suas tarefas, além dos
+vínculos locais das fichas; dependências menores não autorizam antecipação fora
+do marco. Paralelismo entre marcos requer autorização explícita do conjunto.
+Complexidade relativa: P (local), M (vários componentes), G (integração/campanha
+ou dependência externa); sem estimativa de horas e sem compromisso de prazo.
+
+## M0 — Auditoria e replanejamento documental
+
+- Objetivo: estabelecer base verificável e governança para futura implementação.
+- Justificativa: nova missão exige consolidar implementação já existente e eliminar estados concorrentes.
+- Inclui: inventário, requisitos, arquitetura/ADR, tarefas, riscos, rastreabilidade, workflow e links.
+- Exclui: qualquer código funcional, schema, infraestrutura operacional, dados reais e deploy.
+- Pré-requisito: missão documental autorizada; dependências: nenhuma.
+- Entregáveis/componentes: documentos desta missão; preservação dos planos históricos.
+- Testes: links relativos, integridade de IDs/dependências/matriz, escopo Git e diff check.
+- Riscos: R10; decisões externas: não impedem documento, devem estar explícitas.
+- Aceite e encerramento: os 17 itens abaixo verificados, alterações somente documentais, commit/push conferidos sem PR/merge. Não encerra migração.
+
+### WEB-000 — Base documental auditada e plano executável
+
+- Marco: M0. Prioridade: P0. Complexidade: G. Estado: EM_VALIDACAO.
+- Dependências: nenhuma. Responsável: Codex, revisão técnica desta sessão.
+- Critérios: (1) inventário por componente; (2) missão formal; (3) requisitos A–L;
+  (4) arquitetura atual/alvo; (5) M0–M10; (6) IDs/dependências; (7) gates por marco;
+  (8) riscos críticos; (9) decisões externas; (10) contagem de aceites; (11) matriz;
+  (12) AGENTS/workflow; (13) arquivos históricos; (14) único backlog;
+  (15) contradições materiais resolvidas; (16) WEB-001 identificada;
+  (17) nenhuma implementação iniciada. Critérios editoriais verificados por inspeção
+  e verificações locais descritas em EV-M0; entrega restrita a documentação.
+- Evidências: EV-M0 nesta seção e fontes vinculadas; não há aceite funcional implícito.
+- Riscos/bloqueios: decisões pendentes registradas; não bloqueiam documentação.
+- Referências: REQ-AUD-003, ADR-004, auditoria e requisitos.
+- Git: branch docs/replanejamento-stroop-web; commit e envio: ver Retomada.
+
+### EV-M0 — evidência atual, 2026-11-04
+
+Inspeção independente de método, runtime e infraestrutura integrada pelo agente
+principal, com caminhos e limites registrados na auditoria. Revisão independente
+corrigiu ciclo entre DEC-05/M9, acrescentou WEB-041 para configuração research e
+separou preparo local de autorização de deploy. Fontes primárias jsPsych/FastAPI
+consultadas e vinculadas no ADR-004.
+
+Correspondência dos 17 critérios: 1→AUDITORIA_REPLANEJAMENTO; 2/4→ARQUITETURA_WEB e
+ADR-004; 3/11→REQUISITOS_E_RASTREABILIDADE (36 requisitos A–L com origem/estado);
+5/6/7/8/9/10/16→fichas M0–M10, WEB-000…041, riscos R01…10, DEC-01…05 e Retomada
+neste backlog; 12→AGENTS/workflow/contribuição; 13→snapshots congelados de legado;
+14→ROADMAP_WEB/PROGRESS e workflow antigo redirecionados; 15→revisão independente
+mais validação de links/grafo; 17→checagem de escopo exclusivamente Markdown.
+
+Verificações atuais de 2026-11-04: `python3 /tmp/validate_stroop_docs.py`, cujo
+conteúdo reproduzível está no workflow, aprovou 83 documentos, 478 links relativos,
+3 âncoras, 11 marcos, 42 IDs de tarefas únicos, 36 requisitos/linhas de matriz,
+10 riscos e 5 decisões, sem ciclos técnicos. Escopo: 33 arquivos novos/alterados,
+todos Markdown. `git diff --check` aprovado. Revisão de código fonte foi estática;
+não são resultados das suites funcionais. Git final será registrado na Retomada
+após confirmação do commit/push. Suites funcionais, Docker, migrations, medição temporal, login
+Google, produção e CI remota não executados para este marco documental.
+
+## M1 — Fundação e baseline reproduzível
+
+- Objetivo: Preservar a implementação existente e tornar a base verificável antes de alterar funções.
+- Justificativa: Evita reconstrução e valida cedo paridade de métricas/segurança.
+- Inclui: Checkout isolado, regressão sintética, fronteiras, locks e retomada.
+- Exclui: Novas telas/rotas, upgrade incidental, alterações de produção.
+- Pré-requisitos: M0 documental aceito e autorização futura de implementação.
+- Dependências: M0.
+- Entregáveis: Núcleo/CLI preservados, baseline por SHA e percurso local reproduzível.
+- Componentes afetados: `stroop/, api/, web/, tests/, docs/`.
+- Testes necessários: Regressão Python/PG sem skips, Vitest, tipos/build; scanner conforme baseline.
+- Critérios de aceite: Baseline completa ou falhas classificadas/corrigidas no escopo; nenhuma quebra legada; comandos reproduzidos.
+- Riscos: R04, R10.
+- Decisões externas: Nenhuma para ensaio sintético local; recursos indisponíveis precisam ser registrados.
+- Encerramento: todas as tarefas do marco CONCLUIDAS, critérios acima comprovados e evidência consolidada por SHA; sem aceite presumido por documentação ou código existente.
+
+### WEB-001 — Reproduzir baseline sintética do código auditado
+
+- Marco: M1. Prioridade: P0. Complexidade: G. Estado: PRONTA.
+- Dependências: WEB-000.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Checkout isolado, comandos/versões/SHA e resultados Python/PG, frontend/tipos/build registrados; skips de PG não aceitam baseline.
+- Testes/verificação: `unittest com PG descartável; npm test e npm run build`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R04; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-002 — Conferir preservação das métricas e CLIs na baseline
+
+- Marco: M1. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-001.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Fixtures main, sem hits e roundtrip confirmam fórmulas/unidades e comandos/reexports preservados; divergências classificadas.
+- Testes/verificação: `tests/test_nucleo_compartilhado.py, test_csv_unificado.py, test_importar_csv_sqlite.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R04; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-003 — Verificar fronteiras modulares e contratos de extensão
+
+- Marco: M1. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-001.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Dependências atuais mapeadas e testes de fronteira aprovados; somente refatoração necessária registrada, sem instrumento novo.
+- Testes/verificação: `tests/test_nucleo_compartilhado.py, test_casos_uso_importacao.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R10; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-EXT-001; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-004 — Ensaiar desenvolvimento local e retomada do marco
+
+- Marco: M1. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-002, WEB-003.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Segundo percurso documentado encontra estado/tarefa sem investigação global; local API/React/PG reproduzido; M1 atende sua ficha.
+- Testes/verificação: `PLANEJADO: ensaio de retomada e smoke local isolado`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R09; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-EXT-003; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+## M2 — Backend e contratos de dados consolidados
+
+- Objetivo: Fechar ambiguidades de produto/dados e revalidar API e persistência existentes.
+- Justificativa: Integridade e cálculo oficial são base do fluxo de pesquisa.
+- Inclui: Contratos atuais versus código, decisões DEC-01/02, transações, métricas e compatibilidade.
+- Exclui: Novo cadastro global, offline ou schema por conveniência.
+- Pré-requisitos: M1 aceito; decisões para o trabalho que depender delas.
+- Dependências: M1.
+- Entregáveis: Contrato fechado e testes reais de conclusão/replay, papéis e paridade de cálculos.
+- Componentes afetados: `api/, stroop/domain/, application/, persistence/, scripts/migrations/`.
+- Testes necessários: API negativa, PG real com papéis provisionados, rollback pré-commit, duplicação/concorrência, fixtures métricas.
+- Critérios de aceite: Todos casos válidos/inválidos/concorrentes comprovados; ausência de RT e import/export sem divergência semântica.
+- Riscos: R03, R04, R06.
+- Decisões externas: DEC-01 e DEC-02; registrar alternativa aceita antes de ampliar entidade/captura.
+- Encerramento: todas as tarefas do marco CONCLUIDAS, critérios acima comprovados e evidência consolidada por SHA; sem aceite presumido por documentação ou código existente.
+
+### WEB-005 — Fechar contratos de participante, preparação e política de perda
+
+- Marco: M2. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-004; DEC-01 e DEC-02.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Comparação contrato/código aprovada; decisões registram alternativa e impacto, incluindo RAM final-only e entidade de avaliação; nada inferido como novo requisito.
+- Testes/verificação: `PLANEJADO: revisão de contratos/decisões e schema lógico`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R03, R07; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-PAR-002, REQ-AVA-002, REQ-INT-003; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-006 — Revalidar entrada de conclusão e proveniência do protocolo
+
+- Marco: M2. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-005.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Schema fechado, ordem/snapshot, unidades, versões e limites temporais cobrem casos válidos e adversos; contratos de start/abort/complete coincidem com código.
+- Testes/verificação: `tests/test_web_results.py, test_web_sessions.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R02, R03; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-INT-001; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-007 — Comprovar atomicidade, replay e papéis PostgreSQL
+
+- Marco: M2. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-006.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Banco real provisionado prova rollback pré-commit, retry igual, conflito divergente e concorrência sem duplicação; reader sem DML e writer sem owner.
+- Testes/verificação: `tests/test_web_results.py, test_web_database_provision.py, test_postgres_migrations.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R03, R06; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-INT-002, REQ-INF-001; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-008 — Comprovar paridade oficial de métricas e ausência de medida
+
+- Marco: M2. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-007.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: 12 métricas/unidades/classificações e no-hit conferidos nos adaptadores; nenhuma normalização destrutiva do histórico; M2 aceito.
+- Testes/verificação: `tests/test_nucleo_compartilhado.py, test_web_results.py, web/src/dashboard/analysis.test.ts`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R04; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-MET-001, REQ-MET-002; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+## M3 — Viabilidade e motor experimental no navegador
+
+- Objetivo: Revalidar jsPsych/plugins e temporização antes de consolidar operação.
+- Justificativa: Maior risco científico/técnico não pode ficar para depois da UI.
+- Inclui: Pool/paleta/snapshot, ciclo do Host, janela/teclado, interrupção e campanha de engenharia.
+- Exclui: Equivalência psicométrica, suporte móvel, troca de paradigma ou limiares.
+- Pré-requisitos: M1 aceito; matriz de ensaio identificada; DEC-04 para aceite de suporte.
+- Dependências: M1.
+- Entregáveis: Relatório reproduzível com falhas preservadas e matriz técnica explicitada.
+- Componentes afetados: `condicoes/, web/src/experiment/, web/pilots/, stroop/domain/web_results.py`.
+- Testes necessários: Estáticos, motores unitários, navegadores visíveis; 10 execuções sintéticas por ambiente declarado com gate D5.
+- Critérios de aceite: Condições/regras preservadas, gates cumpridos no escopo medido; limites e ambientes não medidos explícitos.
+- Riscos: R01, R02.
+- Decisões externas: DEC-04 define ambientes/equipamento e tratamento de falhas sem presumir equivalência.
+- Encerramento: todas as tarefas do marco CONCLUIDAS, critérios acima comprovados e evidência consolidada por SHA; sem aceite presumido por documentação ou código existente.
+
+### WEB-009 — Conferir snapshot, condições e paleta efetiva da Web
+
+- Marco: M3. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-004.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Pools, versões, cores renderizadas versus CSV histórico, prática/main e tempos coincidem com fontes aprovadas sem alterar protocolo.
+- Testes/verificação: `tests/test_fase3_condicoes_tempos.py, web/src/experiment/practice.test.ts`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R02; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-EXP-001; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-010 — Revalidar plugins jsPsych, ciclo de vida e janela de resposta
+
+- Marco: M3. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-009.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Comparativo ADR-004 confrontado com motor; setup/cleanup e primeira nova pressão/fim exclusivo/interrupções passam; React não dirige quadro.
+- Testes/verificação: `web/src/experiment/main.test.ts, practice.test.ts, ExperimentHost.test.tsx`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R01, R02; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-EXP-002; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-011 — Executar campanha de engenharia temporal em ambientes declarados
+
+- Marco: M3. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-010; DEC-04 para matriz.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: 10 execuções sintéticas por ambiente selecionado, trilhas brutas/falhas preservadas, quadro e desvio total conferidos contra D5; sem substituir falha por rerun omitido.
+- Testes/verificação: `PLANEJADO: campanha técnica D5; web/pilots/w16-local.spec.ts como ferramenta, não prova física`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R01; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-EXP-003; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-012 — Registrar viabilidade e limites de suporte do motor
+
+- Marco: M3. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-011.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Relatório técnico discrimina automação/latência física e ambientes não medidos; responsável aceita suporte ou bloqueia motor; M3 atendido sem equivalência presumida.
+- Testes/verificação: `PLANEJADO: revisão de evidências M3 e DEC-04`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R01, R02; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+## M4 — Fluxo ponta a ponta de avaliações
+
+- Objetivo: Integrar preparação pelo avaliador, execução e recebimento oficial.
+- Justificativa: Reúne contratos/motor/autorização em um resultado persistido.
+- Inclui: Convite, pseudônimo, instruções, prática, principal, falhas de envio e recibo.
+- Exclui: Agendamento/cadastro novo não aprovado, recuperação de principal inválido.
+- Pré-requisitos: M2, M3 e M6 aceitos; DEC-01/02 resolvidas para o fluxo.
+- Dependências: M2, M3, M6.
+- Entregáveis: Avaliação sintética completa em HTTPS real, com trilha e encerramento seguro.
+- Componentes afetados: `web/src/participant/, components/, api/sessions.py, results.py`.
+- Testes necessários: E2E HTTPS/API/PG reais nos navegadores suportados; rede perdida, expiração, revogação, replay.
+- Critérios de aceite: Resultado com 16 tentativas e 12 métricas, recibo e consulta; nenhum falso sucesso nem resultado parcial.
+- Riscos: R03, R05.
+- Decisões externas: DEC-03 apenas se texto de pesquisa real for incorporado; manter modo sintético.
+- Encerramento: todas as tarefas do marco CONCLUIDAS, critérios acima comprovados e evidência consolidada por SHA; sem aceite presumido por documentação ou código existente.
+
+### WEB-013 — Integrar preparação profissional e identificação por convite
+
+- Marco: M4. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-008, WEB-012, WEB-024.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Avaliador autorizado prepara/identifica sessão no React; código único, visita, revogação/expiração e isolamento comprovados com API/PG reais.
+- Testes/verificação: `tests/test_web_sessions.py; web/e2e/integrated/`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-PAR-001, REQ-AVA-001; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-014 — Validar instruções, prática e início principal no fluxo real
+
+- Marco: M4. Prioridade: P1. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-013.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Textos sem coleta nominal/demográfica; prática repetível sem limiar, interrompida reinicia, início/principal usa sessão autorizada e snapshot correto.
+- Testes/verificação: `web/src/experiment/practice.test.ts; web/e2e/integrated/`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R02; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-PAR-003; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-015 — Ensaiar envio, falhas de rede e recuperação de recibo
+
+- Marco: M4. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-014.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Rede falha antes/depois de commit, retry, expiração, revogação e reload têm comportamento declarado; nenhuma confirmação sem recibo nem principal retomado.
+- Testes/verificação: `web/src/participant/; tests/test_web_results.py; E2E HTTPS real`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R03; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-AVA-003; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-016 — Aceitar avaliação completa com consulta persistida
+
+- Marco: M4. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-015.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: E2E real confere 1 avaliação/16 tentativas/12 métricas e proveniência; logout limpa RAM e sessão, acesso cruzado nega; M4 aceito.
+- Testes/verificação: `web/e2e/integrated/, tests/test_web_participant_logout.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R03, R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+## M5 — Interface administrativa e analítica React
+
+- Objetivo: Comprovar capacidades necessárias para dispensar Streamlit na operação final.
+- Justificativa: Já existe UI; auditar paridade evita perder ferramentas úteis.
+- Inclui: Filtros/listas, contas/projetos/vínculos, detalhe, gráficos descritivos e exportação filtrada.
+- Exclui: Relatórios clínicos, novos instrumentos, redesign sem requisito.
+- Pré-requisitos: M4 aceito e autorização profissional revalidada em M6.
+- Dependências: M4.
+- Entregáveis: Operação profissional reproduzível no React com escopo consistente.
+- Componentes afetados: `web/src/components/, dashboard/, api/assessments.py, administration.py`.
+- Testes necessários: Vitest/DOM e E2E reais; acesso cruzado/último admin/CSV filtrado; acessibilidade básica fora do motor.
+- Critérios de aceite: Todas capacidades incluídas operáveis, sem nomes/iniciais em resultados nem perda de unidades/proveniência.
+- Riscos: R05, R10.
+- Decisões externas: Proprietário revisa lacunas materiais de paridade no M7; não inventar relatórios.
+- Encerramento: todas as tarefas do marco CONCLUIDAS, critérios acima comprovados e evidência consolidada por SHA; sem aceite presumido por documentação ou código existente.
+
+### WEB-017 — Revalidar filtros, lista e agregações autorizadas
+
+- Marco: M5. Prioridade: P1. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-016.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Filtros/paginação/contagens cobrem conjunto coerente; troca de projeto e respostas tardias não vazam dados; UI acessível fora do motor.
+- Testes/verificação: `tests/test_web_assessments.py, web/src/dashboard/analysis.test.ts; Playwright`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-REL-001; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-018 — Revalidar administração React de contas e vínculos
+
+- Marco: M5. Prioridade: P1. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-016.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Permissões e bloqueio/revogação reais; proteção do último admin sob concorrência, sem exclusão de coletas ou herança de acesso a resultados.
+- Testes/verificação: `tests/test_web_administration_provisioned.py; Playwright administrativo`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-REL-003; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-019 — Validar detalhe, tentativas, métricas e proveniência
+
+- Marco: M5. Prioridade: P1. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-017.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Unidades/ausência RT, quatro respostas e versões visíveis; sem nomes/iniciais; gráficos e rótulos descritivos com testes UI/API.
+- Testes/verificação: `tests/test_web_assessments.py, test_web_results.py; Vitest/Playwright`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R04; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-MET-003, REQ-REL-002; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-020 — Conferir exportação do conjunto filtrado no React
+
+- Marco: M5. Prioridade: P1. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-018, WEB-019.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: CSV individual/agregado coincide com consulta autorizada; revogação pré-download nega; células protegidas; M5 aceito.
+- Testes/verificação: `tests/test_web_export.py, test_web_aggregate_export.py; HTTPS real`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-CSV-003; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+## M6 — Autenticação, permissões e segurança
+
+- Objetivo: Revalidar Google OIDC e autorização central antes do primeiro fluxo integrado.
+- Justificativa: Reposicionado antes de M4; segurança não será fase tardia.
+- Inclui: Callback real autorizado, credenciais separadas, perfis/vínculos, revogação, CSRF e revisão de ameaças.
+- Exclui: Redução de proteção, troca de provedor, novas políticas institucionais inferidas.
+- Pré-requisitos: M2 aceito; credenciais apenas no ambiente autorizado para ensaio real.
+- Dependências: M2.
+- Entregáveis: Matriz de autorização e evidência de login/logout com conta cadastrada.
+- Componentes afetados: `api/auth.py, google_oidc.py, stroop/domain/auth.py, segurança e proxy`.
+- Testes necessários: OIDC negativo/replay, cookies/CSRF/Origin, IDOR, bloqueio, grants; login Google interativo autorizado separado de fixtures.
+- Critérios de aceite: Controles positivos/negativos comprovados; login real não pode ser substituído por mock ou alegação histórica.
+- Riscos: R05, R07.
+- Decisões externas: Conta/cliente OIDC de teste e ambiente autorizado; se indisponível bloquear somente WEB-021/gate dependente.
+- Encerramento: todas as tarefas do marco CONCLUIDAS, critérios acima comprovados e evidência consolidada por SHA; sem aceite presumido por documentação ou código existente.
+
+### WEB-021 — Revalidar OIDC e executar login real em ambiente de teste autorizado
+
+- Marco: M6. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-008; conta/cliente de teste autorizado.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Casos negativos e callback/PKCE/state/nonce passam; login/logout Google interativo documentado com identidade cadastrada e sem claims/tokens no artefato público.
+- Testes/verificação: `tests/test_web_oidc_callback.py, test_google_oidc.py; PLANEJADO: login real`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-AUT-001; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-022 — Comprovar matriz de perfis, projetos e revogações
+
+- Marco: M6. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-008.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Consulta/importacao/admin e participante testados em operações positivas/negativas; admin sem projeto não herda resultados; revogação efetiva.
+- Testes/verificação: `tests/test_web_auth.py, test_web_assessments.py, test_web_sessions.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-AUT-002; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-023 — Revalidar sessão, cookies, CSRF e isolamento de credenciais
+
+- Marco: M6. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-022.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Origin e CSRF ausentes/divergentes negam; expiração/logout/replay e cookies separados comprovados em HTTPS; sem armazenamento durável.
+- Testes/verificação: `tests/test_web_auth.py, test_web_sessions.py; integração HTTPS`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R05, R07; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-AUT-003; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-024 — Concluir revisão de segurança com evidências negativas
+
+- Marco: M6. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-021, WEB-023.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Threat model atualizado, XSS/IDOR/limites/erros/logs e grants verificados; achados impeditivos corrigidos, sem reduzir proteções; M6 aceito.
+- Testes/verificação: `tests/test_web_security_review.py, test_web_proxy_config.py; scanner`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R05, R07; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-AUD-001, REQ-SEG-001; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+## M7 — Integração, compatibilidade histórica e transição
+
+- Objetivo: Preparar substituição operacional sem retirar legado nem modificar coletas.
+- Justificativa: Coexistência segura e paridade devem preceder desativação.
+- Inclui: CSV complementar, vínculo explícito legado, matriz de capacidades e plano de transição.
+- Exclui: Remoção de PsychoPy/Streamlit, migração real ou acesso a banco de coleta.
+- Pré-requisitos: M5 e M6 aceitos.
+- Dependências: M5, M6.
+- Entregáveis: Intercâmbio sintético e cobertura funcional revisada pelo proprietário.
+- Componentes afetados: `stroop/ingestion/, api/imports.py, web/src/imports/, CLIs, docs/operacao/`.
+- Testes necessários: Roundtrip, sanitização, idempotência, legado por mapa explícito; CLIs/launchers e consultas preservados.
+- Critérios de aceite: Cobertura necessária comprovada, lacunas resolvidas/explicitamente excluídas com aprovação; sem concessão de acesso por rótulo.
+- Riscos: R06, R08.
+- Decisões externas: Revisão do proprietário da cobertura; retirada física é autorização futura independente.
+- Encerramento: todas as tarefas do marco CONCLUIDAS, critérios acima comprovados e evidência consolidada por SHA; sem aceite presumido por documentação ou código existente.
+
+### WEB-025 — Revalidar importação minimizada e status idempotente
+
+- Marco: M7. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-020, WEB-024.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Arquivo original intacto, minimização em RAM e rejeição server-side de nominal; erros, limites e UUID/estado/duplicata comprovados.
+- Testes/verificação: `tests/test_web_imports.py, web/src/imports/minimize.test.ts; HTTPS real`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R07; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-CSV-002; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-026 — Comprovar intercâmbio histórico por fixtures sintéticas
+
+- Marco: M7. Prioridade: P1. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-025.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: CSV 21 campos roundtrip API/CLI, unidades e tentativas main preservados; sem leitura/migração de coletas existentes.
+- Testes/verificação: `tests/test_csv_unificado.py, test_importar_csv_sqlite.py, test_web_export.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R04, R06; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-CSV-001; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-027 — Revalidar vínculo explícito de dados legados
+
+- Marco: M7. Prioridade: P1. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-026.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Projeto de rótulo coincidente sem mapa não acessa; mapa autorizado e desativação cobertos; reader somente leitura; sem provisionar mapa real.
+- Testes/verificação: `tests/test_web_assessments.py, test_web_database_provision.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R06; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-AUD-002; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-028 — Revisar cobertura e plano de substituição operacional
+
+- Marco: M7. Prioridade: P1. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-027.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Matriz Streamlit/React com capacidades requeridas testadas, lacunas tratadas e proprietário aprova transição; legado permanece, sem remoção; M7 aceito.
+- Testes/verificação: `PLANEJADO: revisão de cobertura e regressão CLIs/launchers`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R08, R10; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+## M8 — CI, infraestrutura e preparação operacional
+
+- Objetivo: Revalidar pipeline/empacotamento/recuperação que já existem.
+- Justificativa: CI e restauração já implementadas não podem ser tratadas como só futuras.
+- Inclui: Build isolado, pipeline por SHA, HTTPS, backup, réplica/agenda e restauração de massa sintética.
+- Exclui: Deploy, alteração de VPS/DNS/certificado operacional ou gatilho nesta fase documental.
+- Pré-requisitos: M1 aceito; integração final com M7 antes de M9.
+- Dependências: M1; WEB-032 exige M7.
+- Entregáveis: Release candidata reproduzível e retorno compatível com schema.
+- Componentes afetados: `Dockerfiles, compose.web.yaml, web/deploy/, deploy/, scripts/verify_web_ci.py, .github/workflows/`.
+- Testes necessários: Build/smoke isolados, pipeline local e Actions autorizado, recuperação e benchmark limitados ao ambiente medido.
+- Critérios de aceite: Sem skip obrigatório, evidências por SHA, restauração íntegra e runbooks executáveis no escopo autorizado.
+- Riscos: R08, R09.
+- Decisões externas: Destino de réplica e chaves sob custódia; teste externo só com autorização específica; definir verificação formal sem PR sem mudar proteções.
+- Encerramento: todas as tarefas do marco CONCLUIDAS, critérios acima comprovados e evidência consolidada por SHA; sem aceite presumido por documentação ou código existente.
+
+### WEB-029 — Revalidar imagens e Compose isolado em HTTPS
+
+- Marco: M8. Prioridade: P1. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-004.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Build e saúde reais, proxy único público, limites/headers e rejeição de fontes aprovados; pilha temporária separada dos volumes operacionais.
+- Testes/verificação: `scripts/smoke_web_compose.py, tests/test_web_runtime.py, test_web_proxy_config.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R08, R09; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-INF-002; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-030 — Reproduzir pipeline e definir validação formal sem PR automático
+
+- Marco: M8. Prioridade: P1. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-029.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Runner local passa testes/PG, frontend/build, scanner/auditoria, browsers e integração; verificação Actions por SHA quando autorizada, sem alterar proteções/gatilhos por conveniência.
+- Testes/verificação: `scripts/verify_web_ci.py, tests/test_verify_web_ci.py; PLANEJADO: Actions por SHA`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R09; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-EXT-002; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-031 — Ensaiar restauração, réplica e retorno compatível
+
+- Marco: M8. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-029; destino externo de teste autorizado se necessário.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Massa sintética restaurada isoladamente, schema/dados/recibo conferidos; réplica+agenda+alerta e retorno de imagem ensaiados, RPO/RTO medidos e limites aceitos.
+- Testes/verificação: `scripts/smoke_web_recovery.py, tests/test_web_backup_replication.py, test_vps_rollback.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R08, R09; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-INF-003; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-032 — Fechar release candidata e runbooks reproduzíveis
+
+- Marco: M8. Prioridade: P1. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-028, WEB-030, WEB-031.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Manifesto por SHA/imagens/schema, capacidade no ambiente medido, runbooks backup/retorno/incidente e custódia revisados; M8 aceito sem publicação.
+- Testes/verificação: `scripts/benchmark_web.py; PLANEJADO: revisão de release e CI real aplicável`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R08, R09; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+## M9 — Validação técnica e metodológica
+
+- Objetivo: Separar aceitação de software da autorização de pesquisa.
+- Justificativa: Aceite reduzido histórico W16 não equivale a equivalência nem matriz física atual.
+- Inclui: Política institucional, campanha aprovada, integração/capacidade, revisão metodológica e barreira de coleta.
+- Exclui: Declarar equivalência automaticamente ou realizar estudo com pessoas nesta tarefa técnica.
+- Pré-requisitos: M7, M8 e M3 aceitos; responsável/equipamento disponíveis.
+- Dependências: M7, M8, M3.
+- Entregáveis: Relatório técnico com limites e decisão metodológica assinada/registrada pelo responsável.
+- Componentes afetados: `docs/VALIDACAO_WEB.md, homologação, segurança, protocolo e gates existentes`.
+- Testes necessários: Campanha de engenharia e física conforme DEC-04; paridade matemática, dados e limites de capacidade; sem dados reais implícitos.
+- Critérios de aceite: Falhas resolvidas ou escopo de suporte explicitamente reduzido com aprovação; nenhuma alegação além das evidências; prontidão real decidida.
+- Riscos: R01, R02, R07.
+- Decisões externas: DEC-03/04 para prontidão; DEC-05 é autorização posterior a M9; se estudo científico necessário, planejar protocolo separado e não fabricar resultados.
+- Encerramento: todas as tarefas do marco CONCLUIDAS, critérios acima comprovados e evidência consolidada por SHA; sem aceite presumido por documentação ou código existente.
+
+### WEB-033 — Registrar prontidão institucional e privacidade
+
+- Marco: M9. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-028; DEC-03.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Responsável registra política, finalidades, minimização/retenção, informação aplicável, responsabilidades e eventual autorização institucional; sem inferir consentimento legal.
+- Testes/verificação: `PLANEJADO: revisão institucional/documental DEC-03`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R07; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-SEG-002; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-034 — Executar validação temporal e metodológica aprovada
+
+- Marco: M9. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-012; DEC-04.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Campanha com matriz/equipamento/protocolo aprovados, medidas físicas se exigidas, falhas e limites registrados; comparação com PsychoPy apenas se estudo autorizado.
+- Testes/verificação: `PLANEJADO: campanha M9; docs/VALIDACAO_WEB.md é referência histórica`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R01, R02; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-035 — Homologar candidato integrado e capacidade no ambiente autorizado
+
+- Marco: M9. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-032, WEB-024.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: API/PG/navegadores reais, falhas/reinício/limites de concorrência ensaiados em ambiente autorizado; sem extrapolar local→VPS ou carga→timing físico.
+- Testes/verificação: `web/e2e/integrated/, scripts/benchmark_web.py; PLANEJADO: homologação do candidato`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R08, R09; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-036 — Obter aceite técnico e decisão explícita de liberação
+
+- Marco: M9. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-033, WEB-034, WEB-035.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Responsável aceita prontidão técnica/metodológica e limites de suporte após 033/034/035; não concede deploy/coleta real. Barreira synthetic preservada; pedido concreto de DEC-05 pode ser preparado depois de M9.
+- Testes/verificação: `PLANEJADO: ata de aceite por responsável e revisão das barreiras de operação`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R01, R07; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-SEG-003; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+## M10 — Implantação controlada e documentação operacional
+
+- Objetivo: Publicar somente release aceita e autorizada com recuperação comprovada.
+- Justificativa: Protege sistema publicado, histórico e responsáveis.
+- Inclui: Configuração research condicionada à aprovação (WEB-041), plano autorizado, backup/retorno, publicação/smoke, réplica/alerta e handoff.
+- Exclui: Deploy automático, migração destrutiva, coleta real ou retirada do legado por inferência.
+- Pré-requisitos: M9 aceito; DEC-03/05 para configurar research. Preparação/testes locais não dependem de autorização de deploy; intervenção em produção e eventuais dados/schema exigem autorização específica antes de WEB-038.
+- Dependências: M9.
+- Entregáveis: Registro da release, recuperação e operação assistida com decisão de uso.
+- Componentes afetados: `Runbooks, release, infraestrutura autorizada e documentação de operação`.
+- Testes necessários: Smoke pós-publicação sem dados reais, ensaio isolado de restauração/rollback e aceite operacional.
+- Critérios de aceite: Release íntegra, riscos/limites conhecidos, runbooks e custódia entregues; uso real só se DEC-05 autorizado.
+- Riscos: R07, R08, R09.
+- Decisões externas: Autorização de deploy somente antes de WEB-038, após plano concreto; credenciais/recursos; integração main se desejada exige autorização separada; coleta e retirada legado independentes.
+- Encerramento: todas as tarefas do marco CONCLUIDAS, critérios acima comprovados e evidência consolidada por SHA; sem aceite presumido por documentação ou código existente.
+
+### WEB-037 — Preparar publicação e retorno da release aceita
+
+- Marco: M10. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-041.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Plano concreto e candidata validada identificam release, janela, backup, schema, responsáveis, smoke/critério de retorno; resultado preparado para aprovação final do deploy antes de WEB-038, sem tocar produção.
+- Testes/verificação: `PLANEJADO: checklist pré-publicação`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R08; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-038 — Executar implantação controlada autorizada e smoke
+
+- Marco: M10. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-037; autorização específica de deploy registrada.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Somente ações autorizadas executadas; HTTPS/login/fluxo sintético/consulta/exportação e versão públicos conferidos; falha dispara retorno previsto.
+- Testes/verificação: `PLANEJADO: smoke pós-deploy e evidência da release`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R08, R09; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-039 — Confirmar recuperação e handoff operacional
+
+- Marco: M10. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-038.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Agenda/réplica/alerta e custódia confirmadas; restauração isolada e rollback compatível conferidos para release publicada; operador reproduz runbook sem dados no log.
+- Testes/verificação: `PLANEJADO: ensaio operacional autorizado e handoff`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R08, R09; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-040 — Encerrar transição com aceite do proprietário
+
+- Marco: M10. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-039, WEB-041; DEC-05 para uso real.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Aceite final identifica limites, suporte, política de uso e incidentes; legado preservado salvo autorização específica; liberação real, se concedida, rastreada e verificada; M10 aceito.
+- Testes/verificação: `PLANEJADO: aceite operacional e revisão final de rastreabilidade`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R07, R10; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### WEB-041 — Implementar configuração controlada para pesquisa real após aprovação
+
+- Marco: M10. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-036, DEC-03 e autorização DEC-05 específica para a implementação/configuração de pesquisa; nenhuma ação sobre dados reais por implicação.
+- Responsável: Codex no código e testes; proprietário/instituição nas regras e autorização; operador na ativação real separada.
+- Critérios de aceite: especificar e implementar o contrato já previsto em seguranca/ACESSO_WEB.md para modo research, aviso versionado, elegibilidade/informação aplicáveis, confirmação datada por responsável e habilitação administrativa explícita por projeto. Default continua synthetic; ausência/incompletude/revogação da configuração bloqueia emissão/resgate research. Não alterar D1–D6, métricas nem acrescentar coleta nominal. Qualquer schema novo é aditivo e testado apenas em banco sintético. Revalidar autorização, integração e critérios M9 afetados na nova SHA candidata antes de WEB-037; registrar se requisito metodológico novo exigir replanejamento em vez de implementar por inferência.
+- Testes/verificação: PLANEJADOS, novos testes de configuração completa/incompleta, modos, papéis, revisão/retirada da habilitação e aviso no fluxo real com participantes inequivocamente sintéticos; regressão Python/PG, frontend e HTTPS real. Arquivos/testes novos só serão nomeados quando implementados.
+- Evidências: PLANEJADAS; nenhuma configuração/código de coleta real implementado nesta sessão.
+- Riscos/bloqueios: R05/R07; sem DEC-03/05 permanece PENDENTE/BLOQUEADA conforme impedimento observado. Não há tarefa independente que permita declarar operação real concluída sem esta entrega.
+- Referências: REQ-SEG-003, REQ-SEG-002, REQ-PAR-003, REQ-AVA-001; ARQUITETURA_WEB e seguranca/ACESSO_WEB.md.
+- Git: branch/commit/push/CI a registrar na execução autorizada; não habilitar produção por commit ou teste.
+
+## Registro de riscos
+
+Probabilidade qualitativa é hipótese de planejamento, não estatística. Severidade
+considera integridade, validade e continuidade. Todos ABERTOS em 2026-11-04; presença
+de mitigação no código não elimina risco sem ensaio. Atualizar somente aqui.
+
+| ID | Descrição e causa | Impacto | Probabilidade | Severidade | Mitigação e evidência exigida | Marco | Responsável | Estado |
+|---|---|---|---|---|---|---|---|---|
+| R01 | Timing de navegador varia com hardware, SO, carga e compositor | RT/onset incompatíveis com uso pretendido | Alta | Crítica | M3 cedo, trilhas/gates, matriz medida e campanha aprovada; não inferir latência física | M3/M9 | Técnico + metodológico | ABERTO |
+| R02 | Confundir PsychoPy, variante WEB e aceites históricos | Conclusões científicas indevidas | Alta | Crítica | D1–D6 e versões separadas, preservar falhas W16, validação metodológica distinta | M2/M3/M9 | Metodológico | ABERTO |
+| R03 | RAM até envio final, falha/reload/expiração e corrida de commit | Perda ou duplicação de tentativas/resultados | Alta | Crítica | DEC-02; atomicidade/replay/recibo; falhas pré/pós-commit e mensagem honesta de envio | M2/M4 | Backend + produto | ABERTO |
+| R04 | Diferenças de sentinela RT, unidade, mediana/arredondamento entre consumidores | Regressão nos cálculos/análises | Média | Alta | Golden fixtures sintéticas e paridade núcleo/API/CSV/UI, sem mudança silenciosa | M1/M2/M5 | Técnico | ABERTO |
+| R05 | Alterar OIDC ou perfis/vínculos sem revalidar negações | Acesso cruzado, sessão indevida, perda de administração | Média | Crítica | Login real autorizado, CSRF/Origin/IDOR, revogação, último admin, reader/writer | M6/M4/M5 | Segurança/técnico | ABERTO |
+| R06 | Novo schema ou rótulo de projeto apropria/muda histórico | Corrupção ou acesso a coletas | Média | Crítica | Aditividade, mapa explícito, fixtures, nenhum dado real sem autorização | M2/M7 | Backend + proprietário | ABERTO |
+| R07 | Pseudônimo tratado como anônimo; coleta/liberação sem política institucional | Exposição de pessoas e uso indevido | Média | Crítica | DEC-03/05, minimização e barreira synthetic, sem nomes/logs, revisão institucional | M6/M9/M10 | Proprietário/instituição | ABERTO |
+| R08 | Publicação interrompe aplicação; backup não restaurável/retorno incompatível | Indisponibilidade/perda | Média | Crítica | Ensaio isolado schema/dados/imagens, réplica/agenda/alerta, deploy autorizado e retorno | M7/M8/M10 | Operador/proprietário | ABERTO |
+| R09 | Dependências de VPS/DNS/TLS/OIDC/chaves/destino externo ou CI sem PR | Bloqueio de homologação/recuperação e falsa prontidão | Média | Alta | Preparar local independente; inventário de recursos e validação por SHA, sem mudar proteção para contornar bloqueio | M1/M8/M10 | Operador + técnico | ABERTO |
+| R10 | Reescrever o que existe, ampliar instrumentos e manter backlogs concorrentes | Retrabalho e escopo sem controle | Alta | Alta | Auditoria, backlog único, critérios pequenos, IDs e controle de mudança; sem crédito histórico automático | Todos | Coordenador técnico | ABERTO |
+
+Risco mais importante: R01, com R02 como limite de interpretação. R03 é o
+principal risco de integridade do fluxo atual e precisa decisão antes de ampliar captura.
+
+## Decisões externas e condições de desbloqueio
+
+As hipóteses não são autorização. Uma decisão deve registrar autor/data, opção,
+justificativa, requisito/contrato, tarefas/testes e necessidade de novo ADR ou
+versão experimental. Somente bloquear tarefa dependente, sem paralisar documentação.
+
+| ID | Questão / hipótese preservada | Responsável | Condição objetiva / impacto | Tarefas relacionadas | Estado |
+|---|---|---|---|---|---|
+| DEC-01 | Pseudônimo/visita e preparação por convite atuais bastam? Cadastro longitudinal/avaliação agendada não presumidos | Proprietário + privacidade | Decisão documentada sobre entidades/campos/acesso/retenção; se ampliar, novos requisitos/tarefas antes de schema | WEB-005/013 | PENDENTE |
+| DEC-02 | Aceitar perda anterior ao envio e aborto sem retomada (D2 atual) ou checkpoint técnico separado? | Proprietário + metodológico | Política de perda e mensagem aprovadas; checkpoint/offline/retomada que mude D2 exige decisão científica/versionamento antes da implementação | WEB-005/007/015 | PENDENTE |
+| DEC-03 | Regras institucionais de informação, consentimento aplicável, retenção e incidentes | Proprietário/instituição | Documento aprovado e responsabilidades/canal definidos; nenhuma base legal inventada pelo Codex | WEB-033/036 | PENDENTE |
+| DEC-04 | Matriz de hardware/SO/browser e validação física/metodológica necessária | Responsável metodológico | Plano e recursos aprovados, manter D1/D5 e limites W16; alterações de suporte/gate justificadas e aprovadas | WEB-011/012/034 | PENDENTE |
+| DEC-05 | Após prontidão M9, autorizar separadamente configuração research, deploy e eventual uso real | Proprietário + metodológico/operador | WEB-036 comprovada; registrar autorização específica antes de WEB-041 e, para produção/uso, de WEB-038/040; mudanças da candidata passam revalidação dos gates afetados; não retirar synthetic apenas por aprovação técnica | WEB-041/038/040 | PENDENTE |
+
+Recursos externos não decisórios: conta/cliente OIDC de teste WEB-021; destino de
+réplica e custódia para WEB-031; ambiente de homologação WEB-035; VPS/DNS/TLS e
+acesso de operação WEB-037. Solicitar somente quando a entrega dependente estiver
+concreta; não pedir secrets na conversa. Adoção técnica de stack está no ADR-004,
+não depende de reaprovação científica. Não há bloqueio documental remanescente.
+
+## Registro de mudanças de escopo
+
+- CHG-001, 2026-11-04: nova missão de plataforma e governança única por instrução
+  do proprietário. Substitui execução Wxx/etapas antigas por M0–M10/WEB sem
+  invalidar aceites históricos. Impacta requisitos A–L, AGENTS/workflow e critérios
+  de revalidação; nenhuma mudança em protocolo, fórmula, schema ou runtime.
+  ADR-004 e auditoria fundamentam reutilização de React/FastAPI/jsPsych existentes.
+- Revisão futura: usar ID CHG novo com motivo, requisito alterado, componentes,
+  testes a revisar, dependências afetadas e aprovação externa quando exigida.
+  Não reabrir tarefa concluída sem regressão comprovada ou novo escopo registrado.
+
+## Retomada
+
+A sessão atual termina em M0. **Próximo marco executável após autorização futura:
+M1; primeira tarefa WEB-001**, baseline sintética em checkout isolado do código
+existente. Não criar frontend/API do zero. Ler AGENTS → WORKFLOW_CODEX_CLI →
+esta ficha → requisitos/fontes/testes pertinentes; não repetir auditoria global
+sem divergência concreta. Nenhum trabalho funcional está em andamento no novo plano.
+
+Git documental: branch `docs/replanejamento-stroop-web`, baseada na HEAD auditada
+87f6a9c (contém main fe8f24f e trabalho não integrado). Os commits desta entrega
+podem ser identificados por `git log --oneline --grep='docs: consolida planejamento da plataforma Stroop Web'`;
+o registro de fechamento acrescenta o SHA real sem tentar autorreferenciar o
+próprio commit. Conferir worktree, upstream e commits locais antes de retomar.
+Commit/push documental não autorizam integração à main. CI remota desta entrega
+não executada/não verificada; workflow existente só dispara PR/main/manual.
+Não há PR nem merge autorizado. Produção e dados reais permanecem fora desta sessão.
