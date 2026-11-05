@@ -435,7 +435,7 @@ componente já existe. WEB-000 é exclusivamente documental.
 | REQ-CSV-003 | ADR-004 | M5 | WEB-020 | `api/assessments.py, web/src/api/aggregate.ts` | `tests/test_web_aggregate_export.py` | PLANEJADA; consultar WEB-020 no backlog |
 | REQ-AUD-001 | ADR-004 | M6 | WEB-024 | `stroop/persistence/auth.py, api/transport.py` | `tests/test_web_security_review.py` | PLANEJADA; consultar WEB-024 no backlog |
 | REQ-AUD-002 | ADR-003 + ADR-004 | M7 | WEB-027 | `scripts/migrations/0007_web_legacy_project_links.sql` | `tests/test_web_assessments.py` | PLANEJADA; consultar WEB-027 no backlog |
-| REQ-AUD-003 | ADR-004 | M0 | WEB-000 | `docs/Projeto Stroop Test.md e REQUISITOS_E_RASTREABILIDADE.md` | `PLANEJADO: validação documental M0` | PLANEJADA; consultar WEB-000 no backlog |
+| REQ-AUD-003 | ADR-004 | M0 | WEB-000 | `docs/Projeto Stroop Test.md e REQUISITOS_E_RASTREABILIDADE.md` | `Validação documental reproduzível no workflow (EV-M0)` | EV-M0 real; aceite documental em WEB-000 no backlog |
 | REQ-SEG-001 | ADR-004 | M6 | WEB-024 | `api/transport.py, web/deploy/` | `tests/test_web_security_review.py` | PLANEJADA; consultar WEB-024 no backlog |
 | REQ-SEG-002 | ADR-004 | M9 | WEB-033 | `docs/seguranca/` | `PLANEJADO: revisão do responsável DEC-03` | PLANEJADA; consultar WEB-033 no backlog |
 | REQ-SEG-003 | ADR-004 | M10 | WEB-041 | `stroop/persistence/web_sessions.py, política de operação` | `PLANEJADOS: testes research em WEB-041` | PLANEJADA; consultar WEB-041 no backlog |

@@ -32,7 +32,7 @@ de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
 Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
 não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
 
-Progresso atual: **0/42 entregáveis aceitos; WEB-000 em validação documental;
+Progresso atual: **1/42 entregáveis aceitos, exclusivamente documental (WEB-000);
 0/41 entregáveis de implementação/revalidação funcional aceitos no novo plano**.
 Marcos funcionais não concluídos. Este número só se atualiza aqui, após evidência.
 
@@ -65,7 +65,7 @@ ou dependência externa); sem estimativa de horas e sem compromisso de prazo.
 
 ### WEB-000 — Base documental auditada e plano executável
 
-- Marco: M0. Prioridade: P0. Complexidade: G. Estado: EM_VALIDACAO.
+- Marco: M0. Prioridade: P0. Complexidade: G. Estado: CONCLUIDA.
 - Dependências: nenhuma. Responsável: Codex, revisão técnica desta sessão.
 - Critérios: (1) inventário por componente; (2) missão formal; (3) requisitos A–L;
   (4) arquitetura atual/alvo; (5) M0–M10; (6) IDs/dependências; (7) gates por marco;
@@ -99,8 +99,9 @@ conteúdo reproduzível está no workflow, aprovou 83 documentos, 478 links rela
 3 âncoras, 11 marcos, 42 IDs de tarefas únicos, 36 requisitos/linhas de matriz,
 10 riscos e 5 decisões, sem ciclos técnicos. Escopo: 33 arquivos novos/alterados,
 todos Markdown. `git diff --check` aprovado. Revisão de código fonte foi estática;
-não são resultados das suites funcionais. Git final será registrado na Retomada
-após confirmação do commit/push. Suites funcionais, Docker, migrations, medição temporal, login
+não são resultados das suites funcionais. O commit documental e652f2c1be664241364609443356b0277622c242 foi enviado
+com upstream e confirmado por git ls-remote com a mesma SHA; worktree limpa
+após o primeiro push. Este fechamento registra o aceite com evidência concreta. Suites funcionais, Docker, migrations, medição temporal, login
 Google, produção e CI remota não executados para este marco documental.
 
 ## M1 — Fundação e baseline reproduzível
@@ -821,6 +822,14 @@ Git documental: branch `docs/replanejamento-stroop-web`, baseada na HEAD auditad
 podem ser identificados por `git log --oneline --grep='docs: consolida planejamento da plataforma Stroop Web'`;
 o registro de fechamento acrescenta o SHA real sem tentar autorreferenciar o
 próprio commit. Conferir worktree, upstream e commits locais antes de retomar.
+Entrega documental: commit `e652f2c1be664241364609443356b0277622c242`, enviado e
+confirmado por `git ls-remote --heads origin docs/replanejamento-stroop-web` na
+mesma SHA em 2026-11-04. O commit de fechamento desta evidência é identificável
+por `git log -1 --format=%H -- 'docs/Projeto Stroop Test.md'`; verificar que coincide
+com upstream no fim da sessão. M0 documental concluído; nenhum marco funcional
+iniciado. Os 33 arquivos da entrega são todos Markdown (diferença desde a HEAD
+auditada); inventário recuperável por `git diff --name-only 87f6a9c..HEAD`.
+
 Commit/push documental não autorizam integração à main. CI remota desta entrega
 não executada/não verificada; workflow existente só dispara PR/main/manual.
 Não há PR nem merge autorizado. Produção e dados reais permanecem fora desta sessão.
