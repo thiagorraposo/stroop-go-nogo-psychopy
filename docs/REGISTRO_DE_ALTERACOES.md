@@ -4,6 +4,20 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-05 — Revalidação do motor experimental em M3
+
+- Iniciado M3 por `continue o projeto`; preservada base M2 sem integrar main.
+- Acrescentadas verificações de snapshot WEB versus tempos/paleta do Builder,
+  renderização das dez cores no principal e ciclo de vida dos plugins reais
+  jsPsych sob remontagem React StrictMode, sem mudar regras ou runtime.
+- Corrigida sincronização do teste E2E de teclado: aguarda foco inicial React
+  antes de enviar Espaço/Enter, preservando falhas anteriores no backlog.
+- Requisitos REQ-EXP-001/002 e evidências da revalidação vinculados ao backlog.
+  Resultados de navegador distinguem janela visível, automação e API double;
+  nenhuma evidência é promovida a latência física ou suporte universal.
+- Campanha temporal e aceite de suporte continuam condicionados à DEC-04;
+  nenhum trabalho de outro marco, deploy ou dado real por implicação.
+
 ## 2026-11-05 — Comprovação de atomicidade e paridade de M2
 
 - Acrescentada prova de ACK após commit com constraint trigger adiado e leitura

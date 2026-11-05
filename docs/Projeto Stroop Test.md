@@ -16,7 +16,8 @@ EM_VALIDACAO (entrega disponível, critérios em conferência), CONCLUIDA (todos
 critérios comprovados). Não há crédito parcial. Autorização de sessão é distinta
 de prontidão técnica. A missão documental encerrou em M0; o comando posterior
 `continue o projeto`, em 2026-11-04, autorizou M1 até seu encerramento.
-O novo comando de 2026-11-05 autoriza M2, condicionado às decisões de suas tarefas.
+O comando de 2026-11-05 autorizou M2, já concluído. Novo `continue o projeto`
+autoriza M3, condicionado às decisões de suas tarefas; DEC-04 continua pendente.
 
 Uma tarefa CONCLUIDA tem todos critérios, comandos/resultados/data, componente,
 referências de teste e Git. Documento é evidência suficiente apenas para entrega
@@ -34,7 +35,7 @@ de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
 Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
 não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
 
-Progresso atual: **9/42 entregáveis aceitos (WEB-000 a WEB-008)**.
+Progresso atual: **11/42 entregáveis aceitos (WEB-000 a WEB-010)**.
 WEB-005 é documental; WEB-006 aceita o receptor backend e contratos em banco
 sintético. M1 e M2 concluídos; atomicidade e paridade aceitas em EV-M2-007/008.
 A captura incremental no motor e seus gates temporais continuam em M3/M4.
@@ -43,12 +44,12 @@ A captura incremental no motor e seus gates temporais continuam em M3/M4.
 
 Atualizado em **2026-11-05**, a partir das fichas deste backlog.
 
-| Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima tarefa pronta |
+| Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **9 de 42 · 21,4%** | **33** | **M2 concluído** | [WEB-009](#web-009--conferir-snapshot-condições-e-paleta-efetiva-da-web), após autorização de M3 |
+| **11 de 42 · 26,2%** | **31** | **M3 · aguardando DEC-04** | [WEB-011](#web-011--executar-campanha-de-engenharia-temporal-em-ambientes-declarados), após aprovação da matriz |
 
 ```text
-Aceites   ████░░░░░░░░░░░░░░░░   21,4%
+Aceites   █████░░░░░░░░░░░░░░░   26,2%
 ```
 
 A barra global é aproximada; os números são exatos, com percentual arredondado.
@@ -68,7 +69,7 @@ A ordem da tabela segue os IDs; dependências e paralelismo estão na
 | [M0](#m0--auditoria-e-replanejamento-documental) | Auditoria e replanejamento documental | 🟩 **1/1** | ✅ Concluído |
 | [M1](#m1--fundação-e-baseline-reproduzível) | Fundação e baseline reproduzível | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M2](#m2--backend-e-contratos-de-dados-consolidados) | Backend e contratos de dados consolidados | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
-| [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
+| [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | 🟩🟩⬜⬜ **2/4** | ◐ Aguardando DEC-04 |
 | [M4](#m4--fluxo-ponta-a-ponta-de-avaliações) | Fluxo ponta a ponta de avaliações | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
@@ -92,15 +93,17 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 | ✅ [WEB-006](#web-006--revalidar-entrada-de-conclusão-e-proveniência-do-protocolo) | Receptor incremental, vínculos e proveniência | PostgreSQL real sintético e HTTPS focado |
 | ✅ [WEB-007](#web-007--comprovar-atomicidade-replay-e-papéis-postgresql) | Atomicidade, replay e papéis | PostgreSQL real sintético |
 | ✅ [WEB-008](#web-008--comprovar-paridade-oficial-de-métricas-e-ausência-de-medida) | Paridade das 12 métricas e ausência de medida | Domínio/API/CSV/PG/SQLite/UI e HTTPS focado |
+| ✅ [WEB-009](#web-009--conferir-snapshot-condições-e-paleta-efetiva-da-web) | Condições, paleta efetiva e tempos do snapshot WEB | Fontes Builder/CSV/JSON, DOM e testes de motor |
+| ✅ [WEB-010](#web-010--revalidar-plugins-jspsych-ciclo-de-vida-e-janela-de-resposta) | Plugins, ciclo de vida e regras de resposta/interrupção | jsPsych real, StrictMode, testes de teclado e navegadores visíveis; estabilidade de suporte ainda não aceita |
 
 ### Foco do marco atual
 
-| ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito |
+| ✅ Aceito | ✅ Aceito | ⬜ Bloqueado | ⬜ Sem aceite |
 |---|---|---|---|
-| [WEB-005](#web-005--fechar-contratos-de-participante-preparação-e-política-de-perda): contratos | [WEB-006](#web-006--revalidar-entrada-de-conclusão-e-proveniência-do-protocolo): entrada e proveniência | [WEB-007](#web-007--comprovar-atomicidade-replay-e-papéis-postgresql): atomicidade e replay | [WEB-008](#web-008--comprovar-paridade-oficial-de-métricas-e-ausência-de-medida): paridade de métricas |
+| [WEB-009](#web-009--conferir-snapshot-condições-e-paleta-efetiva-da-web): condições e paleta | [WEB-010](#web-010--revalidar-plugins-jspsych-ciclo-de-vida-e-janela-de-resposta): plugins e lifecycle | [WEB-011](#web-011--executar-campanha-de-engenharia-temporal-em-ambientes-declarados): campanha temporal | [WEB-012](#web-012--registrar-viabilidade-e-limites-de-suporte-do-motor): suporte |
 
-WEB-005 a WEB-008 estão **CONCLUIDAS**. M2 aceito em EV-M2 e EV-M2-007/008.
-Próximo marco: M3, dependente de nova autorização; nenhuma tarefa de M3 iniciada.
+M2 permanece concluído em EV-M2 e EV-M2-007/008. M3 autorizado nesta sessão;
+WEB-009/010 concluídas; WEB-011 bloqueada pela matriz DEC-04 e WEB-012 pendente.
 
 **Acompanhar impedimentos:** [riscos](#registro-de-riscos) ·
 [decisões externas](#decisões-externas-e-condições-de-desbloqueio).
@@ -626,37 +629,37 @@ sessão removido ao fechar; recursos preexistentes preservados.
 
 ### WEB-009 — Conferir snapshot, condições e paleta efetiva da Web
 
-- Marco: M3. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Marco: M3. Prioridade: P0. Complexidade: M. Estado: CONCLUIDA.
 - Dependências: WEB-004.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Pools, versões, cores renderizadas versus CSV histórico, prática/main e tempos coincidem com fontes aprovadas sem alterar protocolo.
-- Testes/verificação: `tests/test_fase3_condicoes_tempos.py, web/src/experiment/practice.test.ts`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R02; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Testes/verificação: `tests/test_fase3_condicoes_tempos.py`, `web/src/experiment/environment.test.ts`, `practice.test.ts`, `main.test.ts`; 34 testes Python focados, 278 Vitest e tipos/build aprovados. Comandos e limites em EV-M3-009/010.
+- Evidências: EV-M3-009/010, 2026-11-05; condições, paleta e tempos revalidados sem mudança de protocolo. Aceite restrito à WEB-009; nenhuma campanha temporal ou suporte aprovado por antecipação.
+- Riscos/bloqueios: nenhum impedimento desta tarefa. R02 preservado: paridade de fontes não comprova equivalência física/psicométrica.
 - Referências: REQ-EXP-001; [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega: branch `feat/m3-motor-experimental`, base `832abfd`; SHA/commit/push/CI no fechamento EV-M3-009/010 e Retomada.
 
 ### WEB-010 — Revalidar plugins jsPsych, ciclo de vida e janela de resposta
 
-- Marco: M3. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Marco: M3. Prioridade: P0. Complexidade: M. Estado: CONCLUIDA.
 - Dependências: WEB-009.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Comparativo ADR-004 confrontado com motor; setup/cleanup e primeira nova pressão/fim exclusivo/interrupções passam; React não dirige quadro.
-- Testes/verificação: `web/src/experiment/main.test.ts, practice.test.ts, ExperimentHost.test.tsx`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R01, R02; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Testes/verificação: `web/src/experiment/main.test.ts`, `practice.test.ts`, `ExperimentHost.test.tsx`, `web/e2e/main.spec.ts`, `practice.spec.ts`; critérios funcionais comprovados em lógica/lifecycle e navegador, com captura Firefox visível completa validada no domínio. Falhas E2E e limites preservados em EV-M3-009/010.
+- Evidências: EV-M3-009/010; ADR-004 confrontado, setup/cleanup StrictMode e fronteiras de resposta/interrupção comprovados; execução visível completa em ambos navegadores, Firefox com 64 transições e validação Python oficial. Aceite funcional desta tarefa não concede estabilidade/suporte da campanha WEB-011/012.
+- Riscos/bloqueios: R01/R02 abertos. Invalidação temporal Firefox na rodada E2E permanece sem causa determinada; captura posterior válida não a apaga. Campanha WEB-011 deve preservar e investigar falhas/transporte ativo na matriz DEC-04. Não inferir suporte estável nem alterar runtime/tolerâncias sem evidência de causa.
 - Referências: REQ-EXP-002; [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega: branch `feat/m3-motor-experimental`, base `832abfd`; testes e evidência funcional versionados conforme EV-M3-009/010 e Retomada, aceite restrito aos critérios funcionais desta tarefa.
 
 ### WEB-011 — Executar campanha de engenharia temporal em ambientes declarados
 
-- Marco: M3. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Marco: M3. Prioridade: P0. Complexidade: G. Estado: BLOQUEADA.
 - Dependências: WEB-010; DEC-04 para matriz.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: 10 execuções sintéticas por ambiente selecionado, trilhas brutas/falhas preservadas, quadro e desvio total conferidos contra D5; sem substituir falha por rerun omitido. CHG-002: incluir transporte incremental ativo, ACK lento/perdido, retries e falha de servidor, sem alongar tentativas; comparar impacto contra D5.
 - Testes/verificação: `PLANEJADO: campanha técnica D5; web/pilots/w16-local.spec.ts como ferramenta, não prova física`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R01; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Riscos/bloqueios: R01. Bloqueio observado: matriz/equipamento DEC-04 ainda não aprovados; pergunta ao responsável enviada nesta sessão sem resposta até o fechamento. Responsável metodológico deve declarar ambientes/versões/recursos e alcance da campanha; Codex então prepara transporte ativo e executa os ensaios autorizados. WEB-012 depende desta entrega.
 - Referências: REQ-EXP-003; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 
@@ -671,6 +674,115 @@ sessão removido ao fechar; recursos preexistentes preservados.
 - Riscos/bloqueios: R01, R02; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### EV-M3-009/010 — fontes, plugins e diagnóstico, 2026-11-05
+
+Autorização: novo `continue o projeto`, limitado a M3. Base `832abfd`, branch
+`feat/m3-motor-experimental`, criada após fetch com worktree limpa. M2 preservado;
+main local `fe8f24f` e origin/main `db56b40` não foram integradas à branch.
+Testes versionados em `7cad3476e2142c98b863dd28c043c4b2e44d083a`
+e enviados com upstream, confirmado por igualdade HEAD/upstream/ls-remote.
+CI consultada após envio: nenhuma execução na branch, sem aprovação Actions.
+Fechamento documental identificável por `git log -1 --format=%H --
+ 'docs/Projeto Stroop Test.md'`; não há autorreferência artificial de SHA.
+
+WEB-009: CSVs-fonte com 4 condições de prática (2/2) e 16 principais (8/8),
+dez cores, palavras e respostas conferidos. Testes novos comparam snapshot WEB
+com a paleta efetiva e os tempos extraídos do XML Builder, incluindo feedback
+separado; hexadecimais históricos do CSV não são usados para renderizar.
+Motor principal renderiza as 16 palavras/condições e dez cores sobre cartão
+claro. Versão WEB `0.2.2-web.1` e snapshot único preservados; testes do validador
+conferem identificação/ordem/unidades. WEB-009 atende seus critérios de fontes;
+nenhum aceite de latência física decorre dessa paridade.
+
+WEB-010: comparação ADR-004 conferida com `main.ts`, `practice.ts` e motores.
+Plugins jsPsych reais controlam DOM/teclado/rAF, Host React apenas monta/limpa;
+plugins padrão exigiriam nova prova da janela fixa, HUD e tecla mantida, e React
+por quadro permanece incompatível com a fronteira escolhida. Testes existentes
+cobrem primeira pressão, RT positivo/fim exclusivo, entrega tardia, repeat,
+tecla mantida, foco/aba/Escape e cleanup. Testes novos montam os plugins reais
+sob StrictMode, comprovam única instância ativa após remontagem, cancelamento
+de timers e ausência de callbacks após desmontagem. Relógio controlado/jsdom
+não substitui navegador real. Critérios funcionais complementados pela captura
+visível abaixo; a estabilidade do ambiente pertence à campanha WEB-011/012,
+ainda sem aceite. As falhas anteriores permanecem explícitas.
+
+Verificações locais desta sessão (sem dados reais):
+
+- `.venv/bin/python -m unittest tests.test_fase3_condicoes_tempos tests.test_web_results -v`:
+  **34 aprovados, zero falhas/erros/skips**, 0,023 s.
+- Em `web/`, `npm ci && npm test && npm run build`: lock preservado,
+  **278 testes/16 arquivos aprovados**, 1,69 s; TypeScript e Vite aprovados.
+- `WEB_TEST_PORT=4273 npx playwright test e2e/practice.spec.ts e2e/main.spec.ts --workers=1 --trace=off --headed`:
+  **7 aprovados, 5 falhas**, 3,1 min; zero retries. Chromium falhou no principal
+  por interrupção sem causa determinada, na espera de prática (22 s) e na
+  navegação inicial por teclado; Firefox falhou na espera de prática (22 s)
+  e na espera do estímulo principal (8 s). Ambos passaram feedback dos quatro
+  desfechos, tecla mantida/interrupção/reinício da prática e bloqueio de celular;
+  Firefox também passou navegação por teclado. Nenhum timeout/gate foi relaxado.
+  Artefatos exclusivamente sintéticos em `web/test-results/`, ignorados pelo Git;
+  não versionar contextos, screenshots ou logs. Falhas não são apagadas por rerun.
+
+- Comparação sem janela visível: mesmo comando sem `--headed`, com
+  `--output=test-results/m3-headless`: **11 aprovados, 1 falha**, 4,5 min,
+  zero retries. Principal completo de 60 s e Escape aprovados em Chromium e
+  Firefox; falha restante na navegação inicial Chromium. Esta comparação não
+  substitui nem apaga os resultados visíveis.
+- Diagnóstico do teste de navegação: `page.goto` aguardava load mas não a
+  montagem React. A instalação dos listeners precede o effect de foco inicial
+  em `App.tsx`. Acrescentada espera observável por `main` focado antes de
+  Espaço/Enter; não há sleep fixo, mudança de runtime ou relaxamento de D2/D5.
+
+- Probe diagnóstico visível separado em Chromium, com o mesmo helper sintético,
+  eventos focus/blur/visibility e fases amostradas em RAM: prática concluída,
+  primeiros dois trials principais observados, sem alertas ou eventos de perda
+  de foco; encerrado deliberadamente pelo harness antes de concluir o bloco.
+  Primeiros 600 intervalos rAF: mediana 16,7 ms, máximo 50 ms. Isso evidencia
+  variação no ambiente, mas não estabelece a causa das cinco falhas anteriores.
+  Script/JSON temporários em `/tmp/stroop-m3-headed-probe.{mjs,json}`, sem
+  credenciais/identificadores; não é réplica válida nem gate D5 ou prova física.
+
+- Após corrigir a sincronização, navegação isolada sem janela:
+  `WEB_TEST_PORT=4273 npx playwright test e2e/practice.spec.ts --grep 'navegacao por teclado' --workers=1 --trace=off --output=test-results/m3-navigation-headless`:
+  **2 aprovados**, 4,2 s, Chromium/Firefox.
+- Revalidação visível dos casos anteriormente falhos:
+  `WEB_TEST_PORT=4273 npx playwright test e2e/main.spec.ts e2e/practice.spec.ts --grep 'principal|navegacao por teclado' --workers=1 --trace=off --headed --output=test-results/m3-headed-recheck`:
+  **5 aprovados, 1 falha**, 2,9 min, zero retries. Chromium aprovou principal
+  completo, Escape e navegação; Firefox aprovou Escape e navegação, mas o
+  principal foi invalidado pelo gate temporal D5 em 40,8 s de teste, exibindo
+  pedido de novo convite/prática. O ambiente Firefox visível não demonstrou
+  execução completa estável; causa de atraso não determinada. Não remover
+  Firefox do suporte aprovado por inferência nem enfraquecer gate/timeout.
+  Diagnóstico local por captura das transições segue autorizado em WEB-010;
+  DEC-04 condiciona campanha/suporte. Esta rodada não concede aceite de M3.
+
+- Captura funcional diagnóstica Firefox visível com ferramenta W16 existente,
+  flag `VITE_W16_TIMING_CAPTURE=synthetic-only` e `/pratica?w16=1`, script
+  temporário `/tmp/stroop-m3-firefox-probe.mjs`: prática e principal completos,
+  **16 tentativas, 64 transições, outcome completed, sem perda de foco/aba**.
+  Quadro medido 16,69000000000051 ms, desvio nominal máximo 3 ms, duração
+  59.997 ms; verificações locais/nominais dentro do gate. Tempos reconstruídos
+  do trace e submetidos a `stroop.domain.web_results.validate_result` com
+  ordem/CSV-fonte: aceitos, sem HTTP/PG ou persistência. Nenhuma resposta de
+  teclado foi sintetizada nesse principal; fronteiras/teclas são comprovadas
+  pelos testes de motor, prática e rodadas E2E acima. Artefatos exclusivamente
+  sintéticos `/tmp/stroop-m3-firefox-{timing,probe}.json`, não versionados.
+  Amostragem diagnóstica não é campanha de dez réplicas nem mede latência física.
+- WEB-010: critérios funcionais conferidos (comparativo ADR-004, setup/cleanup,
+  primeira nova pressão/fim exclusivo/interrupções e independência do React),
+  com evidência controlada e navegador real. Captura completa complementa
+  Firefox visível; falha E2E anterior continua aberta para campanha, sem afirmar
+  que foi corrigida. WEB-010 CONCLUIDA; M3 ainda não aceito e sem suporte estável
+  declarado. Não foi necessário mudar runtime, tempos ou tolerâncias.
+
+Ambiente observado: Linux `7.0.0-42-generic`, Python 3.12.3, Node 24.15.0,
+npm 11.16.0, Playwright 1.64.1; Chromium 156.0.8078.4 e Firefox 157.0;
+display gráfico configurado e `--headed` explícito. API double, teclado sintético,
+HTTP/Vite local; não é integração HTTPS/API/PG nem campanha DEC-04. Nenhuma nova
+suite PostgreSQL foi necessária para alterações restritas a testes do motor.
+WEB-011 bloqueada e WEB-012 sem aceite; matriz DEC-04 solicitada ao responsável,
+sem resposta registrada até este ponto. Transporte incremental ativo, campanha
+D5 e suporte exigem evidências próprias; nenhuma reutilização da exceção W16.
 
 ## M4 — Fluxo ponta a ponta de avaliações
 
@@ -1200,28 +1312,53 @@ não depende de reaprovação científica. Não há bloqueio documental remanesc
 
 ## Retomada
 
-Último marco autorizado: **M2, concluído**. WEB-000 a WEB-008 **CONCLUIDAS**:
-**9/42** entregáveis aceitos (21,4%). DEC-01/02 e WEB-005 mantêm aprovação;
-WEB-006 em `76f71f8` e WEB-007/008 em `c7ae0a4`, com evidências em EV-M2 e
-EV-M2-007/008. A restrição de commit local de EV-M2 descreve a sessão anterior;
-o novo `continue o projeto` autorizou as tarefas restantes conforme workflow.
+Marco autorizado: **M3**, por novo `continue o projeto` em 2026-11-05.
+WEB-009/010 **CONCLUIDAS**: condições/paleta/tempos e critérios funcionais do
+motor, plugins, lifecycle e resposta/interrupção comprovados em EV-M3-009/010.
+M0–M2 preservam aceite; WEB-000 a WEB-010: **11/42** entregáveis aceitos
+(26,2%), 31 sem aceite; M3 **2/4**, ainda não aceito.
 
-Branch `feat/m2-persistencia-incremental`, upstream criado e push dos testes
-confirmado em `c7ae0a4b5259b9e731d27c03e19ee3ade5eb0af2`. Fechamento documental
-identificável pelo comando em EV-M2-007/008. CI consultada após envio: nenhuma
-execução nesta branch. Sem PR/merge, deploy, dados reais ou M3 iniciado.
+WEB-011 **BLOQUEADA** pela matriz/equipamento DEC-04 não aprovados; WEB-012
+PENDENTE de WEB-011. Pergunta ao responsável enviada nesta sessão, sem resposta
+registrada até o fechamento. R01/R02 abertos: Firefox visível teve invalidação
+D5 na rodada E2E e uma captura diagnóstica posterior completa válida; isso não
+comprova estabilidade nem explica a causa da falha. Nenhuma falha foi omitida,
+nenhuma mudança em D1–D6 ou redução de suporte autorizada por inferência.
 
-Próxima ação exata: após nova autorização `continue o projeto`, selecionar M3 e
-iniciar WEB-009 (dependência WEB-004 concluída), lendo somente condições,
-snapshot/protocolo e testes aplicáveis. WEB-011/012 dependem de DEC-04 para a
-matriz de suporte/campanha; não presumir aprovação de ambientes ou latência física.
-Não repetir baseline global sem divergência concreta.
+Próxima ação exata: responsável metodológico aprovar DEC-04 (ambientes,
+equipamentos/versões e alcance da campanha). Depois, em WEB-011, preparar o
+transporte incremental ativo e capturas planejadas/observadas para 10 execuções
+por ambiente, incluindo falhas/retries previstos; investigar a invalidação
+Firefox com evidências. Aceite de suporte em WEB-012 só após campanha e revisão.
+Não iniciar outro marco nem repetir baseline global por implicação.
 
-Validação documental final: procedimento Python do workflow, exceto a asserção
-exclusivamente Markdown de M0: 85 documentos, 546 links, 40 âncoras, 42 tarefas,
-36 requisitos/matriz, 11 marcos, 10 riscos, cinco decisões e grafo sem ciclos.
-Painel: nove concluídas e 33 pendentes; nenhuma tarefa em andamento.
-`git diff --check` aprovado. Nenhum recurso preexistente removido.
+Branch `feat/m3-motor-experimental`, criada de `832abfd` (M2), worktree inicial
+limpa, origin atualizado por fetch. Branch M2/upstream em `832abfd`;
+main local `fe8f24f`, origin/main `db56b40`: diferença preservada sem sincronizar
+ou integrar por implicação. A branch contém trabalho M2 ainda não integrado;
+base mantida para revalidar motor contra o receptor atual. Nenhum PR/merge/deploy.
+
+Git da entrega: testes em **`7cad3476e2142c98b863dd28c043c4b2e44d083a`**,
+push com upstream confirmado por HEAD/upstream/ls-remote na mesma SHA.
+CI consultada após esse push: nenhuma execução na branch (não equivale a
+aprovação). Fechamento documental identificável por `git log -1 --format=%H
+--grep='docs: registra revalidação funcional de M3 e gate temporal pendente'`;
+seu envio é verificável por igualdade HEAD/upstream/ls-remote. Falha de envio
+deve ser registrada sem force push; sem PR/merge automático.
+
+Validação documental local final: procedimento Python do workflow sem a asserção
+exclusivamente Markdown de M0: **85 documentos, 548 links, 42 âncoras**, zero
+erros; 42 tarefas, 36 requisitos/matriz, 11 marcos, 10 riscos, cinco decisões e grafo
+sem ciclos. Contagens visuais conferidas contra fichas: 11 concluídas, uma
+bloqueada e 30 pendentes. `git diff --check` e novo `npm run typecheck` após
+corrigir o E2E aprovados. Quatro arquivos de testes e três documentos no escopo;
+runtime, protocolo, dependências, migrations e dados preservados.
+
+Evidências atuais: EV-M3-009/010; históricos M2 em EV-M2 e EV-M2-007/008.
+Rodadas com falha permanecem explícitas; correção de sincronização do teste não
+corrige nem oculta invalidação Firefox. Artefatos sintéticos somente em locais
+ignorados/temporários, sem exports/logs versionados.
+
 
 Histórico Git do aceite: branch `docs/m2-contratos-participacao`, base `270377b`, worktree
 inicial limpa, upstream conferido após fetch; main/origin/main em `fe8f24f`.
