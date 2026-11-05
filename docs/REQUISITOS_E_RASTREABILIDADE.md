@@ -414,19 +414,19 @@ já existe ou participa da regressão geral. WEB-000 é exclusivamente documenta
 | REQ-AUT-002 | ADR-004 | M6 | WEB-022 | `stroop/domain/auth.py, stroop/persistence/web_sessions.py` | `tests/test_web_auth.py` | PLANEJADA; consultar WEB-022 no backlog |
 | REQ-AUT-003 | ADR-004 | M6 | WEB-023 | `api/auth.py, api/sessions.py` | `tests/test_web_sessions.py` | PLANEJADA; consultar WEB-023 no backlog |
 | REQ-PAR-001 | ADR-004 | M4 | WEB-013 | `api/sessions.py, web/src/participant/` | `tests/test_web_sessions.py` | PLANEJADA; consultar WEB-013 no backlog |
-| REQ-PAR-002 | ADR-004/005 | M2 | WEB-005 | `Modelo lógico e formulário de sessão` | `Revisão documental DEC-01 em 2026-11-05; ensaios PLANEJADOS` | Aceite documental em EV-M2-005-R2; ensaios funcionais PLANEJADOS |
+| REQ-PAR-002 | ADR-004/005 | M2 | WEB-005 | `Modelo lógico e formulário de sessão` | `Revisão documental DEC-01 em 2026-11-05; ensaios PLANEJADOS` | Aceite documental em EV-M2-005-R2; receptor/banco em EV-M2, worker/timing ainda planejados em M3/M4 |
 | REQ-PAR-003 | ADR-004 | M4 | WEB-014 | `web/src/components/, api/models.py` | `tests/test_web_security_review.py` | PLANEJADA; consultar WEB-014 no backlog |
 | REQ-AVA-001 | ADR-004 | M4 | WEB-013 | `web/src/App.tsx, api/sessions.py` | `tests/test_web_sessions.py` | PLANEJADA; consultar WEB-013 no backlog |
-| REQ-AVA-002 | ADR-004/005 | M2 | WEB-005 | `Contrato HTTP e modelo lógico` | `Revisão documental DEC-01 em 2026-11-05; ensaios PLANEJADOS` | Aceite documental em EV-M2-005-R2; ensaios funcionais PLANEJADOS |
+| REQ-AVA-002 | ADR-004/005 | M2 | WEB-005 | `Contrato HTTP e modelo lógico` | `Revisão documental DEC-01 em 2026-11-05; ensaios PLANEJADOS` | Aceite documental em EV-M2-005-R2; receptor/banco em EV-M2, worker/timing ainda planejados em M3/M4 |
 | REQ-AVA-003 | ADR-004 | M4 | WEB-015 | `web/src/participant/ParticipantRun.ts, api/results.py` | `tests/test_web_results.py` | PLANEJADA; consultar WEB-015 no backlog |
 | REQ-EXP-001 | ADR-004 | M3 | WEB-009 | `condicoes/, web/src/experiment/` | `tests/test_fase3_condicoes_tempos.py` | PLANEJADA; consultar WEB-009 no backlog |
 | REQ-EXP-002 | ADR-004 | M3 | WEB-010 | `web/src/experiment/main-engine.ts, ExperimentHost.tsx` | `web/src/experiment/main.test.ts` | PLANEJADA; consultar WEB-010 no backlog |
 | REQ-EXP-003 | ADR-004 | M3 | WEB-011 | `web/src/experiment/environment.ts, web/pilots/` | `PLANEJADO: campanha de engenharia M3` | PLANEJADA; consultar WEB-011 no backlog |
-| REQ-INT-001 | ADR-004 | M2 | WEB-006 | `stroop/domain/web_results.py, api/results.py` | `tests/test_web_results.py` | PLANEJADA; consultar WEB-006 no backlog |
-| REQ-INT-002 | ADR-004 | M2 | WEB-007 | `stroop/persistence/web_sessions.py` | `tests/test_web_results.py` | PLANEJADA; consultar WEB-007 no backlog |
-| REQ-INT-003 | ADR-004/005 | M2 | WEB-005 | `ParticipantRun.ts e modelo lógico` | `ADR-005 e matriz de falhas validados pelo responsável em 2026-11-05` | Aceite documental em EV-M2-005-R2; ensaios funcionais PLANEJADOS |
-| REQ-MET-001 | ADR-004 | M2 | WEB-008 | `stroop/domain/stroop.py, web_results.py` | `tests/test_nucleo_compartilhado.py` | PLANEJADA; consultar WEB-008 no backlog |
-| REQ-MET-002 | ADR-004 | M2 | WEB-008 | `stroop/domain/stroop.py, web/src/dashboard/analysis.ts` | `web/src/dashboard/analysis.test.ts` | PLANEJADA; consultar WEB-008 no backlog |
+| REQ-INT-001 | ADR-004 | M2 | WEB-006 | `stroop/domain/web_results.py, api/results.py` | `tests/test_web_results.py, tests/test_web_sessions.py, tests/test_web_checkpoints.py` | EXECUTADA em WEB-006; EV-M2 no backlog |
+| REQ-INT-002 | ADR-004 | M2 | WEB-007 | `stroop/persistence/web_sessions.py` | `tests/test_web_checkpoints.py, tests/test_web_sessions.py` | Ensaios locais em EV-M2; aceite WEB-007 pendente |
+| REQ-INT-003 | ADR-004/005 | M2 | WEB-005 | `ParticipantRun.ts e modelo lógico` | `ADR-005 e matriz de falhas validados pelo responsável em 2026-11-05` | Aceite documental em EV-M2-005-R2; receptor/banco em EV-M2, worker/timing ainda planejados em M3/M4 |
+| REQ-MET-001 | ADR-004 | M2 | WEB-008 | `stroop/domain/stroop.py, web_results.py` | `tests/test_nucleo_compartilhado.py, tests/test_web_export.py, tests/test_web_checkpoints.py` | Regressão executada em EV-M2; aceite WEB-008 pendente |
+| REQ-MET-002 | ADR-004 | M2 | WEB-008 | `stroop/domain/stroop.py, web/src/dashboard/analysis.ts` | `tests/test_web_results.py, web/src/dashboard/analysis.test.ts` | Regressão executada em EV-M2; aceite WEB-008 pendente |
 | REQ-MET-003 | ADR-004 | M5 | WEB-019 | `web_assessments, api/assessments.py` | `tests/test_web_assessments.py` | PLANEJADA; consultar WEB-019 no backlog |
 | REQ-REL-001 | ADR-004 | M5 | WEB-017 | `web/src/components/, api/assessments.py` | `tests/test_web_assessments.py` | PLANEJADA; consultar WEB-017 no backlog |
 | REQ-REL-002 | ADR-004 | M5 | WEB-019 | `web/src/components/, web/src/dashboard/` | `tests/test_web_results.py` | PLANEJADA; consultar WEB-019 no backlog |
@@ -440,7 +440,7 @@ já existe ou participa da regressão geral. WEB-000 é exclusivamente documenta
 | REQ-SEG-001 | ADR-004 | M6 | WEB-024 | `api/transport.py, web/deploy/` | `tests/test_web_security_review.py` | PLANEJADA; consultar WEB-024 no backlog |
 | REQ-SEG-002 | ADR-004 | M9 | WEB-033 | `docs/seguranca/` | `PLANEJADO: revisão do responsável DEC-03` | PLANEJADA; consultar WEB-033 no backlog |
 | REQ-SEG-003 | ADR-004 | M10 | WEB-041 | `stroop/persistence/web_sessions.py, política de operação` | `PLANEJADOS: testes research em WEB-041` | PLANEJADA; consultar WEB-041 no backlog |
-| REQ-INF-001 | ADR-002 + ADR-004 | M2 | WEB-007 | `scripts/migrations/, provision_web_database.py` | `tests/test_web_database_provision.py` | PLANEJADA; consultar WEB-007 no backlog |
+| REQ-INF-001 | ADR-002 + ADR-004 | M2 | WEB-007 | `scripts/migrations/, provision_web_database.py` | `tests/test_web_database_provision.py, tests/test_postgres_migrations.py` | Ensaios locais em EV-M2; aceite WEB-007 pendente |
 | REQ-INF-002 | ADR-002 + ADR-004 | M8 | WEB-029 | `compose.web.yaml, Dockerfile.api, Dockerfile.web` | `tests/test_web_proxy_config.py` | PLANEJADA; consultar WEB-029 no backlog |
 | REQ-INF-003 | ADR-002 + ADR-004 | M8 | WEB-031 | `scripts/backup_postgres.py, deploy/` | `tests/test_web_backup_replication.py` | PLANEJADA; consultar WEB-031 no backlog |
 | REQ-EXT-001 | ADR-004 | M1 | WEB-003 | `stroop/, api/, web/` | `tests/test_nucleo_compartilhado.py, tests/test_casos_uso_importacao.py, tests/test_multiplos_instrumentos.py` | EV-M1 real em WEB-003; fronteiras/contratos revalidados em 2026-11-04 |

@@ -25,6 +25,8 @@ class SessionRecord:
     app_version: str | None
     order: tuple[int, ...]
     receipt: dict | None = None
+    checkpoint: dict | None = None
+    valid_for_result: bool = True
 
 
 class ConflictError(Exception):
@@ -183,13 +185,31 @@ def create_invitation(database_url: str, invitation_id: UUID, session_id: UUID,
                     or not user[0] or user[1] not in {'importacao','administracao'}):
                 return False
             connection.execute(
+                """INSERT INTO web_project_participants(participant_uuid,project_id,pseudonym)
+                   VALUES (%s,%s,%s) ON CONFLICT (project_id,pseudonym) DO NOTHING""",
+                (uuid4(),project_id,participant_id),
+            )
+            participant_uuid = connection.execute(
+                "SELECT participant_uuid FROM web_project_participants WHERE project_id=%s AND pseudonym=%s",
+                (project_id,participant_id),
+            ).fetchone()[0]
+            connection.execute(
+                """INSERT INTO web_participant_visits(visit_uuid,project_id,participant_uuid,label)
+                   VALUES (%s,%s,%s,%s) ON CONFLICT (project_id,participant_uuid,label) DO NOTHING""",
+                (uuid4(),project_id,participant_uuid,visit),
+            )
+            visit_uuid = connection.execute(
+                "SELECT visit_uuid FROM web_participant_visits WHERE project_id=%s AND participant_uuid=%s AND label=%s",
+                (project_id,participant_uuid,visit),
+            ).fetchone()[0]
+            connection.execute(
                 """INSERT INTO web_invitations
                    (invitation_id,session_id,project_id,code_sha256,participant_id,visit,
-                    evaluator_issuer,evaluator_subject,expires_at)
-                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,
+                    evaluator_issuer,evaluator_subject,participant_uuid,visit_uuid,expires_at)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
                            CURRENT_TIMESTAMP + INTERVAL '24 hours')""",
                 (invitation_id, session_id, project_id, code_hash, participant_id,
-                 visit, issuer, subject),
+                 visit, issuer, subject, participant_uuid, visit_uuid),
             )
             _audit(connection, issuer, subject, "create_invitation")
             return connection.execute(
@@ -447,7 +467,9 @@ def get_participant_session(database_url: str, token_hash: str) -> SessionRecord
                 receipt = connection.execute(
                     "SELECT receipt FROM web_assessments WHERE session_id=%s", (row[0],)
                 ).fetchone()[0]
-            return SessionRecord(row[0],row[1],row[2],row[3],row[4],row[5],order,receipt)
+            from stroop.persistence.web_checkpoints import checkpoint_receipt, invalidated
+            return SessionRecord(row[0],row[1],row[2],row[3],row[4],row[5],order,receipt,
+                                 checkpoint_receipt(connection, row[0]), not invalidated(connection, row[0]))
     try:
         return operation()
     except (MissingError, ExpiredError):
@@ -531,6 +553,17 @@ def complete_participant_session(database_url: str, token_hash: str, payload: di
                 "SELECT condition_id FROM web_session_main_order WHERE session_id=%s ORDER BY trial_number",
                 (row[0],),
             ).fetchall())
+            from stroop.persistence.web_checkpoints import reconcile_complete, invalidated, _unexpired
+            # Schema/domain preparation precedes writes. Existing ACKs survive rollback.
+            prepare_result(order, row[5], observations_only=True)
+            # Conclusao mantem cardinalidade integral antes de tocar o prefixo.
+            if len(payload['trials']) != 16:
+                from stroop.domain.web_results import InvalidResultError
+                raise InvalidResultError
+            reconcile_complete(connection, row[0], payload, completed=row[1] == 'completed')
+            if invalidated(connection, row[0]):
+                connection.commit()
+                raise ConflictError
             result = prepare_result(order, row[5])
             if row[1] == 'completed':
                 saved = connection.execute(
@@ -538,7 +571,8 @@ def complete_participant_session(database_url: str, token_hash: str, payload: di
                     (row[0],),
                 ).fetchone()
                 if saved[0] != result['payload_sha256']:
-                    raise ResultConflictError
+                    from stroop.persistence.web_checkpoints import _conflict
+                    _conflict(connection, row[0])
                 return saved[1], False
 
             metadata = connection.execute(
@@ -548,10 +582,8 @@ def complete_participant_session(database_url: str, token_hash: str, payload: di
             ).fetchone()
             completed_at = connection.execute("SELECT clock_timestamp()").fetchone()[0]
             if completed_at >= row[3]:
-                connection.execute(
-                    "UPDATE web_participant_sessions SET state='expired' WHERE session_id=%s", (row[0],)
-                )
-                connection.commit()
+                # O contexto desfaz o sufixo sem liberar e readquirir o lock.
+                # A expiracao logica vale mesmo sem materializar state=expired.
                 raise ExpiredError
             assessment_id = str(uuid4())
             timestamp = completed_at.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z')
@@ -609,6 +641,8 @@ def complete_participant_session(database_url: str, token_hash: str, payload: di
             connection.execute(
                 "UPDATE web_participant_sessions SET state='completed' WHERE session_id=%s", (row[0],)
             )
+            # Incluir o tempo gasto nas escritas, antes do commit e do recibo.
+            _unexpired(connection, row, rollback=True)
             return receipt, True
     except psycopg.Error as exc:
         raise PersistenceError from exc

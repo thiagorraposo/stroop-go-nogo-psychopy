@@ -141,3 +141,17 @@ test('logout limpa acesso com CSRF e exige confirmacao 204', async () => {
   mock({}, 200)
   await expect(logoutParticipant(common.csrf_token)).rejects.toMatchObject({ code: 'invalid_response' })
 })
+
+test('aceita recibo de checkpoint fechado sem expor tentativas nem permitir retomada', async () => {
+  const checkpoint = { confirmed_through: 0, prefix_hash: null, received_at: null }
+  mock({ ...preparing, checkpoint })
+  await expect(getParticipantSession()).resolves.toEqual(model)
+  mock({ ...preparing, checkpoint: { ...checkpoint, confirmed_through: 17 } })
+  await expect(getParticipantSession()).rejects.toMatchObject({ code: 'invalid_response' })
+  mock({ ...preparing, checkpoint: { ...checkpoint, extra: 'SINTETICO' } })
+  await expect(getParticipantSession()).rejects.toMatchObject({ code: 'invalid_response' })
+  mock({ ...preparing, state: 'aborted', checkpoint })
+  await expect(getParticipantSession()).rejects.toMatchObject({ code: 'state_conflict' })
+  mock({ ...receipt, valid_for_result: false, summary: null, checkpoint })
+  await expect(getParticipantSession()).rejects.toMatchObject({ code: 'state_conflict' })
+})

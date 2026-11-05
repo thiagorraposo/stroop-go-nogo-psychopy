@@ -226,3 +226,14 @@ describe('summary profissional Go/No-Go W15B', () => {
     await expect(listAssessments(projectId)).rejects.toMatchObject({ code: 'invalid_response' });
   });
 });
+
+it('aceita marca de validade fechada e impede uso de resultado invalidado', async () => {
+  fetchMock.mockResolvedValue(json({ items: [{ ...item, valid_for_result: true, invalidation_reason: null }], next_cursor: null }));
+  await expect(listAssessments(projectId)).resolves.toMatchObject({ items: [item] });
+  fetchMock.mockResolvedValue(json({ ...detail, valid_for_result: true, invalidation_reason: null }));
+  await expect(getAssessment(projectId, item.assessment_id)).resolves.toEqual(detail);
+  fetchMock.mockResolvedValue(json({ ...detail, valid_for_result: false, invalidation_reason: 'focus_lost', summary: null }));
+  await expect(getAssessment(projectId, item.assessment_id)).rejects.toMatchObject({ code: 'state_conflict' });
+  fetchMock.mockResolvedValue(json({ ...detail, valid_for_result: true, invalidation_reason: 'focus_lost' }));
+  await expect(getAssessment(projectId, item.assessment_id)).rejects.toMatchObject({ code: 'invalid_response' });
+});

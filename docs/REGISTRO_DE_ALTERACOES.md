@@ -4,6 +4,20 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-05 — Receptor incremental e vínculos WEB
+
+- Implementada migration aditiva 0011 para participantes/visitas por projeto,
+  checkpoints e invalidação, com mapeamento restrito a convites WEB existentes.
+- Acrescentados receptor HTTP, recibos parciais, reconciliação de conclusão,
+  inspeção de estado e invalidação tardia sem resultado oficial utilizável.
+  Clientes existentes validam os novos campos, sem alterar o motor experimental.
+- Revalidada expiração durante escritas; grants mínimos incluem somente as
+  colunas necessárias à revisão do fim principal. Requisitos REQ-INT-001/002,
+  REQ-INF-001 e regressão REQ-MET-001/002 rastreados em EV-M2 no backlog único.
+- Decisões DEC-01/02 já aprovadas; testes exclusivamente sintéticos. Worker,
+  fila e impacto temporal do transporte continuam nas tarefas M3/M4. Sem
+  alteração metodológica, dependências novas ou operação em produção/dados reais.
+
 ## 2026-11-05 — Painel visual de acompanhamento
 
 - Acrescentado painel ao backlog com resumo de aceites, barras por marco,

@@ -97,3 +97,48 @@ test('reenvio manual conserva corpo e duplo clique grava uma unica avaliacao', a
     await expect(page.getByRole('heading', { name: 'Participação encerrada.' })).toBeVisible()
   } finally { await issued.close() }
 })
+
+test('receptor incremental HTTPS confirma prefixo e exclui invalidacao tardia do oficial', async ({ page }) => {
+  const issued = await invitation()
+  try {
+    await redeem(page, issued.code)
+    const bootstrapResponse = await page.request.get('/api/v1/participant/session')
+    const bootstrap = await bootstrapResponse.json()
+    const headers = { Origin: new URL(page.url()).origin, 'X-CSRF-Token': bootstrap.csrf_token }
+    const payload = {
+      protocol_id: bootstrap.protocol_id, test_version: bootstrap.test_version, platform: 'web',
+      app_version: 'synthetic-m2-receiver', frame_period_ms: 16,
+      trials: bootstrap.main_conditions.map((condition: { condition_id: number }, index: number) => ({
+        trial_number: index + 1, condition_id: condition.condition_id, key_pressed: null,
+        reaction_time_ms: null, key_at_ms: null, trial_start_ms: index * 3750,
+        stimulus_onset_ms: index * 3750 + 300, stimulus_offset_ms: index * 3750 + 2800,
+        trial_end_ms: (index + 1) * 3750,
+      })),
+    }
+    expect((await page.request.post('/api/v1/participant/start', { headers, data: { app_version: payload.app_version } })).status()).toBe(200)
+    const path = '/api/v1/participant/session/checkpoints'
+    const body = { ...payload, trials: payload.trials.slice(0, 3) }
+    const first = await page.request.post(path, { headers, data: body })
+    expect(first.status()).toBe(200)
+    const ack = await first.json()
+    expect(ack.confirmed_through).toBe(3)
+    expect(ack.prefix_hash).toMatch(/^[a-f0-9]{64}$/)
+    expect(await (await page.request.post(path, { headers, data: body })).json()).toEqual(ack)
+    expect((await (await page.request.get('/api/v1/participant/session')).json()).checkpoint.confirmed_through).toBe(3)
+    const complete = await page.request.post('/api/v1/participant/complete', { headers, data: payload })
+    expect(complete.status()).toBe(201)
+    const receipt = await complete.json()
+    expect(receipt.summary.response_time_seconds).toBeNull()
+    expect((await page.request.post('/api/v1/participant/session/invalidate', {
+      headers, data: { reason: 'visibility_hidden', event_at_ms: 59000 },
+    })).status()).toBe(200)
+    const base = `/api/v1/projects/${issued.project_id}`
+    const detail = await issued.professional.get(`${base}/assessments/${receipt.assessment_id}`)
+    expect((await detail.json()).valid_for_result).toBe(false)
+    expect((await issued.professional.get(`${base}/assessments/${receipt.assessment_id}/export`)).status()).toBe(404)
+    const state = await issued.professional.get(`${base}/sessions/${issued.session_id}`)
+    expect(state.status()).toBe(200)
+    expect((await state.json()).checkpoint.confirmed_through).toBe(16)
+    expect(manage('state', { session_id: issued.session_id }).assessments).toBe(1)
+  } finally { await issued.close() }
+})

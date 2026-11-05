@@ -92,6 +92,18 @@ function receipt(value: unknown): Receipt {
 }
 function session(value: unknown): PreparingSession | RunningSession | Receipt {
   if (!record(value)) invalid()
+  if (value.valid_for_result === false || value.state === 'aborted') throw new ApiError('state_conflict', 409)
+  if (Object.hasOwn(value, 'checkpoint')) {
+    const checkpoint = value.checkpoint
+    if (!closed(checkpoint, ['confirmed_through', 'prefix_hash', 'received_at'])
+      || !Number.isInteger(checkpoint.confirmed_through) || Number(checkpoint.confirmed_through) < 0
+      || Number(checkpoint.confirmed_through) > 16
+      || (checkpoint.confirmed_through === 0 ? checkpoint.prefix_hash !== null || checkpoint.received_at !== null
+        : typeof checkpoint.prefix_hash !== 'string' || !/^[a-f0-9]{64}$/.test(checkpoint.prefix_hash) || !utc(checkpoint.received_at))) invalid()
+    const { checkpoint: _checkpoint, ...body } = value
+    value = body
+  }
+  if (!record(value)) invalid()
   if (value.state === 'completed') return receipt(value)
   const keys = ['session_id', 'state', 'activated_at', 'expires_at', 'csrf_token', 'can_resume']
   if (value.state === 'running') {

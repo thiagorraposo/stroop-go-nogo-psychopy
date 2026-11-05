@@ -34,11 +34,10 @@ de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
 Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
 não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
 
-Progresso atual: **6/42 entregáveis aceitos (WEB-000 a WEB-005)**.
-WEB-005 é aceite documental de contratos; os quatro aceites funcionais de M1
-permanecem, sem atribuir funcionamento à nova persistência por aprovação do desenho.
-M1 concluído; demais marcos funcionais não concluídos. Este número só se atualiza
-aqui, após evidência.
+Progresso atual: **7/42 entregáveis aceitos (WEB-000 a WEB-006)**.
+WEB-005 é documental; WEB-006 aceita o receptor backend e contratos em banco
+sintético. M1 concluído; M2 permanece aberto, com WEB-007/008 sem aceite.
+A captura incremental no motor e seus gates temporais continuam em M3/M4.
 
 ## Painel visual de acompanhamento
 
@@ -46,10 +45,10 @@ Atualizado em **2026-11-05**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima tarefa pronta |
 |---|---|---|---|
-| **6 de 42 · 14,3%** | **36** | **M2** | [WEB-006](#web-006--revalidar-entrada-de-conclusão-e-proveniência-do-protocolo) |
+| **7 de 42 · 16,7%** | **35** | **M2** | [WEB-007](#web-007--comprovar-atomicidade-replay-e-papéis-postgresql) |
 
 ```text
-Aceites   ███░░░░░░░░░░░░░░░░░░░   14,3%
+Aceites   ███░░░░░░░░░░░░░░░░░░░   16,7%
 ```
 
 A barra global é aproximada; os números são exatos, com percentual arredondado.
@@ -68,7 +67,7 @@ A ordem da tabela segue os IDs; dependências e paralelismo estão na
 |---|---|---|---|
 | [M0](#m0--auditoria-e-replanejamento-documental) | Auditoria e replanejamento documental | 🟩 **1/1** | ✅ Concluído |
 | [M1](#m1--fundação-e-baseline-reproduzível) | Fundação e baseline reproduzível | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
-| [M2](#m2--backend-e-contratos-de-dados-consolidados) | Backend e contratos de dados consolidados | 🟩⬜⬜⬜ **1/4** | 🔵 Marco atual |
+| [M2](#m2--backend-e-contratos-de-dados-consolidados) | Backend e contratos de dados consolidados | 🟩🟩⬜⬜ **2/4** | 🔵 Marco atual |
 | [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M4](#m4--fluxo-ponta-a-ponta-de-avaliações) | Fluxo ponta a ponta de avaliações | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
@@ -90,15 +89,16 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 | ✅ [WEB-003](#web-003--verificar-fronteiras-modulares-e-contratos-de-extensão) | Verificar fronteiras modulares e contratos de extensão | Baseline funcional sintética |
 | ✅ [WEB-004](#web-004--ensaiar-desenvolvimento-local-e-retomada-do-marco) | Ensaiar desenvolvimento local e retomada do marco | Baseline funcional sintética |
 | ✅ [WEB-005](#web-005--fechar-contratos-de-participante-preparação-e-política-de-perda) | Fechar contratos de participante, preparação e política de perda | Documental |
+| ✅ [WEB-006](#web-006--revalidar-entrada-de-conclusão-e-proveniência-do-protocolo) | Receptor incremental, vínculos e proveniência | PostgreSQL real sintético e HTTPS focado |
 
 ### Foco do marco atual
 
-| ✅ Aceito | ▶ Pronto para executar | ○ Aguarda WEB-006 | ○ Aguarda WEB-007 |
+| ✅ Aceito | ✅ Aceito | ▶ Próxima pronta | ○ Aguarda WEB-007 |
 |---|---|---|---|
 | [WEB-005](#web-005--fechar-contratos-de-participante-preparação-e-política-de-perda): contratos | [WEB-006](#web-006--revalidar-entrada-de-conclusão-e-proveniência-do-protocolo): entrada e proveniência | [WEB-007](#web-007--comprovar-atomicidade-replay-e-papéis-postgresql): atomicidade e replay | [WEB-008](#web-008--comprovar-paridade-oficial-de-métricas-e-ausência-de-medida): paridade de métricas |
 
-WEB-006 está **PRONTA**, ainda sem execução registrada. A aprovação documental de
-WEB-005 não comprova a implementação da persistência incremental.
+WEB-006 está **CONCLUIDA**, com receptor backend e testes em EV-M2.
+WEB-007 está **PRONTA**; WEB-008 aguarda seu aceite. M2 permanece aberto.
 
 **Acompanhar impedimentos:** [riscos](#registro-de-riscos) ·
 [decisões externas](#decisões-externas-e-condições-de-desbloqueio).
@@ -411,24 +411,105 @@ Históricos EV-M2-005/R1 preservam o contexto anterior à validação, agora sup
 
 ### WEB-006 — Revalidar entrada de conclusão e proveniência do protocolo
 
-- Marco: M2. Prioridade: P0. Complexidade: M. Estado: PRONTA.
+- Marco: M2. Prioridade: P0. Complexidade: M. Estado: CONCLUIDA.
 - Dependências: WEB-005.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Após validação DEC-02, schema fechado e vínculos participante/visita/projeto; ordem/snapshot, unidades e versões; contratos de checkpoint/start/abort/complete e invalidação tardia coincidem com código. Especificar migration aditiva e mapear sessões existentes sem inferir associação de legado. Validar partial versus oficial conforme ADR-005; não iniciar implementação antes do gate WEB-005.
-- Testes/verificação: `tests/test_web_results.py, test_web_sessions.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R02, R03; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Testes/verificação: `tests/test_web_results.py`, `tests/test_web_sessions.py`, `tests/test_web_checkpoints.py`, migrations/provisionamento, regressão Python, Vitest/tipos/build e ensaio HTTPS focado no receptor; resultados em EV-M2.
+- Evidências: EV-M2; critérios de entrada, vínculos, proveniência e ciclo incremental conferidos em código/PG real e HTTPS. Sem aceite antecipado de M2 ou de captura incremental no motor.
+- Riscos/bloqueios: nenhum bloqueio desta unidade. R02/R03 continuam abertos; recepção no servidor não prova worker, ausência de perda ou validade física/metodológica. WEB-007/008 mantêm seus gates próprios.
 - Referências: REQ-INT-001; [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega: `feat/m2-persistencia-incremental`, base `72cca1f`; fechamento local em EV-M2 e Retomada, sem push conforme instrução final do responsável.
+
+### EV-M2 — receptor incremental e banco sintético, 2026-11-05
+
+Unidade concluída de WEB-006. A instrução final do responsável limita esta
+sessão ao fechamento seguro e commit local; WEB-007/008 não recebem aceite
+por antecipação. Critérios conferidos: schema fechado e vínculos compostos,
+ordem/snapshot, unidades/versões, start/abort/checkpoint/complete, invalidação
+tardia e preservação de parciais separados do resultado oficial. Migration
+aditiva mapeia só convites WEB; nenhuma associação de legado inferida.
+
+Entregas: migration aditiva 0011 com UUIDs por projeto/participante/visita,
+backfill exclusivamente de convites WEB, FKs compostas e tabelas separadas de
+observações/recibos/invalidação; receptor de checkpoints, consulta de recibo e
+estado profissional, reconciliação de complete e invalidação auditável. Observações
+confirmadas sobrevivem a rollback final; inválidos ficam fora de listas, facetas,
+agregados e CSV oficiais. Clientes existentes validam os campos novos e impedem
+usar resumo invalidado. Não há worker, fila ou transporte incremental no motor:
+esses componentes e seus gates temporais continuam em M3/M4.
+
+Revisão corrigiu o limite de expiração durante as escritas da conclusão: desfazer
+sufixo/resultado se o prazo vencer antes do commit, conservando ACK anterior e
+sem liberar/readquirir lock para materializar expiração. Writer só atualiza
+campos de avanço do recibo, sem mudar proveniência ou observações. Fórmulas,
+unidades, CSV, versões experimentais, OIDC e limites de acesso preservados.
+
+Git inicial: branch adequada já existente com alterações locais de WEB-006,
+preservadas e integradas nesta unidade, sem descarte. Base `72cca1f`; fetch
+executado. `origin/main=db56b40`, `main=fe8f24f`; preservada a base documental/M1
+não integrada, sem rebase/merge nem tentativa de sincronização não fast-forward.
+Os testes usam container exclusivo `stroop-m2-validation-20261105`, PostgreSQL
+17.6, tmpfs, porta loopback 32769 e banco `stroop_etapa4_test_m2_validation`.
+Não foram abertos `.env` operacional, coletas ou backups.
+
+Verificações locais desta unidade (Python 3.12.3, Node 24.15.0/npm 11.16.0,
+Linux 7.0.0-42-generic; Playwright 1.64.1, Chromium 156.0.8078.4/Firefox 157.0):
+
+- `.venv/bin/python scripts/verify_web_ci.py python`, com TEST_DATABASE_URL
+  apontando somente ao banco sintético acima: **387 testes aprovados, zero skips**
+  (111,582 s). Inclui limites de entrada/proveniência, replay, conflitos,
+  rollback, corridas, vínculos, métricas/CSV e negações de acesso.
+- `npm test` em web: **275 testes em 16 arquivos aprovados**;
+  `npm run build` (inclui typecheck): aprovado. Dependências existentes
+  reutilizadas, sem instalação/atualização incidental; `pip check` aprovado.
+- `.venv/bin/python scripts/verify_web_ci.py browser`: **98 testes gerais +
+  quatro timing aprovados**, Chromium/Firefox. É regressão do motor atual,
+  sem transporte incremental ativo; não concede aceite M3, latência física ou
+  equivalência psicométrica.
+- Após a última correção de grants, `.venv/bin/python -m unittest
+  tests.test_web_database_provision -v`: **9 aprovados**; inclui invalidação
+  tardia pelo writer restrito e recusa de SELECT em reaction_time_ms.
+- Em web, `npx playwright test --config playwright.integration.config.ts
+  --grep 'receptor incremental HTTPS'`, no mesmo banco sintético após o fim da
+  suíte Python: **2 aprovados (9,3 s)**. API real, proxy HTTPS local e papéis
+  provisionados, sem mocks HTTP; confirmou ACK/replay, consulta do prefixo,
+  conclusão, invalidação tardia, detalhe sem resumo e exportação negada. Suite
+  HTTPS integral não reexecutada neste fechamento da menor unidade.
+- Scanner `scripts/verify_web_ci.py sources`: aprovado, 354 fontes no inventário
+  após staging dos arquivos novos. Links/estrutura e `git diff --check`
+  aprovados no fechamento; resultados documentais finais registrados em Retomada.
+
+Falhas intermediárias preservadas como evidência: o teste novo de prazo usava
+clock_timestamp duas vezes e violava por microssegundos o limite de 30 min da
+própria fixture; corrigido para statement_timestamp, confirmado no conjunto de
+387 testes. O primeiro HTTPS focado falhou nos dois browsers com 503 na
+invalidação: faltava SELECT de assessment_id/trial_number/trial_end_ms ao writer.
+Grant limitado às três colunas, teste negativo de RT e repetição 9+2 aprovados.
+O conjunto de 387 antecede exclusivamente essa correção final de grant/teste;
+a revalidação final correspondente são os 9 testes de provisionamento e 2 HTTPS.
+
+Limites e continuidade: WEB-007 deve conferir formalmente toda a matriz de
+atomicidade/replay/papéis e completar qualquer lacuna; WEB-008 revalida a paridade
+como aceite próprio. Nenhum aceite de M2, worker/fila, M3/M4, pesquisa real ou
+produção. R03 permanece aberto, incluindo perda do sufixo sem ACK. Somente o
+container criado nesta sessão foi removido ao encerrar, sem tocar recursos preexistentes.
+
+Git: commit local identificável por `git log -1 --format=%H
+--grep='feat(web): implementa receptor incremental e vínculos de sessões'`,
+na branch `feat/m2-persistencia-incremental`. Sem push por instrução final do
+responsável; sem upstream desta branch. `gh run list --branch
+feat/m2-persistencia-incremental` não retornou execução; Actions não executada
+para esta entrega local. Sem PR, merge, deploy ou migration em dados reais.
 
 ### WEB-007 — Comprovar atomicidade, replay e papéis PostgreSQL
 
-- Marco: M2. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Marco: M2. Prioridade: P0. Complexidade: G. Estado: PRONTA.
 - Dependências: WEB-006.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Banco real provisionado prova rollback pré-commit, checkpoint com ACK pós-commit, retry igual/sobreposto, conflito divergente, prefixo sem lacuna e concorrência checkpoint/abort/complete; expiração/invalidação preservam observações, resultado oficial é atômico e não duplica. Vínculos compostos e múltiplas avaliações por visita comprovados; reader sem DML e writer sem owner. Ensaios de CHG-002/ADR-005 são adicionais, não cobertos por teste histórico.
-- Testes/verificação: `tests/test_web_results.py, test_web_database_provision.py, test_postgres_migrations.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Testes/verificação: `tests/test_web_results.py, test_web_database_provision.py, test_postgres_migrations.py`. Regressão inicial em EV-M2; conferir cobertura restante antes do aceite desta tarefa.
+- Evidências: ensaios iniciais compartilhados de WEB-006 em EV-M2; aceite próprio ainda pendente, sem execução de nova unidade neste encerramento.
 - Riscos/bloqueios: R03, R06; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: REQ-INT-002, REQ-INF-001; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
@@ -439,8 +520,8 @@ Históricos EV-M2-005/R1 preservam o contexto anterior à validação, agora sup
 - Dependências: WEB-007.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: 12 métricas/unidades/classificações e no-hit conferidos nos adaptadores; nenhuma normalização destrutiva do histórico; M2 aceito. CHG-002: preservar fórmulas e comprovar exclusão de incompletos/ inválidos do resultado oficial.
-- Testes/verificação: `tests/test_nucleo_compartilhado.py, test_web_results.py, web/src/dashboard/analysis.test.ts`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Testes/verificação: `tests/test_nucleo_compartilhado.py, test_web_results.py, web/src/dashboard/analysis.test.ts`. Regressão inicial em EV-M2; conferir cobertura restante antes do aceite desta tarefa.
+- Evidências: ensaios iniciais compartilhados de WEB-006 em EV-M2; aceite próprio ainda pendente, sem execução de nova unidade neste encerramento.
 - Riscos/bloqueios: R04; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: REQ-MET-001, REQ-MET-002; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
@@ -1037,22 +1118,29 @@ não depende de reaprovação científica. Não há bloqueio documental remanesc
 
 ## Retomada
 
-Marco autorizado atual: **M2**, pelo novo comando `continue o projeto` de
-2026-11-05. M1 permanece concluído (WEB-001 a WEB-004; EV-M1).
-WEB-005 **CONCLUIDA**, por validação explícita do responsável em 2026-11-05
-(EV-M2-005-R2). DEC-01/02 aprovadas; estratégia ADR-005, contrato alvo, matriz de
-invalidação e risco residual validados na resposta “valido” à proposta `270377b`.
-WEB-006 **PRONTA**; WEB-007/008 PENDENTES. M2 não concluído.
+Marco autorizado atual: **M2**. DEC-01/02 e WEB-005 permanecem aprovadas.
+WEB-006 **CONCLUIDA**, com entregas e resultados em EV-M2; WEB-007 **PRONTA**,
+WEB-008 PENDENTE. **7/42** entregáveis aceitos; M2 não concluído.
 
-Próxima ação: detalhar e executar WEB-006 dentro de M2, conforme autorização do
-marco já registrada, preservando a separação entre contrato alvo e código atual.
-Especificar schema aditivo, mapeamento de sessões WEB e testes de entrada/
-proveniência/checkpoint; alteração de schema só no escopo autorizado da tarefa,
-sem operação em dados reais. A validação não exige nova aprovação das decisões
-DEC-01/02 já tomadas, nem autoriza M3, deploy ou integração main.
-Esta sessão registra e valida o aceite documental; WEB-006 ainda não iniciada.
+A instrução final do responsável solicita a menor unidade segura, testes,
+registro e **commit local**. Sessão encerrada em WEB-006, sem iniciar nova unidade,
+push ou outro marco. Entrega na branch `feat/m2-persistencia-incremental`, base
+`72cca1f`; SHA do commit recuperável pelo comando exato em EV-M2 e informado no
+fechamento da sessão. Sem upstream/push e sem execução Actions nesta entrega.
 
-Git do aceite: branch `docs/m2-contratos-participacao`, base `270377b`, worktree
+Próxima ação exata: iniciar WEB-007, comparar os casos de EV-M2 com cada linha
+aplicável da matriz ADR-005, completar lacunas de rollback/replay/concorrência/
+expiração e papéis em PostgreSQL descartável `stroop_etapa4_test_*`, registrar
+aceite próprio e só então tornar WEB-008 pronta. Reutilizar testes/evidências
+válidos; não repetir baseline global ou avançar M3 por implicação.
+
+Validação documental final: procedimento Python do workflow (exceto a asserção
+exclusivamente Markdown de M0) aprovado: 85 documentos, 544 links, 38 âncoras,
+42 tarefas, 36 requisitos/matriz, 11 marcos, 10 riscos, cinco decisões e grafo
+sem ciclos. Painel conferido: sete concluídas, uma pronta, 34 pendentes;
+`git diff --check` aprovado. Nenhum recurso preexistente foi removido.
+
+Histórico Git do aceite: branch `docs/m2-contratos-participacao`, base `270377b`, worktree
 inicial limpa, upstream conferido após fetch; main/origin/main em `fe8f24f`.
 Proposta `270377b89ea477bf864114d0e8a3017e3520a84f` enviada e confirmada no
 upstream/remoto antes desta revisão. Commit deste aceite identificável por
@@ -1117,4 +1205,5 @@ Commit desta entrega identificável por `git log -1 --format=%H
 Envio verificável pela igualdade de HEAD, upstream e referência remota dessa
 branch; eventual falha deve ser registrada sem force push. CI remota desta entrega
 não verificada; validação acima é local. Sem PR, merge ou deploy.
-Próxima tarefa funcional permanece WEB-006, conforme Retomada acima.
+Próxima tarefa funcional naquela entrega era WEB-006; registro histórico
+superado pela Retomada e EV-M2 desta implementação.

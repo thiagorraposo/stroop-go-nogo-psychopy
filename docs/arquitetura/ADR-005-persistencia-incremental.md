@@ -1,6 +1,7 @@
 # ADR-005 — Participação por projeto e persistência incremental
 
-Data: 2026-11-05. Decisão técnica validada pelo responsável, sem implementação.
+Data: 2026-11-05. Decisão técnica validada pelo responsável. Receptor backend
+implementado em M2; worker e integração temporal permanecem em M3/M4.
 Após apresentação da proposta versionada em `270377b`, o responsável respondeu
 “valido”, aprovando a estratégia, os limites de perda e a matriz de invalidação.
 Essa resposta satisfaz a exigência de validação documental anterior ao código;
@@ -113,7 +114,8 @@ exigir os ensaios sintéticos planejados abaixo nas tarefas do backlog:
 | Timing e carga | Mesmos gates D5 com transporte ativo, ACK lento/perdido, retries e servidor indisponível; medir callbacks/cópia e quadros nos browsers de referência; sem presumir latência física |
 | Segurança | PG real descartável, reader sem DML/writer sem owner, isolamento por projeto em cada operação; sem dados/segredos em armazenamento JS/log/cache |
 
-Nenhum desses ensaios foi executado para este desenho nesta entrega. M2 valida
+Na entrega documental original nenhum desses ensaios havia sido executado.
+Os ensaios atuais de receptor/banco estão registrados em EV-M2 no backlog. M2 valida
 contratos e banco; M3 valida impacto temporal; M4 integra fluxo/motor/UX; M5
 revalida exclusão de inválidos nas consultas. Aprovação documental não encerra
 esses gates nem autoriza produção.

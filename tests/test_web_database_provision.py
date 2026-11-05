@@ -126,6 +126,71 @@ class ProvisionPostgresTests(unittest.TestCase):
             self.assertEqual(connection.execute('SELECT count(*) FROM trial_results WHERE assessment_id=%s', (receipt['assessment_id'],)).fetchone()[0], 16)
             self.assertEqual(connection.execute('SELECT count(*) FROM assessment_metrics WHERE assessment_id=%s', (receipt['assessment_id'],)).fetchone()[0], 12)
 
+    def test_incremental_writer_grants_links_concurrency_and_multiple_assessments(self):
+        from concurrent.futures import ThreadPoolExecutor
+        issuer, subject = 'https://accounts.google.com', f'synthetic-links-{uuid4().hex[:8]}'
+        with psycopg.connect(self.owner_dsn) as connection:
+            connection.execute("INSERT INTO app_users(issuer,subject,role) VALUES(%s,%s,'importacao')", (issuer,subject))
+        projects = [uuid4(),uuid4()]
+        for project in projects:
+            web_sessions.create_project(self.writer_dsn,project,f'SYNTHETIC_{uuid4().hex[:8]}','Sintetico',issuer,subject)
+            web_sessions.set_member(self.writer_dsn,project,issuer,subject,True,issuer,subject)
+        def issue(values):
+            project,visit = values
+            invitation,session = uuid4(),uuid4()
+            code = hashlib.sha256(secrets.token_bytes(32)).hexdigest()
+            web_sessions.create_invitation(self.writer_dsn,invitation,session,project,code,'P_SINTETICO',visit,issuer,subject)
+            return invitation,session,code
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            issued = list(pool.map(issue,[(projects[0],'V1'),(projects[0],'V1')]))
+        issue((projects[0],'V2'))
+        issue((projects[1],'V1'))
+        with psycopg.connect(self.owner_dsn) as connection:
+            self.assertEqual(connection.execute('SELECT count(DISTINCT participant_uuid),count(DISTINCT visit_uuid) FROM web_invitations WHERE project_id=%s',(projects[0],)).fetchone(),(1,2))
+            self.assertEqual(connection.execute('SELECT count(DISTINCT participant_uuid) FROM web_invitations WHERE project_id=ANY(%s)',(projects,)).fetchone()[0],2)
+        for invitation,session,code in issued:
+            token=hashlib.sha256(secrets.token_bytes(32)).hexdigest()
+            web_sessions.redeem(self.writer_dsn,code,token,ORDER)
+            web_sessions.start_participant_session(self.writer_dsn,token,'web-0.1.0')
+            payload=synthetic_payload()
+            response=web_results.checkpoint(self.writer_dsn,token,{**payload,'trials':payload['trials'][:3]},synthetic_conditions())
+            self.assertEqual(response['confirmed_through'],3)
+            self.assertEqual(web_sessions.get_participant_session(self.writer_dsn,token).checkpoint['prefix_hash'],response['prefix_hash'])
+            receipt,created=web_results.complete(self.writer_dsn,token,payload,synthetic_conditions())
+            self.assertTrue(created)
+            allowed,items=web_assessments.list_assessments(self.reader_dsn,projects[0],issuer,subject,limit=10,offset=0)
+            self.assertTrue(allowed)
+            self.assertTrue(any(row['assessment_id']==receipt['assessment_id'] for row in items))
+        self.assertEqual(len(items),2)
+        # A revisao tardia consulta apenas o fim principal, inclusive em historico
+        # anterior a checkpoints; nao conceder SELECT de todas as observacoes.
+        self.assertFalse(web_results.invalidate(self.writer_dsn,token,'focus_lost',59000)['valid_for_result'])
+        allowed,valid = web_assessments.list_assessments(
+            self.reader_dsn,projects[0],issuer,subject,limit=10,offset=0)
+        self.assertTrue(allowed)
+        self.assertEqual(len(valid),1)
+        self.denied(self.writer_dsn,'SELECT reaction_time_ms FROM web_trial_observations')
+        for statement in ('UPDATE web_session_observations SET payload=payload',
+                          'UPDATE web_session_checkpoints SET provenance=provenance',
+                          'DELETE FROM web_session_observations',
+                          'DELETE FROM web_session_invalidations',
+                          'UPDATE web_invitations SET participant_uuid=participant_uuid',
+                          'UPDATE web_project_participants SET pseudonym=pseudonym'):
+            self.denied(self.writer_dsn,statement)
+        for statement in ('INSERT INTO web_session_invalidations(session_id,reason,source) SELECT session_id,\'reload\',\'participant\' FROM web_participant_sessions',
+                          'UPDATE web_session_checkpoints SET confirmed_through=confirmed_through'):
+            self.denied(self.reader_dsn,statement)
+        with psycopg.connect(self.writer_dsn) as connection:
+            self.assertEqual(connection.execute('SHOW synchronous_commit').fetchone()[0],'on')
+            self.assertEqual(connection.execute('SHOW fsync').fetchone()[0],'on')
+            with self.assertRaises(psycopg.errors.ForeignKeyViolation):
+                connection.execute("""INSERT INTO web_invitations(invitation_id,session_id,project_id,code_sha256,
+                    participant_id,visit,evaluator_issuer,evaluator_subject,expires_at,participant_uuid,visit_uuid)
+                    SELECT %s,%s,%s,%s,participant_id,visit,evaluator_issuer,evaluator_subject,
+                    CURRENT_TIMESTAMP+interval '24 hours',participant_uuid,visit_uuid
+                    FROM web_invitations WHERE invitation_id=%s""",
+                    (uuid4(),uuid4(),projects[1],hashlib.sha256(secrets.token_bytes(32)).hexdigest(),issued[0][0]))
+
     def test_papeis_provisionados_importam_e_consultam_csv_web(self):
         issuer, subject = 'https://accounts.google.com', f'synthetic-import-{uuid4().hex[:8]}'
         with psycopg.connect(self.owner_dsn) as connection:

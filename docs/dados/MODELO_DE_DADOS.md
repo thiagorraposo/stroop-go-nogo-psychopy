@@ -215,8 +215,10 @@ Nenhuma coleta, importação, migration ou grant foi executado nesta revisão.
 
 ## Participação por projeto — decisão de 2026-11-05
 
-Modelo de produto aprovado pelo responsável (DEC-01); desenho lógico alvo,
-sem DDL executado. O esquema atual ainda conserva pseudônimo/visita como rótulos.
+Modelo de produto aprovado pelo responsável (DEC-01), implementado pela migration
+aditiva `0011_web_incremental_sessions.sql`. Execução somente em PostgreSQL
+descartável sintético e evidências em EV-M2 no backlog; sem migração operacional.
+Pseudônimo/visita continuam como rótulos compatíveis nas interfaces existentes.
 
 - Participante de projeto tem UUID técnico estável e pseudônimo único **dentro
   do projeto**, sem cadastro central de pessoa. Mesmo pseudônimo em projetos
@@ -240,7 +242,7 @@ sem DDL executado. O esquema atual ainda conserva pseudônimo/visita como rótul
   sessões e avaliações permanecem. Não reservar identificador pessoal global,
   inferir correspondência ou coletar dados nominais nesta versão.
 
-A futura alteração é aditiva, com mapeamento auditável das sessões WEB existentes;
+A alteração é aditiva, com mapeamento auditável das sessões WEB existentes;
 sem apropriar legado por texto coincidente. Migrations existentes são imutáveis.
 Retenção e eventual eliminação seguem decisão institucional DEC-03; preservação
 operacional dos parciais não significa retenção ilimitada.
@@ -271,7 +273,25 @@ e resultados oficiais. Payloads inseguros ou fora do schema são recusados; dado
 estruturalmente válidos com falha metodológica podem ser preservados como
 observações inválidas, sem aprovação para resultado.
 
-Sem tabelas ou estados físicos novos definidos por inferência: o contrato de
+O contrato de
 transporte alvo validado pelo responsável está no [contrato HTTP](../desenvolvimento/CONTRATO_API_WEB.md),
 a estratégia no [ADR-005](../arquitetura/ADR-005-persistencia-incremental.md),
 e critérios de validade no [protocolo](../experimento/PROTOCOLO_WEB.md).
+
+### Mapeamento físico aditivo de M2
+
+| Entidade | Tabela / vínculo |
+|---|---|
+| Participante de projeto | `web_project_participants`, UUID e unicidade projeto/pseudônimo |
+| Visita | `web_participant_visits`, UUID e FK composta de projeto/participante |
+| Preparação | `web_invitations` acrescenta UUIDs de participante/visita e FKs compostas com os rótulos existentes |
+| Observação parcial | `web_session_observations`, PK sessão/posição, FK composta para condição na ordem principal, JSON original e SHA-256 |
+| Recibo parcial | `web_session_checkpoints`, sessão única, proveniência, prefixo confirmado/hash e recebimento UTC |
+| Invalidação auditável | `web_session_invalidations`, sessão única, primeira razão/origem/instante observado, registro UTC e ator profissional opaco quando aplicável |
+
+O backfill usa somente projeto/pseudônimo/visita de convites WEB existentes.
+Não altera avaliações ou tentativas oficiais anteriores, não fabrica checkpoints
+para resultados antigos e não preenche mapa de legado. A FK composta entre
+`web_assessments` e convite impede atribuir o resultado a outro projeto.
+Observações e invalidações são imutáveis para o writer de runtime; apenas o
+recibo parcial pode avançar. O reader recebe SELECT nas colunas necessárias.

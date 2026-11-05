@@ -660,9 +660,12 @@ ou os navegadores exigidos por essas etapas.
 
 ## Contrato alvo validado — persistência incremental (2026-11-05)
 
-Esta seção especifica o alvo para DEC-02; **não descreve endpoints disponíveis**.
-As seções anteriores registram o contrato implementado final-only, rejeitado
-como política futura pelo responsável. O responsável validou expressamente
+Esta seção especifica o contrato aprovado em DEC-02. O receptor backend foi
+implementado em M2; resultados dos ensaios e SHA ficam em EV-M2 no
+[backlog](../Projeto%20Stroop%20Test.md#ev-m2--receptor-incremental-e-banco-sintético-2026-11-05).
+As seções anteriores preservam os corpos integrais de start/complete. O cliente
+experimental ainda envia somente ao final: worker/fila e gates de prontidão e
+timing pertencem a M3/M4. O responsável validou expressamente
 esta estratégia e a matriz metodológica em 2026-11-05, após apresentação de
 `270377b`, conforme [ADR-005](../arquitetura/ADR-005-persistencia-incremental.md).
 Contrato alvo aprovado não é evidência de implementação ou integração.
@@ -682,7 +685,7 @@ são resolvidos no servidor na preparação, sem confiar em associações do cli
 Compatibilidade do corpo atual por rótulos deve ser preservada com resolução
 unívoca; UUIDs internos não mudam as 21 colunas do CSV.
 
-### Recepção incremental proposta
+### Recepção incremental
 
 - `POST /participant/session/checkpoints`: cookie participante + CSRF/Origin;
   corpo fechado `{protocol_id,test_version,platform,app_version,frame_period_ms,
@@ -706,11 +709,15 @@ unívoca; UUIDs internos não mudam as 21 colunas do CSV.
   sem sobrescrever. Uma corrida divergente impede resultado válido até revisão;
   não escolher silenciosamente a versão conveniente. Recibo só é sucesso após
   commit durável conforme configuração PostgreSQL validada.
-- `GET /participant/session` acrescentará objeto fechado `checkpoint` com
+- `GET /participant/session` acrescenta objeto fechado `checkpoint` com
   `confirmed_through`, `prefix_hash`, `received_at` (hash/data nulos no prefixo 0).
   Permite consultar recebimento após resposta perdida; não devolve tentativas
   para reconstrução/retomada do principal. Credencial expirada/revogada não
   consulta nem envia. Profissional autorizado pode conferir estado no projeto.
+  Em aborted, retorna 200 com metadados da sessão, `can_resume:false`, CSRF e
+  checkpoint, sem tentativas; start/complete continuam proibidos. Em completed,
+  mantém recibo e headers de CSRF/prazo, acrescentando checkpoint; se invalidada,
+  acrescenta `valid_for_result:false` e suprime o resumo com `summary:null`.
 - Checkpoint pode chegar após `abort`, antes do vencimento e sem revogação,
   somente para preservar o prefixo já observado: nunca muda estado terminal,
   nunca autoriza novo start/complete. Após completed, só replay idêntico de
@@ -757,3 +764,16 @@ idempotente materializar o estado. Conservar motivo observado; sem aviso,
 registrar causa desconhecida. Não criar resultado automaticamente com prefixo 16.
 Nova execução exige novo convite/sessão e prática; mesma visita pode ser usada
 sem misturar observações de sessões diferentes.
+
+### Inspeção profissional de recebimento
+
+`GET /projects/{project_id}/sessions/{session_id}` exige profissional ativo,
+vínculo e projeto ativo; usa exclusivamente a credencial de leitura. Retorna
+objeto fechado com `session_id`, `state`, `expires_at`, `complete`,
+`valid_for_result`, `abort_reason`, `revoked`, `invalidation` e `checkpoint`.
+`invalidation` é nulo ou `{reason,source,event_at_ms,recorded_at}`; `checkpoint`
+tem os mesmos três campos da consulta participante. Sem conclusão, validade é
+sempre falsa; prazo vencido em preparing/running aparece como expired, sem
+fabricar motivo. Não devolve observações brutas, métricas ou credenciais.
+Rejeita corpo/query e usa os mesmos erros seguros e no-store. Este canal não
+concede retomada nem exportação parcial; a interface de inspeção pertence a M4/M5.

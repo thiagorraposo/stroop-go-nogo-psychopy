@@ -402,9 +402,11 @@ async def participant_session(request: Request):
         raise _persistence_error() from None
     result = {"session_id": session.session_id, "state": session.state,
               "activated_at": _serialize_time(session.activated_at),
-              "expires_at": _serialize_time(session.expires_at), "can_resume": False}
+              "expires_at": _serialize_time(session.expires_at), "can_resume": False,
+              "checkpoint": session.checkpoint or {"confirmed_through":0,"prefix_hash":None,"received_at":None}}
     if session.state == 'completed':
-        return JSONResponse(session.receipt, headers={
+        return JSONResponse({**session.receipt, "checkpoint": result["checkpoint"],
+                             **({"valid_for_result":False,"summary":None} if not session.valid_for_result else {})}, headers={
             'X-CSRF-Token': _participant_csrf(request.app.state.config, token),
             'X-Session-Expires-At': _serialize_time(session.expires_at),
         })
@@ -427,7 +429,8 @@ async def participant_session(request: Request):
         result["csrf_token"] = _participant_csrf(request.app.state.config,
                                                   _cookie(request, PARTICIPANT_COOKIE))
     elif session.state == "aborted":
-        raise APIError("state_conflict")
+        # Recibo parcial consultavel; nunca permite retomada nem novo start.
+        result["csrf_token"] = _participant_csrf(request.app.state.config, token)
     return result
 
 

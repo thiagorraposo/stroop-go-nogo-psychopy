@@ -169,7 +169,9 @@ class WebSessionsPostgresTests(unittest.TestCase):
         self.assertEqual((receipt['platform'], receipt['state']), ('web', 'completed'))
         self.assertEqual(response.headers['cache-control'], 'no-store')
         self.assertEqual(self._counts(), (1, 16, 12, 1, 16))
-        self.assertEqual(participant.get('/api/v1/participant/session').json(), receipt)
+        bootstrap = participant.get('/api/v1/participant/session').json()
+        self.assertEqual(bootstrap.pop('checkpoint')['confirmed_through'], 16)
+        self.assertEqual(bootstrap, receipt)
         self.assertEqual(participant.post('/api/v1/participant/abort', json={'reason': 'user_cancelled'}).status_code, 409)
         self.assertEqual(participant.post('/api/v1/participant/start', json={'app_version': payload['app_version']}).status_code, 409)
         with psycopg.connect(self.database_url) as connection:
@@ -396,7 +398,7 @@ class WebSessionsPostgresTests(unittest.TestCase):
         aborted = participant.post("/api/v1/participant/abort",
                                    json={"reason": "focus_lost"}, headers=headers)
         self.assertEqual((aborted.status_code, aborted.json()["state"]), (200, "aborted"))
-        self.assertEqual(participant.get("/api/v1/participant/session").status_code, 409)
+        self.assertEqual(participant.get("/api/v1/participant/session").status_code, 200)
         with psycopg.connect(self.database_url) as connection:
             self.assertEqual(connection.execute("SELECT COUNT(*) FROM assessments").fetchone()[0], 0)
 
