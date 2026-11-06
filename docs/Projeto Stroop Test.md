@@ -2293,8 +2293,29 @@ preservadas sem integração. Evidências funcionais e integradas completas em
 `EV-M4-013/016`. Entrega identificável por
 `git log -1 --format=%H --grep='feat(web): conclui fluxo ponta a ponta de avaliações em M4'`.
 Validação documental, scanner e `git diff --check` aprovados antes do commit;
-envio e consulta de Actions por SHA registrados no fechamento desta seção. Sem
-PR, merge, tag, deploy, migração real ou acesso a dados/secrets operacionais.
+envio e consulta de Actions por SHA registrados no fechamento abaixo. Sem PR,
+merge, tag, deploy, migração real ou acesso a dados/secrets operacionais.
+
+#### Fechamento Git de M4 — 2026-11-06
+
+Entrega **`0cf71b6ecdfd14edda090ba2bb7d8bdad7bcccbb`**, enviada com upstream na
+branch `feat/m4-fluxo-avaliacoes`; igualdade `HEAD`, `origin/feat/m4-fluxo-avaliacoes`
+e `git ls-remote --heads origin feat/m4-fluxo-avaliacoes` confirmada nessa SHA.
+`gh run list --branch feat/m4-fluxo-avaliacoes --limit 5 --json headSha,status,conclusion,url`
+retornou `[]`: nenhuma execução Actions encontrada para `0cf71b6` (o workflow
+existente dispara em `push` para `main`, `pull_request` e `workflow_dispatch`);
+CI remota **não executada** para esta SHA, sem transferir aprovação de outra SHA.
+
+Validador documental final (`python3 scripts/verify_web_docs.py`): **11 marcos,
+45 tarefas, 50 requisitos, 12 riscos, cinco decisões, 26 aceitos, 86 documentos,
+626 links e 76 âncoras**, grafo sem ciclos; `python3 -m unittest tests.test_verify_web_docs -v`
+(**7/7 aprovados**, sem skips), `.venv/bin/python scripts/verify_web_ci.py sources`
+(**393 fontes versionadas verificadas**, zero achados) e `git diff --check`
+aprovados. Este fechamento documental é identificável por
+`git log -1 --format=%H --grep='docs: registra envio e fechamento de M4'`;
+conferir seu envio por `HEAD`/upstream/remoto, sem commit artificial de
+autorreferência. Próxima ação preservada: autorizar explicitamente **M5/WEB-017 e WEB-018**.
+Nenhum PR, merge, tag, deploy ou acesso a dados reais executado.
 
 ### Retomada anterior — conclusão de M6 (WEB-021 e WEB-024), 2026-11-06
 
