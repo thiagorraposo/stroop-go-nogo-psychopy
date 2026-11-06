@@ -7,7 +7,7 @@ import sys
 import tempfile
 from uuid import UUID, uuid4
 
-from common import ROOT, ISSUER, database_url, fixture_user, fixture_session, primary_subject
+from common import ROOT, ISSUER, PASSWORD, database_url, fixture_user, fixture_session, primary_subject
 import psycopg
 from api.auth import PROFESSIONAL_COOKIE
 from stroop.domain.auth import opaque_user_id
@@ -49,7 +49,8 @@ def execute(value):
     token, _ = fixture_session(subject)
     return {'cookie_name': PROFESSIONAL_COOKIE, 'token': token, 'project_id': str(project_id),
             'subject': subject, 'assessment_id': assessment_id,
-            'evaluator_id': opaque_user_id(ISSUER, subject)}
+            'evaluator_id': opaque_user_id(ISSUER, subject),
+            'username': f'synthetic-{UUID(subject).hex}', 'password': PASSWORD}
 
 
 if __name__ == '__main__':

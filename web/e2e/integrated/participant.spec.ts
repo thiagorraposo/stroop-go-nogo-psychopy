@@ -57,7 +57,8 @@ test('principal real recupera recibo perdido sem duplicar avaliacao e encerra cr
     expect(completions).toBe(1)
     const stored = manage('state', { session_id: issued.session_id })
     expect(stored.state).toBe('completed')
-    expect([stored.assessments, stored.trials, stored.metrics]).toEqual([1, 16, 12])
+    expect([stored.assessments, stored.trials, stored.metrics, stored.observations, stored.confirmed_through])
+      .toEqual([1, 16, 12, 16, 16])
     expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0)
     const detail = await issued.professional.get(`/api/v1/projects/${issued.project_id}/assessments/${stored.assessment_id}`)
     expect(detail.status()).toBe(200)
@@ -85,13 +86,15 @@ test('reenvio manual conserva corpo e duplo clique grava uma unica avaliacao', a
     const retry = page.getByRole('button', { name: 'Reenviar resultado', exact: true })
     await expect(retry).toBeEnabled({ timeout: 15_000 })
     await expect(page.getByRole('status')).not.toContainText('Resultado recebido pela equipe.')
+    await expect.poll(() => manage('state', { session_id: issued.session_id }).confirmed_through).toBe(16)
     expect(manage('state', { session_id: issued.session_id }).assessments).toBe(0)
     await retry.evaluate(element => { (element as HTMLButtonElement).click(); (element as HTMLButtonElement).click() })
     await expect(page.getByRole('status')).toContainText('Resultado recebido pela equipe.')
     expect(bodies.length).toBe(2)
     expect(bodies[0] === bodies[1]).toBe(true)
     const stored = manage('state', { session_id: issued.session_id })
-    expect([stored.assessments, stored.trials, stored.metrics]).toEqual([1, 16, 12])
+    expect([stored.assessments, stored.trials, stored.metrics, stored.observations, stored.confirmed_through])
+      .toEqual([1, 16, 12, 16, 16])
     await expect(page.getByRole('button', { name: 'Começar tarefa' })).toHaveCount(0)
     await page.getByRole('button', { name: 'Finalizar', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Participação encerrada.' })).toBeVisible()
@@ -141,4 +144,44 @@ test('receptor incremental HTTPS confirma prefixo e exclui invalidacao tardia do
     expect((await state.json()).checkpoint.confirmed_through).toBe(16)
     expect(manage('state', { session_id: issued.session_id }).assessments).toBe(1)
   } finally { await issued.close() }
+})
+
+test('worker incremental preserva prefixo parcial em interrupcao sem resultado oficial e exige pratica em nova sessao', async ({ page }) => {
+  const first = await invitation()
+  const second = await invitation()
+  try {
+    await redeem(page, first.code)
+    await finishPractice(page)
+    await page.getByRole('button', { name: 'Começar tarefa' }).click()
+    await expect.poll(() => manage('state', { session_id: first.session_id }).confirmed_through, { timeout: 25_000 })
+      .toBeGreaterThanOrEqual(1)
+    await expect(page.locator('[data-phase="stimulus"]')).toBeVisible({ timeout: 8_000 })
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('alert')).toContainText('observação parcial, sem gerar resultado oficial')
+    await expect(page.getByRole('alert')).toContainText('Solicite um novo convite e faça a prática novamente.')
+    await expect.poll(() => manage('state', { session_id: first.session_id }).state).toBe('aborted')
+    const partial = manage('state', { session_id: first.session_id })
+    expect(partial.assessments).toBe(0)
+    expect(partial.observations).toBeGreaterThanOrEqual(1)
+    expect(partial.confirmed_through).toBe(partial.observations)
+    const inspect = await first.professional.get(`/api/v1/projects/${first.project_id}/sessions/${first.session_id}`)
+    expect(inspect.status()).toBe(200)
+    expect(await inspect.json()).toMatchObject({
+      session_id: first.session_id,
+      state: 'aborted',
+      complete: false,
+      valid_for_result: false,
+      abort_reason: 'escape',
+      checkpoint: { confirmed_through: partial.confirmed_through },
+    })
+
+    // Nova sessao nunca retoma do prefixo e exige pratica completa antes do bloco principal.
+    await page.getByLabel('Código do convite').fill(second.code)
+    await page.getByRole('button', { name: 'Validar convite' }).click()
+    await expect(page.getByRole('heading', { name: 'Primeiro, vamos praticar.' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Começar tarefa' })).toHaveCount(0)
+  } finally {
+    await first.close()
+    await second.close()
+  }
 })

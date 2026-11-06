@@ -184,10 +184,23 @@ export function abortParticipant(csrf: string, sessionId: string, reason: AbortR
     if (!closed(value, ['session_id', 'state']) || value.session_id !== sessionId || value.state !== 'aborted') invalid()
   })
 }
+export function invalidateParticipant(csrf: string, sessionId: string, reason: AbortReason,
+  eventAtMs: number | null = null): Promise<boolean> {
+  return request('/api/v1/participant/session/invalidate',
+    { ...post({ reason, event_at_ms: eventAtMs }, csrf), keepalive: true }, async response => {
+      if (response.status !== 200) invalid(response.status)
+      const value = await json(response)
+      if (!closed(value, ['session_id', 'valid_for_result']) || value.session_id !== sessionId
+        || typeof value.valid_for_result !== 'boolean') invalid()
+      return value.valid_for_result
+    })
+}
 export function participantErrorMessage(error: unknown): string {
   if (error instanceof ApiError && error.status === 401) return 'Este acesso não está disponível. Utilize um convite válido.'
   if (error instanceof ApiError && error.code === 'csrf_failed') return 'Não foi possível verificar este acesso. Entre em contato com a equipe.'
-  if (error instanceof ApiError && error.code === 'state_conflict') return 'Esta sessão não pode continuar. Solicite um novo convite à equipe.'
+  if (error instanceof ApiError && error.code === 'state_conflict') {
+    return 'Esta sessão não pode continuar e não gerou resultado oficial. Observações parciais não permitem retomada; solicite um novo convite à equipe.'
+  }
   return apiErrorMessage(error)
 }
 

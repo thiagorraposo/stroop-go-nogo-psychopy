@@ -4,6 +4,23 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-06 — Fluxo ponta a ponta de avaliações e transporte incremental (M4)
+
+- Integrado o Dedicated Worker incremental (`checkpoint-worker.ts`) ao fluxo real
+  do participante (`ParticipantRun`, `PracticePreparation` e `ParticipantFlow`),
+  com sondagem de prontidão, drain assíncrono em interrupção, `worker-src 'self'`
+  em `web/security-headers.json` e invalidação tardia via
+  `POST /api/v1/participant/session/invalidate`.
+- Validados preparação profissional após login local (`CHG-004` / `AUTH-L07`),
+  múltiplas visitas/avaliações, isolamento de pseudônimo entre projetos,
+  ausência de campos nominais/demográficos e de precisão agregada durante a
+  execução, preservação de prefixo parcial em `web_session_observations` sem
+  criar resultado oficial, avaliação completa com 16 tentativas/12 métricas/
+  proveniência e logout participante limpando RAM/cookie.
+- Concluídas WEB-013, WEB-014, WEB-015 e WEB-016, encerrando M4 (4/4; 26/45
+  entregáveis aceitos). Evidências, falhas intermediárias preservadas, limites
+  e próxima ação (M5/WEB-017 e WEB-018) registrados somente no backlog canônico.
+
 ## 2026-11-06 — Conclusão da autenticação local e revisão de segurança (M6)
 
 - Implementados e integrados login, troca de senha e revogação locais, gestão

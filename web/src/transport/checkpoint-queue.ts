@@ -6,7 +6,8 @@ import type { MainTrial } from '../experiment/main-engine'
 export type TransportContext = Pick<PreparingSession, 'session_id' | 'csrf_token' | 'expires_at'> &
   Pick<CompletePayload, 'protocol_id' | 'test_version' | 'platform' | 'app_version'>
 export type TransportStatus = { state: 'ready' | 'pending' | 'confirmed' | 'stopped';
-  confirmed: number; queued: number; attempts: number; reason?: string }
+  confirmed: number; queued: number; attempts: number; reason?: string;
+  error?: { code: string; status: number } }
 type Checkpoint = { confirmed_through: number; prefix_hash: string | null; received_at: string | null }
 
 function checkpoint(value: unknown): Checkpoint {
@@ -36,16 +37,16 @@ export class CheckpointQueue {
   private readonly controller = new AbortController()
 
   constructor(private readonly context: TransportContext, private readonly notify: (status: TransportStatus) => void) {}
-  private status(state: TransportStatus['state'], reason?: string) {
+  private status(state: TransportStatus['state'], reason?: string, error?: { code: string; status: number }) {
     this.notify({ state, confirmed: this.confirmed, queued: this.trials.length, attempts: this.attempts,
-      ...(reason ? { reason } : {}) })
+      ...(reason ? { reason } : {}), ...(error ? { error } : {}) })
   }
   private alive() { return !this.stopped && Date.now() < Date.parse(this.context.expires_at) }
   private async session(preparing = false) {
     return request('/api/v1/participant/session', { method: 'GET', headers: { Accept: 'application/json' } }, async response => {
       const value: unknown = await response.json()
       if (!record(value) || value.session_id !== this.context.session_id
-        || (preparing && (value.state !== 'preparing' || value.expires_at !== this.context.expires_at))) {
+        || (preparing && (!['preparing', 'running'].includes(String(value.state)) || value.expires_at !== this.context.expires_at))) {
         throw new ApiError('invalid_response', response.status)
       }
       return checkpoint(value.checkpoint)
@@ -55,15 +56,18 @@ export class CheckpointQueue {
     if (this.ready || this.stopped) throw new ApiError('state_conflict', 409)
     const remaining = Date.parse(this.context.expires_at) - Date.now()
     if (!Number.isFinite(remaining) || remaining <= 0 || remaining > 1_800_000) {
-      this.stop('expired'); throw new ApiError('session_expired', 410)
+      this.stop('expired', { code: 'session_expired', status: 410 }); throw new ApiError('session_expired', 410)
     }
-    this.expiry = setTimeout(() => this.stop('expired'), remaining)
+    this.expiry = setTimeout(() => this.stop('expired', { code: 'session_expired', status: 410 }), remaining)
     try {
       const receipt = await this.session(true)
       if (!this.alive() || receipt.confirmed_through !== 0) throw new ApiError('state_conflict', 409)
       this.ready = true
       this.status('ready')
-    } catch (error) { this.stop('not_ready'); throw error }
+    } catch (error) {
+      const details = error instanceof ApiError ? { code: error.code, status: error.status } : undefined
+      this.stop('not_ready', details); throw error
+    }
   }
   enqueue(trial: Readonly<MainTrial>, framePeriod: number) {
     if (!this.alive()) return
@@ -134,12 +138,12 @@ export class CheckpointQueue {
       }
     }
   }
-  stop(reason = 'disposed') {
+  stop(reason = 'disposed', error?: { code: string; status: number }) {
     if (this.stopped) return
     this.stopped = true
     clearTimeout(this.timer); clearTimeout(this.expiry)
     this.controller.abort()
-    this.status('stopped', reason)
+    this.status('stopped', reason, error)
     this.trials = []; this.batch = undefined
   }
 }

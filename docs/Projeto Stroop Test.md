@@ -19,8 +19,9 @@ de prontidão técnica. A missão documental encerrou em M0; o comando posterior
 O comando de 2026-11-05 autorizou M2, já concluído. Novo `continue o projeto`
 autoriza M3, condicionado às decisões de suas tarefas. Em 2026-11-05, o proprietário
 aprovou DEC-04 no alcance local de engenharia descrito em EV-M3-011; validação
-física/metodológica permanece pendente para M9. Após o aceite de M3, novo
-`continue o projeto` em 2026-11-06 autoriza M6/WEB-021, conforme Retomada vigente.
+física/metodológica permanece pendente para M9. Após o aceite de M3, novo `continue o projeto` em 2026-11-06 autorizou M6, já
+concluído. Novo `continue o projeto` em 2026-11-06 autorizou M4 até seu
+encerramento, conforme Retomada vigente.
 
 Uma tarefa CONCLUIDA tem todos critérios, comandos/resultados/data, componente,
 referências de teste e Git. Documento é evidência suficiente apenas para entrega
@@ -38,12 +39,12 @@ de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
 Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
 não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
 
-Progresso atual: **22/45 entregáveis aceitos (WEB-000 a WEB-012, WEB-021 a WEB-024, WEB-029/030 e WEB-042/043/044)**.
+Progresso atual: **26/45 entregáveis aceitos (WEB-000 a WEB-016, WEB-021 a WEB-024, WEB-029/030 e WEB-042/043/044)**.
 WEB-005 é documental; WEB-006 aceita o receptor backend e contratos em banco
-sintético. M1, M2, M3 e M6 concluídos; atomicidade e paridade aceitas em EV-M2-007/008;
-autenticação local e revisão de segurança aceitas em EV-M6-021/024.
-Captura incremental e gates temporais da fixture aceitos em M3; integração
-do produto com HTTPS/API/PG permanece em M4.
+sintético. M1, M2, M3, M4 e M6 concluídos; atomicidade e paridade aceitas em EV-M2-007/008;
+autenticação local e revisão de segurança aceitas em EV-M6-021/024; fluxo ponta a
+ponta de avaliações com Dedicated Worker incremental e HTTPS/API/PG reais aceito
+em EV-M4-013/016.
 
 ## Painel visual de acompanhamento
 
@@ -51,10 +52,10 @@ Atualizado em **2026-11-06**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **22 de 45 · 48,9%** | **23** | **M6 concluído · M4 próximo** | Autorizar M4/WEB-013; WEB-031 aguarda destino externo |
+| **26 de 45 · 57,8%** | **19** | **M4 concluído · M5 próximo** | Autorizar M5/WEB-017; WEB-031 aguarda destino externo |
 
 ```text
-Aceites   ██████████░░░░░░░░░░   48,9%
+Aceites   ████████████░░░░░░░░   57,8%
 ```
 
 A barra global é aproximada; os números são exatos, com percentual arredondado.
@@ -75,7 +76,7 @@ A ordem da tabela segue os IDs; dependências e paralelismo estão na
 | [M1](#m1--fundação-e-baseline-reproduzível) | Fundação e baseline reproduzível | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M2](#m2--backend-e-contratos-de-dados-consolidados) | Backend e contratos de dados consolidados | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | 🟩🟩🟩🟩🟩🟩🟩 **7/7** | ✅ Concluído |
-| [M4](#m4--fluxo-ponta-a-ponta-de-avaliações) | Fluxo ponta a ponta de avaliações | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
+| [M4](#m4--fluxo-ponta-a-ponta-de-avaliações) | Fluxo ponta a ponta de avaliações | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M7](#m7--integração-compatibilidade-histórica-e-transição) | Integração, compatibilidade histórica e transição | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
@@ -102,6 +103,10 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 | ✅ [WEB-010](#web-010--revalidar-plugins-jspsych-ciclo-de-vida-e-janela-de-resposta) | Plugins, ciclo de vida e regras de resposta/interrupção | jsPsych real, StrictMode, testes de teclado e navegadores visíveis; suporte restrito aceito separadamente em WEB-012 |
 | ✅ [WEB-011](#web-011--executar-campanha-de-engenharia-temporal-em-ambientes-declarados) | Campanha local de engenharia com transporte ativo | Vinte capturas completas, dez por navegador, uma falha de preparação preservada; API double, sem latência física |
 | ✅ [WEB-012](#web-012--registrar-viabilidade-e-limites-de-suporte-do-motor) | Viabilidade técnica local e limites do motor | Campanha EV-M3-011 e aceite explícito do responsável em EV-M3-012-ACEITE |
+| ✅ [WEB-013](#web-013--integrar-preparação-profissional-e-identificação-por-convite) | Preparação profissional com login local, convite único, múltiplas visitas/avaliações e isolamento | React/FastAPI/PostgreSQL/HTTPS reais em Chromium e Firefox |
+| ✅ [WEB-014](#web-014--validar-instruções-prática-e-início-principal-no-fluxo-real) | Instruções sem coleta nominal/demográfica, prática repetível sem precisão agregada e início principal | Vitest, Playwright browser e fluxo HTTPS/API/PG reais |
+| ✅ [WEB-015](#web-015--ensaiar-envio-falhas-de-rede-e-recuperação-de-recibo) | Dedicated Worker incremental integrado, prefixo parcial em interrupção, invalidação tardia e estados de recibo | Vitest, Python/PG e E2E HTTPS/API/PG reais em Chromium e Firefox |
+| ✅ [WEB-016](#web-016--aceitar-avaliação-completa-com-consulta-persistida) | Avaliação completa com 16 tentativas, 12 métricas, recibo, logout participante e consulta protegida | E2E HTTPS/API/PG reais em Chromium e Firefox e testes Python/PG |
 | ✅ [WEB-042](#web-042--refinar-estímulos-e-hierarquia-visual-experimental) | Palavras com contorno branco sem cartão e centro preservado | DOM, dez cores/screenshots Chromium/Firefox e regressão funcional |
 | ✅ [WEB-043](#web-043--reformular-hud-e-retirar-precisão-agregada-do-participante) | HUD sem precisão, progresso real e cronômetro estável | DOM/árvore acessível, unidade e navegadores; gates de campanha separados |
 | ✅ [WEB-044](#web-044--validar-regressão-da-apresentação-experimental-refinada) | Regressão consolidada visual, funcional, métricas/CSV e observação temporal preparatória | Testes e fluxos consolidados; campanha WEB-011 aceita, suporte WEB-012 separado |
@@ -114,19 +119,19 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 
 ### Foco do marco atual
 
-M6 concluído (**4/4**) nesta sessão em `EV-M6-021/024`: WEB-021 e WEB-024
-CONCLUIDAS com evidências reais positivas/negativas (AUTH-L01–L09), somando-se a
-WEB-022 e WEB-023. Próximo marco na ordem crítica: **M4** (`WEB-013` PRONTA
-tecnicamente), aguardando nova instrução explícita (`continue o projeto`) que
-autorize o marco.
+M4 concluído (**4/4**) nesta sessão em `EV-M4-013/016`: `WEB-013`, `WEB-014`,
+`WEB-015` e `WEB-016` CONCLUIDAS com evidências reais positivas/negativas em
+React/FastAPI/PostgreSQL/HTTPS (Chromium e Firefox). Próximo marco na ordem
+crítica: **M5** (`WEB-017` e `WEB-018` PRONTAS tecnicamente), aguardando nova
+instrução explícita (`continue o projeto`) que autorize o marco.
 
 | ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito |
 |---|---|---|---|
-| [WEB-021](#web-021--implementar-autenticação-local-e-integrar-login-profissional-seguro): autenticação local | [WEB-022](#web-022--comprovar-matriz-de-perfis-projetos-e-revogações): perfis e projetos | [WEB-023](#web-023--revalidar-sessão-cookies-csrf-e-isolamento-de-credenciais): sessões e CSRF | [WEB-024](#web-024--concluir-revisão-de-segurança-com-evidências-negativas): revisão de segurança |
+| [WEB-013](#web-013--integrar-preparação-profissional-e-identificação-por-convite): preparação e convite | [WEB-014](#web-014--validar-instruções-prática-e-início-principal-no-fluxo-real): instruções e prática | [WEB-015](#web-015--ensaiar-envio-falhas-de-rede-e-recuperação-de-recibo): worker incremental e recibo | [WEB-016](#web-016--aceitar-avaliação-completa-com-consulta-persistida): avaliação completa e consulta |
 
 M2 permanece concluído em EV-M2 e EV-M2-007/008. M3 permanece concluído (7/7)
-em EV-M3-012-ACEITE. M6 encerrado (4/4) em EV-M6-021/024; não avançar para M4
-sem autorização explícita.
+em EV-M3-012-ACEITE. M6 permanece concluído (4/4) em EV-M6-021/024. M4 encerrado
+(4/4) em EV-M4-013/016; não avançar para M5 sem autorização explícita.
 
 **Acompanhar impedimentos:** [riscos](#registro-de-riscos) ·
 [decisões externas](#decisões-externas-e-condições-de-desbloqueio).
@@ -870,53 +875,175 @@ D5 e suporte exigem evidências próprias; nenhuma reutilização da exceção W
 
 ### WEB-013 — Integrar preparação profissional e identificação por convite
 
-- Marco: M4. Prioridade: P0. Complexidade: M. Estado: PRONTA.
+- Marco: M4. Prioridade: P0. Complexidade: M. Estado: CONCLUIDA.
 - Dependências: WEB-008, WEB-012, WEB-024.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Avaliador autorizado prepara/identifica sessão no React; código único, visita, revogação/expiração e isolamento comprovados com API/PG reais. CHG-002: múltiplas visitas e avaliações na mesma visita preservam UUIDs/vínculos, sem cadastro global ou agenda.
-- Testes/verificação: `tests/test_web_sessions.py; web/e2e/integrated/`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
-- Referências: REQ-PAR-001, REQ-AVA-001; [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
-- CHG-004: Login local aceito em WEB-021/024 deve preceder preparação e emissão de convite; AUTH-L04/L07 regressa pseudônimos, visitas, expiração/revogação e projetos. Credencial participante segue independente.
+- Testes/verificação: `tests/test_web_sessions.py, tests/test_local_auth.py; web/e2e/integrated/invitations.spec.ts, web/e2e/integrated/sessions-security.spec.ts`. Executados sem skips em PG descartável e HTTPS/API/PG reais em Chromium e Firefox; ver `EV-M4-013/016`.
+- Evidências: `EV-M4-013/016` (2026-11-06); preparação após login local, código de convite de uso único, múltiplas visitas (`T1`, `T2`), múltiplas avaliações na mesma visita, isolamento de pseudônimo entre projetos, revogação/expiração e credencial participante independente comprovados.
+- Riscos/bloqueios: R05 permanece aberto como risco residual para marcos posteriores (M5/M7/M9/M10); nenhum impedimento aberto em M4.
+- Referências: REQ-PAR-001, REQ-PAR-002, REQ-AVA-001, REQ-AVA-002; [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch `feat/m4-fluxo-avaliacoes`; entrega e fechamento registrados em `EV-M4-013/016`.
+- CHG-004: Login local aceito em WEB-021/024 precede preparação e emissão de convite em `invitations.spec.ts`; AUTH-L04/L07 regressado com pseudônimos, visitas, expiração/revogação, isolamento entre projetos e credencial participante independente.
 
 ### WEB-014 — Validar instruções, prática e início principal no fluxo real
 
-- Marco: M4. Prioridade: P1. Complexidade: M. Estado: PENDENTE.
+- Marco: M4. Prioridade: P1. Complexidade: M. Estado: CONCLUIDA.
 - Dependências: WEB-013.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Textos sem coleta nominal/demográfica; prática repetível sem limiar, interrompida reinicia, início/principal usa sessão autorizada e snapshot correto. CHG-003: reorganizar instruções/tecla/confirmação e transições sem mudar semântica/estratégia; feedback individual e repetição opcional sem limiar mantidos, prática sem precisão agregada.
-- Testes/verificação: `web/src/experiment/practice.test.ts; web/e2e/integrated/`. Arquivos citados existem; verificações PLANEJADAS não têm resultado. Adicional PLANEJADO: App/practice/Host, teclado, foco e transições em Chromium/Firefox e fluxo HTTPS real.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R02; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Testes/verificação: `web/src/experiment/practice.test.ts, web/src/experiment/ExperimentHost.test.tsx, web/src/participant/ParticipantRun.test.ts, tests/test_web_security_review.py; web/e2e/practice.spec.ts, web/e2e/main.spec.ts, web/e2e/participant.spec.ts, web/e2e/integrated/participant.spec.ts`. Executados sem skips em Vitest, Python/PG e Chromium/Firefox; ver `EV-M4-013/016`.
+- Evidências: `EV-M4-013/016` (2026-11-06); ausência de campos nominais/demográficos (`age`/`idade`/`sex`/`sexo`/`gender`/`birth`/`cpf`/`email`/`phone`) e de precisão agregada no DOM/árvore acessível durante prática e principal, repetição opcional sem limiar, reinício da prática interrompida, transições por teclado/foco sem disparo por tecla mantida e início do principal com sessão autorizada/ordem do snapshot comprovados.
+- Riscos/bloqueios: R02 permanece aberto para validação física/metodológica (M9); nenhum impedimento aberto em M4.
 - Referências: REQ-PAR-003; [arquitetura](ARQUITETURA_WEB.md). REQ-UX-008/009, UX-06/07.
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega: branch `feat/m4-fluxo-avaliacoes`; entrega e fechamento registrados em `EV-M4-013/016`.
 
 ### WEB-015 — Ensaiar envio, falhas de rede e recuperação de recibo
 
-- Marco: M4. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Marco: M4. Prioridade: P0. Complexidade: M. Estado: CONCLUIDA.
 - Dependências: WEB-014.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Rede falha antes/depois de commit, retry, expiração, revogação e reload têm comportamento declarado; nenhuma confirmação sem recibo nem principal retomado. CHG-002: fila/worker/ACK, prefixo preservado em interrupção, incompletude sem aviso e invalidação tardia; nova sessão exige prática; mensagens distinguem parcial recebido de resultado oficial. CHG-003: distinguir concluído, aguardando envio, enviando, confirmado, falha, interrompido/inválido; não anunciar recebimento antes do recibo. Preservar ACK/replay, parciais sem resultado oficial, sem retomada; resultado individual somente autorizado pelo protocolo.
-- Testes/verificação: `web/src/participant/; tests/test_web_results.py; E2E HTTPS real`. Arquivos citados existem; verificações PLANEJADAS não têm resultado. Adicional PLANEJADO: ParticipantRun.test.ts, ResultSummary.test.tsx e E2E real dos estados com perda/reconsulta do recibo.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R03; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
-- Referências: REQ-AVA-003; [arquitetura](ARQUITETURA_WEB.md). REQ-UX-010; ADR-005.
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Testes/verificação: `web/src/participant/ParticipantRun.test.ts, web/src/api/participant.test.ts, web/src/transport/checkpoint-queue.test.ts, tests/test_web_results.py, tests/test_web_checkpoints.py, tests/test_web_proxy_config.py; web/e2e/main.spec.ts, web/e2e/integrated/participant.spec.ts, web/e2e/integrated/complete-results.spec.ts`. Executados sem skips em Vitest, Python/PG e E2E HTTPS/API/PG reais em Chromium e Firefox; ver `EV-M4-013/016`.
+- Evidências: `EV-M4-013/016` (2026-11-06); Dedicated Worker incremental (`checkpoint-worker.ts`) integrado ao `ParticipantRun` e `PracticePreparation`/`ParticipantFlow` com `worker-src 'self'` em `web/security-headers.json`, drain assíncrono em interrupção preservando prefixo parcial em `web_session_observations` sem criar `assessments`, invalidação tardia via `POST /api/v1/participant/session/invalidate`, reload/perda de foco abortando `running`, nova sessão exigindo prática e mensagens distinguindo observações parciais de recibo oficial comprovados.
+- Riscos/bloqueios: R03 permanece aberto como risco residual de perda de sufixo não transmitido antes de queda abrupta conforme `ADR-005`; nenhum impedimento aberto em M4.
+- Referências: REQ-AVA-003, REQ-INT-003; [arquitetura](ARQUITETURA_WEB.md). REQ-UX-010; ADR-005.
+- Git da entrega: branch `feat/m4-fluxo-avaliacoes`; entrega e fechamento registrados em `EV-M4-013/016`.
 
 ### WEB-016 — Aceitar avaliação completa com consulta persistida
 
-- Marco: M4. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Marco: M4. Prioridade: P0. Complexidade: G. Estado: CONCLUIDA.
 - Dependências: WEB-015.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: E2E real confere 1 avaliação/16 tentativas/12 métricas e proveniência; logout limpa RAM e sessão, acesso cruzado nega; M4 aceito. CHG-002: sessão interrompida conserva observações e não gera resultado final; nenhuma mistura entre nova sessão e anterior. CHG-003: fluxo real sem precisão durante prática/principal conserva feedback individual, 12 métricas persistidas e separação das observações parciais; novo layout e estados de envio cobertos.
-- Testes/verificação: `web/e2e/integrated/, tests/test_web_participant_logout.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado. Adicional PLANEJADO: ausência DOM/árvore acessível, recibos, incompletas/inválidas e paridade oficial em HTTPS/API/PG.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R03, R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Testes/verificação: `web/e2e/integrated/invitations.spec.ts, web/e2e/integrated/participant.spec.ts, web/e2e/integrated/complete-results.spec.ts, web/e2e/integrated/sessions-security.spec.ts, tests/test_web_participant_logout.py, tests/test_web_assessments.py`. Executados sem skips em PG descartável e E2E HTTPS/API/PG reais em Chromium e Firefox; ver `EV-M4-013/016`.
+- Evidências: `EV-M4-013/016` (2026-11-06); avaliação completa ponta a ponta com login local, 16 checkpoints incrementais (`observations = 16`, `confirmed_through = 16`), 1 avaliação oficial, 16 tentativas principais, 12 métricas oficiais, `app_version` `web-0.1.0+visual.1.0.0`, logout participante limpando RAM/cookie e recusando replay, negação de acesso cruzado e exclusão de sessões interrompidas/invalidadas dos resultados oficiais comprovados. M4 aceito (4/4).
+- Riscos/bloqueios: R03 e R05 permanecem abertos como riscos residuais para marcos posteriores; nenhum impedimento aberto em M4.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md). REQ-UX-005/006/008/009/010.
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
-- CHG-004: Integrar login profissional local e consulta protegida no E2E sem alterar persistência incremental, recibo, interrupções ou 12 métricas; AUTH-L07.
+- Git da entrega: branch `feat/m4-fluxo-avaliacoes`; entrega e fechamento registrados em `EV-M4-013/016`.
+- CHG-004: Login profissional local e consulta protegida integrados no E2E real sem alterar persistência incremental, recibo, interrupções ou 12 métricas; AUTH-L07 comprovado.
+
+### EV-M4-013/016 — fluxo ponta a ponta, transporte incremental e aceitação M4, 2026-11-06
+
+Autorização: comando canônico `continue o projeto` no marco vigente **M4**
+(após M2, M3 e M6 aceitos), executando todas as tarefas prontas e encadeadas do
+marco (`WEB-013`, `WEB-014`, `WEB-015` e `WEB-016`) na branch
+`feat/m4-fluxo-avaliacoes` (base `7e77ef8127c20d5af255969d93a20d4116f8a247`) e
+encerrando no limite de M4 sem avançar implicitamente a M5.
+
+Entregas técnicas e de integração consolidadas nesta sessão:
+
+1. **Integração do Dedicated Worker incremental no fluxo real do participante (`WEB-015` / `ADR-005`)**:
+   - `web/src/participant/ParticipantRun.ts`, `web/src/components/PracticePreparation.tsx`
+     e `web/src/components/ParticipantFlow.tsx` integram `prepareCheckpointWorker`
+     ao início do bloco principal (`start()`) e encaminham cada tentativa principal
+     concluída via `onMainTrialComplete={(trial, framePeriod) => run.recordTrial(trial, framePeriod)}`
+     para o Dedicated Worker (`web/src/transport/checkpoint-worker.ts`).
+   - `ParticipantRun.start()` dispara `startParticipant` de forma síncrona (preservando
+     o vínculo imediato de `AbortSignal`) e aguarda a preparação do worker antes de
+     habilitar `engineStarted = true` e `phase: 'main'`, falhando fechado sem
+     degradar para envio final apenas em RAM.
+   - `web/src/transport/checkpoint-queue.ts` aceita `state: 'preparing' | 'running'`
+     com `confirmed_through === 0` e `expires_at` coincidente na sondagem de
+     prontidão do worker, permitindo retry idempotente quando `POST /api/v1/participant/start`
+     já transitou a sessão para `running`.
+   - `web/src/transport/checkpoint-worker.ts` realiza drain assíncrono (`dispose(true)`)
+     ao interromper o bloco principal, aguardando o envio do prefixo já concluído
+     antes de encerrar o Dedicated Worker.
+   - `web/security-headers.json` atualiza a diretiva CSP de `worker-src 'none'`
+     para `worker-src 'self'`, autorizando exclusivamente Dedicated Workers da
+     mesma origem (`ADR-005` item 2) no proxy HTTPS e mantendo bloqueados workers
+     externos/`blob:`.
+2. **Invalidação tardia e distinção explícita entre observações parciais e recibo oficial (`WEB-015` / `CHG-002` / `CHG-003`)**:
+   - `web/src/api/client.ts` e `web/src/api/participant.ts` adicionam
+     `invalidateParticipant` (`POST /api/v1/participant/session/invalidate` com
+     `keepalive: true`, cabeçalho `X-CSRF-Token` e validação estrita do recibo
+     `state: 'invalidated'`), integrado a `ParticipantRun.invalidate(...)` e ao
+     fallback de `abort` em conflito `409`.
+   - `web/src/api/participant.ts`, `web/src/participant/ParticipantRun.ts` e
+     `web/src/components/ResultSummary.tsx` distinguem explicitamente observações
+     parciais (`web_session_observations`), resultado pendente de confirmação e
+     recibo oficial (`state: 'completed'`), vedando retomada do bloco principal
+     (`D2`) e exigindo nova sessão com prática.
+3. **Cobertura ponta a ponta com login local, múltiplas visitas/avaliações, ausência de precisão/demografia e consulta persistida (`WEB-013`, `WEB-014`, `WEB-015`, `WEB-016`)**:
+   - `web/e2e/practice.spec.ts` e `web/e2e/main.spec.ts` verificam ausência de
+     campos nominais/demográficos (`age`/`idade`/`sex`/`sexo`/`gender`/`birth`/`cpf`/`email`/`phone`)
+     e de precisão agregada no DOM e na árvore acessível durante a prática e o
+     bloco principal, além dos 16 checkpoints enviados ao worker em `main.spec.ts`.
+   - `web/e2e/integrated/invitations.spec.ts` autentica o profissional pelo
+     formulário real de login local em `/equipe` (`CHG-004` / `AUTH-L07`),
+     confere `observations = 16`, `confirmed_through = 16` e
+     `app_version = 'web-0.1.0+visual.1.0.0'`, e adiciona cenário cobrindo
+     múltiplas visitas (`T1`, `T2`), múltiplas avaliações na mesma visita,
+     isolamento de pseudônimo entre projetos e independência entre credenciais
+     profissional e participante.
+   - `web/e2e/integrated/participant.spec.ts` confere os 16 checkpoints
+     confirmados pelo Dedicated Worker no fluxo completo e adiciona cenário de
+     interrupção no meio do bloco principal (após 2 tentativas concluídas + perda
+     de foco na 3ª), comprovando `state = 'aborted'`, `observations = 2`
+     preservadas em `web_session_observations`, `assessments = 0` na consulta
+     profissional e exigência de nova prática ao iniciar nova sessão para a mesma
+     visita.
+
+Ambiente observado nesta sessão: Linux `7.0.0-42-generic` x86_64, Python `3.12.3`,
+Node `24.15.0`, npm `11.16.0`, Docker `29.9.2`, PostgreSQL `17.6-bookworm`
+(`sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3`)
+em container descartável `stroop_etapa4_test_m4` (tmpfs, porta `127.0.0.1:55439`,
+banco `stroop_etapa4_test_m4`, removido ao final), Playwright `1.64.1`,
+Chromium `156.0.8078.4` e Firefox `157.0`. Nenhum container preexistente, dado
+real ou arquivo `.env` operacional foi tocado.
+
+Comandos executados e resultados reais (0 skips em todas as suítes):
+
+- `npm --prefix web test && npm --prefix web run build`:
+  **303/303 testes Vitest aprovados em 19 arquivos** (2,95 s), `tsc --noEmit` e
+  `vite build` (598 ms, gerando bundle do Dedicated Worker
+  `dist/assets/checkpoint.worker-DokVT_sh.js`) aprovados.
+- `TEST_DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:55439/stroop_etapa4_test_m4" PYTHONPATH=. .venv/bin/python -m unittest tests.test_web_sessions tests.test_web_results tests.test_web_checkpoints tests.test_web_participant_logout tests.test_web_assessments tests.test_web_auth -v`:
+  **92 aprovados em 64,234 s**, 0 falhas, 0 skips.
+- `TEST_DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:55439/stroop_etapa4_test_m4" PYTHONPATH=. .venv/bin/python -m unittest tests.test_local_auth -v`:
+  **17 aprovados em 16,593 s**, 0 falhas, 0 skips.
+- `PYTHONPATH=. .venv/bin/python -m unittest tests.test_web_proxy_config -v`:
+  **6 aprovados em 0,049 s**, 0 falhas, 0 skips.
+- Em `web`: `npx playwright test e2e/participant.spec.ts e2e/practice.spec.ts e2e/navigation.spec.ts e2e/w09a-review.spec.ts`:
+  **32/32 aprovados em 1,4 min** (Chromium e Firefox), 0 falhas, 0 skips.
+- Em `web`: `npx playwright test e2e/main.spec.ts --workers=1 --trace=off`:
+  **4/4 aprovados em 3,6 min** (Chromium e Firefox), 0 falhas, 0 skips.
+- Em `web`: `TEST_DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:55439/stroop_etapa4_test_m4" npx playwright test --config playwright.integration.config.ts e2e/integrated/complete-results.spec.ts e2e/integrated/sessions-security.spec.ts`:
+  **4/4 aprovados em 29,2 s** (Chromium e Firefox), 0 falhas, 0 skips.
+- Em `web`: `TEST_DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:55439/stroop_etapa4_test_m4" npx playwright test --config playwright.integration.config.ts e2e/integrated/invitations.spec.ts e2e/integrated/participant.spec.ts`:
+  **20/20 aprovados em 10,8 min** (10 cenários por navegador em Chromium e
+  Firefox), 0 falhas, 0 skips.
+
+Falhas intermediárias preservadas nesta sessão:
+- Primeira tentativa de subir container PostgreSQL descartável na porta `55432`
+  recusou bind por porta já alocada no loopback; container recriado na porta
+  livre `55439` (`stroop_etapa4_test_m4`) e removido após os ensaios.
+- Primeira invocação `npx --prefix web playwright test ...` a partir da raiz do
+  repositório falhou imediatamente porque o Playwright resolveu o diretório de
+  trabalho na raiz sem carregar `web/playwright.config.ts` (`baseURL` e
+  `webServer`); corrigido executando a partir de `cd web && npx playwright test ...`
+  e removendo o diretório vazio `test-results/` criado na raiz.
+- Primeira invocação de `tests.test_web_local_auth` falhou com `ModuleNotFoundError`
+  porque o módulo canônico chama-se `tests.test_local_auth`; executado
+  `tests.test_local_auth` (17/17 aprovados).
+- Primeira execução integrada de `e2e/integrated/invitations.spec.ts` teve
+  **1 falha** no primeiro teste (`Preparando a execução.` não avançou para o
+  estímulo principal) porque `web/security-headers.json` continha
+  `worker-src 'none'`, fazendo o proxy HTTPS bloquear a instanciação do
+  Dedicated Worker (`new Worker(...)`) por CSP e o `ParticipantRun.start()`
+  falhar fechado conforme projetado. Atualizado `worker-src 'none'` para
+  `worker-src 'self'` em `web/security-headers.json`, validado em
+  `tests.test_web_proxy_config` (6/6) e na suíte integrada completa
+  (`invitations.spec.ts` + `participant.spec.ts`: **20/20 aprovados** em
+  Chromium e Firefox).
+
+Conferência de todos os critérios de `WEB-013`, `WEB-014`, `WEB-015`, `WEB-016`
+e do marco `M4`: todos comprovados. `WEB-013`, `WEB-014`, `WEB-015` e `WEB-016`
+passam a `CONCLUIDA`, encerrando **M4 (4/4)** e elevando o progresso global para
+**26/45 (57,8%)**. Com `WEB-016` concluída, `WEB-017` e `WEB-018` em **M5**
+passam a `PRONTA` tecnicamente, aguardando autorização explícita do marco M5.
+Git, envio e CI registrados no fechamento da Retomada vigente.
 
 ## M5 — Interface administrativa e analítica React
 
@@ -936,7 +1063,7 @@ D5 e suporte exigem evidências próprias; nenhuma reutilização da exceção W
 
 ### WEB-017 — Revalidar filtros, lista e agregações autorizadas
 
-- Marco: M5. Prioridade: P1. Complexidade: M. Estado: PENDENTE.
+- Marco: M5. Prioridade: P1. Complexidade: M. Estado: PRONTA.
 - Dependências: WEB-016.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Filtros/paginação/contagens cobrem conjunto coerente; troca de projeto e respostas tardias não vazam dados; UI acessível fora do motor. CHG-002: sessões incompletas e avaliações invalidadas não entram nos conjuntos válidos/agregações, com acesso a parciais separado e autorizado.
@@ -949,7 +1076,7 @@ D5 e suporte exigem evidências próprias; nenhuma reutilização da exceção W
 
 ### WEB-018 — Revalidar administração React de contas e vínculos
 
-- Marco: M5. Prioridade: P1. Complexidade: M. Estado: PENDENTE.
+- Marco: M5. Prioridade: P1. Complexidade: M. Estado: PRONTA.
 - Dependências: WEB-016.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Permissões e bloqueio/revogação reais; proteção do último admin sob concorrência, sem exclusão de coletas ou herança de acesso a resultados.
@@ -2143,7 +2270,33 @@ explicitamente PLANEJADOS. Versionamento/envio conferidos no fechamento Git.
 
 ## Retomada
 
-### Retomada vigente — conclusão de M6 (WEB-021 e WEB-024), 2026-11-06
+### Retomada vigente — conclusão de M4 (WEB-013 a WEB-016), 2026-11-06
+
+Comando `continue o projeto` no marco vigente **M4** concluído até o limite do
+marco, sem avançar implicitamente para outro marco. `WEB-013`, `WEB-014`,
+`WEB-015` e `WEB-016` **CONCLUIDAS**, encerrando **M4 (4/4)**. Progresso global:
+**26/45 entregáveis aceitos (57,8%)**, 19 sem aceite: `WEB-017` e `WEB-018`
+**PRONTAS** (aguardando autorização do marco M5), 16 **PENDENTES** e `WEB-031`
+**BLOQUEADA** por destino externo autorizado indisponível.
+
+Próxima ação exata: emitir nova instrução explícita (`continue o projeto`) para
+autorizar o marco **M5 — Interface administrativa e analítica React**, iniciando
+por `WEB-017` ("Revalidar filtros, lista e agregações autorizadas") e `WEB-018`
+("Revalidar administração React de contas e vínculos"), cujas dependências
+(`WEB-016` e marcos `M4`, `M6`) estão integralmente aceitas. `WEB-031` permanece
+aguardando destino externo autorizado; `DEC-03` (`WEB-033`) e `DEC-05`
+(`WEB-041`/`WEB-038`/`WEB-040`) mantêm seus gates próprios.
+
+Git: branch `feat/m4-fluxo-avaliacoes`, base `7e77ef8127c20d5af255969d93a20d4116f8a247`
+(`feat/m6-autenticacao-local`), `main` (`fe8f24f`) e `origin/main` (`db56b40`)
+preservadas sem integração. Evidências funcionais e integradas completas em
+`EV-M4-013/016`. Entrega identificável por
+`git log -1 --format=%H --grep='feat(web): conclui fluxo ponta a ponta de avaliações em M4'`.
+Validação documental, scanner e `git diff --check` aprovados antes do commit;
+envio e consulta de Actions por SHA registrados no fechamento desta seção. Sem
+PR, merge, tag, deploy, migração real ou acesso a dados/secrets operacionais.
+
+### Retomada anterior — conclusão de M6 (WEB-021 e WEB-024), 2026-11-06
 
 Comando `continue o projeto` no marco vigente **M6** concluído até o limite do
 marco, sem avançar implicitamente para outro marco. `WEB-021` e `WEB-024`
