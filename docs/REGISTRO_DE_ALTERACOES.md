@@ -4,6 +4,25 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-06 — Conclusão da autenticação local e revisão de segurança (M6)
+
+- Implementados e integrados login, troca de senha e revogação locais, gestão
+  por ID opaco, `Origin`/CSRF, limite de 4 KiB e cookie `__Host-stroop_professional`;
+  `API_AUTH_MODE=local` passa a ser o padrão fora de `APP_ENV=test`, recusando
+  endpoints OIDC com 404. Frontend limpa credenciais/RAM e não oferece cadastro
+  de contas adicionais.
+- Lista local ampliada para 10.898 hashes SHA-256 (SecLists), migration 0013
+  protege o último admin local ativo e revoga sessões locais ao bloquear/mudar
+  perfil; antiabuso combina origem/identificador persistentes, falhas
+  compartilhadas e teto de 10.000 buckets com limpeza >24 h.
+- Validados AUTH-L01–L09 sem skips: suíte Python/PG integral, Vitest/build,
+  Playwright `browser`/`integration`/`local-auth` em Chromium e Firefox,
+  scanner/self-test, auditorias, Compose HTTPS sem secrets Google e smoke de
+  backup/restore isolado exigindo `recover` antes da abertura.
+- Concluídas WEB-021 e WEB-024, encerrando M6 (4/4; 22/45 entregáveis aceitos).
+  Evidências, falhas intermediárias preservadas, limites e próxima ação (M4/WEB-013)
+  registrados somente no backlog canônico.
+
 ## 2026-11-06 — Base transacional para credenciais locais
 
 - Iniciada implementação autorizada de M6: identidade local própria, migration

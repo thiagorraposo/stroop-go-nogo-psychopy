@@ -15,7 +15,7 @@ from tests.test_api_base import DATABASE, ORIGIN, synthetic_config
 
 
 def environment():
-    return {'API_DATABASE_URL': DATABASE, 'API_PUBLIC_ORIGIN': ORIGIN, 'APP_ENV': 'test',
+    return {'API_AUTH_MODE':'oidc', 'API_DATABASE_URL': DATABASE, 'API_PUBLIC_ORIGIN': ORIGIN, 'APP_ENV': 'test',
             'OIDC_CLIENT_ID': 'synthetic-client-id', 'OIDC_CLIENT_SECRET': 'synthetic-client-secret',
             'API_SESSION_SECRET': 'synthetic-session-secret-00000000000000'}
 

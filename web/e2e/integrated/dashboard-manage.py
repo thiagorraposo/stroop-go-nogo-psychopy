@@ -1,22 +1,17 @@
 """Preparacao sintetica isolada W15; banco descartavel validado por common."""
 import csv
-from datetime import datetime, timedelta, timezone
-from hashlib import sha256
 import io
 import json
 from pathlib import Path
-import secrets
 import sys
 import tempfile
 from uuid import UUID, uuid4
 
-from common import ROOT, ISSUER, SUBJECT, database_url
+from common import ROOT, ISSUER, database_url, fixture_user, fixture_session, primary_subject
 import psycopg
 from api.auth import PROFESSIONAL_COOKIE
-from stroop.application import auth
 from stroop.domain.auth import opaque_user_id
 from stroop.application.import_postgres import import_csv
-from stroop.persistence import web_auth
 
 
 def execute(value):
@@ -29,15 +24,13 @@ def execute(value):
     role = value['role']
     if role not in ('consulta', 'importacao', 'administracao'):
         raise ValueError('Perfil sintetico invalido')
-    expires = int((datetime.now(timezone.utc) + timedelta(hours=1)).timestamp())
-    actor = auth.authorize(database, {'iss': ISSUER, 'sub': SUBJECT, 'exp': expires}, 'view_dashboard')
-    subject = 'synthetic-dashboard-' + uuid4().hex
-    auth.create_user(database, ISSUER, subject, role, None, actor)
+    subject = fixture_user(role)
+    actor_subject = primary_subject()
     project_id = uuid4()
     label = 'SYNTHETIC_DASH_' + uuid4().hex
     with psycopg.connect(database) as connection:
         connection.execute('''INSERT INTO web_projects(project_id,code,name,created_by_issuer,created_by_subject)
-            VALUES(%s,%s,'Pesquisa sintetica W15',%s,%s)''', (project_id, label, ISSUER, SUBJECT))
+            VALUES(%s,%s,'Pesquisa sintetica W15',%s,%s)''', (project_id, label, ISSUER, actor_subject))
         connection.execute('INSERT INTO web_project_members(project_id,issuer,subject) VALUES(%s,%s,%s)',
                            (project_id, ISSUER, subject))
         connection.execute('INSERT INTO web_legacy_project_links(legacy_project,project_id) VALUES(%s,%s)',
@@ -53,8 +46,7 @@ def execute(value):
         with path.open('w', newline='') as output:
             writer = csv.DictWriter(output, fieldnames=list(rows[0])); writer.writeheader(); writer.writerows(rows)
         import_csv(path, database)
-    token = secrets.token_urlsafe(32)
-    web_auth.create_professional_session(database, sha256(token.encode()).hexdigest(), ISSUER, subject, expires)
+    token, _ = fixture_session(subject)
     return {'cookie_name': PROFESSIONAL_COOKIE, 'token': token, 'project_id': str(project_id),
             'subject': subject, 'assessment_id': assessment_id,
             'evaluator_id': opaque_user_id(ISSUER, subject)}

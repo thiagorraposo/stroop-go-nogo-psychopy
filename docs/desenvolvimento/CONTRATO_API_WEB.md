@@ -1,8 +1,9 @@
 # Contrato HTTP da versao WEB
 
 Revisão alvo de 2026-11-06: [autenticação local CHG-004](#autenticação-local--contrato-alvo-chg-004)
-substitui apenas o mecanismo profissional OIDC para a versão alvo. Seções OIDC
-abaixo preservam contrato atual/histórico; não indicam implementação local.
+substitui apenas o mecanismo profissional OIDC para a versão alvo WEB,
+implementada e verificada em M6 (WEB-021/024). Seções OIDC abaixo preservam
+contrato legado/histórico; estado e aceite somente no backlog canônico.
 
 
 Base: 2026-10-16 (W02 histórico). Revisão documental: 2026-11-04.
@@ -796,11 +797,12 @@ app_version original; não atribuir versão visual com base só em test_version.
 
 ## Autenticação local — contrato alvo CHG-004
 
-**PLANEJADO**, decisão de 2026-11-06, [ADR-006](../arquitetura/ADR-006-autenticacao-local.md).
+Decisão de 2026-11-06, [ADR-006](../arquitetura/ADR-006-autenticacao-local.md),
+implementada e verificada em M6 (WEB-021/024); estado, evidências e aceite ficam
+somente no [backlog canônico](../Projeto%20Stroop%20Test.md).
 Para a versão alvo WEB, esta seção substitui o mecanismo OIDC profissional das
-seções anteriores, preservadas como contrato do código atual/histórico.
-Nenhuma rota nova existe por ter sido especificada. Demais payloads experimentais,
-CSV, convites, recibos e prazos participantes ficam intactos.
+seções anteriores, preservadas como contrato legado/histórico.
+Demais payloads experimentais, CSV, convites, recibos e prazos participantes ficam intactos.
 
 ### Login, identidade e sessão
 

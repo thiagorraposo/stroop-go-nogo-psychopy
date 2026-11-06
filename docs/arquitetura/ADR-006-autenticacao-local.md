@@ -1,8 +1,8 @@
 # ADR-006 — Autenticação profissional local com conta administrativa única
 
 Data: 2026-11-06. Decisão de produto/arquitetura/segurança aprovada pelo
-proprietário na missão documental CHG-004. **Implementação PLANEJADA**.
-Estado, tarefas, riscos, evidências e aceite somente no
+proprietário na missão documental CHG-004 e implementada/verificada em M6
+(WEB-021/024). Estado, tarefas, riscos, evidências e aceite somente no
 [backlog canônico](../Projeto%20Stroop%20Test.md). Complementa ADR-004, sem
 revogar DEC-01–05, isolamento por projeto ou metodologia.
 

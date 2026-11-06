@@ -2,7 +2,7 @@ import { expect, request, test } from '@playwright/test'
 import { invitation, manage, redeem } from './fixtures'
 
 test('HTTPS separa credenciais e CSRF; logout revoga replay sem encerrar participante', async ({ page, context }) => {
-  // Identidade/sessao profissional sintetica provisionada localmente, sem simular login Google.
+  // Sessao local injetada pelo operador de fixtures; login real tem suite propria.
   const professional = manage('professional') as unknown as {
     cookie_name: string; token: string; csrf: string
   }

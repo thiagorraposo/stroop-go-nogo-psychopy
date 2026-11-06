@@ -1,12 +1,10 @@
 # Aplicacao WEB em Docker
 
-Nota de planejamento CHG-004, 2026-11-06 — **PLANEJADO**:
-Configuração Compose observada ainda exige secrets Google; alvo WEB-021/032
-deve iniciar sem cliente/callback Google obrigatório, mantendo secret de sessão,
-DSNs e TLS externos. Bootstrap local protegido ocorre fora do bundle/manifesto;
-sem senha padrão. Revalidar imagens e HTTPS antes do corte.
-Decisão: [ADR-006](../arquitetura/ADR-006-autenticacao-local.md). Execução/aceite somente no backlog canônico.
-
+Autenticação profissional local CHG-004: a pilha usa `API_AUTH_MODE=local`,
+sem secrets Google ou conexão a provedor externo. Secret de sessão, DSNs e TLS
+continuam externos. Bootstrap/recuperação exigem terminal protegido do operador;
+nenhuma senha padrão é incorporada. [ADR-006](../arquitetura/ADR-006-autenticacao-local.md).
+Execução, validação e aceite somente no backlog canônico.
 
 Pacote da W19 validado localmente com dados sinteticos. O aceite permanece no
 [roadmap](../ROADMAP_WEB.md). Este procedimento prepara uma pilha independente;
@@ -23,8 +21,7 @@ Guarde a configuracao preenchida e os arquivos de secrets fora do repositorio
 e do contexto de build; nao reutilize bancos de coleta em testes.
 
 Os arquivos externos fornecem senha do proprietario PostgreSQL, tres DSNs
-separadas (migracao/provisionamento, escrita e leitura), cliente/secret Google
-OIDC, chave de sessao e certificado/chave TLS. As DSNs apontam para
+separadas (migracao/provisionamento, escrita e leitura), chave de sessao e certificado/chave TLS. As DSNs apontam para
 `web-postgres:5432` e o mesmo banco, com usuarios distintos. A senha deve estar
 codificada conforme URI. A API nao descobre arquivos `.env` e recusa configurar
 simultaneamente uma variavel secreta e sua variante `_FILE`.
@@ -38,7 +35,7 @@ cadeia confiavel. Certificados sinteticos exigem simultaneamente ambiente
 
 `WEB_PUBLIC_ORIGIN` e a origem HTTPS publica exata, incluindo porta quando
 diferente de 443. O proxy aceita DNS e IPv4; literal IPv6 ainda nao e suportado.
-Cadastre o callback Google conforme o
+Use o login local conforme o
 [contrato HTTP WEB](../desenvolvimento/CONTRATO_API_WEB.md) e as
 [regras de acesso WEB](../seguranca/ACESSO_WEB.md).
 O padrao publica somente o proxy em loopback nas portas 8088/8448. Exposicao
@@ -64,6 +61,21 @@ preexistente. Os jobs recebem a credencial proprietaria; o servidor recebe
 somente escrita/leitura. Cadastro inicial do administrador permanece operacao
 autorizada conforme o contrato de autenticacao.
 
+Para criar a primeira conta após migrations/provisionamento, use terminal do
+operador e somente a imagem validada. Este exemplo exige autorização sobre o
+ambiente e não pode ser executado automaticamente em produção:
+
+```bash
+docker compose --project-name stroop-web --env-file /CAMINHO-EXTERNO/web.env -f compose.web.yaml --profile web-tools run --rm --entrypoint python --env API_OPERATOR_DATABASE_URL_FILE=/run/secrets/migration_database_url web-migrate -m scripts.gerenciar_conta_local bootstrap USUARIO_TECNICO
+```
+
+O comando pede senha oculta e confirmação; recusa stdin sem terminal. `recover`
+substitui `bootstrap` somente em recuperação explícita e pede `RECUPERAR`,
+revogando todas as sessões. Nenhum projeto é concedido automaticamente. Não
+forneça senha em argumentos/variáveis/arquivos do manifesto nem envie DSN de
+operador ao servidor HTTP. O modo OIDC permanece exclusivamente em fixtures
+legadas de `APP_ENV=test`; é recusado em development/production.
+
 O provisionador recusa papeis existentes sem sua marca de gerenciamento,
 privilegios administrativos, memberships ou propriedade de objetos. Confere
 tambem grants inseguros de PUBLIC, sem alterar globalmente um banco compartilhado.
@@ -71,9 +83,10 @@ Conceda o baseline necessario por procedimento do operador antes de repetir um
 job recusado. A leitura recebe somente as colunas do contrato de consultas;
 o writer recebe DML operacional, sem DML direto em usuarios ou no mapa de legado.
 Uma funcao estreita da migration 0008 adquire o lock de usuario necessario a
-revogacoes concorrentes. A migration 0010 acrescenta a capacidade de criar e
-alterar contas por operacoes fechadas: revalida o ator administrativo, serializa
-mudancas, protege o ultimo administrador e registra auditoria na transacao.
+revogacoes concorrentes. A capacidade de gestão da 0010 é refinada pela 0013:
+revalida o ator administrativo, serializa mudanças, protege o último admin local
+e revoga sessões em bloqueio/mudança de perfil, sem criação de credencial pelo
+runtime. A 0012 associa a credencial local sem reescrever identidades históricas.
 Ambas usam SECURITY DEFINER com search_path fixo; EXECUTE e concedido somente
 ao writer e revogado de PUBLIC. Nenhuma concede INSERT/UPDATE de app_users
 ao runtime; os fluxos legados conservam sua persistencia existente. O privilegio
@@ -83,8 +96,8 @@ temporarias por PUBLIC permanece; nao ha CREATE persistente para o runtime.
 ## Fronteiras operacionais
 
 Somente o proxy publica portas. PostgreSQL participa apenas da rede interna
-de dados; API e proxy compartilham outra rede interna. Uma rede de saida
-exclusiva da API permite verificar Google OIDC. O servidor confia em headers
+de dados; API e proxy compartilham outra rede interna. A API não recebe rede de
+saída externa para autenticação. O servidor confia em headers
 encaminhados apenas nesta topologia sem porta publicada; o proxy sobrescreve
 origem, protocolo e IP encaminhados. Nao exponha a API diretamente mantendo
 `--forwarded-allow-ips '*'`.

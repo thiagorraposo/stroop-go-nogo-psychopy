@@ -358,3 +358,15 @@ somente leitura/atualização de credencial existente, sessões e contador; não
 INSERT/DELETE de credenciais nem DML de `app_users`. Bootstrap é exclusivo do
 operador. Reader não recebe acesso às novas tabelas. Compatibilidade/grants da base isolada têm ensaio em EV-M6-021-BASE no
 backlog; integração HTTP/HTTPS e aceite integral mantêm os gates de WEB-021.
+
+### Gestão local transacional — evolução 0013
+
+0013 substitui apenas a função restrita `web_manage_user`, sem reescrever
+0001–0012 nem registros históricos. Sob a trava de gestão existente, o último
+admin **local** ativo deve continuar disponível mesmo havendo admins Google
+históricos. Alterar perfil ou bloquear alvo local revoga suas sessões na mesma
+transação; reativação posterior não ressuscita esses cookies. Criação de
+principal local pela função runtime é recusada, mantendo bootstrap exclusivo do
+operador. Assinatura/grants permanecem; reader/writer não ganham DML de usuários
+ou acesso adicional a hash. Aplicação/ensaios somente em PG sintético autorizado
+de WEB-021, com regressões de último admin/concorrência e compatibilidade.

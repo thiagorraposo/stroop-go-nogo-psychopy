@@ -199,3 +199,11 @@ kbd { font: inherit; font-size: .9em; border: 1px solid #b7bfca; border-radius: 
 }
 .experiment-progress-track > span { display: block; height: 100%; background: #CBD5E1; }
 .experiment-timer { white-space: nowrap; min-width: 12ch; text-align: right; }
+
+.professional-credentials { display: grid; gap: .75rem; max-width: 34rem; margin: 1.5rem 0; }
+.professional-credentials label { font-weight: 700; }
+.professional-credentials input { width: 100%; padding: .8rem 1rem; border: 1px solid #8793a6; border-radius: 5px; background: white; color: #172139; }
+.professional-credentials input:focus-visible, .password-settings summary:focus-visible { outline: 3px solid #7350c7; outline-offset: 2px; }
+.professional-credentials button { justify-self: start; }
+.password-settings { margin: 1.25rem 0; }
+.password-settings summary { cursor: pointer; font-weight: 700; }

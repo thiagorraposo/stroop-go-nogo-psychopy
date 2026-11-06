@@ -10,9 +10,6 @@ ou em um diretorio temporario privado removido no encerramento.
 from __future__ import annotations
 
 import argparse
-import base64
-import hashlib
-import hmac
 import http.client
 import csv
 import io
@@ -102,7 +99,7 @@ class WebComposeSmoke:
         self.api_image = api_image
         self.proxy_image = proxy_image
         self.temporary = temporary
-        self.project = "stroopw19" + secrets.token_hex(5)
+        self.project = "stroop_etapa4_test_smoke_" + secrets.token_hex(5)
         self.environment_file = temporary / "compose.env"
         self.certificate = temporary / "tls_certificate.pem"
         self.private_key = temporary / "tls_private_key.pem"
@@ -138,8 +135,6 @@ class WebComposeSmoke:
             "WEB_MIGRATION_DATABASE_URL_FILE": self._write_secret("migration_database_url", self.migration_url),
             "WEB_DATABASE_URL_FILE": self._write_secret("api_database_url", self.writer_url),
             "WEB_READ_DATABASE_URL_FILE": self._write_secret("api_read_database_url", self.reader_url),
-            "WEB_OIDC_CLIENT_ID_FILE": self._write_secret("oidc_client_id", "synthetic-client.invalid"),
-            "WEB_OIDC_CLIENT_SECRET_FILE": self._write_secret("oidc_client_secret", secrets.token_urlsafe(24)),
             "WEB_SESSION_SECRET_FILE": self._write_secret("api_session_secret", self.session_secret),
             "WEB_TLS_CERTIFICATE_FILE": self.certificate,
             "WEB_TLS_PRIVATE_KEY_FILE": self.private_key,
@@ -320,6 +315,15 @@ class WebComposeSmoke:
         self._assert(status == 400)
         status, _, body = self._request(tls=True, method="GET", path="/health/ready")
         self._assert(status == 200 and json.loads(body) == {"status": "ready"})
+        for path in ('/api/v1/auth/login', '/api/v1/auth/callback', '/oauth2callback'):
+            status, _, _ = self._request(tls=True, method='GET', path=path)
+            self._assert(status == 404)
+        status, _, _ = self._json_request('POST', '/api/v1/auth/login',
+            {'username': 'synthetic-smoke-admin', 'password': 'synthetic-invalid-password'}, {})
+        self._assert(status == 403)
+        status, _, _ = self._request(tls=True, method='POST', path='/api/v1/auth/login',
+            body=b' ' * 4097, headers={'Origin': f'https://{HOST}:{self.https_port}'})
+        self._assert(status == 413)
         # Regex com quantificadores precisa ser aceita pelo parser real Nginx.
         # A rota CSV deixa passar mais de 64 KiB ate a autenticacao da API,
         # enquanto as demais mantem o limite global na borda.
@@ -342,40 +346,32 @@ class WebComposeSmoke:
             self._assert(status == 404)
 
     def _seed_admin_session(self) -> dict[str, str]:
-        # Provision container reads credentials via *_FILE; session creation is
-        # a fixture operation, not an OIDC endpoint/mocked identity-provider flow.
-        token = secrets.token_urlsafe(32)
-        helper = f'''import hashlib, os, time
-import psycopg
+        # Bootstrap exclusivo do operador na fixture; login HTTP local real.
+        # A senha aleatoria existe apenas nesta memoria/stdin do container novo.
+        password = secrets.token_urlsafe(36)
+        helper = f'''import os
 from api.config import secret_value, postgres_database_url
-from stroop.domain.auth import opaque_user_id
+from stroop.application.local_auth import provision
 owner = postgres_database_url(secret_value(os.environ, 'API_MIGRATION_DATABASE_URL'))
-subject = 'synthetic-w19-admin'
-token = {token!r}
-expires = int(time.time()) + 3600
-with psycopg.connect(owner) as db:
-    db.execute("INSERT INTO app_users(issuer,subject,email,role,active) VALUES ('https://accounts.google.com',%s,NULL,'administracao',TRUE)", (subject,))
-    db.execute("INSERT INTO web_professional_sessions(token_sha256,issuer,subject,oidc_expires_at,expires_at) VALUES (%s,'https://accounts.google.com',%s,to_timestamp(%s),LEAST(to_timestamp(%s),CURRENT_TIMESTAMP+INTERVAL '8 hours'))", (hashlib.sha256(token.encode('ascii')).hexdigest(),subject,expires,expires))
+if not provision(owner, 'synthetic-smoke-admin', {password!r}):
+    raise SystemExit(2)
 print('seeded')
 '''
         result = self.compose(
             "run", "--rm", "--no-deps", "--interactive", "--entrypoint", "python",
             "web-provision", "-", input_text=helper,
         )
-        if result != "seeded":
-            raise SmokeFailure
-        csrf = hmac.new(
-            self.session_secret.encode("utf-8"),
-            b"stroop-professional-csrf-v1\0" + token.encode("ascii"),
-            hashlib.sha256,
-        ).digest()
-        return {
-            "cookie": token,
-            "csrf": base64.urlsafe_b64encode(csrf).rstrip(b"=").decode("ascii"),
-            "user_id": base64.urlsafe_b64encode(
-                b"https://accounts.google.com\0synthetic-w19-admin"
-            ).rstrip(b"=").decode("ascii"),
-        }
+        self._assert(result == "seeded")
+        status, headers, profile = self._json_request('POST', '/api/v1/auth/login',
+            {'username': 'synthetic-smoke-admin', 'password': password},
+            {'Origin': f'https://{HOST}:{self.https_port}'})
+        self._assert(status == 200 and set(profile) == {'user_id', 'role', 'expires_at', 'csrf_token'})
+        cookie = headers.get('set-cookie', '')
+        self._assert(all(attribute in cookie for attribute in ('Secure', 'HttpOnly', 'SameSite=lax', 'Path=/')))
+        self._assert('Domain=' not in cookie)
+        name, separator, token = cookie.split(';', 1)[0].partition('=')
+        self._assert(name == '__Host-stroop_professional' and separator == '=' and len(token) >= 40)
+        return {'cookie': token, 'csrf': profile['csrf_token'], 'user_id': profile['user_id']}
 
     def _api_headers(self, admin: dict[str, str], *, write: bool = False):
         headers = {
@@ -408,6 +404,8 @@ read_url = postgres_database_url(secret_value(os.environ, 'API_READ_DATABASE_URL
 with psycopg.connect(read_url, connect_timeout=5) as db:
     allowed = db.execute("SELECT has_column_privilege(current_user,'public.web_assessments','assessment_id','SELECT'),has_column_privilege(current_user,'public.web_assessments','assessment_id','INSERT'),has_schema_privilege(current_user,'public','CREATE')").fetchone()
     if allowed != (True, False, False): raise SystemExit(2)
+    if db.execute("SELECT has_column_privilege(current_user,'public.web_local_credentials','password_hash','SELECT')").fetchone()[0]:
+        raise SystemExit(4)
     try:
         db.execute('CREATE TABLE public.synthetic_w19_forbidden(id integer)')
     except psycopg.errors.InsufficientPrivilege:
@@ -428,25 +426,35 @@ print(json.dumps({'select':True,'insert':False,'schema_create':False}))
             raise SmokeFailure from None
 
     def _administration_smoke(self, admin: dict[str, str]):
-        """Exige gestao real pelo writer restrito, sem promover o runtime a owner."""
+        """Gestao local pelo writer; criacao publica e ultimo admin protegidos."""
         headers = self._api_headers(admin, write=True)
-        status, _, user = self._json_request(
-            'POST', '/api/v1/admin/users',
-            {'issuer': 'https://accounts.google.com',
-             'subject': 'synthetic-w21-managed', 'role': 'consulta'}, headers,
-        )
-        self._assert(status == 201 and user['role'] == 'consulta' and user['active'])
-        status, _, result = self._json_request(
-            'PUT', f"/api/v1/admin/users/{user['user_id']}",
-            {'role': 'importacao', 'active': False, 'email': None}, headers,
-        )
-        self._assert(status == 200 and result['role'] == 'importacao'
-                     and result['active'] is False)
-        status, _, result = self._json_request(
-            'PUT', f"/api/v1/admin/users/{admin['user_id']}",
-            {'role': 'consulta', 'active': True, 'email': None}, headers,
-        )
+        status, _, result = self._json_request('POST', '/api/v1/admin/users',
+            {'issuer': 'https://accounts.google.com', 'subject': 'synthetic-denied-account',
+             'role': 'consulta'}, headers)
+        self._assert(status == 403 and result['error']['code'] == 'permission_denied')
+        # Preservar a gestao de um recurso historico sem criar segunda conta local.
+        helper = '''import os
+import psycopg
+from api.config import secret_value
+with psycopg.connect(secret_value(os.environ,'API_MIGRATION_DATABASE_URL')) as db:
+    db.execute("INSERT INTO app_users(issuer,subject,role) VALUES ('https://accounts.google.com','synthetic-smoke-historical','consulta')")
+print('seeded')
+'''
+        self._assert(self.compose('run', '--rm', '--no-deps', '--interactive', '--entrypoint',
+            'python', 'web-provision', '-', input_text=helper) == 'seeded')
+        status, _, users = self._json_request('GET', '/api/v1/admin/users', None, headers)
+        self._assert(status == 200 and len(users['items']) == 2)
+        self._assert(all(set(row) == {'user_id', 'role', 'active'} for row in users['items']))
+        historical = next(row for row in users['items'] if row['user_id'] != admin['user_id'])
+        status, _, result = self._json_request('PATCH', f"/api/v1/admin/users/{historical['user_id']}",
+            {'role': 'importacao', 'active': False}, headers)
+        self._assert(status == 200 and result['role'] == 'importacao' and result['active'] is False)
+        status, _, result = self._json_request('PATCH', f"/api/v1/admin/users/{admin['user_id']}",
+            {'role': 'consulta', 'active': True}, headers)
         self._assert(status == 409 and result['error']['code'] == 'state_conflict')
+        status, _, result = self._json_request('PATCH', f"/api/v1/admin/users/{admin['user_id']}",
+            {'role': 'administracao', 'active': True}, headers)
+        self._assert(status == 200 and result['active'] is True)
 
     def _collect_and_query(self):
         admin = self._seed_admin_session()
@@ -595,6 +603,8 @@ def main(argv: list[str] | None = None) -> int:
         "--build-images", action="store_true",
         help="build API e proxy em sequencia antes do smoke",
     )
+    parser.add_argument('--api-image', default=API_IMAGE)
+    parser.add_argument('--proxy-image', default=PROXY_IMAGE)
     options = parser.parse_args(argv)
     temporary_path = Path(tempfile.mkdtemp(prefix="stroop-w19-"))
     temporary_path.chmod(0o700)
@@ -603,7 +613,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if not COMPOSE.is_file():
             raise SmokeFailure
-        smoke = WebComposeSmoke(temporary_path, options.build_images)
+        smoke = WebComposeSmoke(temporary_path, options.build_images,
+                                api_image=options.api_image, proxy_image=options.proxy_image)
         smoke.run()
     except Exception as error:
         if isinstance(error, SmokeFailure) and str(error) in {

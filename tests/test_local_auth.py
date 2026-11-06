@@ -4,6 +4,9 @@ from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor
 from hashlib import sha256
 import os
+import subprocess
+import sys
+import json
 from pathlib import Path
 import tempfile
 import time
@@ -36,7 +39,7 @@ class LocalPolicyTests(unittest.TestCase):
         for value in ('', 'a b', 'á', 'K', 'a' * 65):
             with self.assertRaises(InvalidCredential): normalize_username(value)
         self.assertEqual(validate_password(PASSWORD), PASSWORD)
-        for value in ('a'*14, 'a'*129, 'passwordpassword', '1'*20, '\ud800'*20):
+        for value in ('a'*14, 'a'*129, '123456789123456', 'QWERTYUIOPASDFGHJKL', 'passwordpassword', '1'*20, '\ud800'*20):
             with self.assertRaises(InvalidCredential): validate_password(value)
 
     def test_argon2_salt_parametros_verificacao_e_sem_trim(self):
@@ -58,6 +61,7 @@ class LocalPolicyTests(unittest.TestCase):
         VERIFY_SLOTS.acquire()
         try:
             with self.assertRaises(PasswordServiceUnavailable): verify_password(None, PASSWORD)
+            with self.assertRaises(PasswordServiceUnavailable): hash_password(PASSWORD)
         finally:
             VERIFY_SLOTS.release()
             VERIFY_SLOTS.release()
@@ -107,7 +111,7 @@ class LocalPostgresTests(unittest.TestCase):
             c.execute("INSERT INTO app_users(issuer,subject,role) VALUES ('https://accounts.google.com','synthetic-old','administracao')")
             c.execute("INSERT INTO web_projects(project_id,code,name,created_by_issuer,created_by_subject) VALUES (%s,'OLD','Synthetic old','https://accounts.google.com','synthetic-old')", (project,))
             c.execute("INSERT INTO web_project_members(project_id,issuer,subject) VALUES (%s,'https://accounts.google.com','synthetic-old')", (project,))
-        self.assertEqual(apply_migrations(DSN), ['0012_local_authentication.sql'])
+        self.assertEqual(apply_migrations(DSN), ['0012_local_authentication.sql', '0013_local_user_management.sql'])
         self.bootstrap()
         self.assertEqual(self.rows('SELECT issuer,subject FROM web_project_members'), [('https://accounts.google.com','synthetic-old')])
         self.assertEqual(self.rows('SELECT created_by_issuer,created_by_subject FROM web_projects'), [('https://accounts.google.com','synthetic-old')])
@@ -242,3 +246,116 @@ class LocalPostgresTests(unittest.TestCase):
         self.assertEqual(self.login('reader', bucket='reader')[0], 'success')
         self.assertEqual(application.session_context(DSN,digest('reader'),'view_dashboard')[0], 'success')
         self.assertEqual(application.session_context(DSN,digest('reader'),'manage_users')[0], 'forbidden')
+
+    def test_origem_conta_todas_tentativas_sem_trabalho_criptografico_apos_limite(self):
+        self.bootstrap()
+        origin = digest('synthetic-origin')
+        for index in range(20):
+            status, _ = application.authenticate(DSN, 'synthetic', PASSWORD,
+                digest('synthetic'), digest(f'origin-session-{index}'), origin_bucket=origin)
+            self.assertEqual(status, 'success')
+        with patch.object(application, 'verify_password', side_effect=AssertionError('nao verificar')):
+            status, retry = application.authenticate(DSN, 'missing', PASSWORD,
+                digest('missing'), digest('limited-origin'), origin_bucket=origin)
+        self.assertEqual(status, 'limited')
+        self.assertGreaterEqual(retry, 1)
+        self.assertLessEqual(retry, 60)
+        self.assertEqual(self.rows('SELECT count(*) FROM web_local_auth_limits WHERE bucket_sha256=%s',
+                                   (digest('missing'),)), [(0,)])
+        with psycopg.connect(DSN) as c:
+            c.execute("UPDATE web_local_auth_limits SET window_started_at=clock_timestamp()-INTERVAL '61 seconds' WHERE bucket_sha256=%s", (origin,))
+        self.assertEqual(application.authenticate(DSN, 'synthetic', PASSWORD,
+            digest('synthetic'), digest('origin-renewed'), origin_bucket=origin)[0], 'success')
+
+    def test_origem_concorrente_e_admissao_cardinalidade_limitada(self):
+        # Testa o contador persistente real; nao substitui verificacao de senha.
+        with ThreadPoolExecutor(max_workers=6) as pool:
+            retries = list(pool.map(lambda index: persistence._prepare_attempt(DSN,
+                digest(f'identity-{index}'), digest('shared-origin'), 3, 60), range(6)))
+        self.assertEqual(retries.count(None), 3)
+        self.assertEqual(self.rows('SELECT failure_count FROM web_local_auth_limits WHERE bucket_sha256=%s',
+                                   (digest('shared-origin'),)), [(3,)])
+        self.assertEqual(self.rows('SELECT count(*) FROM web_local_auth_limits'), [(4,)])
+        with patch.object(persistence, 'MAX_LIMIT_BUCKETS', 4):
+            self.assertEqual(persistence._prepare_attempt(DSN, digest('new-identity'), None, 20, 60), 60)
+            admitted = self.rows('SELECT bucket_sha256 FROM web_local_auth_limits WHERE bucket_sha256<>%s LIMIT 1',
+                                 (digest('shared-origin'),))[0][0]
+            self.assertIsNone(persistence._prepare_attempt(DSN, admitted, None, 20, 60))
+            with psycopg.connect(DSN) as c:
+                c.execute("UPDATE web_local_auth_limits SET window_started_at=clock_timestamp()-INTERVAL '25 hours'")
+            self.assertIsNone(persistence._prepare_attempt(DSN, digest('new-identity'), None, 20, 60))
+            self.assertEqual(self.rows('SELECT count(*) FROM web_local_auth_limits'), [(1,)])
+
+    def test_troca_e_login_compartilham_falhas_sem_hash_antecipado(self):
+        self.bootstrap()
+        self.login()
+        for index in range(4):
+            self.assertEqual(self.login(f'wrong-login-{index}', password=OTHER)[0], 'invalid')
+        with patch.object(application, 'hash_password', side_effect=AssertionError('nao gerar hash')):
+            self.assertEqual(application.change_password_limited(DSN, digest('synthetic-token'), OTHER,
+                PASSWORD, bucket_for_username=digest, origin_bucket=digest('password-origin'))[0], 'invalid')
+            status, retry = application.change_password_limited(DSN, digest('synthetic-token'), PASSWORD,
+                OTHER, bucket_for_username=digest, origin_bucket=digest('password-origin'))
+            self.assertEqual(status, 'limited')
+            self.assertGreaterEqual(retry, 1)
+        self.assertEqual(self.login('still-limited')[0], 'limited')
+        self.assertEqual(self.rows('SELECT credential_version FROM web_local_credentials'), [(1,)])
+        with psycopg.connect(DSN) as c:
+            c.execute("UPDATE web_local_auth_limits SET window_started_at=clock_timestamp()-INTERVAL '16 minutes'")
+        self.assertEqual(application.change_password_limited(DSN, digest('synthetic-token'), PASSWORD,
+            OTHER, bucket_for_username=digest, origin_bucket=digest('password-origin'))[0], 'success')
+        self.assertEqual(self.login('new-password', password=OTHER)[0], 'success')
+        for index in range(4):
+            self.assertEqual(application.change_password_limited(DSN, digest('new-password'), PASSWORD,
+                OTHER, bucket_for_username=digest, origin_bucket=digest('password-origin'))[0], 'invalid')
+        self.assertEqual(self.login('fifth', password=PASSWORD)[0], 'invalid')
+        self.assertEqual(application.change_password_limited(DSN, digest('new-password'), OTHER,
+            PASSWORD, bucket_for_username=digest, origin_bucket=digest('password-origin'))[0], 'limited')
+
+    def test_troca_rejeita_politica_antes_contadores_e_nao_hash_sessao_invalida(self):
+        self.bootstrap()
+        self.login()
+        with patch.object(application, 'hash_password', side_effect=AssertionError('nao gerar hash')):
+            with self.assertRaises(InvalidCredential):
+                application.change_password_limited(DSN, digest('synthetic-token'), PASSWORD,
+                    'passwordpassword', bucket_for_username=digest, origin_bucket=digest('origin'))
+            self.assertFalse(application.change_password(DSN, digest('missing'), PASSWORD, OTHER))
+        self.assertEqual(self.rows('SELECT count(*) FROM web_local_auth_limits'), [(1,)])
+
+    def test_cap_concorrente_e_falha_cripto_nao_apaga_contador_origem(self):
+        self.bootstrap()
+        with patch.object(persistence, 'MAX_LIMIT_BUCKETS', 4):
+            with ThreadPoolExecutor(max_workers=6) as pool:
+                results = list(pool.map(lambda index: persistence._prepare_attempt(DSN,
+                    digest(f'cap-identity-{index}'), digest(f'cap-origin-{index}'), 20, 60), range(6)))
+            self.assertEqual(results.count(None), 2)
+            self.assertEqual(self.rows('SELECT count(*) FROM web_local_auth_limits'), [(4,)])
+        with patch.object(application, 'verify_password', side_effect=RuntimeError('synthetic failure')):
+            with self.assertRaises(RuntimeError):
+                application.authenticate(DSN, 'synthetic', PASSWORD, digest('synthetic'),
+                    digest('no-session'), origin_bucket=digest('failure-origin'))
+        self.assertEqual(self.rows('SELECT failure_count FROM web_local_auth_limits WHERE bucket_sha256=%s',
+                                   (digest('failure-origin'),)), [(1,)])
+        self.assertEqual(self.rows('SELECT failure_count FROM web_local_auth_limits WHERE bucket_sha256=%s',
+                                   (digest('synthetic'),)), [(0,)])
+        self.assertEqual(self.rows('SELECT count(*) FROM web_local_sessions'), [(0,)])
+
+
+    def test_limite_compartilhado_entre_processos_sem_senha_em_argv(self):
+        self.bootstrap()
+        program = """import json, os, sys
+from hashlib import sha256
+from stroop.application.local_auth import authenticate
+v=json.load(sys.stdin)
+h=lambda s:sha256(s.encode()).hexdigest()
+r=authenticate(os.environ['TEST_DATABASE_URL'], 'synthetic', v['password'],h('synthetic-multiprocess'), h(v['token']))
+print(r[0])
+"""
+        # Processos independentes, conexoes e estado em PG, entrada sintetica via pipe.
+        for index in range(6):
+            result = subprocess.run([sys.executable, '-c', program], input=json.dumps({'password':OTHER,'token':str(uuid4())}),
+                text=True, capture_output=True, check=True,
+                env={'TEST_DATABASE_URL':DSN, 'PATH':os.environ.get('PATH','')}, timeout=20)
+            self.assertEqual(result.stdout.strip(), 'invalid' if index < 5 else 'limited')
+        self.assertEqual(self.rows('SELECT failure_count FROM web_local_auth_limits WHERE bucket_sha256=%s',
+                                  (digest('synthetic-multiprocess'),)),[(5,)])

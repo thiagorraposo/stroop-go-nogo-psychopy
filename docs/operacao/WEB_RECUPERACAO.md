@@ -70,8 +70,25 @@ REVOKE ALL ON FUNCTION public.web_manage_user(text,text,text,text,text,text,text
 
 Depois execute `web-provision` com o proprietario da funcao restaurada e os
 novos papeis dedicados. O provisionador recusa baseline inseguro e nunca concede
-DDL ao runtime para contornar essa recusa. Segredos OIDC/sessao/TLS, manifesto
+DDL ao runtime para contornar essa recusa. Segredos de sessão/TLS, manifesto
 das imagens e chaves de backup exigem custodia separada; nao fazem parte do dump.
+
+## Credencial local após restauração
+
+Mantenha o banco restaurado isolado e a API parada até terminar a recuperação.
+O dump contém hash antigo e hashes de sessões: restaurar bytes não revoga seu
+uso. Após migrations e provisionamento, execute `recover USUARIO_TECNICO` em
+terminal protegido conforme [WEB_DOCKER](WEB_DOCKER.md), com senha nova que não
+reutilize a restaurada. Confirme `RECUPERAR`. A transação atualiza hash/versão e
+revoga todas as sessões locais; preserve os vínculos existentes sem conceder
+outros por inferência. Use novo secret profissional e confira TLS/custódia.
+
+Antes de qualquer abertura autorizada, comprove cookie antigo recusado, senha
+antiga recusada, login novo aceito e projetos/resultados/recibos preservados.
+Não ligue OIDC para contornar a recuperação nem faça down migration. O comando
+`restore-test` estrutural não executa esses passos nem constitui liberação de
+serviço. Réplica independente e RPO/RTO continuam gates próprios de WEB-031.
+Execução/evidências concretas ficam somente no backlog.
 
 ## Replica externa automatica
 

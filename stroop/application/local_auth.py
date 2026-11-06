@@ -12,17 +12,34 @@ def provision(database_url: str, username: str, password: str, *, recover: bool 
     return persistence.provision(database_url, username, hash_password(password), recover=recover)
 
 
-def authenticate(database_url, username, password, bucket, token_hash, previous_hash=None):
+def authenticate(database_url, username, password, bucket, token_hash, previous_hash=None,
+                 *, origin_bucket=None, origin_limit=20, origin_window_seconds=60):
     username = normalize_username(username)
     validate_password(password, new=False)
     return persistence.authenticate(database_url, username, password, bucket, token_hash,
-                                    previous_hash, verify_password, hash_password, needs_rehash)
+                                    previous_hash, verify_password, lambda value: hash_password(value, new=False), needs_rehash,
+                                    origin_bucket=origin_bucket, origin_limit=origin_limit,
+                                    origin_window_seconds=origin_window_seconds)
 
 
 def change_password(database_url, token_hash, current_password, new_password):
     validate_password(current_password, new=False)
+    validate_password(new_password)
     return persistence.change_password(database_url, token_hash, current_password,
-                                       hash_password(new_password), verify_password)
+                                       new_password, verify_password, hash_password)[0] == 'success'
+
+
+def change_password_limited(database_url, token_hash, current_password, new_password, *,
+                            bucket_for_username, origin_bucket=None, origin_limit=20,
+                            origin_window_seconds=60):
+    """Compartilha limite do identificador com login; hash novo somente apos senha atual."""
+    validate_password(current_password, new=False)
+    validate_password(new_password)
+    return persistence.change_password(database_url, token_hash, current_password,
+                                       new_password, verify_password, hash_password,
+                                       bucket_for_username=bucket_for_username,
+                                       origin_bucket=origin_bucket, origin_limit=origin_limit,
+                                       origin_window_seconds=origin_window_seconds)
 
 
 def session_context(database_url, token_hash, action):

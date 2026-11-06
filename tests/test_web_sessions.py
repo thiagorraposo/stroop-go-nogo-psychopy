@@ -65,7 +65,7 @@ class WebSessionsPostgresTests(unittest.TestCase):
         self._set_member(self.admin, CONSULTA)
 
     def _config(self):
-        return APIConfig(
+        return APIConfig(auth_mode="oidc",
             database_url=self.database_url, public_origin=ORIGIN, app_env="test",
             oidc_client_id="synthetic-client-id",
             oidc_client_secret="synthetic-client-secret-never-use",

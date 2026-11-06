@@ -18,8 +18,11 @@ Alvo WEB CHG-004: login local por usuário/senha, conta administrativa única,
 sem cadastro público ou autenticação externa obrigatória, conforme
 [ADR-006](../arquitetura/ADR-006-autenticacao-local.md) e
 [especificação de segurança](AUTENTICACAO_E_PERMISSOES.md#autenticação-local--especificação-alvo-chg-004).
-O código atual ainda valida Google OIDC e identidade `iss/sub`; evidências
-históricas não comprovam a implementação local. Preservar perfis `consulta`,
+O runtime WEB opera com `API_AUTH_MODE=local` por padrão e recusa endpoints OIDC
+em desenvolvimento/produção; o suporte OIDC e identidade `iss/sub` permanecem
+preservados apenas para compatibilidade histórica e regressões em `APP_ENV=test`.
+Estado e evidências ficam no [backlog canônico](../Projeto%20Stroop%20Test.md).
+Preservar perfis `consulta`,
 `importacao` e `administracao`, cadastro/estado e autorização no servidor.
 A conta inicial tem perfil `administracao`, mas bootstrap não concede projetos.
 Compartilhamento não identifica cada profissional; `evaluator_id` identifica

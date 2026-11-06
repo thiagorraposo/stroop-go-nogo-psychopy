@@ -1,32 +1,26 @@
 """Operacoes sinteticas de teste por stdin/stdout, sem rotas extras na API."""
-from datetime import datetime, timedelta, timezone
-from hashlib import sha256
 import json
-import secrets
 import sys
 from uuid import UUID
 
-from common import ISSUER, SUBJECT, database_url, environment
+from common import ISSUER, database_url, environment, fixture_session, fixture_user, primary_subject
 import psycopg
 from api.auth import PROFESSIONAL_COOKIE, _csrf_token
 from api.config import APIConfig
-from stroop.application import auth
 from stroop.domain.auth import opaque_user_id
-from stroop.persistence import web_auth, web_sessions
+from stroop.persistence import web_sessions
 
 
 def execute(action, value):
     database = database_url()
+    if action == 'fixture_user':
+        subject = fixture_user(value['role'])
+        return {'subject': subject, 'user_id': opaque_user_id(ISSUER, subject)}
     if action == 'professional':
-        issuer = value.get('issuer', ISSUER)
-        subject = value.get('subject', SUBJECT)
-        expires = int((datetime.now(timezone.utc) + timedelta(hours=1)).timestamp())
-        user = auth.authorize(database, {'iss': issuer, 'sub': subject, 'exp': expires}, 'view_dashboard')
-        token = secrets.token_urlsafe(32)
-        web_auth.create_professional_session(database, sha256(token.encode()).hexdigest(), issuer, subject, expires)
+        subject = value.get('subject') or primary_subject()
+        token, user_id = fixture_session(subject)
         return {'cookie_name': PROFESSIONAL_COOKIE, 'token': token,
-                'csrf': _csrf_token(APIConfig.from_env(environment()), token),
-                'user_id': opaque_user_id(user.issuer, user.subject)}
+                'csrf': _csrf_token(APIConfig.from_env(environment()), token), 'user_id': user_id}
     session_id = UUID(value['session_id'])
     with psycopg.connect(database) as connection:
         if action == 'expire':

@@ -20,9 +20,14 @@ class PasswordServiceUnavailable(RuntimeError):
     """Custo concorrente ou material codificado indisponivel."""
 
 
-def hash_password(password: str) -> str:
-    validate_password(password)
-    return HASHER.hash(password)
+def hash_password(password: str, *, new: bool = True) -> str:
+    validate_password(password, new=new)
+    if not VERIFY_SLOTS.acquire(blocking=False):
+        raise PasswordServiceUnavailable('Verificacao indisponivel.')
+    try:
+        return HASHER.hash(password)
+    finally:
+        VERIFY_SLOTS.release()
 
 
 def verify_password(encoded: str | None, password: str) -> bool:

@@ -9,8 +9,8 @@ export type ProfessionalProfile = {
 
 const backendErrors = {
   invalid_json: [400, 'Não foi possível enviar a solicitação.'],
-  invalid_oidc_state: [400, 'O acesso expirou. Entre novamente com o Google.'],
-  authentication_required: [401, 'Entre com o Google para continuar.'],
+  invalid_oidc_state: [400, 'O acesso expirou. Entre novamente.'],
+  authentication_required: [401, 'Entre com sua conta para continuar.'],
   permission_denied: [403, 'Seu perfil não permite esta operação.'],
   account_blocked: [403, 'Sua conta está bloqueada. Contate o responsável pela pesquisa.'],
   csrf_failed: [403, 'A verificação de segurança falhou. Atualize a página e tente novamente.'],
@@ -111,7 +111,7 @@ export type ApiPath = '/api/v1/assessments/export' | '/api/v1/admin/users' | `/a
   `/api/v1/projects/${string}/imports/${string}` |
   `/api/v1/projects/${string}/members${string}` | `/api/v1/projects/${string}/members/${string}` |
   `/api/v1/projects/${string}/invitations${string}` | '/api/v1/projects' | `/api/v1/projects?${string}` |
-  `/api/v1/projects/${string}/assessments${string}` | '/api/v1/auth/me' | '/api/v1/auth/logout' |
+  `/api/v1/projects/${string}/assessments${string}` | '/api/v1/auth/me' | '/api/v1/auth/login' | '/api/v1/auth/password' | '/api/v1/auth/logout' |
   '/api/v1/participant/redeem' | '/api/v1/participant/session' |
   '/api/v1/participant/start' | '/api/v1/participant/complete' | '/api/v1/participant/abort' |
   '/api/v1/participant/logout' | '/api/v1/participant/session/checkpoints';
@@ -139,7 +139,14 @@ export async function request<T>(path: ApiPath,
         ...init, credentials: 'same-origin', cache: 'no-store', redirect: 'error',
         signal: controller.signal,
       });
-      if (!response.ok) throw await responseError(response);
+      if (!response.ok) {
+        const error = await responseError(response);
+        if (response.status === 401 && typeof window !== 'undefined'
+          && !path.startsWith('/api/v1/participant/') && path !== '/api/v1/auth/login') {
+          window.dispatchEvent(new Event('stroop-professional-session-ended'));
+        }
+        throw error;
+      }
       return decode(response);
     })();
     return await Promise.race([operation, interruption]);
@@ -187,6 +194,29 @@ export function logoutProfessional(csrfToken: string, signal?: AbortSignal): Pro
     method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json',
       'X-CSRF-Token': csrfToken }, body: '{}',
   }, async (response) => {
+    if (response.status !== 204) throw new ApiError('invalid_response', response.status);
+  }, signal);
+}
+
+/** Credenciais transitam somente no corpo HTTPS; nenhum armazenamento local. */
+export function loginProfessional(username: string, password: string, signal?: AbortSignal): Promise<ProfessionalProfile> {
+  return request('/api/v1/auth/login', {
+    method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  }, async response => {
+    if (response.status !== 200) throw new ApiError('invalid_response', response.status);
+    let body: unknown;
+    try { body = await response.json(); } catch { throw new ApiError('invalid_response', response.status); }
+    return professionalProfile(body);
+  }, signal);
+}
+
+export function changeProfessionalPassword(currentPassword: string, newPassword: string, csrfToken: string,
+  signal?: AbortSignal): Promise<void> {
+  return request('/api/v1/auth/password', {
+    method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+  }, async response => {
     if (response.status !== 204) throw new ApiError('invalid_response', response.status);
   }, signal);
 }

@@ -191,8 +191,10 @@ git diff --check
 
 Decisão de 2026-11-06: [ADR-006](../arquitetura/ADR-006-autenticacao-local.md).
 As seções OIDC acima descrevem o código/legado e seu histórico; a versão alvo
-WEB passa a usar conta administrativa local única. Nada foi implementado nesta
-revisão. Permissões por projeto em [ACESSO_WEB](ACESSO_WEB.md) continuam válidas.
+WEB passa a usar conta administrativa local única, implementada e verificada em
+M6 (WEB-021/024), com evidências e aceite somente no
+[backlog canônico](../Projeto%20Stroop%20Test.md). Permissões por projeto em
+[ACESSO_WEB](ACESSO_WEB.md) continuam válidas.
 
 ### Credenciais e procedimento administrativo futuro
 
