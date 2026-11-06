@@ -538,7 +538,7 @@ já existe ou participa da regressão geral. WEB-000 é exclusivamente documenta
 
 | Requisito | Decisão | Marco | Tarefa | Componente | Teste/verificação | Evidência → aceite |
 |---|---|---|---|---|---|---|
-| REQ-AUT-001 | ADR-004 | M6 | WEB-021 | `api/auth.py, api/google_oidc.py` | `tests/test_web_oidc_callback.py` | PLANEJADA; consultar WEB-021 no backlog |
+| REQ-AUT-001 | ADR-004 | M6 | WEB-021 | `api/auth.py, api/google_oidc.py` | `tests/test_web_oidc_callback.py` | PARCIAL em EV-M6-022/023; negativos sintéticos aprovados, login Google real BLOQUEADO em WEB-021 |
 | REQ-AUT-002 | ADR-004 | M6 | WEB-022 | `stroop/domain/auth.py, stroop/persistence/web_sessions.py` | `tests/test_web_auth.py` | ACEITA em EV-M6-022/023 no backlog; PG/API e HTTPS, OIDC externo separado |
 | REQ-AUT-003 | ADR-004 | M6 | WEB-023 | `api/auth.py, api/sessions.py` | `tests/test_web_sessions.py` | ACEITA em EV-M6-022/023 no backlog; dez casos HTTPS e regressão PG |
 | REQ-PAR-001 | ADR-004 | M4 | WEB-013 | `api/sessions.py, web/src/participant/` | `tests/test_web_sessions.py` | PLANEJADA; consultar WEB-013 no backlog |
@@ -570,9 +570,9 @@ já existe ou participa da regressão geral. WEB-000 é exclusivamente documenta
 | REQ-SEG-003 | ADR-004 | M10 | WEB-041 | `stroop/persistence/web_sessions.py, política de operação` | `PLANEJADOS: testes research em WEB-041` | PLANEJADA; consultar WEB-041 no backlog |
 | REQ-INF-001 | ADR-002 + ADR-004 | M2 | WEB-007 | `scripts/migrations/, provision_web_database.py` | `tests/test_web_database_provision.py, tests/test_postgres_migrations.py` | Aceite em EV-M2-007/008; consultar WEB-007 no backlog |
 | REQ-INF-002 | ADR-002 + ADR-004 | M8 | WEB-029 | `compose.web.yaml, Dockerfile.api, Dockerfile.web` | `tests/test_web_proxy_config.py` | ACEITA em EV-M8-029/031 no backlog; build/Compose HTTPS sintético real |
-| REQ-INF-003 | ADR-002 + ADR-004 | M8 | WEB-031 | `scripts/backup_postgres.py, deploy/` | `tests/test_web_backup_replication.py` | PLANEJADA; consultar WEB-031 no backlog |
+| REQ-INF-003 | ADR-002 + ADR-004 | M8 | WEB-031 | `scripts/backup_postgres.py, deploy/` | `tests/test_web_backup_replication.py` | PARCIAL em EV-M8-029/031; restore/rollback/SSH/agenda locais reais; réplica externa e limites pendentes |
 | REQ-EXT-001 | ADR-004 | M1 | WEB-003 | `stroop/, api/, web/` | `tests/test_nucleo_compartilhado.py, tests/test_casos_uso_importacao.py, tests/test_multiplos_instrumentos.py` | EV-M1 real em WEB-003; fronteiras/contratos revalidados em 2026-11-04 |
-| REQ-EXT-002 | ADR-004 | M8 | WEB-030 | `scripts/verify_web_ci.py, .github/workflows/web.yml` | `tests/test_verify_web_ci.py` | PLANEJADA; consultar WEB-030 no backlog |
+| REQ-EXT-002 | ADR-004 | M8 | WEB-030 | `scripts/verify_web_ci.py, .github/workflows/web.yml` | `tests/test_verify_web_ci.py` | ACEITA em EV-M8-030; pipeline integral local e Actions 42159898317 na SHA 0d79fd2 |
 | REQ-EXT-003 | ADR-004 | M1 | WEB-004 | `AGENTS.md, docs/WORKFLOW_CODEX_CLI.md` | `Receita BASELINE_LOCAL.md; scripts/verify_web_ci.py integration; ensaio de retomada WEB-004` | EV-M1 real em WEB-004; percurso local/retomada revalidados em 2026-11-04 |
 | REQ-UX-001 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M3 | WEB-042 | `web/src/experiment/main-engine.ts, web/src/experiment/practice-engine.ts` | `web/src/experiment/main.test.ts, practice.test.ts, presentation.test.ts; web/e2e/presentation.spec.ts; main.spec.ts/practice.spec.ts` | IMPLEMENTADO/TESTADO; aceite do escopo WEB-042/043 em EV-M3-042/043; regressão consolidada WEB-044 em EV-M3-044; validações WEB-011/034 continuam próprias |
 | REQ-UX-002 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M3 | WEB-042 | `web/src/experiment/main-engine.ts, web/src/experiment/practice-engine.ts` | `web/src/experiment/main.test.ts, practice.test.ts, presentation.test.ts; web/e2e/presentation.spec.ts; main.spec.ts/practice.spec.ts` | IMPLEMENTADO/TESTADO; aceite do escopo WEB-042/043 em EV-M3-042/043; regressão consolidada WEB-044 em EV-M3-044; validações WEB-011/034 continuam próprias |

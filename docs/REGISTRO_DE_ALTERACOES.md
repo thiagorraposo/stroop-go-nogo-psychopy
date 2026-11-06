@@ -4,6 +4,26 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-06 — Réplica SSH e agenda sintéticas reais
+
+- Novo harness gera backup PG sintético, copia por SSH com forced-command,
+  confere bytes/checksum/idempotência e restaura cópia com recibo válido.
+- Timers transitórios comprovam cópia positiva e alerta negativo; ferramenta SSH
+  fica só em imagem descartável, sem instalar no host ou relaxar StrictModes.
+- Registradas falhas de ownership anteriores e limites do ensaio no mesmo host.
+  Gate de réplica externa preservado em WEB-031; nenhuma aprovação inventada.
+- Sessão excepcional encerrada após seleção global sem tarefas elegíveis;
+  workflow/AGENTS permanentes preservados. Evidências no backlog canônico.
+
+## 2026-11-06 — Pipeline integral local e Actions por SHA
+
+- Runner integral em checkout sparse/PG descartável e locks exatos aprovado:
+  scanner/self-test, Python, frontend, auditorias, browsers e HTTPS reais.
+- Workflow_dispatch existente validou a mesma SHA sem PR/merge/deploy; primeira
+  falha de scanner documental preservada, corrigida sem allowlist ou bypass.
+- Evidências e URLs em EV-M8-030 no backlog; nenhuma regra permanente de
+  continuidade alterada. Decisões/painel alinhados aos ensaios atuais.
+
 ## 2026-11-06 — Infraestrutura sintética e integridade da restauração
 
 - Build/Compose HTTPS reais revalidados; smoke passou a exigir recusa de nove

@@ -37,7 +37,7 @@ de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
 Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
 não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
 
-Progresso atual: **18/45 entregáveis aceitos (WEB-000 a WEB-011, WEB-022/023, WEB-029 e WEB-042/043/044)**.
+Progresso atual: **19/45 entregáveis aceitos (WEB-000 a WEB-011, WEB-022/023, WEB-029/030 e WEB-042/043/044)**.
 WEB-005 é documental; WEB-006 aceita o receptor backend e contratos em banco
 sintético. M1 e M2 concluídos; atomicidade e paridade aceitas em EV-M2-007/008.
 A captura incremental no motor e seus gates temporais continuam em M3/M4.
@@ -48,10 +48,10 @@ Atualizado em **2026-11-06**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **18 de 45 · 40,0%** | **27** | **M6/M8 · execução excepcional da sessão** | Reproduzir pipeline [WEB-030](#web-030--reproduzir-pipeline-e-definir-validação-formal-sem-pr-automático) e recuperação WEB-031; M3 aguarda aceite WEB-012 |
+| **19 de 45 · 42,2%** | **26** | **M3 · suporte em validação; M6/M8 parciais** | Sem tarefa elegível: aceite WEB-012, ambiente OIDC WEB-021 e destino externo WEB-031 dependem do responsável |
 
 ```text
-Aceites   ████████░░░░░░░░░░░░   40,0%
+Aceites   ████████░░░░░░░░░░░░   42,2%
 ```
 
 A barra global é aproximada; os números são exatos, com percentual arredondado.
@@ -76,7 +76,7 @@ A ordem da tabela segue os IDs; dependências e paralelismo estão na
 | [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | ⬜🟩🟩⬜ **2/4** | ◐ Parcial; login externo bloqueado |
 | [M7](#m7--integração-compatibilidade-histórica-e-transição) | Integração, compatibilidade histórica e transição | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
-| [M8](#m8--ci-infraestrutura-e-preparação-operacional) | CI, infraestrutura e preparação operacional | 🟩⬜⬜⬜ **1/4** | ◐ Pipeline e recuperação em validação |
+| [M8](#m8--ci-infraestrutura-e-preparação-operacional) | CI, infraestrutura e preparação operacional | 🟩🟩⬜⬜ **2/4** | ◐ Parcial; réplica externa e release pendentes |
 | [M9](#m9--validação-técnica-e-metodológica) | Validação técnica e metodológica | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M10](#m10--implantação-controlada-e-documentação-operacional) | Implantação controlada e documentação operacional | ⬜⬜⬜⬜⬜ **0/5** | ○ Pendente |
 
@@ -100,12 +100,11 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 | ✅ [WEB-011](#web-011--executar-campanha-de-engenharia-temporal-em-ambientes-declarados) | Campanha local de engenharia com transporte ativo | Vinte capturas completas, dez por navegador, uma falha de preparação preservada; API double, sem latência física |
 | ✅ [WEB-042](#web-042--refinar-estímulos-e-hierarquia-visual-experimental) | Palavras com contorno branco sem cartão e centro preservado | DOM, dez cores/screenshots Chromium/Firefox e regressão funcional |
 | ✅ [WEB-043](#web-043--reformular-hud-e-retirar-precisão-agregada-do-participante) | HUD sem precisão, progresso real e cronômetro estável | DOM/árvore acessível, unidade e navegadores; gates de campanha separados |
-| ✅ [WEB-044](#web-044--validar-regressão-da-apresentação-experimental-refinada) | Regressão consolidada visual, funcional, métricas/CSV e observação temporal preparatória | Testes atuais e fluxos reutilizados na mesma fonte; campanha e suporte pendentes |
-
+| ✅ [WEB-044](#web-044--validar-regressão-da-apresentação-experimental-refinada) | Regressão consolidada visual, funcional, métricas/CSV e observação temporal preparatória | Testes e fluxos consolidados; campanha WEB-011 aceita, suporte WEB-012 separado |
 | ✅ [WEB-022](#web-022--comprovar-matriz-de-perfis-projetos-e-revogações) | Perfis, projetos, administração sem vínculo e revogação | PostgreSQL real sintético, API e HTTPS |
 | ✅ [WEB-023](#web-023--revalidar-sessão-cookies-csrf-e-isolamento-de-credenciais) | Sessões separadas, Origin/CSRF, expiração, logout e replay | PostgreSQL/API e navegadores em HTTPS local |
-
 | ✅ [WEB-029](#web-029--revalidar-imagens-e-compose-isolado-em-https) | Imagens, Compose/HTTPS, saúde, headers, isolamento e recusa de fontes | Build/proxy/API/PostgreSQL reais em pilha sintética isolada |
+| ✅ [WEB-030](#web-030--reproduzir-pipeline-e-definir-validação-formal-sem-pr-automático) | Pipeline integral local e Actions por SHA; procedimento sem PR | Scanner/auditorias, PG, frontend, navegadores e HTTPS reais |
 
 ### Foco do marco atual
 
@@ -997,11 +996,11 @@ D5 e suporte exigem evidências próprias; nenhuma reutilização da exceção W
 - Dependências: WEB-008; conta/cliente de teste autorizado.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Casos negativos e callback/PKCE/state/nonce passam; login/logout Google interativo documentado com identidade cadastrada e sem claims/tokens no artefato público.
-- Testes/verificação: `tests/test_web_oidc_callback.py, test_google_oidc.py; PLANEJADO: login real`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Testes/verificação: `tests/test_web_oidc_callback.py, test_google_oidc.py; PLANEJADO: login real`. Negativos sintéticos reexecutados em EV-M6-022/023 e pipeline EV-M8-030; login Google interativo ainda PLANEJADO/BLOQUEADO.
+- Evidências: parciais em EV-M6-022/023, 2026-11-06; callback/PKCE/state/nonce e verificador OIDC sintéticos aprovados. Sem evidência nova de login/logout Google interativo; não aceita WEB-021.
 - Riscos/bloqueios: R05; conta/cliente Google de teste e ambiente interativo ainda não autorizados/disponibilizados nesta sessão. Não inspecionar secrets operacionais. Responsável deve prover o ambiente/conta autorizados; WEB-024 permanece dependente. Casos sintéticos podem ser revalidados sem aceitar login real.
 - Referências: REQ-AUT-001; [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git parcial: branch `test/m6-m8-validacao-isolada`; testes negativos no escopo M6/EV-M8-030. Não há entrega aceita do login real.
 
 ### WEB-022 — Comprovar matriz de perfis, projetos e revogações
 
@@ -1186,15 +1185,15 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 
 ### WEB-030 — Reproduzir pipeline e definir validação formal sem PR automático
 
-- Marco: M8. Prioridade: P1. Complexidade: G. Estado: EM_ANDAMENTO.
+- Marco: M8. Prioridade: P1. Complexidade: G. Estado: CONCLUIDA.
 - Dependências: WEB-029.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Runner local passa testes/PG, frontend/build, scanner/auditoria, browsers e integração; verificação Actions por SHA quando autorizada, sem alterar proteções/gatilhos por conveniência.
-- Testes/verificação: `scripts/verify_web_ci.py, tests/test_verify_web_ci.py; PLANEJADO: Actions por SHA`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R09; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Testes/verificação: `scripts/verify_web_ci.py all`, doze testes do runner e workflow_dispatch existente na mesma SHA: todos estágios locais/remotos aprovados, sem skips. Ver EV-M8-030.
+- Evidências: EV-M8-030, 2026-11-06; SHA `0d79fd297f169ad25c63402dbd11c535694a0b98`, pipeline integral local e Actions 42159898317 aprovados. Procedimento formal sem PR em CI_WEB.
+- Riscos/bloqueios: R09 preservado para recursos/gates operacionais; nenhum impedimento nos critérios do pipeline. Primeira falha scanner preservada na evidência.
 - Referências: REQ-EXT-002; [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega: branch `test/m6-m8-validacao-isolada`; candidato `0d79fd2` enviado e Actions por SHA aprovado. Fechamento documental posterior sem transferir CI ao novo HEAD.
 
 ### WEB-031 — Ensaiar restauração, réplica e retorno compatível
 
@@ -1202,9 +1201,9 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 - Dependências: WEB-029; destino externo de teste autorizado se necessário.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Massa sintética restaurada isoladamente, schema/dados/recibo conferidos; réplica+agenda+alerta e retorno de imagem ensaiados, RPO/RTO medidos e limites aceitos.
-- Testes/verificação: `scripts/smoke_web_recovery.py, tests/test_web_backup_replication.py, test_vps_rollback.py`. Restauração real positiva/recibo inválido negativo, outage e rollback aprovados; réplica isolada em doubles. Agenda/SSH positivo ainda sem aceite. Ver EV-M8-029/031.
-- Evidências: EV-M8-029/031, 2026-11-06; 11 migrations/uma avaliação/recibo restaurados, 6,305 s backup+restore local. Sem comprovação de réplica SSH positiva ou RPO no destino.
-- Riscos/bloqueios: R08/R09. Não há sshd local nem imagem SSH disponível; nenhum destino externo de teste autorizado nesta sessão. Responsável deve disponibilizar destino/conta/chave de teste ou autorizar preparação da ferramenta local. Não acessar VPS/backup operacional. WEB-032 permanece PENDENTE; doubles não aceitam réplica real.
+- Testes/verificação: `scripts/smoke_web_recovery.py, tests/test_web_backup_replication.py, test_vps_rollback.py`. Restauração positiva/negativa, outage/rollback, réplica SSH local positiva, idempotência, timer real positivo/negativo e alerta aprovados. Ver EV-M8-029/031; réplica externa não ensaiada.
+- Evidências: EV-M8-029/031, 2026-11-06; 11 migrations/uma avaliação/recibo restaurados, 6,305 s backup+restore local. Réplica SSH local/restore aprovados; idade 3,689 s/cópia 0,909 s. Sem comprovação de réplica externa/RPO no destino.
+- Riscos/bloqueios: R08/R09. Ferramenta SSH local preparada/ensaiada sem instalar no host; bloqueio por ferramenta superado. REQ-INF-003 exige réplica externa antes da publicação; destino/conta/chave externos de teste e aceite dos limites operacionais dependem do responsável. Não acessar VPS/backup operacional por inferência; ensaio no mesmo computador não prova falha independente nem RPO/RTO externos. WEB-032 preserva M7 e este gate.
 - Referências: REQ-INF-003; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega parcial: branch `test/m6-m8-validacao-isolada`; commit/envio/CI no fechamento desta sessão.
 
@@ -1281,6 +1280,43 @@ Git diff --check aprovado. Código em `357e28f39b132b0213998b5066051bdd7b2fa04d`
 enviado e confirmado por HEAD/upstream/ls-remote. Hashes/envio/CI adicionais no
 fechamento desta execução.
 
+Continuação independente — réplica real local, 2026-11-06:
+
+A ausência de sshd no host foi superada com ferramenta de teste em imagem Docker
+descartável derivada da API aceita. Instala openssh-server somente nessa imagem,
+sem mudar host, serviços existentes, locks ou dependências da aplicação. Novo
+`scripts/smoke_web_replication.py`: gera massa PostgreSQL sintética nova, usa
+create_backup, SSH real/forced-command canônico, cópia/idempotência e restaura
+cópia com restore_isolated/verify_web. Chaves efêmeras/known_hosts fixo, somente
+loopback/porta aleatória, usuário restrito sem senha/forwarding/root; StrictModes
+preservado. Chave AES separada não é montada no servidor/exportador.
+
+Comando: `.venv/bin/python scripts/smoke_web_replication.py --api-image
+IMAGEM_API_LOCAL --proxy-image IMAGEM_PROXY_LOCAL`, usando repositórios/tag/IDs
+locais documentados acima. Resultado final **passed**, **86.649 bytes**, bytes e
+checksum exatos, idempotência sem substituir arquivo, comando livre recusado.
+Cópia SSH restaurou **11 migrations/uma avaliação/recibo válido**. Timer transitório
+real executou CLI para copiar e confirmou arquivo; depois servidor parado gerou
+alerta fechado e exit 1. Imagem/container SSH, timers, chaves/configs e massa
+sintética próprios removidos; nenhuma conexão externa ou backup operacional.
+
+Medidas observadas: idade do backup **3,689 s**, tempo da cópia **0,909 s**;
+backup+restore anterior **6,305 s**. São menores que os objetivos históricos
+RPO 24 h/RTO 4 h, mas idade/cópia/restore pontuais não medem disponibilidade ou
+recuperação ponta a ponta do destino externo. Saída explicita
+`external_rpo_not_measured=true`. WEB-031 **não concluída**: REQ-INF-003 mantém
+réplica externa e comparação/aceite dos limites operacionais por responsável.
+Nenhum objetivo/garantia foi redefinido para aceitar o ensaio local.
+
+Duas tentativas anteriores falharam na cópia por StrictModes: authorized_keys
+montada tinha UID do host, diferente do usuário do container. Diagnóstico
+sanitizado confirmou causa. Correção somente no harness copia chave pública
+efêmera ao contexto de build e instala arquivo de root; não desabilita
+StrictModes nem relaxa SSH. Primeiro diagnóstico usou ciphertext de transporte;
+rodada final usou dump PG real conforme descrito. Falhas preservadas, sem
+conversão artificial em passes. Código novo revisado pelo principal; execução
+real positiva/negativa serve como validação do harness, sem testes espelho.
+
 ### EV-M8-030 — pipeline por SHA em execução, 2026-11-06
 
 Worktree sparse exclusiva `/tmp/stroop-web030-20261106`, exclusões de dados e
@@ -1300,8 +1336,25 @@ primeira tentativa não executados; não há aceite parcial de pipeline.
 
 Actions inicial [42159772439](https://github.com/thiagorraposo/stroop-go-nogo-psychopy/actions/runs/42159772439)
 disparado pelo workflow_dispatch existente sobre `357e28f`, com headSha
-conferido; resultado será registrado no fechamento, não presumido aprovado.
-Nova SHA documental será usada para repetição integral local/remota.
+conferido; concluiu **failure** no Scanner oficial de secrets, preservada.
+Reexecução local/remota na SHA **`0d79fd297f169ad25c63402dbd11c535694a0b98`**:
+[Actions 42159898317](https://github.com/thiagorraposo/stroop-go-nogo-psychopy/actions/runs/42159898317),
+headSha conferido. Não transferir sucesso entre SHAs por inferência.
+
+Resultados locais já concluídos na reexecução: sources **366 fontes** e
+secret-self-test aprovados; **397 Python aprovados em 99,884 s**, sem skips;
+frontend `npm ci`, **292 Vitest/18 arquivos**, tipos/build aprovados; npm audit
+zero e pip-audit sem vulnerabilidades conhecidas. Browsers gerais **104/104** (1,7 min), temporais seriais **4/4** (3,5 min)
+e integração HTTPS/API/PG **40/40** (10,7 min, vinte por navegador) aprovados,
+sem falhas/skips/retries. Runner integral terminou exit 0; worktree sparse
+permaneceu limpa e seu PG exclusivo foi removido. Actions **42159898317** concluiu **success** na mesma SHA, todos estágios
+obrigatórios aprovados. WEB-030 aceita; não é campanha metodológica ou deploy.
+Commits posteriores documentais têm verificação de fontes/links/consistência,
+sem alegar Actions no novo HEAD. Logs sintéticos locais preservados em
+`/tmp/stroop-web030-local-pipeline.log` (tentativa bloqueada) e
+`/tmp/stroop-web030-local-pipeline-0d79fd2.log` (aprovação). Ambiente Python
+3.12.3, Node 24.15.0/npm 11.16.0, PG 17.6, OpenSSL 3.0.13, Playwright 1.64.1,
+Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 
 ## M9 — Validação técnica e metodológica
 
@@ -1465,7 +1518,8 @@ de mitigação no código não elimina risco sem ensaio. Atualizar somente aqui.
 | R11 | Contorno/retirada da caixa e precisão, HUD e diferenças de renderização alteram percepção/saliência/atenção | Versões experimentais incompatíveis e evidência anterior insuficiente | Média | Alta | Aprovação visual D3/D4 pelo proprietário registrada; conferir dez cores/screenshots sintéticos Chromium/Firefox, versão/SHA distinta, WEB-044/011 e revisão WEB-034 com DEC-04. Não inferir melhoria de desempenho/validade pela redução de informação potencialmente distrativa | M3/M4/M9 | Técnico + metodológico | ABERTO |
 
 Risco mais importante: R01, com R02 como limite de interpretação. R03 é o
-principal risco de integridade do fluxo atual e precisa decisão antes de ampliar captura.
+principal risco de integridade do fluxo atual: DEC-02 foi aprovada; integração
+real da captura e tratamento de perda no produto permanecem gates M4.
 
 ## Decisões externas e condições de desbloqueio
 
@@ -1475,8 +1529,8 @@ versão experimental. Somente bloquear tarefa dependente, sem paralisar document
 
 | ID | Questão / hipótese preservada | Responsável | Condição objetiva / impacto | Tarefas relacionadas | Estado |
 |---|---|---|---|---|---|
-| DEC-01 | Participante pseudonimizado por projeto, múltiplas visitas/avaliações e preparação por convite; sem cadastro central ou agenda separada nesta versão | Proprietário; decisão explícita em 2026-11-05 | APROVADA a direção; vínculos estáveis e evolução aditiva no modelo. Implementação/ensaios ainda não realizados; retenção institucional continua DEC-03 | WEB-005/006/007/013 | APROVADA |
-| DEC-02 | Final-only rejeitado; persistência incremental com recibo/idempotência e preservação de incompletas/ inválidas, sem retomada; nova sessão com prática | Proprietário + metodológico; diretriz e validação explícitas em 2026-11-05 | Resposta “valido” à proposta `270377b` aprova ADR-005, contrato alvo, matriz D2/D5 e perda residual; gate documental WEB-005 satisfeito. Implementação/ensaios técnicos e temporais ainda exigidos | WEB-005/006/007/011/012/015 | APROVADA |
+| DEC-01 | Participante pseudonimizado por projeto, múltiplas visitas/avaliações e preparação por convite; sem cadastro central ou agenda separada nesta versão | Proprietário; decisão explícita em 2026-11-05 | APROVADA a direção; vínculos estáveis e evolução aditiva no modelo. Contratos/receptor/atomicidade aceitos em EV-M2/EV-M2-007/008; integração do participante permanece M4. Retenção institucional continua DEC-03 | WEB-005/006/007/013 | APROVADA |
+| DEC-02 | Final-only rejeitado; persistência incremental com recibo/idempotência e preservação de incompletas/ inválidas, sem retomada; nova sessão com prática | Proprietário + metodológico; diretriz e validação explícitas em 2026-11-05 | Resposta “valido” à proposta `270377b` aprova ADR-005, contrato alvo, matriz D2/D5 e perda residual; gate documental WEB-005 satisfeito. Receptor aceito em M2 e worker/campanha local em EV-M3-011; integração real do produto permanece M4 | WEB-005/006/007/011/012/015 | APROVADA |
 | DEC-03 | Regras institucionais de informação, consentimento aplicável, retenção e incidentes | Proprietário/instituição | Documento aprovado e responsabilidades/canal definidos; nenhuma base legal inventada pelo Codex | WEB-033/036 | PENDENTE |
 | DEC-04 | Matriz local e alcance de engenharia; validação física/metodológica permanece gate M9 | Proprietário/responsável metodológico; aprovação explícita em 2026-11-05 | Resposta “eu aprovo esse alcance para DEC-04” aprova proposta de dez sessões sintéticas por ambiente local Chromium/Firefox visíveis, layout final e transporte/falhas ativos. Equipamento observado em EV-M3-011; D1/D5 intactos. Não aprova suporte por antecipação nem validação física/metodológica WEB-034 | WEB-011/012/034 | APROVADA |
 | DEC-05 | Após prontidão M9, autorizar separadamente configuração research, deploy e eventual uso real | Proprietário + metodológico/operador | WEB-036 comprovada; registrar autorização específica antes de WEB-041 e, para produção/uso, de WEB-038/040; mudanças da candidata passam revalidação dos gates afetados; não retirar synthetic apenas por aprovação técnica | WEB-041/038/040 | PENDENTE |
@@ -1604,21 +1658,49 @@ WEB-034 mantêm critérios próprios. Histórico inicial CHG-003 acima preservad
 
 ## Retomada
 
-### Retomada vigente — execução excepcional entre marcos, 2026-11-06
+### Retomada vigente — execução excepcional encerrada, 2026-11-06
 
-Autorização temporária explícita do proprietário nesta sessão permite atravessar
-marcos e executar tarefas independentes com pré-requisitos satisfeitos. Não
-altera AGENTS, workflow, semântica permanente de continuidade ou gates externos.
-Base limpa `851ac3a`, fetch concluído, HEAD/upstream iguais; main `fe8f24f`,
-origin/main `db56b40`, preservados sem integração. Branch de entrega
-`test/m6-m8-validacao-isolada` mantém base M2/M3 ainda não integrada.
+**19/45 aceitos (42,2%)**, 26 sem aceite; M3 6/7, M6 2/4, M8 2/4.
+Autorização temporária desta sessão permitiu atravessar marcos com dependências
+satisfeitas. WEB-022/023/029/030 CONCLUIDAS; WEB-021/031 BLOQUEADAS; WEB-012
+EM_VALIDACAO. Nenhum marco adicional encerrado. Regras de AGENTS/workflow e
+semântica permanente de continue o projeto não foram alteradas; a exceção
+termina nesta execução.
 
-Seleção global: WEB-022/023 (P0, M6) e WEB-029 (M8) aceitas; WEB-030/031 em execução. WEB-012 permanece EM_VALIDACAO aguardando aceite do
-responsável em EV-M3-012. WEB-021 BLOQUEADA por conta/cliente OIDC e ambiente de
-teste não disponibilizados/autorizados; não buscar credenciais operacionais.
-M4 depende de M3/M6; M5/M7 e gates finais M8/M9/M10 preservam dependências.
-Nenhum marco parcialmente bloqueado declarado concluído. Evidências desta
-execução serão registradas abaixo; aceites anteriores permanecem históricos.
+Base limpa `851ac3a`, fetch concluído; main `fe8f24f`, origin/main `db56b40`
+preservadas sem integração. Branch `test/m6-m8-validacao-isolada` mantém base
+M2/M3 ainda não integrada. Commits enviados e conferidos por upstream/remoto:
+`d10fa376349f948fef82adcda43521db003b5411` (M6),
+`357e28f39b132b0213998b5066051bdd7b2fa04d` (infra),
+`0d79fd297f169ad25c63402dbd11c535694a0b98` (documentação do scanner).
+Entrega/fechamento da réplica identificável por `git log -1 --format=%H
+--grep='test(infra): ensaia réplica SSH e agenda em ambiente sintético'`;
+conferir seu envio por HEAD/upstream/ls-remote, sem autorreferência artificial.
+
+Pipeline integral local e Actions aprovados em **0d79fd2**, URL/SHA/resultados
+em EV-M8-030; falha inicial 357e28f preservada. Novo harness SSH posterior tem
+validação real própria em EV-M8-029/031, sem alegar Actions nesse novo HEAD.
+Documentação final: validador, sete testes documentais, scanner de fontes e
+`git diff --check` aprovados. Evidências M6 em EV-M6-022/023. Sem PR/merge/tag,
+VPS/deploy ou dados reais. Worktree sparse e imagens API/proxy sintéticas
+preservadas; PG e recursos transitórios criados para os ensaios removidos.
+
+Seleção global final e próxima ação:
+
+- WEB-012: responsável aceitar limites de suporte de EV-M3-012 ou bloquear motor;
+  aprovação do alcance DEC-04 não aprova resultados por antecipação.
+- WEB-021: disponibilizar conta/cliente/ambiente OIDC de teste autorizado;
+  não solicitar secrets pela conversa nem abrir .env operacional. WEB-024 depende dela.
+- WEB-031: entrega técnica local pronta e ensaiada, inclusive SSH/agenda/alerta.
+  Responsável deve disponibilizar destino externo/custódia de teste autorizados
+  e revisar limites; REQ-INF-003 não é comprovado por duas cópias no mesmo host.
+- M4 aguarda M3/M6; M5/M7 aguardam seus gates; WEB-032 aguarda M7/WEB-031;
+  M9/M10 preservam pré-requisitos, DEC-03/05 e validação física/metodológica.
+
+**Nenhuma tarefa elegível sem recurso/aceite adicional**. Próxima ação:
+aceite WEB-012; para execução técnica independente, WEB-021 com ambiente
+OIDC autorizado ou continuação WEB-031 com destino externo de teste autorizado.
+Não repetir baseline global/campanha concluída sem divergência concreta.
 
 ### Retomada anterior — campanha local concluída; suporte em revisão, 2026-11-06
 

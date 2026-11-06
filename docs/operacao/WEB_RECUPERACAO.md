@@ -126,7 +126,19 @@ contagens permanecem iguais. Nao interrompe a previa do usuario nem usa bancos
 operacionais. O tempo reportado mede o ensaio local de backup/restauracao,
 sem prometer capacidade ou tempo de recuperacao do ambiente alvo.
 
-Ensaio local aprovado: 8 migrations e uma coleta restauradas, integridade de
+Para conferir transporte SSH/agenda sem tocar a VPS, use
+`python scripts/smoke_web_replication.py --api-image IMAGEM_API_LOCAL
+--proxy-image IMAGEM_PROXY_LOCAL`, com imagens locais já construídas pelo smoke
+Compose. Requer Docker, cliente ssh/ssh-keygen e systemd de usuário ativo.
+O harness instala openssh-server somente em imagem descartável de teste, gera
+backup PG sintético novo, replica por SSH com chave/hostkey efêmeras e restaura
+cópia isolada. Timers transitórios conferem cópia e alerta de indisponibilidade;
+limpeza remove apenas recursos próprios. Não instala servidor no host, não usa
+configuração SSH pessoal, destino externo ou backups existentes. O resultado
+local não garante réplica externa, disponibilidade contínua ou RPO/RTO da VPS.
+Evidências/aceite atuais somente no [backlog](../Projeto%20Stroop%20Test.md).
+
+Registro histórico do primeiro ensaio local: 8 migrations e uma coleta restauradas, integridade de
 16 tentativas/12 metricas e estado concluido verificados; backup/restauracao
 em 7,083 segundos, falha de banco detectada e rollback do candidato com
 contagens preservadas. Monitor4/4, regressao de servico de backup1/1 e suite
