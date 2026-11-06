@@ -1,5 +1,13 @@
 # Transicao, cobertura e manutencao WEB
 
+Nota de planejamento CHG-004, 2026-11-06 — **PLANEJADO**:
+Paridade futura WEB-028 inclui login local, expiração/logout/recuperação,
+autorização por projeto e limites de auditoria compartilhada. Capacidades
+Google abaixo descrevem a base histórica; Streamlit permanece até aprovação
+de transição e eventual retirada especificamente autorizada.
+Decisão: [ADR-006](../arquitetura/ADR-006-autenticacao-local.md). Execução/aceite somente no backlog canônico.
+
+
 Este documento orienta a operacao das funcionalidades implementadas e a
 coexistencia com o fluxo local. O estado formal e os aceites permanecem no
 [roadmap WEB](../ROADMAP_WEB.md); release publicada e evidencias operacionais

@@ -217,3 +217,29 @@ A [documentacao primaria de temporizacao do jsPsych](https://www.jspsych.org/v8/
 distingue limitacoes de apresentacao em navegador e alerta que resultados de
 estudos anteriores podem nao se aplicar a versoes atuais. Ela nao concede
 homologacao automatica a este motor ou ao equipamento do estudo.
+
+## Autenticação local — plano de verificação CHG-004
+
+**Todos os casos abaixo são PLANEJADOS**, sem resultado desta missão documental.
+[ADR-006](arquitetura/ADR-006-autenticacao-local.md) não valida motor/metodologia.
+São referências de teste, não tarefas ou workflow novos. Execução/resultado/data/
+SHA/skips/aceite devem ser registrados somente nas fichas do
+[backlog](Projeto%20Stroop%20Test.md). Nomes de futuros arquivos serão escolhidos
+na implementação; caminhos existentes abaixo são suites a adaptar/regredir.
+
+| Casos | Requisitos | WEB de execução / aceite | Verificação futura e ambiente |
+|---|---|---|---|
+| AUTH-L01 login/credencial | REQ-AUT-001/004 | WEB-021 → WEB-024 | Unidade backend de hash/verificação Argon2id, salt distinto, parâmetros, senha íntegra sem trim/truncamento, rehash, política e ausência de plaintext/default. API/PG: login válido/inválido, inexistente/bloqueado e conta ausente; mesmo erro sem enumeração, nenhuma sessão em falha |
+| AUTH-L02 provisionamento/recuperação | REQ-AUT-004, REQ-AUD-001 | WEB-021 → WEB-024 | CLI protegida/terminal sem eco e segredos em argv/log; bootstrap concorrente/segunda execução, recuperação break-glass, versão de senha e todas sessões revogadas atomicamente; falha transacional/rollback, último admin, nenhum vínculo implícito |
+| AUTH-L03 força bruta/enumeração | REQ-AUT-005, REQ-SEG-001 | WEB-021 → WEB-024 | Janela por conta/origem, concorrência/múltiplos processos/reinício, usuário inexistente, 429/Retry-After, limites expiram, IP forjado, banco/contador indisponível, DoS de hash/conta única, erros/tempos/corpos sem pistas; logs sanitizados |
+| AUTH-L04 sessões/revogação | REQ-AUT-002/003/004 | WEB-021 → WEB-024 | PG/API: login renova cookie, fixação/replay, limite inativo/absoluto nas bordas, polling sem extensão, logout repetido/replay, revogação admin, bloqueio e troca/recuperação da senha concorrentes a login/escrita; participante continua isolado |
+| AUTH-L05 cookies/CSRF/Origin | REQ-AUT-003, REQ-SEG-001 | WEB-021 → WEB-024 | HTTPS real: Secure/HttpOnly/SameSite/Path/sem Domain, cookies/headers duplicados, CSRF ausente/divergente, origem ausente/null/divergente inclusive login; no-store, limpeza RAM/storage e expiração em outra aba. Regressão test_web_auth.py/test_web_sessions.py |
+| AUTH-L06 autorização/admin | REQ-AUT-002/006, REQ-AUD-001 | WEB-021 → WEB-024 | PG com reader/writer: conta admin sem vínculo nega leitura/export/convite, IDOR entre projetos, perfis insuficientes, revogação de membro/emissor, último admin, cadastro adicional recusado, revogação de sessões efetiva; test_web_administration_provisioned.py/test_web_assessments.py/test_web_database_provision.py |
+| AUTH-L07 produto/E2E | REQ-AUT-001/002/003/006, REQ-AVA-001, REQ-REL-001, REQ-CSV-003 | WEB-021/024, integração WEB-013/016/017/018/020/028/035 | React/FastAPI/PG reais em HTTPS Chromium/Firefox: formulário/teclado/foco/erros/loading, login abre dashboard, acesso não autenticado nega, logout/expiração, criação de convite e participante separado, métricas/gráficos/export intactos. Vitest/tipos/build e web/e2e/integrated; doubles não aceitam integração |
+| AUTH-L08 schema/restore | REQ-INF-001/003, REQ-AUT-004 | WEB-021 → WEB-024; recuperação/release WEB-031/032/039 | test_postgres_migrations.py e provisionamento em stroop_etapa4_test*: catálogo antigo→novo preserva FKs/vínculos/resultados/auditoria; constraints/grants negam hash ao reader e DDL ao runtime; rollback compatível e backup/restore isolado sem ressuscitar sessões/senha antiga |
+| AUTH-L09 segurança/operação | REQ-SEG-001/002/003, REQ-INF-002, REQ-EXT-002, REQ-AUT-005/006 | WEB-024/032/033/035/036/037/038/039/040/041 | test_web_security_review.py/test_web_proxy_config.py, scanner/auditorias, imagens/Compose sem Google obrigatório, OIDC indisponível no corte, TLS/headers/logs/grants/segredos; pipeline por SHA sem skip obrigatório. Revisão institucional de conta compartilhada e smoke/handoff só quando autorizados |
+
+Aceite local só depois de resultados positivos/negativos reais, conferência de
+todos os critérios e evidência nova. Testes OIDC sintéticos e sessões provisionadas
+anteriormente permanecem históricos; não testam senha local. Login profissional
+não comprova latência física, WEB-012/034, DEC-03/05, réplica externa ou deploy.

@@ -1,5 +1,16 @@
 # Tratamento e retencao de dados
 
+Atualização alvo CHG-004 (2026-11-06): substituir identidade OIDC profissional
+por principal técnico local na versão alvo, conforme
+[ADR-006](../arquitetura/ADR-006-autenticacao-local.md). Texto OIDC abaixo é
+contrato atual/histórico. Hash de senha e sessões são dados sensíveis de acesso,
+nunca dados de pesquisa/exportação/logs; backup continua criptografado. Auditoria
+local registra conta, ação/resultado e ID técnico, sem autoria individual, com
+prazo operacional provisório de 180 dias sujeito a DEC-03, sem alterar política
+institucional por esta missão. Conta compartilhada requer avaliação institucional
+explícita antes de dados reais; R07/R12 e WEB-033 no backlog.
+
+
 Politica provisória autorizada em 2026-09-13 para orientar o hardening. Ela nao
 substitui protocolo de pesquisa, decisao do pesquisador responsável, parecer do
 CEP, base legal, aviso aos titulares ou normas internas. Todos os prazos devem

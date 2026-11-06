@@ -48,7 +48,7 @@ Atualizado em **2026-11-06**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **19 de 45 · 42,2%** | **26** | **M3 · suporte em validação; M6/M8 parciais** | Sem tarefa elegível: aceite WEB-012, ambiente OIDC WEB-021 e destino externo WEB-031 dependem do responsável |
+| **19 de 45 · 42,2%** | **26** | **M3 · suporte em validação; M6/M8 parciais** | M3: aceite WEB-012 pelo responsável; WEB-021 pronta tecnicamente em M6, exige autorização posterior do marco; WEB-031 aguarda destino externo |
 
 ```text
 Aceites   ████████░░░░░░░░░░░░   42,2%
@@ -74,7 +74,7 @@ A ordem da tabela segue os IDs; dependências e paralelismo estão na
 | [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | 🟩🟩🟩⬜🟩🟩🟩 **6/7** | ◐ Campanha aceita; suporte em validação |
 | [M4](#m4--fluxo-ponta-a-ponta-de-avaliações) | Fluxo ponta a ponta de avaliações | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
-| [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | ⬜🟩🟩⬜ **2/4** | ◐ Parcial; login externo bloqueado |
+| [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | ⬜🟩🟩⬜ **2/4** | ◐ Parcial; autenticação local planejada |
 | [M7](#m7--integração-compatibilidade-histórica-e-transição) | Integração, compatibilidade histórica e transição | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M8](#m8--ci-infraestrutura-e-preparação-operacional) | CI, infraestrutura e preparação operacional | 🟩🟩⬜⬜ **2/4** | ◐ Parcial; réplica externa e release pendentes |
 | [M9](#m9--validação-técnica-e-metodológica) | Validação técnica e metodológica | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
@@ -700,6 +700,7 @@ sessão removido ao fechar; recursos preexistentes preservados.
 - Riscos/bloqueios: R01/R02/R11 abertos. Responsável deve aceitar os limites observados ou bloquear motor; não ampliar matriz nem declarar equivalência por inferência.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md). CHG-003; R11.
 - Git da entrega: branch `feat/m3-motor-experimental`; relatório identificável por `git log -1 --format=%H --grep="docs: registra campanha DEC-04 e limites de suporte"`; envio/CI no fechamento EV-M3-011.
+- CHG-004: Sem mudança de estado/aceite: exige decisão explícita sobre os resultados e limites de EV-M3-012. Login local não comprova viabilidade, timing físico ou validade metodológica.
 
 ### EV-M3-009/010 — fontes, plugins e diagnóstico, 2026-11-05
 
@@ -873,6 +874,7 @@ D5 e suporte exigem evidências próprias; nenhuma reutilização da exceção W
 - Riscos/bloqueios: R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: REQ-PAR-001, REQ-AVA-001; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- CHG-004: Login local aceito em WEB-021/024 deve preceder preparação e emissão de convite; AUTH-L04/L07 regressa pseudônimos, visitas, expiração/revogação e projetos. Credencial participante segue independente.
 
 ### WEB-014 — Validar instruções, prática e início principal no fluxo real
 
@@ -909,6 +911,7 @@ D5 e suporte exigem evidências próprias; nenhuma reutilização da exceção W
 - Riscos/bloqueios: R03, R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md). REQ-UX-005/006/008/009/010.
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- CHG-004: Integrar login profissional local e consulta protegida no E2E sem alterar persistência incremental, recibo, interrupções ou 12 métricas; AUTH-L07.
 
 ## M5 — Interface administrativa e analítica React
 
@@ -937,6 +940,7 @@ D5 e suporte exigem evidências próprias; nenhuma reutilização da exceção W
 - Riscos/bloqueios: R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: REQ-REL-001; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- CHG-004: Login local em WEB-021 fornece entrada protegida; revalidar 401/403/404, filtros/gráficos e logout/expiração sem redesign ou redução de relatórios (AUTH-L07).
 
 ### WEB-018 — Revalidar administração React de contas e vínculos
 
@@ -949,6 +953,7 @@ D5 e suporte exigem evidências próprias; nenhuma reutilização da exceção W
 - Riscos/bloqueios: R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: REQ-REL-003; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- CHG-004: Adequar UI administrativa à conta local única; gestão de vínculos/perfis/bloqueio preservada, sem cadastro público ou oferta de novas contas nesta versão. Contrato antigo de criação OIDC permanece histórico; AUTH-L06/L07 regressa último admin e acesso por projeto.
 
 ### WEB-019 — Validar detalhe, tentativas, métricas e proveniência
 
@@ -976,31 +981,31 @@ D5 e suporte exigem evidências próprias; nenhuma reutilização da exceção W
 
 ## M6 — Autenticação, permissões e segurança
 
-- Objetivo: Revalidar Google OIDC e autorização central antes do primeiro fluxo integrado.
+- Objetivo: Substituir Google OIDC por login local e preservar autorização central antes do primeiro fluxo integrado (CHG-004).
 - Justificativa: Reposicionado antes de M4; segurança não será fase tardia.
-- Inclui: Callback real autorizado, credenciais separadas, perfis/vínculos, revogação, CSRF e revisão de ameaças.
-- Exclui: Redução de proteção, troca de provedor, novas políticas institucionais inferidas.
-- Pré-requisitos: M2 aceito; credenciais apenas no ambiente autorizado para ensaio real.
+- Inclui: Conta administrativa local única, senha/hash, provisionamento e recuperação protegidos, sessões separadas, perfis/vínculos, revogação, CSRF e revisão de ameaças.
+- Exclui: Cadastro público, ampliação para múltiplas contas, redução de proteção e políticas institucionais inferidas.
+- Pré-requisitos: M2 aceito; ensaios com conta sintética provisionada em ambiente isolado HTTPS/API/PG, sem recurso Google.
 - Dependências: M2.
 - Entregáveis: Matriz de autorização e evidência de login/logout com conta cadastrada.
-- Componentes afetados: `api/auth.py, google_oidc.py, stroop/domain/auth.py, segurança e proxy`.
-- Testes necessários: OIDC negativo/replay, cookies/CSRF/Origin, IDOR, bloqueio, grants; login Google interativo autorizado separado de fixtures.
+- Componentes afetados: `api/auth.py, config.py, administration.py, stroop/domain/auth.py, stroop/application/auth.py, stroop/persistence/, web/src/App.tsx`, schema aditivo, segurança e proxy.
+- Testes necessários: matriz AUTH-L01–L09 em [validação](VALIDACAO_WEB.md#autenticação-local--plano-de-verificação-chg-004), cookies/CSRF/Origin, IDOR, bloqueio e grants; login real local em HTTPS/API/PG, sem doubles para aceite.
 - Critérios de aceite: Controles positivos/negativos comprovados; login real não pode ser substituído por mock ou alegação histórica.
-- Riscos: R05, R07.
-- Decisões externas: Conta/cliente OIDC de teste e ambiente autorizado; se indisponível bloquear somente WEB-021/gate dependente.
+- Riscos: R05, R07, R12.
+- Decisões externas: direção local aprovada pelo proprietário nesta missão; uso compartilhado com dados reais exige DEC-03. Implementação requer autorização posterior de M6; nenhum cliente Google é dependência alvo.
 - Encerramento: todas as tarefas do marco CONCLUIDAS, critérios acima comprovados e evidência consolidada por SHA; sem aceite presumido por documentação ou código existente.
 
-### WEB-021 — Revalidar OIDC e executar login real em ambiente de teste autorizado
+### WEB-021 — Implementar autenticação local e integrar login profissional seguro
 
-- Marco: M6. Prioridade: P0. Complexidade: G. Estado: BLOQUEADA.
-- Dependências: WEB-008; conta/cliente de teste autorizado.
-- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: Casos negativos e callback/PKCE/state/nonce passam; login/logout Google interativo documentado com identidade cadastrada e sem claims/tokens no artefato público.
-- Testes/verificação: `tests/test_web_oidc_callback.py, test_google_oidc.py; PLANEJADO: login real`. Negativos sintéticos reexecutados em EV-M6-022/023 e pipeline EV-M8-030; login Google interativo ainda PLANEJADO/BLOQUEADO.
-- Evidências: parciais em EV-M6-022/023, 2026-11-06; callback/PKCE/state/nonce e verificador OIDC sintéticos aprovados. Sem evidência nova de login/logout Google interativo; não aceita WEB-021.
-- Riscos/bloqueios: R05; conta/cliente Google de teste e ambiente interativo ainda não autorizados/disponibilizados nesta sessão. Não inspecionar secrets operacionais. Responsável deve prover o ambiente/conta autorizados; WEB-024 permanece dependente. Casos sintéticos podem ser revalidados sem aceitar login real.
-- Referências: REQ-AUT-001; [arquitetura](ARQUITETURA_WEB.md).
-- Git parcial: branch `test/m6-m8-validacao-isolada`; testes negativos no escopo M6/EV-M8-030. Não há entrega aceita do login real.
+- Marco: M6. Prioridade: P0. Complexidade: G. Estado: PRONTA.
+- Dependências: WEB-008.
+- Responsável: Codex na execução autorizada de M6; proprietário/operador na custódia e instituição no eventual uso real.
+- Critérios de aceite: Login local válido cria sessão nova e abre dashboard; senha inválida, usuário inexistente/bloqueado e acesso não autenticado negam genericamente. Conta única administrativa, sem cadastro público/default/hardcode; Argon2id, provisionamento, alteração/recuperação administrativa e revogação atômica após senha. Rate limiting por conta/origem, cookies seguros, CSRF/Origin inclusive login, inatividade e limite absoluto, logout/invalidação e revogação administrativa conforme contrato. React/FastAPI/PG/HTTPS reais; preservar projetos, grants, último admin, convites e dados históricos; compatibilidade/migração aditiva testadas antes do corte de OIDC. Regressões novas de WEB-022/023 obrigatórias aqui, consolidadas em WEB-024.
+- Testes/verificação: PLANEJADOS AUTH-L01–L09 em [validação](VALIDACAO_WEB.md#autenticação-local--plano-de-verificação-chg-004); regressão das suites existentes auth/admin/sessions/assessments e E2E integrado em Chromium/Firefox. Sem teste funcional executado nesta missão.
+- Evidências: CHG-004/ADR-006 são especificação PLANEJADA, sem implementação/teste/aceite local. Histórico preservado: antigos callback/PKCE/state/nonce sintéticos em EV-M6-022/023 e EV-M8-030; login Google interativo não comprovado. Esses testes não aceitam a alternativa local.
+- Riscos/bloqueios: R05/R07/R12. Bloqueio anterior por conta/cliente Google deixa de ser dependência alvo; falta implementar/testar em sessão futura autorizada. PRONTA significa dependências técnicas satisfeitas, sem autorizar avanço de M3 a M6. Nunca abrir secrets operacionais.
+- Referências: REQ-AUT-001/004/005, REQ-AUT-002/003; [ADR-006](arquitetura/ADR-006-autenticacao-local.md), CHG-004.
+- Git parcial histórico: `test/m6-m8-validacao-isolada`, EV-M6-022/023 e EV-M8-030; nenhuma entrega local aceita. Versionamento desta revisão em EV-CHG-004.
 
 ### WEB-022 — Comprovar matriz de perfis, projetos e revogações
 
@@ -1009,10 +1014,11 @@ D5 e suporte exigem evidências próprias; nenhuma reutilização da exceção W
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Consulta/importacao/admin e participante testados em operações positivas/negativas; admin sem projeto não herda resultados; revogação efetiva.
 - Testes/verificação: `tests/test_web_auth.py, test_web_assessments.py, test_web_sessions.py`. Executados em PG descartável, junto aos casos de autenticação/importação; dez casos HTTPS reais em Chromium/Firefox. Ver EV-M6-022/023.
-- Evidências: EV-M6-022/023, 2026-11-06; critérios positivos/negativos comprovados em banco sintético e HTTPS. OIDC externo permanece WEB-021.
+- Evidências: EV-M6-022/023, 2026-11-06; critérios positivos/negativos comprovados em banco sintético e HTTPS. Login local alvo permanece WEB-021; evidência histórica OIDC preservada.
 - Riscos/bloqueios: R05 preservado para revisão final; matriz local comprovada sem aprovação de OIDC externo.
 - Referências: REQ-AUT-002; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch `test/m6-m8-validacao-isolada`; entrega identificável por `git log -1 --format=%H --grep="test(web): comprova permissões e isolamento de sessões em M6"`; envio/CI no fechamento desta execução.
+- CHG-004: Aceite histórico EV-M6-022/023 preservado. Regressões locais PLANEJADAS AUTH-L04/L06/L07 em WEB-021/024: conta local admin sem vínculo não lê/exporta/emite convite; vínculos explícitos, bloqueio, perfis consulta/importacao/administracao e último admin preservados. Não ampliar múltiplas contas agora; fixtures de perfis são regressão, não produto novo.
 
 ### WEB-023 — Revalidar sessão, cookies, CSRF e isolamento de credenciais
 
@@ -1021,10 +1027,11 @@ D5 e suporte exigem evidências próprias; nenhuma reutilização da exceção W
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Origin e CSRF ausentes/divergentes negam; expiração/logout/replay e cookies separados comprovados em HTTPS; sem armazenamento durável.
 - Testes/verificação: `tests/test_web_auth.py, test_web_sessions.py; integração HTTPS`. Executados em PG descartável, junto aos casos de autenticação/importação; dez casos HTTPS reais em Chromium/Firefox. Ver EV-M6-022/023.
-- Evidências: EV-M6-022/023, 2026-11-06; critérios positivos/negativos comprovados em banco sintético e HTTPS. OIDC externo permanece WEB-021.
+- Evidências: EV-M6-022/023, 2026-11-06; critérios positivos/negativos comprovados em banco sintético e HTTPS. Login local alvo permanece WEB-021; evidência histórica OIDC preservada.
 - Riscos/bloqueios: R05/R07 preservados para revisão final; nenhum impedimento nos critérios locais desta tarefa. Login real não aceito por estes ensaios.
 - Referências: REQ-AUT-003; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch `test/m6-m8-validacao-isolada`; entrega identificável por `git log -1 --format=%H --grep="test(web): comprova permissões e isolamento de sessões em M6"`; envio/CI no fechamento desta execução.
+- CHG-004: Aceite histórico EV-M6-022/023 preservado. Novo mecanismo não coberto: AUTH-L03/L04/L05 em WEB-021/024 devem provar inatividade, teto absoluto, login CSRF/Origin, rotação da senha, logout/revogação, cookies e isolamento profissional/participante; nenhuma credencial durável no cliente.
 
 ### WEB-024 — Concluir revisão de segurança com evidências negativas
 
@@ -1037,6 +1044,7 @@ D5 e suporte exigem evidências próprias; nenhuma reutilização da exceção W
 - Riscos/bloqueios: R05, R07; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: REQ-AUD-001, REQ-SEG-001; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- CHG-004: Exigir AUTH-L01–L09 e regressões novas de WEB-022/023 na SHA candidata local: hash/segredos, força bruta/enumeração/DoS, provisionamento/recuperação, sessões/rotação, admin/IDOR/grants, logs e auditoria limitada da conta compartilhada. R12 permanece residual; decisão institucional em WEB-033, sem criar ciclo com M6. REQ-AUT-004/005/006 e REQ-SEG-001; evidência nova PLANEJADA.
 
 ### EV-M6-022/023 — autorização e sessões reais sintéticas, 2026-11-06
 
@@ -1154,6 +1162,7 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 - Riscos/bloqueios: R08, R10; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- CHG-004: Paridade deve comparar capacidades autorizadas Streamlit/React, incluindo login local, logout/sessões e limitação de autoria individual (AUTH-L07). Aprovação do proprietário continua necessária; nenhuma remoção Streamlit autorizada.
 
 ## M8 — CI, infraestrutura e preparação operacional
 
@@ -1182,6 +1191,7 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 - Riscos/bloqueios: R08/R09 preservados para release/operação; nenhum impedimento do ensaio local. Não aceita VPS/produção ou OIDC externo.
 - Referências: REQ-INF-002; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch `test/m6-m8-validacao-isolada`; hash/envio/CI no fechamento desta sessão.
+- CHG-004: Aceite histórico preservado; reexecução local de imagens/configuração sem Google exigida em WEB-032 (AUTH-L08/L09), sem transferência de CI anterior.
 
 ### WEB-030 — Reproduzir pipeline e definir validação formal sem PR automático
 
@@ -1194,6 +1204,7 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 - Riscos/bloqueios: R09 preservado para recursos/gates operacionais; nenhum impedimento nos critérios do pipeline. Primeira falha scanner preservada na evidência.
 - Referências: REQ-EXT-002; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch `test/m6-m8-validacao-isolada`; candidato `0d79fd2` enviado e Actions por SHA aprovado. Fechamento documental posterior sem transferir CI ao novo HEAD.
+- CHG-004: Aceite histórico por SHA preservado; WEB-021/032 devem integrar testes locais e revisar locks/harnesses/fixtures OIDC e scanners sem alterar gatilhos/proteções nem remover regressões para obter passe.
 
 ### WEB-031 — Ensaiar restauração, réplica e retorno compatível
 
@@ -1206,11 +1217,12 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 - Riscos/bloqueios: R08/R09. Ferramenta SSH local preparada/ensaiada sem instalar no host; bloqueio por ferramenta superado. REQ-INF-003 exige réplica externa antes da publicação; destino/conta/chave externos de teste e aceite dos limites operacionais dependem do responsável. Não acessar VPS/backup operacional por inferência; ensaio no mesmo computador não prova falha independente nem RPO/RTO externos. WEB-032 preserva M7 e este gate.
 - Referências: REQ-INF-003; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega parcial: branch `test/m6-m8-validacao-isolada`; commit/envio/CI no fechamento desta sessão.
+- CHG-004: Réplica externa independente continua obrigatória; após evolução de schema local, WEB-032 revalida restauração de hashes/sessões com custódia e invalidação de sessões restauradas para não ressuscitar acessos. RPO/RTO externo requer medição e aceite, não conta Google.
 
 ### WEB-032 — Fechar release candidata e runbooks reproduzíveis
 
 - Marco: M8. Prioridade: P1. Complexidade: G. Estado: PENDENTE.
-- Dependências: WEB-028, WEB-030, WEB-031.
+- Dependências: WEB-028, WEB-030, WEB-031, WEB-024.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Manifesto por SHA/imagens/schema, capacidade no ambiente medido, runbooks backup/retorno/incidente e custódia revisados; M8 aceito sem publicação.
 - Testes/verificação: `scripts/benchmark_web.py; PLANEJADO: revisão de release e CI real aplicável`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
@@ -1218,6 +1230,7 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 - Riscos/bloqueios: R08, R09; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- CHG-004: Candidata deve incluir WEB-024 local aceita, AUTH-L08/L09, manifesto/schema/locks novos, runbooks sem cliente Google obrigatório, provisionamento/recuperação e invalidação de sessões no restore/rollback. Réplica externa WEB-031 e M7 continuam impeditivos; nenhuma publicação.
 
 ### EV-M8-029/031 — imagens e recuperação isoladas, 2026-11-06
 
@@ -1383,6 +1396,7 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Riscos/bloqueios: R07; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: REQ-SEG-002; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- CHG-004: DEC-03 deve avaliar expressamente uso compartilhado, ausência de atribuição individual, custódia/distribuição/troca na saída de profissional e adequação a dados reais; rejeição exige contas individuais em mudança futura antes do uso, sem aprovação presumida. REQ-AUT-006, R07/R12; evidência institucional ainda ausente.
 
 ### WEB-034 — Executar validação temporal e metodológica aprovada
 
@@ -1395,6 +1409,7 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Riscos/bloqueios: R01, R02; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md). REQ-UX-001 a REQ-UX-007/011; R01/R02/R11.
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- CHG-004: Arquitetura local não altera campanha/metodologia. Manter DEC-04 e obter aprovação específica do protocolo/equipamento físico quando exigido em M9; aceite de engenharia local não o substitui.
 
 ### WEB-035 — Homologar candidato integrado e capacidade no ambiente autorizado
 
@@ -1407,6 +1422,7 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Riscos/bloqueios: R08, R09; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- CHG-004: Homologar candidata local por SHA: AUTH-L01–L09, segurança/privacidade, provisão sintética e recuperação; nenhum resultado OIDC histórico aprova login local ou ambiente VPS.
 
 ### WEB-036 — Obter aceite técnico e decisão explícita de liberação
 
@@ -1419,6 +1435,7 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Riscos/bloqueios: R01, R07; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: REQ-SEG-003; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- CHG-004: Aceite técnico inclui riscos residuais R05/R07/R12 e decisão de adequação de conta compartilhada em WEB-033; DEC-05, deploy e coleta permanecem separados.
 
 ## M10 — Implantação controlada e documentação operacional
 
@@ -1447,6 +1464,7 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Riscos/bloqueios: R08; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- CHG-004: Plano concreto identifica provisionamento local protegido, custódia, rotação/revogação, schema compatível e rollback sem reabrir OIDC/sessões antigas; nenhum segredo no manifesto.
 
 ### WEB-038 — Executar implantação controlada autorizada e smoke
 
@@ -1459,6 +1477,7 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Riscos/bloqueios: R08, R09; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- CHG-004: Somente após autorização específica: provisionar/verificar conta local no ambiente alvo por procedimento protegido, smoke HTTPS/login/logout/negações, sem publicar senha/segredos; deploy não autoriza coleta.
 
 ### WEB-039 — Confirmar recuperação e handoff operacional
 
@@ -1471,6 +1490,7 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Riscos/bloqueios: R08, R09; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- CHG-004: Handoff inclui recuperação administrativa, rotação na alteração da equipe, revogação de todas as sessões e restore sem ressuscitar acesso; demonstrar custódia e recuperação externa/RPO/RTO.
 
 ### WEB-040 — Encerrar transição com aceite do proprietário
 
@@ -1483,6 +1503,7 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Riscos/bloqueios: R07, R10; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- CHG-004: Aceite operacional explicita conta compartilhada, limites de auditoria e política institucional; transição, uso real e eventual retirada Streamlit exigem aprovações próprias.
 
 ### WEB-041 — Implementar configuração controlada para pesquisa real após aprovação
 
@@ -1495,6 +1516,7 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Riscos/bloqueios: R05/R07; sem DEC-03/05 permanece PENDENTE/BLOQUEADA conforme impedimento observado. Não há tarefa independente que permita declarar operação real concluída sem esta entrega.
 - Referências: REQ-SEG-003, REQ-SEG-002, REQ-PAR-003, REQ-AVA-001; ARQUITETURA_WEB e seguranca/ACESSO_WEB.md.
 - Git: branch/commit/push/CI a registrar na execução autorizada; não habilitar produção por commit ou teste.
+- CHG-004: Configuração research exige DEC-03/05, política de conta local e privilégios/vínculos explícitos, proteção de credenciais e autoria limitada; testar barreiras com conta sintética antes da ativação real separada.
 
 ## Registro de riscos
 
@@ -1508,14 +1530,15 @@ de mitigação no código não elimina risco sem ensaio. Atualizar somente aqui.
 | R02 | Confundir PsychoPy, variante WEB e aceites históricos | Conclusões científicas indevidas | Alta | Crítica | D1–D6 e versões separadas, preservar falhas W16, validação metodológica distinta; identificar apresentação antes/depois e variante aprovada frente a D3/D4 | M2/M3/M9 | Metodológico | ABERTO |
 | R03 | RAM até envio final, falha/reload/expiração e corrida de commit | Perda ou duplicação de tentativas/resultados | Alta | Crítica | CHG-002/ADR-005; validar estratégia incremental e matriz antes de código; ensaiar ACK/replay, perda do sufixo e corridas; final-only rejeitado | M2/M4 | Backend + produto | ABERTO |
 | R04 | Diferenças de sentinela RT, unidade, mediana/arredondamento entre consumidores | Regressão nos cálculos/análises | Média | Alta | Golden fixtures sintéticas e paridade núcleo/API/CSV/UI, sem mudança silenciosa | M1/M2/M5 | Técnico | ABERTO |
-| R05 | Alterar OIDC ou perfis/vínculos sem revalidar negações | Acesso cruzado, sessão indevida, perda de administração | Média | Crítica | Login real autorizado, CSRF/Origin/IDOR, revogação, último admin, reader/writer | M6/M4/M5 | Segurança/técnico | ABERTO |
+| R05 | Substituir OIDC por senha local ou alterar perfis/vínculos sem revalidar negações | Acesso cruzado, sessão indevida, perda de administração | Média | Crítica | WEB-021/024: Argon2id, antiabuso, login local HTTPS/API/PG real, CSRF/Origin/IDOR, inatividade/teto, rotação/revogação, último admin, reader/writer; evidências futuras AUTH-L01–L09 | M6/M4/M5 | Segurança/técnico | ABERTO |
 | R06 | Novo schema ou rótulo de projeto apropria/muda histórico | Corrupção ou acesso a coletas | Média | Crítica | Aditividade, mapa explícito, fixtures, nenhum dado real sem autorização | M2/M7 | Backend + proprietário | ABERTO |
-| R07 | Pseudônimo tratado como anônimo; coleta/liberação sem política institucional | Exposição de pessoas e uso indevido | Média | Crítica | DEC-03/05, minimização e barreira synthetic, sem nomes/logs, revisão institucional | M6/M9/M10 | Proprietário/instituição | ABERTO |
+| R07 | Pseudônimo tratado como anônimo; coleta/liberação sem política institucional | Exposição de pessoas e uso indevido | Média | Crítica | DEC-03/05, minimização e barreira synthetic, sem nomes/logs, revisão institucional incluindo adequação da conta compartilhada e R12 | M6/M9/M10 | Proprietário/instituição | ABERTO |
 | R08 | Publicação interrompe aplicação; backup não restaurável/retorno incompatível | Indisponibilidade/perda | Média | Crítica | Ensaio isolado schema/dados/imagens, réplica/agenda/alerta, deploy autorizado e retorno | M7/M8/M10 | Operador/proprietário | ABERTO |
-| R09 | Dependências de VPS/DNS/TLS/OIDC/chaves/destino externo ou CI sem PR | Bloqueio de homologação/recuperação e falsa prontidão | Média | Alta | Preparar local independente; inventário de recursos e validação por SHA, sem mudar proteção para contornar bloqueio | M1/M8/M10 | Operador + técnico | ABERTO |
+| R09 | Dependências de VPS/DNS/TLS/provisionamento local/chaves/destino externo ou CI sem PR | Bloqueio de homologação/recuperação e falsa prontidão | Média | Alta | Preparar local independente; inventário de recursos e validação por SHA, sem mudar proteção para contornar bloqueio | M1/M8/M10 | Operador + técnico | ABERTO |
 | R10 | Reescrever o que existe, ampliar instrumentos e manter backlogs concorrentes | Retrabalho e escopo sem controle | Alta | Alta | Auditoria, backlog único, critérios pequenos, IDs e controle de mudança; sem crédito histórico automático | Todos | Coordenador técnico | ABERTO |
 
 | R11 | Contorno/retirada da caixa e precisão, HUD e diferenças de renderização alteram percepção/saliência/atenção | Versões experimentais incompatíveis e evidência anterior insuficiente | Média | Alta | Aprovação visual D3/D4 pelo proprietário registrada; conferir dez cores/screenshots sintéticos Chromium/Firefox, versão/SHA distinta, WEB-044/011 e revisão WEB-034 com DEC-04. Não inferir melhoria de desempenho/validade pela redução de informação potencialmente distrativa | M3/M4/M9 | Técnico + metodológico | ABERTO |
+| R12 | Conta administrativa compartilhada: vazamento/reuso da senha, saída de integrante e autoria indistinguível | Sem atribuição individual, revogação por pessoa impossível, possível inadequação institucional para dados reais | Alta | Crítica | Proprietário/operador: custódia protegida, senha exclusiva, troca na alteração da equipe e revogação global; WEB-021/024/033/039 demonstram controles e decisão DEC-03. Hash/HTTPS não eliminam risco; contas individuais futuras exigem novo escopo | M6/M9/M10 | Proprietário + segurança + instituição | ABERTO |
 
 Risco mais importante: R01, com R02 como limite de interpretação. R03 é o
 principal risco de integridade do fluxo atual: DEC-02 foi aprovada; integração
@@ -1535,7 +1558,8 @@ versão experimental. Somente bloquear tarefa dependente, sem paralisar document
 | DEC-04 | Matriz local e alcance de engenharia; validação física/metodológica permanece gate M9 | Proprietário/responsável metodológico; aprovação explícita em 2026-11-05 | Resposta “eu aprovo esse alcance para DEC-04” aprova proposta de dez sessões sintéticas por ambiente local Chromium/Firefox visíveis, layout final e transporte/falhas ativos. Equipamento observado em EV-M3-011; D1/D5 intactos. Não aprova suporte por antecipação nem validação física/metodológica WEB-034 | WEB-011/012/034 | APROVADA |
 | DEC-05 | Após prontidão M9, autorizar separadamente configuração research, deploy e eventual uso real | Proprietário + metodológico/operador | WEB-036 comprovada; registrar autorização específica antes de WEB-041 e, para produção/uso, de WEB-038/040; mudanças da candidata passam revalidação dos gates afetados; não retirar synthetic apenas por aprovação técnica | WEB-041/038/040 | PENDENTE |
 
-Recursos externos não decisórios: conta/cliente OIDC de teste WEB-021; destino de
+WEB-021 alvo não exige recurso Google; provisionamento local futuro deve ser protegido.
+Recursos externos não decisórios: destino de
 réplica e custódia para WEB-031; ambiente de homologação WEB-035; VPS/DNS/TLS e
 acesso de operação WEB-037. Solicitar somente quando a entrega dependente estiver
 concreta; não pedir secrets na conversa. Adoção técnica de stack está no ADR-004,
@@ -1656,9 +1680,194 @@ WEB-034 mantêm critérios próprios. Histórico inicial CHG-003 acima preservad
   testes a revisar, dependências afetadas e aprovação externa quando exigida.
   Não reabrir tarefa concluída sem regressão comprovada ou novo escopo registrado.
 
+### CHG-004 — Substituição do Google OIDC por autenticação local com conta administrativa única
+
+- Origem/data: missão explícita do proprietário, 2026-11-06. Mudança de produto,
+  arquitetura e segurança; retirar dependência Google para profissionais. Autoriza
+  somente análise, integração documental, validação e versionamento nesta sessão.
+- Anterior: Google OIDC com cadastro `iss/sub`, callback/PKCE/state/nonce e sessão
+  profissional limitada pela identidade. Alvo: login/senha no backend, uma conta
+  administrativa local sem cadastro público/autenticação externa obrigatória;
+  interface profissional e sessão opaca segura. [ADR-006](arquitetura/ADR-006-autenticacao-local.md)
+  registra a decisão durável ainda não coberta pelos ADRs anteriores, sem duplicar
+  política/HTTP/DDL. Possibilidade futura de várias contas não implementada agora.
+- Requisitos alterados: REQ-AUT-001/002/003, REQ-AUD-001, REQ-SEG-001/002/003,
+  REQ-INF-001/002/003, REQ-EXT-002, REQ-AVA-001 e REQ-REL-001/003. Novos REQ-AUT-004 (credenciais/ciclo),
+  REQ-AUT-005 (antiabuso) e REQ-AUT-006 (conta compartilhada). Demais requisitos
+  mantêm conteúdo e recebem integração pela dependência de M6 nas fichas;
+  matriz passa de 47 para 50 requisitos sem alegar implementação.
+- Marcos: M0–M2 aceitos intactos; M3 mantém WEB-012/EV-M3-012 e gates científicos;
+  M6 substitui mecanismo em WEB-021 e agrega regressões de WEB-022/023 em
+  WEB-021/024, preservando seus aceites históricos. M4 integra convite/persistência
+  por conta local; M5 login/admin sem redesign; M7 paridade/transição sem retirar
+  Streamlit; M8 configuração/CI/release/restore sem Google obrigatório; M9 revisão
+  institucional/metodológica/homologação; M10 provisionamento e operação protegidos.
+- Dependências: WEB-021 depende de WEB-008 aceita e fica PRONTA tecnicamente;
+  bloqueio antigo do cliente Google deixa de ser dependência da solução alvo.
+  Falta implementação e teste locais; WEB-024 continua dependente de WEB-021/023.
+  WEB-032 explicita WEB-024 além de WEB-028/030/031, sem ciclos; restante do grafo
+  e regras de entrada por marco preservados. Sem avanço excepcional entre marcos.
+- Segurança: hash Argon2id, bootstrap/recuperação protegidos, antiabuso/erros
+  genéricos, CSRF/Origin, cookies, expiração inativa/absoluta e revogação após
+  senha; grants/último admin/vínculos por projeto preservados. Sem credencial
+  default/hardcode/plaintext/versionada, nem token em storage. Schema aditivo e
+  compatibilidade exigem execução futura; nenhuma migration alterada/aplicada.
+- Privacidade/riscos: R05/R07 revistos, R09 ajustado ao recurso alvo e R12 novo.
+  Conta compartilhada perde atribuição individual, sofre vazamento/reuso e exige
+  troca global ao mudar equipe; não permite revogar só uma pessoa. Hash/HTTPS
+  não eliminam esse risco. Proprietário/operador custodiam; instituição decide
+  adequação em DEC-03/WEB-033. Produto aprovado não presume autorização com dados reais.
+- Operação: provisionamento seguro, rotação, recuperação e restore sem ressuscitar
+  sessões/credenciais; replica externa independente, RPO/RTO e custódia permanecem
+  WEB-031. Não acessar/reconfigurar VPS, Google ou qualquer serviço nesta missão.
+- Testes/aceite futuros: AUTH-L01–L09 em [validação](VALIDACAO_WEB.md#autenticação-local--plano-de-verificação-chg-004),
+  vinculados à matriz e fichas: unidade/hash/CLI, API/PG reais, React/tipos/build,
+  E2E HTTPS Chromium/Firefox, segurança, schema/grants/restore e operação.
+  OIDC sintético não aceita alternativa local; WEB-021 não concluída. Todos os
+  critérios completos em WEB-021/024 e revisão de candidata por SHA.
+- Condições de implementação: autorização posterior do marco M6 pelo workflow,
+  WEB-008 aceita, contratos alvo disponíveis; schema/testes sintéticos primeiro.
+  Alterações reais de dados/migrations e credenciais sensíveis exigem autorização
+  específica. M6 antecede M4; nenhum comando novo nem continuidade excepcional.
+- Condições de uso real: WEB-033/034/035/036 e DEC-03; DEC-05/WEB-041 para research,
+  autorização de deploy antes de WEB-038, coleta e transição operacional separadas.
+  Caso conta compartilhada seja inadequada, nova mudança para contas individuais
+  antes do uso. Não há aprovação institucional ou recurso externo novo nesta revisão.
+- Contagem: nenhum WEB novo/renumerado/retirado; denominador **45** e numerador
+  **19** preservados (**42,2%**, 26 sem aceite). Requisitos/riscos novos detalham
+  escopo de tarefas existentes e não criam entregável ou crédito documental extra.
+
+### EV-CHG-004 — auditoria direcionada e revisão integral, 2026-11-06
+
+Base auditada `bdd2631f6d6e7981b6c92c1d77471e4deeb45df8`, branch inicial
+`test/m6-m8-validacao-isolada` limpa e alinhada ao upstream após fetch;
+main local `fe8f24f`, origin/main `db56b40` preservados sem integração.
+Nova branch documental `docs/autenticacao-local-roadmap` parte dessa base para
+preservar M2/M3/M6/M8 não integrados. Auditoria por leitura de código e manifests,
+sem abrir .env operacional, backups, secrets ou coletas, nem executar login/teste
+funcional. Fontes: AGENTS aplicáveis, workflow, fichas, matriz, arquitetura,
+ADRs 001–005, segurança/dados/API/testes/CI/infraestrutura. Registro técnico:
+
+| Classificação | Componentes observados | Direção futura / limite |
+|---|---|---|
+| Reutilizáveis, com regressão | `api/auth.py`: cookies __Host separados, hash de token, HMAC CSRF, Origin exato, require_professional, me/logout e limite profissional; `api/transport.py` RequestBoundary montado em `api/main.py`; erros seguros/headers | Preservar sem reduzir proteção; autenticação local troca contexto e prazos. Rate limit atual de login é por IP, não basta para senha local |
+| Reutilizáveis, com adaptação de identidade | `stroop/domain/auth.py` ROLES/PERMISSIONS, `stroop/application/auth.py`, `api/sessions.py`, `api/administration.py`, persistência auth/web_sessions, grants `scripts/provision_web_database.py` | Guards e permissões por projeto/último admin/emissor permanecem; parse_identity e parse_opaque_user_id restringem Google e precisam adaptação explícita. Admin não herda dados |
+| Substituir na WEB alvo | `api/auth.py` GET login e callback/alias em main; `api/google_oidc.py` discovery/token/JWKS, verificação assinatura/aud/iss/nonce; `api/config.py` OIDC obrigatório; `web/src/App.tsx` link Google/guard e `web/src/api/client.ts` mensagens Google | POST local/validação de senha e formulário; sem retorno de claims/cadastro, sem fallback externo obrigatório. Nenhuma implementação feita |
+| Substituir estruturas acopladas | `stroop/persistence/web_auth.py` sessão com oidc_expires_at; CHECK/FKs de 0002/0004 e referências 0005/0008/0009/0010; CLI `scripts/gerenciar_usuarios.py` bootstrap/recover por issuer/subject | Nova evolução aditiva de identidade/credencial/sessão local e funções/grants; não reutilizar identidade Google fictícia, não reassociar dados. CLI atual não provisiona senha |
+| Removíveis futuramente da WEB após corte validado | `api/google_oidc.py`, transações/state/nonce/PKCE e configuração cliente/callback, google-auth/httpx/requests onde só servirem ao provedor | Remoção só por necessidade demonstrada e autorização/escopo futuro; httpx também é ferramenta de testes, requests pode ter outros consumidores. Nenhuma dependência/rota/configuração removida nesta missão |
+| Configuração a substituir/revalidar | `compose.web.yaml` secrets OIDC obrigatórios/callback, api requirements/lock, scripts de smoke/fixtures; `.github/workflows/web.yml` e `scripts/verify_web_ci.py` | Alvo não exige Google; testar imagens/schema/login local e atualizar fixtures/locks quando implementar. Manter scanners, gatilhos PR/main/manual e CI por SHA |
+| Históricos preservados | Streamlit `dashboard/app.py` login google e `dashboard/auth.py`, `compose.production.yaml`, `dashboard/requirements.lock` Authlib==1.9.4; migrations existentes, testes/relatórios e SHAs OIDC | Authlib está no lock do dashboard/stack Streamlit, sem import direto no cliente FastAPI (usa google-auth==2.62.0, httpx/requests). Não apagar Authlib/Google do legado nem assumir retirada autorizada do Streamlit |
+| Testes reutilizáveis ou substituídos por escopo | test_web_auth.py/test_web_sessions.py/test_web_administration_provisioned.py/test_web_assessments.py, E2E integrated e fixtures de sessão provisionada; test_web_oidc_callback.py/test_google_oidc.py/test_web_security_review.py | Negativos de autorização/CSRF persistem e ganham login real local. Fixtures e criptografia OIDC são histórico/regressão do código preservado, sem comprovar senha, bootstrap, inatividade ou recuperação locais |
+
+Revisão de **todas as 26 fichas sem aceite** feita contra seus requisitos,
+pré-requisitos de marco, dependências locais e evidências; inventário abaixo
+explica a revisão, enquanto estado/critério executável continuam nas fichas:
+
+- WEB-012 EM_VALIDACAO: REQ-EXP-003 e gate M3, WEB-011 aceita/EV-M3-012 disponível;
+  proprietário deve aceitar resultados/limites ou bloquear motor. Nada no login
+  resolve timing físico ou transfere DEC-04 para suporte.
+- WEB-013/014/015/016 PENDENTES: REQ-PAR/AVA/INT/UX do fluxo, dependências
+  sequenciais preservadas e gates M2/M3/M6. Evidências de receptor/campanha são
+  parciais para integração; ensaios reais e estados/recibos ainda PLANEJADOS.
+- WEB-017/018/019/020 PENDENTES: REQ-REL/MET/CSV/UX e gate M4, dependências
+  preservadas; login/admin local integrado sem redesign, gráficos/12 métricas/
+  exportações preservados. Ensaios finais de cada ficha ainda sem aceite.
+- WEB-021 PRONTA e WEB-024 PENDENTE: requisitos AUT/AUD/SEG e novas regressões,
+  WEB-008 aceita; 024 aguarda 021/023. OIDC histórico é parcial para mecanismo
+  retirado do alvo. Implementar/testar local e revisar segurança; uso sintético
+  não exige DEC-03, uso real exige. Nenhum bloqueio Google remanescente no alvo.
+- WEB-025/026/027/028 PENDENTES: REQ-CSV/AUD e gate M5/M6; importação minimizada,
+  intercâmbio legado e mapa explícito seguem dependências/fixtures das fichas.
+  Ensaios finais PLANEJADOS; 028 requer cobertura e aprovação do proprietário,
+  incluindo autenticação local. Não retirar Streamlit/CLIs/launchers.
+- WEB-031 BLOQUEADA: REQ-INF-003, WEB-029 aceita e evidência parcial EV-M8-029/031;
+  proprietário/operador devem prover destino externo independente autorizado,
+  custódia, ensaio medido RPO/RTO e aceite dos limites; duas cópias locais não bastam.
+- WEB-032 PENDENTE: REQ-INF/EXT, WEB-028/030/031/024 e M7; candidata/runbooks
+  PLANEJADOS. Consolidar SHA/imagens/schema local, CI nova e recuperação sem
+  credenciais/sessões ressuscitadas; não transferir Actions 0d79fd2 ao futuro SHA.
+- WEB-033 PENDENTE: REQ-SEG-002/AUT-006 e WEB-028/DEC-03; política/aprovação
+  institucional e conta compartilhada a decidir pelo proprietário/instituição.
+- WEB-034 PENDENTE: requisitos experimentais/UX, WEB-012/DEC-04 e gates M9;
+  campanha local existe, validação metodológica/física aprovada ainda não.
+- WEB-035/036 PENDENTES: requisitos transversais/SEG e gates M9; 035 aguarda
+  candidata/segurança, 036 converge 033/034/035. Homologação técnica e aceite do
+  responsável ainda sem evidência, não concedem deploy/coleta.
+- WEB-041 PENDENTE: REQ-SEG-003, WEB-036/DEC-03/05; proprietário deve autorizar
+  configuração research após M9. Conta local e barreiras exigem testes futuros.
+- WEB-037/038/039/040 PENDENTES: requisitos INF/SEG/operação e gate M9/041;
+  plano → autorização específica de deploy → smoke → recuperação/handoff →
+  aceite operacional do proprietário, conforme fichas. Destino/custódia e uso
+  compartilhado não aprovados; retirada legado e coleta têm autorização própria.
+
+WEB-000…011, WEB-022/023/029/030/042/043/044 mantêm aceites/evidências anteriores;
+regressões novas ficam nas tarefas abertas, sem reabrir aceite por planejamento.
+DEC-01…05 e CHG-001…003 preservadas integralmente. Nenhuma decisão externa foi
+resolvida documentalmente. Resultado desta missão é integração de especificação;
+nenhum requisito de autenticação local declarado IMPLEMENTADO/TESTADO/ACEITO.
+
+#### Validação e aceite documental de CHG-004 — 2026-11-06
+
+Critérios desta missão conferidos: decisão/arquitetura local, credenciais e
+segurança, WEB-021 e regressões WEB-022/023/024, marcos afetados e 26 pendências,
+grafo/gates, R12 e decisões externas, testes futuros e matriz, workflow/progresso,
+preservação de histórico e próxima ação. Aceite restrito à integração documental;
+nenhum aceite funcional local ou aprovação externa concedido.
+
+Verificações locais, Python 3.12.3, sem instalação:
+
+- `python3 scripts/verify_web_docs.py`: aprovado; **11 marcos, 45 tarefas,
+  50 requisitos/matriz, 12 riscos, cinco decisões, 19 aceitos, 85 documentos,
+  611 links locais e 69 âncoras**, dependências sem ciclos e IDs preservados.
+- `python3 -m unittest tests.test_verify_web_docs -v` e rodada final `-q`:
+  **7/7 aprovados**, sem skips; não são testes funcionais de autenticação.
+- Conferência adicional contra base `bdd2631`: bloco CHG-001–003 integralmente
+  preservado, linhas DEC-01–05 idênticas, todos os 19 estados CONCLUIDA mantidos;
+  referências de requisito resolvem e escopo contém somente Markdown em docs/.
+  Distribuição: 19 CONCLUIDAS, 23 PENDENTES, uma EM_VALIDACAO, uma PRONTA e uma
+  BLOQUEADA. Workflow permanente/AGENTS sem diff; denominador/progresso intactos.
+- `git diff --check`: aprovado. Não houve alteração de validador ou critério
+  para permitir passe. Uma conferência intermediária rejeitou a matriz após
+  ajuste de células sem espaço após `|`; corrigida formatação, com nova validação
+  integral e sete testes aprovados, sem alterar conteúdo/asserções do validador.
+
+Escopo: 21 documentos Markdown (incluindo novo ADR-006); runtime, dependências,
+DDL, dados e configurações CI/infraestrutura não alterados. Suites funcionais,
+PG/React/build/Playwright, scanners e Actions **não executados nesta missão**;
+nenhum ensaio OIDC/local, serviço remoto, PR/merge/deploy ou coleta. Testes futuros
+explicitamente PLANEJADOS. Versionamento/envio conferidos no fechamento Git.
+
 ## Retomada
 
-### Retomada vigente — execução excepcional encerrada, 2026-11-06
+### Retomada vigente — integração documental CHG-004, 2026-11-06
+
+Missão exclusivamente documental encerrada após validação/versionamento.
+**19/45 aceitos (42,2%)**, 26 sem aceite: 23 PENDENTES, WEB-012 EM_VALIDACAO,
+WEB-021 PRONTA e WEB-031 BLOQUEADA. M3 **6/7** permanece vigente; M6 **2/4** e
+M8 **2/4** parciais, demais marcos/aceites preservados. Local login PLANEJADO,
+nenhuma implementação nesta sessão. R05/R07/R09 atualizados e R12 ABERTO.
+
+Próxima ação pelo workflow permanente: responsável aceitar suporte restrito dos
+resultados EV-M3-012 ou bloquear motor; `validar marco atual` pode conferir esses
+critérios sem conceder aceite pelo responsável. **Não há tarefa funcional PRONTA
+em M3** para `continue o projeto` implementar antes desse gate. WEB-021 é a
+próxima implementação tecnicamente pronta no caminho de integração, **em M6**,
+exigindo autorização posterior explícita desse marco; não é selecionada por um
+`continue o projeto` ainda restrito a M3. Nenhuma continuidade excepcional ativa.
+M6/WEB-024 antecedem M4. WEB-031 continua dependendo de destino externo autorizado;
+WEB-028/032, DEC-03/033, WEB-034/035/036, DEC-05/041 e WEB-037–040 mantêm seus
+pré-requisitos e aprovações separados. Não repetir campanha/baseline sem divergência.
+
+Git: branch `docs/autenticacao-local-roadmap`, base auditada `bdd2631`, main e
+origin/main preservadas. Entrega identificável por `git log -1 --format=%H
+--grep='docs: integra autenticação local e revisa pendências canônicas'`;
+seu envio deve ser conferido por HEAD/upstream/ls-remote, sem commit artificial
+de autorreferência. Resultado da validação e envio no fechamento desta missão.
+CI histórica aprovada apenas em 0d79fd2/EV-M8-030; CI desta revisão não executada,
+sem transferência de aprovação. Nenhum PR/merge/tag/deploy/migration ou dado real.
+
+
+### Retomada anterior — execução excepcional encerrada, 2026-11-06
 
 **19/45 aceitos (42,2%)**, 26 sem aceite; M3 6/7, M6 2/4, M8 2/4.
 Autorização temporária desta sessão permitiu atravessar marcos com dependências

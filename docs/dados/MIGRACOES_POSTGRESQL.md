@@ -1,5 +1,12 @@
 # Schema e migrations PostgreSQL — Etapa 4
 
+Nota de planejamento CHG-004, 2026-11-06 — **PLANEJADO**:
+WEB-021 deve criar evolução aditiva local e testar FKs/grants/compatibilidade
+conforme [modelo](MODELO_DE_DADOS.md#autenticação-local--evolução-aditiva-planejada-chg-004).
+Migrations existentes são imutáveis; esta revisão não cria nem aplica DDL.
+Decisão: [ADR-006](../arquitetura/ADR-006-autenticacao-local.md). Execução/aceite somente no backlog canônico.
+
+
 Data: 2026-09-01.
 
 Esta etapa versionou o schema PostgreSQL das tres tabelas de dominio e oferece

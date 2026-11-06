@@ -1,5 +1,13 @@
 # Operacao e recuperacao WEB
 
+Nota de planejamento CHG-004, 2026-11-06 — **PLANEJADO**:
+WEB-031/032/039 devem ensaiar schema local/hash protegido, redefinir senha
+restaurada antiga e revogar sessões antes da abertura, sem reativar OIDC
+automaticamente. Manter réplica externa independente, custódia, RPO/RTO e
+rollback compatível; ensaio local não prova independência do destino.
+Decisão: [ADR-006](../arquitetura/ADR-006-autenticacao-local.md). Execução/aceite somente no backlog canônico.
+
+
 Procedimento da W20 validado com dados sinteticos. Estado e aceite no
 [roadmap](../ROADMAP_WEB.md); topologia e configuracao em
 [WEB_DOCKER](WEB_DOCKER.md). Nao executar na VPS sem a etapa autorizada.

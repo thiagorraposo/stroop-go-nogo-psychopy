@@ -295,3 +295,45 @@ para resultados antigos e não preenche mapa de legado. A FK composta entre
 `web_assessments` e convite impede atribuir o resultado a outro projeto.
 Observações e invalidações são imutáveis para o writer de runtime; apenas o
 recibo parcial pode avançar. O reader recebe SELECT nas colunas necessárias.
+
+## Autenticação local — evolução aditiva planejada CHG-004
+
+[ADR-006](../arquitetura/ADR-006-autenticacao-local.md) aprova conta local única;
+nenhum DDL aplicado nesta revisão. Catálogo existente 0001–0011 imutável.
+`app_users` e `web_professional_sessions` restringem issuer a Google em CHECK;
+sessão exige `oidc_expires_at`. Portanto acrescentar apenas `password_hash` não
+é migração suficiente e falsificar issuer/expiração Google é proibido.
+
+WEB-021 deve produzir nova migration aditiva e contrato de grants antes de
+executá-la em PG descartável. Representar principal técnico local imutável
+(independente do username), credencial com username normalizado único, hash
+Argon2id codificado, versão da credencial, estado e timestamps; sessão local
+com hash único de token, principal, versão, criação, última atividade, teto
+absoluto e revogação. Nunca senha recuperável, token bruto ou segredo default.
+Identidade local separada não deve exigir reescrever identidades Google.
+Estrutura comporta futuros principais; bootstrap garante somente uma conta
+local nesta versão, inclusive sob concorrência; cadastro adicional não exposto.
+
+A implementação deve resolver explicitamente referências de autorização e
+proveniência hoje compostas por issuer/subject: criador de `web_projects`,
+`web_project_members`, emissor de `web_invitations`, `web_csv_imports`,
+`auth_audit_events`, `web_lock_emitter` (0008) e função de gestão de usuários
+(0010). Adicionar referências/associações locais e funções adaptadas, mantendo
+colunas/linhas/FKs históricas e integridade de origem; sem reassociar avaliações,
+convites ou projetos à conta local por inferência. Documentar DDL/constraints e
+matriz de compatibilidade old/new antes da migration. Vínculos locais são
+concedidos explicitamente, não copiados de Google por e-mail/nome/equipe.
+
+Reader não lê hash, credencial, contador ou sessão; writer tem somente operações
+necessárias; owner/migrador e operador de recuperação são separados. Funções
+privilegiadas exigem search_path seguro e EXECUTE mínimo; runtime não ganha
+DDL/bootstrap irrestrito. Validar locks de último admin/emissor e a atomicidade
+de rotação+revogação/login concorrente, sem mudar fórmulas ou schema científico.
+
+Histórico OIDC, auditoria e dados existentes são preservados. Massa sintética
+antiga deve continuar íntegra após upgrade; rollback de imagem usa schema
+aditivo compatível sem down migration destrutiva. Backup inclui hashes sensíveis:
+custódia criptografada, restauração isolada e revogação de sessões restauradas
+antes de reabrir acesso, impedindo ressurgimento de credenciais revogadas; se
+senha restaurada for antiga, redefinir por operador antes da abertura. Testar
+sem tocar banco real. DDL/migração real exige autorização específica futura.

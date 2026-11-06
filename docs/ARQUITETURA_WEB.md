@@ -47,7 +47,7 @@ registro de ingestão e casos de uso são pontos de extensão suficientes agora.
 
 ## Fluxo principal e estado
 
-Avaliador Google OIDC → projeto autorizado → criação de avaliação/convite com
+Alvo CHG-004: avaliador com login local → projeto autorizado → criação de avaliação/convite com
 código pseudonimizado e visita → identificação por resgate → instruções → prática
 → principal no navegador → conclusão validada na API → transação PG → recibo →
 métricas oficiais → painel React → exportação autorizada.
@@ -103,7 +103,7 @@ na tarefa WEB-005. Operações já presentes, a revalidar:
 
 | Grupo sob /api/v1 | Operação / vínculo planejado |
 |---|---|
-| auth/login, callback, me, logout | Google no servidor, sessão opaca, sem token Google no bundle |
+| auth/login, me, logout | Alvo: senha no backend e sessão opaca; callback Google somente no código atual/histórico |
 | projects e members | Criar/listar projetos e vínculos explícitos por papel |
 | projects/{id}/invitations | Avaliador prepara sessão, emite/revoga convite de uso único |
 | participant/redeem, session, start, abort, complete, logout | Fluxo experimental isolado da sessão profissional |
@@ -122,15 +122,21 @@ reautorizam. Cliente usa mesma origem e caminhos relativos, sem CORS irrestrito.
 
 ## Autenticação e autorização
 
-Google OIDC já adaptado ao backend. Identidade é iss+sub, e-mail auxiliar;
-cadastro prévio, perfis consulta/importacao/administracao e vínculo ao projeto.
-Não inventar papel de avaliador com privilégios extras: é a função de preparação
-já autorizada a importacao/administracao no escopo do projeto. Administração
-não recebe resultados globais automaticamente. Cookies profissional/participante
-separados, Secure/HttpOnly/SameSite, tokens opacos armazenados por hash; state,
-nonce, PKCE e validação criptográfica no servidor. CSRF em RAM. Bloqueios e
-revogações reavaliados em cada operação. Login Google real exige conta/ambiente
-autorizados em M6; fixture OIDC não comprova esse aceite.
+Alvo aprovado em CHG-004: [ADR-006](arquitetura/ADR-006-autenticacao-local.md)
+substitui Google OIDC por login local com conta administrativa única, sem
+cadastro público. Regras completas de credencial, bootstrap/recuperação,
+antiabuso e sessões em [autenticação](seguranca/AUTENTICACAO_E_PERMISSOES.md#autenticação-local--especificação-alvo-chg-004),
+e transporte em [contrato](desenvolvimento/CONTRATO_API_WEB.md#autenticação-local--contrato-alvo-chg-004).
+Conta técnica tem privilégios administrativos, mas precisa de vínculo explícito
+para cada projeto/dado/convite. Conta compartilhada não atribui autoria individual
+nem autoriza uso real; DEC-03 deve avaliar adequação e R12.
+
+O código auditado ainda usa OIDC `iss/sub`, state/nonce/PKCE e expiração do
+provedor; não há implementação local aceita. Reutilizar cookies opacos por hash,
+CSRF/Origin, autorização no backend, guards e grants, adaptando identidade e
+prazos via evolução aditiva. Não falsificar claims Google nem transferir testes
+OIDC para aceite local. Sessões de participantes por convite permanecem distintas.
+Migração/corte/rollback estão no ADR-006 e impactos de schema no modelo de dados.
 
 ## Modelo lógico
 

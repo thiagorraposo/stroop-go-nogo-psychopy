@@ -1,5 +1,12 @@
 # Verificacoes reproduziveis WEB
 
+Nota de planejamento CHG-004, 2026-11-06 — **PLANEJADO**:
+Pipeline histórico com sessões/Google sintéticos não aceita senha local.
+WEB-021/032 devem adaptar fixtures/locks e integrar AUTH-L01–L09 mantendo
+scanners, gates e gatilhos/proteções; evidências anteriores valem só por SHA.
+Decisão: [ADR-006](../arquitetura/ADR-006-autenticacao-local.md). Execução/aceite somente no backlog canônico.
+
+
 O workflow [WEB validada](../../.github/workflows/web.yml) executa verificacoes em
 pull requests, pushes em `main` e disparos manuais. Push em branch de trabalho
 nao duplica a execucao do PR. Nao faz deploy, publica artefatos,

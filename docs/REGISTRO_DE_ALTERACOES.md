@@ -4,6 +4,19 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-06 — CHG-004: autenticação local e revisão de pendências
+
+- Decisão do proprietário integrada ao backlog e ADR-006: uma conta administrativa
+  local, sem cadastro público/Google obrigatório, mantendo projetos e convites.
+- Especificados hash/provisionamento/recuperação, antiabuso, sessões/revogação,
+  contrato HTTP e migração aditiva; matriz e plano AUTH-L01–L09 atualizados.
+- Revisadas todas as pendências e riscos, incluindo conta compartilhada sem
+  autoria individual e avaliação institucional ainda necessária. Aceites,
+  DEC-01–05, histórico, cálculo de progresso e workflow preservados.
+- Missão restrita à documentação; nenhum runtime, teste funcional, dependency,
+  migration ou ambiente externo alterado. Evidências/versionamento em EV-CHG-004
+  e Retomada do backlog, sem criar execução paralela.
+
 ## 2026-11-06 — Réplica SSH e agenda sintéticas reais
 
 - Novo harness gera backup PG sintético, copia por SSH com forced-command,

@@ -18,13 +18,13 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 
 ### REQ-AUT-001
 
-- Descrição: Identificar profissional por Google OIDC iss+sub e cadastro ativo.
-- Justificativa: Preserva identidade verificada e evita autorização por e-mail.
-- Prioridade: P0. Estado da especificação: **Confirmado**.
-- Aceite verificável: Callback válido cria sessão; assinatura/aud/iss/nonce/state inválidos, expirados ou reutilizados não criam sessão.
+- Descrição: Autenticar profissional por usuário e senha locais no backend, com conta administrativa única inicial e sem cadastro público/Google obrigatório.
+- Justificativa: Decisão do proprietário retira dependência externa; não amplia múltiplas contas nesta versão.
+- Prioridade: P0. Estado da especificação: **Confirmado** (CHG-004/ADR-006, 2026-11-06).
+- Aceite verificável: Login válido abre dashboard com sessão nova; inválido/inexistente/bloqueado nega genericamente; logout e acesso não autenticado negam conforme contrato, integração React/FastAPI/PG/HTTPS real AUTH-L01/L07.
 - Dependências: WEB-021 e pré-requisitos registrados no backlog.
-- Restrições conhecidas: ACESSO_WEB / D1–D6 não alterados; login real em ambiente autorizado.
-- Origem: seguranca/AUTENTICACAO_E_PERMISSOES.md e api/auth.py.
+- Restrições conhecidas: Implementação PLANEJADA; evidência OIDC histórica não cobre login local; autorização de M6 posterior.
+- Origem: Decisão explícita do proprietário nesta missão; ADR-006 e contrato HTTP alvo.
 
 ### REQ-AUT-002
 
@@ -35,6 +35,7 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 - Dependências: WEB-022 e pré-requisitos registrados no backlog.
 - Restrições conhecidas: Sem novo papel implícito de avaliador.
 - Origem: seguranca/AUTENTICACAO_E_PERMISSOES.md e api/auth.py.
+- Impacto CHG-004: mantém perfis, último admin e vínculos explícitos; conta local não herda projetos. Regressão AUTH-L06 em WEB-021/024 preserva aceite histórico de WEB-022.
 
 ### REQ-AUT-003
 
@@ -43,8 +44,39 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 - Prioridade: P0. Estado da especificação: **Confirmado**.
 - Aceite verificável: Secure/HttpOnly/SameSite e origem/CSRF testados; logout/expiração/replay encerram acesso apropriado.
 - Dependências: WEB-023 e pré-requisitos registrados no backlog.
-- Restrições conhecidas: Sem tokens Google ou credenciais em armazenamento do cliente.
+- Restrições conhecidas: Sem credenciais em armazenamento durável do cliente; alvo local exige inatividade, teto absoluto e revogação após rotação, AUTH-L04/L05, sem alterar sessão participante.
 - Origem: desenvolvimento/CONTRATO_API_WEB.md e routers api/.
+- Impacto CHG-004: exige AUTH-L04/L05 para sessão local, Origin inclusive login, inatividade e rotação/revogação; aceite WEB-023 histórico não cobre novo mecanismo.
+
+### REQ-AUT-004
+
+- Descrição: Proteger senha, provisionamento, alteração e recuperação administrativa da conta local.
+- Justificativa: Credencial passa a ser responsabilidade da aplicação e do operador.
+- Prioridade: P0. Estado da especificação: **Confirmado** (CHG-004/ADR-006).
+- Aceite verificável: Argon2id/salt/custo e verificação segura, sem plaintext/hardcode/default/segredo versionado; bootstrap protegido sem cadastro público, recuperação auditada, rotação revoga todas sessões na mesma transação e resiste a login concorrente; AUTH-L01/L02/L04/L08.
+- Dependências: WEB-021 e pré-requisitos registrados no backlog; controles técnicos em WEB-021/024.
+- Restrições conhecidas: Schema aditivo, grants mínimos e histórico preservado; procedimento real só autorizado posteriormente.
+- Origem: Missão documental do proprietário de 2026-11-06; ADR-006 e segurança.
+
+### REQ-AUT-005
+
+- Descrição: Impedir enumeração e limitar força bruta no login local sem vazamento ou bypass.
+- Justificativa: Senha local introduz superfície de abuso própria.
+- Prioridade: P0. Estado da especificação: **Confirmado** (CHG-004/ADR-006).
+- Aceite verificável: Limites por conta/origem confiável persistentes/concorrentes, erros genéricos, hash fictício, 429/Retry-After e falha fechada; logs sem senha/hash/token/usuário tentado; AUTH-L03/L09.
+- Dependências: WEB-021 e pré-requisitos registrados no backlog; controles técnicos em WEB-021/024.
+- Restrições conhecidas: Custo de hash e DoS da conta única avaliados em WEB-024; defaults na especificação de segurança.
+- Origem: Missão documental do proprietário de 2026-11-06; ADR-006 e segurança.
+
+### REQ-AUT-006
+
+- Descrição: Explicitar privilégios e limitações de auditoria da conta administrativa compartilhada.
+- Justificativa: Conta técnica compartilhada não permite atribuição individual ou revogação por pessoa.
+- Prioridade: P0. Estado da especificação: **Confirmado** (CHG-004/ADR-006).
+- Aceite verificável: Admin sem vínculo não acessa dados; custódia/troca na mudança de equipe e revogação global documentadas/testadas; DEC-03 avalia adequação institucional antes de dados reais; AUTH-L06/L07/L09.
+- Dependências: WEB-033 e pré-requisitos registrados no backlog; controles técnicos em WEB-021/024.
+- Restrições conhecidas: Direção de produto aprovada, adequação institucional PENDENTE; não declarar auditoria individual nem uso real autorizado.
+- Origem: Missão documental do proprietário de 2026-11-06; ADR-006 e segurança.
 
 ## B. Gestão de participantes
 
@@ -89,6 +121,7 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 - Dependências: WEB-013 e pré-requisitos registrados no backlog.
 - Restrições conhecidas: Projeto synthetic até liberação específica DEC-05.
 - Origem: Missão de replanejamento do proprietário em 2026-11-04.
+- Impacto CHG-004: CHG-004 exige login local aceito e vínculo explícito antes de emitir convite; participante continua por convite separado. AUTH-L07 em WEB-013/016, após WEB-024.
 
 ### REQ-AVA-002
 
@@ -226,6 +259,7 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 - Dependências: WEB-017 e pré-requisitos registrados no backlog.
 - Restrições conhecidas: Sem totais globais não autorizados.
 - Origem: Missão de replanejamento do proprietário em 2026-11-04.
+- Impacto CHG-004: CHG-004 integra entrada local protegida em WEB-021 e revalida acesso/logout no dashboard em WEB-017 (AUTH-L07), sem alterar filtros/gráficos.
 
 ### REQ-REL-002
 
@@ -247,6 +281,7 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 - Dependências: WEB-018 e pré-requisitos registrados no backlog.
 - Restrições conhecidas: Administração não herda escopo de resultados.
 - Origem: Auditoria de código em AUDITORIA_REPLANEJAMENTO.md.
+- Impacto CHG-004: CHG-004 adapta administração à conta local única e seus vínculos/perfis/bloqueio; sem oferta/criação de contas adicionais agora. Preservar último admin, AUTH-L06/L07 em WEB-018 após WEB-021/024.
 
 ## H. Importação e exportação
 
@@ -292,6 +327,7 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 - Dependências: WEB-024 e pré-requisitos registrados no backlog.
 - Restrições conhecidas: Não imprimir dados em logs para depurar.
 - Origem: seguranca/ACESSO_WEB.md e controles existentes.
+- Impacto CHG-004: inclui eventos de login/limitação/provisionamento/rotação/recuperação sem senha/hash; autoria é da conta técnica, não individual (REQ-AUT-006). AUTH-L02/L03/L06/L09 em WEB-024.
 
 ### REQ-AUD-002
 
@@ -324,6 +360,7 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 - Dependências: WEB-024 e pré-requisitos registrados no backlog.
 - Restrições conhecidas: Não reduzir proteções para simplificar migração.
 - Origem: seguranca/ACESSO_WEB.md e controles existentes.
+- Impacto CHG-004: inclui revisão final de credencial local, enumeração/força bruta/DoS, expiração e revogação; AUTH-L01–L09, WEB-024.
 
 ### REQ-SEG-002
 
@@ -334,6 +371,7 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 - Dependências: WEB-033 e pré-requisitos registrados no backlog.
 - Restrições conhecidas: Não inventar base legal, prazo ou autorização ética.
 - Origem: Missão de replanejamento do proprietário em 2026-11-04.
+- Impacto CHG-004: CHG-004/DEC-03 exige avaliação institucional explícita de conta compartilhada, custódia e limites de auditoria (R07/R12), AUTH-L09, WEB-033; decisão ainda não concedida.
 
 ### REQ-SEG-003
 
@@ -344,6 +382,7 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 - Dependências: WEB-041 (após WEB-036 e DEC-05) e pré-requisitos registrados no backlog.
 - Restrições conhecidas: Disponibilidade de VPS/domínio não autoriza coleta/deploy.
 - Origem: Auditoria de código em AUDITORIA_REPLANEJAMENTO.md.
+- Impacto CHG-004: exige conta local configurada com privilégios/vínculos explícitos em WEB-041 e aceites separados de research/deploy/coleta/transição; AUTH-L09.
 
 ## K. Infraestrutura e implantação
 
@@ -356,6 +395,7 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 - Dependências: WEB-007 e pré-requisitos registrados no backlog.
 - Restrições conhecidas: Nenhuma migration nesta fase nem dados reais sem aprovação.
 - Origem: Missão de replanejamento do proprietário em 2026-11-04.
+- Impacto CHG-004: exige schema de identidade/credencial/sessão local aditivo e grants/testes AUTH-L08 em WEB-021/024; aceite WEB-007 preservado, sem evidência local nova.
 
 ### REQ-INF-002
 
@@ -366,6 +406,7 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 - Dependências: WEB-029 e pré-requisitos registrados no backlog.
 - Restrições conhecidas: Infraestrutura operacional inalterada nesta execução.
 - Origem: Missão de replanejamento do proprietário em 2026-11-04.
+- Impacto CHG-004: remove Google como dependência alvo de configuração; revalidar imagens/Compose/HTTPS em WEB-032, AUTH-L09; aceite histórico WEB-029 não cobre novo runtime.
 
 ### REQ-INF-003
 
@@ -376,6 +417,7 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 - Dependências: WEB-031 e pré-requisitos registrados no backlog.
 - Restrições conhecidas: Objetivos históricos ADR-002, não garantias; produção requer autorização.
 - Origem: arquitetura/ADR-002-hospedagem-vps.md.
+- Impacto CHG-004: mantém réplica externa/RPO/RTO; AUTH-L08 em WEB-031/032/039 inclui hashes protegidos e restore sem ressuscitar sessões/senha antiga.
 
 ## L. Manutenibilidade e extensibilidade
 
@@ -398,6 +440,7 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 - Dependências: WEB-030 e pré-requisitos registrados no backlog.
 - Restrições conhecidas: Push branch atual não dispara verify; sem mudar gatilho nesta fase.
 - Origem: Auditoria de código em AUDITORIA_REPLANEJAMENTO.md.
+- Impacto CHG-004: integra testes locais/fixtures/locks ao pipeline futuro em WEB-021/032, AUTH-L09; Actions anterior vale somente para seu SHA.
 
 ### REQ-EXT-003
 
@@ -538,13 +581,16 @@ já existe ou participa da regressão geral. WEB-000 é exclusivamente documenta
 
 | Requisito | Decisão | Marco | Tarefa | Componente | Teste/verificação | Evidência → aceite |
 |---|---|---|---|---|---|---|
-| REQ-AUT-001 | ADR-004 | M6 | WEB-021 | `api/auth.py, api/google_oidc.py` | `tests/test_web_oidc_callback.py` | PARCIAL em EV-M6-022/023; negativos sintéticos aprovados, login Google real BLOQUEADO em WEB-021 |
-| REQ-AUT-002 | ADR-004 | M6 | WEB-022 | `stroop/domain/auth.py, stroop/persistence/web_sessions.py` | `tests/test_web_auth.py` | ACEITA em EV-M6-022/023 no backlog; PG/API e HTTPS, OIDC externo separado |
-| REQ-AUT-003 | ADR-004 | M6 | WEB-023 | `api/auth.py, api/sessions.py` | `tests/test_web_sessions.py` | ACEITA em EV-M6-022/023 no backlog; dez casos HTTPS e regressão PG |
+| REQ-AUT-001 | CHG-004; ADR-006 | M6 | WEB-021 | `api/auth.py, config.py, web/src/App.tsx, web/src/api/client.ts` | PLANEJADO: AUTH-L01/L07, suites auth e E2E HTTPS reais | PLANEJADO local; histórico OIDC parcial em EV-M6-022/023 e EV-M8-030 preservado, sem aceite WEB-021 |
+| REQ-AUT-002 | ADR-004; CHG-004/ADR-006 | M6 | WEB-022 | `stroop/domain/auth.py, stroop/persistence/web_sessions.py, api/administration.py` | Histórico test_web_auth.py; PLANEJADO local AUTH-L04/L06/L07 em WEB-021/024 | ACEITO histórico EV-M6-022/023; regressão local PLANEJADA, sem transferir aceite |
+| REQ-AUT-003 | ADR-004; CHG-004/ADR-006 | M6 | WEB-023 | `api/auth.py, api/sessions.py, stroop/persistence/web_auth.py` | Histórico test_web_sessions.py; PLANEJADO local AUTH-L04/L05 em WEB-021/024 | ACEITO histórico EV-M6-022/023; novo mecanismo PLANEJADO |
+| REQ-AUT-004 | CHG-004; ADR-006 | M6 | WEB-021 | `api/auth.py, stroop/application/auth.py, stroop/persistence/`, nova migration/CLI planejadas | PLANEJADO: AUTH-L01/L02/L04/L08 | PLANEJADO; evidência e aceite futuros WEB-021/024, nenhum hash local implementado nesta missão |
+| REQ-AUT-005 | CHG-004; ADR-006 | M6 | WEB-021 | `api/auth.py, api/config.py, stroop/persistence/web_auth.py`, proxy | PLANEJADO: AUTH-L03/L09 | PLANEJADO; evidência e aceite futuros WEB-021/024 |
+| REQ-AUT-006 | CHG-004; ADR-006; DEC-03 | M9 | WEB-033 | Política institucional, autorização backend e runbooks | PLANEJADO: AUTH-L06/L07/L09, revisão DEC-03 | PLANEJADO; controles WEB-021/024 e decisão institucional WEB-033 sem evidência nova |
 | REQ-PAR-001 | ADR-004 | M4 | WEB-013 | `api/sessions.py, web/src/participant/` | `tests/test_web_sessions.py` | PLANEJADA; consultar WEB-013 no backlog |
 | REQ-PAR-002 | ADR-004/005 | M2 | WEB-005 | `Modelo lógico e formulário de sessão` | `Revisão documental DEC-01 em 2026-11-05; ensaios PLANEJADOS` | Aceite documental em EV-M2-005-R2; receptor/banco em EV-M2, worker/timing da fixture em EV-M3-011; integração de produto permanece M4 |
 | REQ-PAR-003 | ADR-004 | M4 | WEB-014 | `web/src/components/, api/models.py` | `tests/test_web_security_review.py` | PLANEJADA; consultar WEB-014 no backlog |
-| REQ-AVA-001 | ADR-004 | M4 | WEB-013 | `web/src/App.tsx, api/sessions.py` | `tests/test_web_sessions.py` | PLANEJADA; consultar WEB-013 no backlog |
+| REQ-AVA-001 | ADR-004; CHG-004/ADR-006 | M4 | WEB-013 | `web/src/App.tsx, api/sessions.py` | `tests/test_web_sessions.py`; PLANEJADO: AUTH-L06/L07 conforme requisito | PLANEJADA; consultar WEB-013 no backlog |
 | REQ-AVA-002 | ADR-004/005 | M2 | WEB-005 | `Contrato HTTP e modelo lógico` | `Revisão documental DEC-01 em 2026-11-05; ensaios PLANEJADOS` | Aceite documental em EV-M2-005-R2; receptor/banco em EV-M2, worker/timing da fixture em EV-M3-011; integração de produto permanece M4 |
 | REQ-AVA-003 | ADR-004 | M4 | WEB-015 | `web/src/participant/ParticipantRun.ts, api/results.py` | `tests/test_web_results.py` | PLANEJADA; consultar WEB-015 no backlog |
 | REQ-EXP-001 | ADR-004 | M3 | WEB-009 | `condicoes/, web/src/experiment/` | `tests/test_fase3_condicoes_tempos.py`, `web/src/experiment/environment.test.ts`, `practice.test.ts`, `main.test.ts` | EXECUTADA em WEB-009; EV-M3-009/010 no backlog |
@@ -556,23 +602,23 @@ já existe ou participa da regressão geral. WEB-000 é exclusivamente documenta
 | REQ-MET-001 | ADR-004 | M2 | WEB-008 | `stroop/domain/stroop.py, web_results.py` | `tests/test_nucleo_compartilhado.py, tests/test_web_export.py, tests/test_web_checkpoints.py` | EXECUTADA em WEB-008; EV-M2-007/008 no backlog |
 | REQ-MET-002 | ADR-004 | M2 | WEB-008 | `stroop/domain/stroop.py, web/src/dashboard/analysis.ts` | `tests/test_web_results.py, web/src/dashboard/analysis.test.ts` | EXECUTADA em WEB-008; EV-M2-007/008 no backlog |
 | REQ-MET-003 | ADR-004 | M5 | WEB-019 | `web_assessments, api/assessments.py` | `tests/test_web_assessments.py` | PLANEJADA; consultar WEB-019 no backlog |
-| REQ-REL-001 | ADR-004 | M5 | WEB-017 | `web/src/components/, api/assessments.py` | `tests/test_web_assessments.py` | PLANEJADA; consultar WEB-017 no backlog |
+| REQ-REL-001 | ADR-004; CHG-004/ADR-006 | M5 | WEB-017 | `web/src/components/, api/assessments.py` | `tests/test_web_assessments.py`; PLANEJADO: AUTH-L06/L07 conforme requisito | PLANEJADA; consultar WEB-017 no backlog |
 | REQ-REL-002 | ADR-004 | M5 | WEB-019 | `web/src/components/, web/src/dashboard/` | `tests/test_web_results.py` | PLANEJADA; consultar WEB-019 no backlog |
-| REQ-REL-003 | ADR-004 | M5 | WEB-018 | `api/administration.py, web/src/api/administration.ts` | `tests/test_web_administration_provisioned.py` | PLANEJADA; consultar WEB-018 no backlog |
+| REQ-REL-003 | ADR-004; CHG-004/ADR-006 | M5 | WEB-018 | `api/administration.py, web/src/api/administration.ts` | `tests/test_web_administration_provisioned.py`; PLANEJADO: AUTH-L06/L07 conforme requisito | PLANEJADA; consultar WEB-018 no backlog |
 | REQ-CSV-001 | ADR-004 | M7 | WEB-026 | `stroop/ingestion/stroop_csv.py, api/assessments.py` | `tests/test_csv_unificado.py` | PLANEJADA; consultar WEB-026 no backlog |
 | REQ-CSV-002 | ADR-004 | M7 | WEB-025 | `web/src/imports/minimize.ts, api/imports.py` | `tests/test_web_imports.py` | PLANEJADA; consultar WEB-025 no backlog |
 | REQ-CSV-003 | ADR-004 | M5 | WEB-020 | `api/assessments.py, web/src/api/aggregate.ts` | `tests/test_web_aggregate_export.py` | PLANEJADA; consultar WEB-020 no backlog |
-| REQ-AUD-001 | ADR-004 | M6 | WEB-024 | `stroop/persistence/auth.py, api/transport.py` | `tests/test_web_security_review.py` | PLANEJADA; consultar WEB-024 no backlog |
+| REQ-AUD-001 | ADR-004; CHG-004/ADR-006 | M6 | WEB-024 | `stroop/persistence/auth.py, api/transport.py` | `tests/test_web_security_review.py`; PLANEJADO local: AUTH-L02/L03/L06/L09; WEB-024 | PLANEJADA; consultar WEB-024 no backlog; incremento local PLANEJADO, consultar AUTH-L02/L03/L06/L09; WEB-024 nas fichas |
 | REQ-AUD-002 | ADR-003 + ADR-004 | M7 | WEB-027 | `scripts/migrations/0007_web_legacy_project_links.sql` | `tests/test_web_assessments.py` | PLANEJADA; consultar WEB-027 no backlog |
 | REQ-AUD-003 | ADR-004 | M0 | WEB-000 | `docs/Projeto Stroop Test.md e REQUISITOS_E_RASTREABILIDADE.md` | `Validação documental reproduzível no workflow (EV-M0)` | EV-M0 real; aceite documental em WEB-000 no backlog |
-| REQ-SEG-001 | ADR-004 | M6 | WEB-024 | `api/transport.py, web/deploy/` | `tests/test_web_security_review.py` | PLANEJADA; consultar WEB-024 no backlog |
-| REQ-SEG-002 | ADR-004 | M9 | WEB-033 | `docs/seguranca/` | `PLANEJADO: revisão do responsável DEC-03` | PLANEJADA; consultar WEB-033 no backlog |
-| REQ-SEG-003 | ADR-004 | M10 | WEB-041 | `stroop/persistence/web_sessions.py, política de operação` | `PLANEJADOS: testes research em WEB-041` | PLANEJADA; consultar WEB-041 no backlog |
-| REQ-INF-001 | ADR-002 + ADR-004 | M2 | WEB-007 | `scripts/migrations/, provision_web_database.py` | `tests/test_web_database_provision.py, tests/test_postgres_migrations.py` | Aceite em EV-M2-007/008; consultar WEB-007 no backlog |
-| REQ-INF-002 | ADR-002 + ADR-004 | M8 | WEB-029 | `compose.web.yaml, Dockerfile.api, Dockerfile.web` | `tests/test_web_proxy_config.py` | ACEITA em EV-M8-029/031 no backlog; build/Compose HTTPS sintético real |
-| REQ-INF-003 | ADR-002 + ADR-004 | M8 | WEB-031 | `scripts/backup_postgres.py, deploy/` | `tests/test_web_backup_replication.py` | PARCIAL em EV-M8-029/031; restore/rollback/SSH/agenda locais reais; réplica externa e limites pendentes |
+| REQ-SEG-001 | ADR-004; CHG-004/ADR-006 | M6 | WEB-024 | `api/transport.py, web/deploy/` | `tests/test_web_security_review.py`; PLANEJADO local: AUTH-L01–L09; WEB-024 | PLANEJADA; consultar WEB-024 no backlog; incremento local PLANEJADO, consultar AUTH-L01–L09; WEB-024 nas fichas |
+| REQ-SEG-002 | ADR-004; CHG-004/ADR-006 | M9 | WEB-033 | `docs/seguranca/` | `PLANEJADO: revisão do responsável DEC-03`; PLANEJADO local: AUTH-L09/DEC-03; WEB-033 | PLANEJADA; consultar WEB-033 no backlog; incremento local PLANEJADO, consultar AUTH-L09/DEC-03; WEB-033 nas fichas |
+| REQ-SEG-003 | ADR-004; CHG-004/ADR-006 | M10 | WEB-041 | `stroop/persistence/web_sessions.py, política de operação` | `PLANEJADOS: testes research em WEB-041`; PLANEJADO local: AUTH-L09; WEB-041 | PLANEJADA; consultar WEB-041 no backlog; incremento local PLANEJADO, consultar AUTH-L09; WEB-041 nas fichas |
+| REQ-INF-001 | ADR-002 + ADR-004; CHG-004/ADR-006 | M2 | WEB-007 | `scripts/migrations/, provision_web_database.py` | `tests/test_web_database_provision.py, tests/test_postgres_migrations.py`; PLANEJADO local: AUTH-L08; WEB-021/024 | Aceite em EV-M2-007/008; consultar WEB-007 no backlog; incremento local PLANEJADO, consultar AUTH-L08; WEB-021/024 nas fichas |
+| REQ-INF-002 | ADR-002 + ADR-004; CHG-004/ADR-006 | M8 | WEB-029 | `compose.web.yaml, Dockerfile.api, Dockerfile.web` | `tests/test_web_proxy_config.py`; PLANEJADO local: AUTH-L09; WEB-032 | ACEITA em EV-M8-029/031 no backlog; build/Compose HTTPS sintético real; incremento local PLANEJADO, consultar AUTH-L09; WEB-032 nas fichas |
+| REQ-INF-003 | ADR-002 + ADR-004; CHG-004/ADR-006 | M8 | WEB-031 | `scripts/backup_postgres.py, deploy/` | `tests/test_web_backup_replication.py`; PLANEJADO local: AUTH-L08; WEB-031/032/039 | PARCIAL em EV-M8-029/031; restore/rollback/SSH/agenda locais reais; réplica externa e limites pendentes; incremento local PLANEJADO, consultar AUTH-L08; WEB-031/032/039 nas fichas |
 | REQ-EXT-001 | ADR-004 | M1 | WEB-003 | `stroop/, api/, web/` | `tests/test_nucleo_compartilhado.py, tests/test_casos_uso_importacao.py, tests/test_multiplos_instrumentos.py` | EV-M1 real em WEB-003; fronteiras/contratos revalidados em 2026-11-04 |
-| REQ-EXT-002 | ADR-004 | M8 | WEB-030 | `scripts/verify_web_ci.py, .github/workflows/web.yml` | `tests/test_verify_web_ci.py` | ACEITA em EV-M8-030; pipeline integral local e Actions 42159898317 na SHA 0d79fd2 |
+| REQ-EXT-002 | ADR-004; CHG-004/ADR-006 | M8 | WEB-030 | `scripts/verify_web_ci.py, .github/workflows/web.yml` | `tests/test_verify_web_ci.py`; PLANEJADO local: AUTH-L09; WEB-021/032 | ACEITA em EV-M8-030; pipeline integral local e Actions 42159898317 na SHA 0d79fd2; incremento local PLANEJADO, consultar AUTH-L09; WEB-021/032 nas fichas |
 | REQ-EXT-003 | ADR-004 | M1 | WEB-004 | `AGENTS.md, docs/WORKFLOW_CODEX_CLI.md` | `Receita BASELINE_LOCAL.md; scripts/verify_web_ci.py integration; ensaio de retomada WEB-004` | EV-M1 real em WEB-004; percurso local/retomada revalidados em 2026-11-04 |
 | REQ-UX-001 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M3 | WEB-042 | `web/src/experiment/main-engine.ts, web/src/experiment/practice-engine.ts` | `web/src/experiment/main.test.ts, practice.test.ts, presentation.test.ts; web/e2e/presentation.spec.ts; main.spec.ts/practice.spec.ts` | IMPLEMENTADO/TESTADO; aceite do escopo WEB-042/043 em EV-M3-042/043; regressão consolidada WEB-044 em EV-M3-044; validações WEB-011/034 continuam próprias |
 | REQ-UX-002 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M3 | WEB-042 | `web/src/experiment/main-engine.ts, web/src/experiment/practice-engine.ts` | `web/src/experiment/main.test.ts, practice.test.ts, presentation.test.ts; web/e2e/presentation.spec.ts; main.spec.ts/practice.spec.ts` | IMPLEMENTADO/TESTADO; aceite do escopo WEB-042/043 em EV-M3-042/043; regressão consolidada WEB-044 em EV-M3-044; validações WEB-011/034 continuam próprias |
@@ -586,7 +632,7 @@ já existe ou participa da regressão geral. WEB-000 é exclusivamente documenta
 | REQ-UX-010 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M4 | WEB-015 | `web/src/participant/ParticipantRun.ts, web/src/components/ResultSummary.tsx, api/results.py` | `PLANEJADO: ParticipantRun.test.ts, ResultSummary.test.tsx e web/e2e/integrated/` | PLANEJADO; evidência/aceite futuro em WEB-015; sem SHA de implementação |
 | REQ-UX-011 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M5 | WEB-019 | `web/src/styles.css, web/src/App.tsx, web/src/components/, web/src/dashboard/` | `PLANEJADO: componentes Vitest, teclado/árvore acessível e E2E M5; cobertura experimental WEB-044` | Cobertura experimental M3 conferida em EV-M3-044; restante e aceite M5 WEB-019 PLANEJADOS |
 
-Estados de evidência UX: **PLANEJADO** (critério sem execução), **IMPLEMENTADO**
+Estados de evidência (todos os requisitos, inclusive autenticação local): **PLANEJADO** (critério sem execução), **IMPLEMENTADO**
 (código disponível), **TESTADO** (comandos/resultados/SHA registrados), **ACEITO**
 (todos os critérios conferidos na ficha WEB). Esses rótulos não substituem os
 estados canônicos das tarefas nem dão crédito parcial. Evidência e aceite são

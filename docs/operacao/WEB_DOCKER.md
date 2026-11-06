@@ -1,5 +1,13 @@
 # Aplicacao WEB em Docker
 
+Nota de planejamento CHG-004, 2026-11-06 — **PLANEJADO**:
+Configuração Compose observada ainda exige secrets Google; alvo WEB-021/032
+deve iniciar sem cliente/callback Google obrigatório, mantendo secret de sessão,
+DSNs e TLS externos. Bootstrap local protegido ocorre fora do bundle/manifesto;
+sem senha padrão. Revalidar imagens e HTTPS antes do corte.
+Decisão: [ADR-006](../arquitetura/ADR-006-autenticacao-local.md). Execução/aceite somente no backlog canônico.
+
+
 Pacote da W19 validado localmente com dados sinteticos. O aceite permanece no
 [roadmap](../ROADMAP_WEB.md). Este procedimento prepara uma pilha independente;
 a publicacao na VPS pertence a W22, sob responsabilidade do responsavel ou

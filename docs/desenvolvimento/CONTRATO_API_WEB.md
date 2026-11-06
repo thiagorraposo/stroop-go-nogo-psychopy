@@ -1,5 +1,10 @@
 # Contrato HTTP da versao WEB
 
+Revisão alvo de 2026-11-06: [autenticação local CHG-004](#autenticação-local--contrato-alvo-chg-004)
+substitui apenas o mecanismo profissional OIDC para a versão alvo. Seções OIDC
+abaixo preservam contrato atual/histórico; não indicam implementação local.
+
+
 Base: 2026-10-16 (W02 histórico). Revisão documental: 2026-11-04.
 Há routers implementados em api/ para as operações descritas; esta é a fonte de
 contrato a confrontar com código em WEB-005/006, não evidência de teste aprovado.
@@ -788,3 +793,84 @@ Snapshot compartilhado `condicoes/web_protocol.json` passa a incluir seção
 os metadados já fixados em start/conclusão/recibo. Não acrescentar campos ao
 payload fechado, schema ou CSV de 21 colunas. Recibos/resultados antigos mantêm
 app_version original; não atribuir versão visual com base só em test_version.
+
+## Autenticação local — contrato alvo CHG-004
+
+**PLANEJADO**, decisão de 2026-11-06, [ADR-006](../arquitetura/ADR-006-autenticacao-local.md).
+Para a versão alvo WEB, esta seção substitui o mecanismo OIDC profissional das
+seções anteriores, preservadas como contrato do código atual/histórico.
+Nenhuma rota nova existe por ter sido especificada. Demais payloads experimentais,
+CSV, convites, recibos e prazos participantes ficam intactos.
+
+### Login, identidade e sessão
+
+- `POST /api/v1/auth/login`: JSON fechado `{username,password}`. `username`:
+  1–64 ASCII `[A-Za-z0-9_.-]`, aparado e convertido para minúsculas; unicidade
+  usa a mesma normalização. `password`: string de 15–128 caracteres Unicode,
+  sem aparar/normalizar/truncar (exceção explícita à convenção geral de strings).
+  Limite de corpo específico 4 KiB, UTF-8/JSON; sem query/formulário simples.
+  `Origin` único exatamente igual ao configurado obrigatório, inclusive antes
+  da sessão: proteção de login CSRF; sem origem, null ou divergente → 403
+  `csrf_failed`. Não reutilizar token CSRF de sessão anterior para login.
+- Sucesso 200 fechado `{user_id,role,expires_at,csrf_token}`, formato de `/me`;
+  emite cookie profissional novo aleatório de pelo menos 256 bits, guardado por
+  hash no servidor, nunca no corpo. Invalidar sessão profissional anterior do
+  mesmo navegador; impedir fixação. Destino frontend fixo/local: dashboard.
+- Usuário inexistente, senha incorreta, conta bloqueada: mesmo 401
+  `authentication_required`, mensagem genérica “Usuário ou senha inválidos.”,
+  sem `registration_request`, iss/sub ou dicas de cadastro; nenhum cookie novo.
+  Limitação: 429 `rate_limited` com `Retry-After`; indisponibilidade: 503
+  `service_unavailable`. Envelope fechado existente e no-store em todos os casos.
+  Corpo inválido mantém 400/413/415/422 das convenções; erros nunca refletem entrada.
+- `GET /api/v1/auth/me`: conserva campos `{user_id,role,expires_at,csrf_token}`;
+  `user_id` opaco/estável representa principal técnico local e não codificação
+  Google obrigatória. Cliente não interpreta nem escolhe identidade/perfil.
+  Sem sessão válida, expirada/revogada ou conta bloqueada → 401. APIs protegidas
+  mantêm 401/403/404 e autorização por objeto/projeto; nenhum redirect HTML em API.
+- Cookie `__Host-stroop_professional`: Secure, HttpOnly, SameSite=Lax, Path=/,
+  sem Domain; `Max-Age`/`Expires` não excedem limite servidor. Teto absoluto
+  **8 horas**, sem extensão por atividade, e inatividade **30 minutos** no
+  servidor desde login/última operação autenticada autorizada. `/me`/polling
+  automático não renova atividade; definir testes de fronteira e concorrência.
+  `expires_at` devolve o menor prazo efetivo; frontend revalida quando necessário,
+  limpa RAM em 401/logout e não decide validade. Horário do cliente não prorroga.
+- `POST /api/v1/auth/logout` mantém `{}`/204, Origin e CSRF e invalidação efetiva
+  no banco, inclusive replay em outra aba; repetição sem cookie continua 204
+  após validar Origin. Todas as escritas autenticadas conservam X-CSRF-Token
+  e Origin exatos. Sem localStorage/sessionStorage/IndexedDB ou senha persistida.
+
+### Alteração e revogação
+
+- `POST /api/v1/auth/password`: sessão ativa, Origin e CSRF, JSON fechado
+  `{current_password,new_password}`; strings com os limites acima, 4 KiB no total.
+  Senha atual inválida → 401 genérico e rate limit como login. Nova senha fora
+  da política → 422 genérico sem eco. Sucesso 204 **após commit** do novo hash/
+  versão e revogação de todas as sessões, inclusive corrente; apaga cookie e
+  frontend exige novo login. Sem criação de sessão automática pela troca.
+- `POST /api/v1/admin/users/{user_id}/sessions/revoke`: `{}`, 204 após revogar
+  todas as sessões do principal explicitamente indicado; administração ativa,
+  Origin/CSRF e rate limit de escrita. Alvo fora do contrato/inexistente → 404;
+  perfil insuficiente → 403. Revogar a própria conta encerra sessão corrente.
+  Idempotente quanto a sessões já revogadas; não altera vínculos ou dados.
+- Bootstrap e recuperação são procedimentos administrativos protegidos fora do
+  HTTP público, conforme [segurança](../seguranca/AUTENTICACAO_E_PERMISSOES.md#autenticação-local--especificação-alvo-chg-004).
+  API não expõe endpoint de recuperação pública nem cadastro. Bloqueio de conta
+  e rotação/recuperação impedem uso de sessão antiga em todas as operações.
+- Gestão mantém perfis/vínculos e proteção do último admin. `GET /admin/users`
+  alvo retorna identidade técnica opaca, role e active, sem hash/senha e sem
+  exigir issuer/subject Google; campos legados de exibição ficam documentados
+  como históricos. `PATCH /admin/users/{id}` preserva role/active e valida último
+  admin; negar criação de contas adicionais com 403 `permission_denied` no
+  `POST /admin/users` alvo. Não remover recursos históricos nem habilitar
+  ampliação multiusuário por esta decisão. Ajustar clientes/testes juntos.
+- No corte alvo, `GET /auth/login`, callback e alias `/oauth2callback` deixam de
+  emitir sessões OIDC e retornam 404; nenhuma configuração Google é obrigatória.
+  Código/DDL legado permanecem até retirada especificamente autorizada.
+
+Defaults de antiabuso e política de senha estão na especificação de segurança;
+rate limit de leituras/escritas continua distinto do login. Convites mantêm
+24 h, participante 30 min absolutos, CSRF e cookies separados. Rotação de senha
+revoga sessões profissionais; autorização do emissor bloqueado/perfil/vínculo
+revogado continua revalidada em convites/sessões participantes. Não declarar
+que trocar senha, por si, revoga convites: exposição de convites exige sua
+revogação explícita. Testar a distinção em AUTH-L04/L06/L07.

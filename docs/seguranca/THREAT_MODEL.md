@@ -1,5 +1,11 @@
 # Threat model
 
+Revisão alvo CHG-004, 2026-11-06: referências OIDC abaixo preservam o código
+atual/histórico. Para a versão alvo WEB, aplicar
+[autenticação local](AUTENTICACAO_E_PERMISSOES.md#autenticação-local--especificação-alvo-chg-004)
+e [ADR-006](../arquitetura/ADR-006-autenticacao-local.md). Estado/riscos no backlog.
+
+
 Escopo: preparacao para exposicao futura do dashboard autenticado. Este modelo
 nao transforma o experimento em instrumento clinico e nao autoriza dados reais
 ou deploy. Deve ser revisto na Etapa 11 diante do host, DNS, certificado,
@@ -135,3 +141,17 @@ e uma permissao geral de HTML inline, conforme a
 [documentacao de style-src](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/style-src).
 Os testes de CSP precisam passar no bundle real; a previa Vite de desenvolvimento
 na porta4173 nao constitui hospedagem com essa politica de producao.
+
+## Ameaças da autenticação local — CHG-004
+
+| Ameaça | Controle alvo planejado | Risco residual / verificação |
+|---|---|---|
+| Banco/hash exposto ou senha reutilizada | Argon2id/salt/custo, política de senha, grants e backups protegidos | Hash não elimina quebra offline; AUTH-L01/L08, rotação por incidente |
+| Enumeração/força bruta/DoS | Mensagens/corpos genéricos, hash fictício, limites por conta/origem e concorrência | Conta única pode sofrer negação de acesso; AUTH-L03/L09 e revisão WEB-024 |
+| Login CSRF/fixação/replay ou sessão antiga | Origin no login, nova sessão, CSRF autenticado, inatividade/teto e revogação efetiva | Comprometimento de host/browser permanece externo; AUTH-L04/L05 |
+| Recuperação/rotação concorrente ou abuso de admin | Operador protegido, confirmação/auditoria, transação de senha e revogação; projetos explícitos | Credencial administrativa comprometida amplia alcance; AUTH-L02/L06 |
+| Compartilhamento e saída de profissional | Custódia, troca de senha/revogação global e revisão DEC-03 | Sem autoria ou revogação individual; R12 permanece aberto, WEB-033/039 |
+| Corte/rollback/restore ressuscita acesso | Schema aditivo testado, invalidação de sessões, redefinição de senha restaurada | Exigir AUTH-L08/L09/WEB-032; sem reativação automática de OIDC |
+
+Todos os controles locais são PLANEJADOS. Acesso por projeto e separação do
+participante não mudam. Nenhum scanner/ataque contra produção foi autorizado.

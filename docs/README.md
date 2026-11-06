@@ -9,7 +9,7 @@ Leitura inicial: [README do produto](../README.md) → [auditoria](AUDITORIA_REP
 | [Acompanhamento visual](PROGRESS.md) | Acesso ao painel de marcos e aceites no backlog, sem contagem paralela |
 | [WORKFLOW_CODEX_CLI](WORKFLOW_CODEX_CLI.md) | Protocolo dos quatro comandos e Git autônomo sem PR/merge automático |
 | [AGENTS raiz](../AGENTS.md) e [docs](AGENTS.md) | Instruções estáveis e limites |
-| [ARQUITETURA_WEB](ARQUITETURA_WEB.md), [ADRs](arquitetura/) | Visão atual/alvo e decisões; [ADR-004](arquitetura/ADR-004-replanejamento-plataforma.md) consolida a nova direção |
+| [ARQUITETURA_WEB](ARQUITETURA_WEB.md), [ADRs](arquitetura/) | Visão atual/alvo e decisões; [ADR-004](arquitetura/ADR-004-replanejamento-plataforma.md) consolida a direção; [ADR-006](arquitetura/ADR-006-autenticacao-local.md) define autenticação local alvo |
 | [REQUISITOS_E_RASTREABILIDADE](REQUISITOS_E_RASTREABILIDADE.md) | Catálogo A–L, origem e vínculos; não mantém progresso |
 | [Decisões metodológicas](experimento/DECISOES_DO_EXPERIMENTO.md), [protocolo](experimento/PROTOCOLO_WEB.md), [CSV](experimento/CSV_UNIFICADO.md) | Regras científicas, limites e intercâmbio |
 | [Modelo](dados/MODELO_DE_DADOS.md), [migrations](dados/MIGRACOES_POSTGRESQL.md), [HTTP](desenvolvimento/CONTRATO_API_WEB.md) | Contratos técnicos canônicos, sem cópias |
