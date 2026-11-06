@@ -37,7 +37,7 @@ de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
 Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
 não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
 
-Progresso atual: **17/45 entregáveis aceitos (WEB-000 a WEB-011, WEB-022/023 e WEB-042/043/044)**.
+Progresso atual: **18/45 entregáveis aceitos (WEB-000 a WEB-011, WEB-022/023, WEB-029 e WEB-042/043/044)**.
 WEB-005 é documental; WEB-006 aceita o receptor backend e contratos em banco
 sintético. M1 e M2 concluídos; atomicidade e paridade aceitas em EV-M2-007/008.
 A captura incremental no motor e seus gates temporais continuam em M3/M4.
@@ -48,10 +48,10 @@ Atualizado em **2026-11-06**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **17 de 45 · 37,8%** | **28** | **M6/M8 · execução excepcional da sessão** | Validar infraestrutura [WEB-029](#web-029--revalidar-imagens-e-compose-isolado-em-https); M3 aguarda aceite de suporte WEB-012 |
+| **18 de 45 · 40,0%** | **27** | **M6/M8 · execução excepcional da sessão** | Reproduzir pipeline [WEB-030](#web-030--reproduzir-pipeline-e-definir-validação-formal-sem-pr-automático) e recuperação WEB-031; M3 aguarda aceite WEB-012 |
 
 ```text
-Aceites   ████████░░░░░░░░░░░░   37,8%
+Aceites   ████████░░░░░░░░░░░░   40,0%
 ```
 
 A barra global é aproximada; os números são exatos, com percentual arredondado.
@@ -76,7 +76,7 @@ A ordem da tabela segue os IDs; dependências e paralelismo estão na
 | [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | ⬜🟩🟩⬜ **2/4** | ◐ Parcial; login externo bloqueado |
 | [M7](#m7--integração-compatibilidade-histórica-e-transição) | Integração, compatibilidade histórica e transição | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
-| [M8](#m8--ci-infraestrutura-e-preparação-operacional) | CI, infraestrutura e preparação operacional | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
+| [M8](#m8--ci-infraestrutura-e-preparação-operacional) | CI, infraestrutura e preparação operacional | 🟩⬜⬜⬜ **1/4** | ◐ Pipeline e recuperação em validação |
 | [M9](#m9--validação-técnica-e-metodológica) | Validação técnica e metodológica | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M10](#m10--implantação-controlada-e-documentação-operacional) | Implantação controlada e documentação operacional | ⬜⬜⬜⬜⬜ **0/5** | ○ Pendente |
 
@@ -104,6 +104,8 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 
 | ✅ [WEB-022](#web-022--comprovar-matriz-de-perfis-projetos-e-revogações) | Perfis, projetos, administração sem vínculo e revogação | PostgreSQL real sintético, API e HTTPS |
 | ✅ [WEB-023](#web-023--revalidar-sessão-cookies-csrf-e-isolamento-de-credenciais) | Sessões separadas, Origin/CSRF, expiração, logout e replay | PostgreSQL/API e navegadores em HTTPS local |
+
+| ✅ [WEB-029](#web-029--revalidar-imagens-e-compose-isolado-em-https) | Imagens, Compose/HTTPS, saúde, headers, isolamento e recusa de fontes | Build/proxy/API/PostgreSQL reais em pilha sintética isolada |
 
 ### Foco do marco atual
 
@@ -1172,19 +1174,19 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 
 ### WEB-029 — Revalidar imagens e Compose isolado em HTTPS
 
-- Marco: M8. Prioridade: P1. Complexidade: G. Estado: EM_ANDAMENTO.
+- Marco: M8. Prioridade: P1. Complexidade: G. Estado: CONCLUIDA.
 - Dependências: WEB-004.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Build e saúde reais, proxy único público, limites/headers e rejeição de fontes aprovados; pilha temporária separada dos volumes operacionais.
-- Testes/verificação: `scripts/smoke_web_compose.py, tests/test_web_runtime.py, test_web_proxy_config.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R08, R09; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Testes/verificação: `scripts/smoke_web_compose.py, tests/test_web_runtime.py, test_web_proxy_config.py`. 17 testes runtime/proxy aprovados; build e smoke Compose/HTTPS reais aprovados, incluindo nove rotas de fonte/configuração recusadas. Ver EV-M8-029/031.
+- Evidências: EV-M8-029/031, 2026-11-06; imagens com tags exclusivas, proxy/API/PG reais, recursos descartáveis e fluxo sintético persistido.
+- Riscos/bloqueios: R08/R09 preservados para release/operação; nenhum impedimento do ensaio local. Não aceita VPS/produção ou OIDC externo.
 - Referências: REQ-INF-002; [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega: branch `test/m6-m8-validacao-isolada`; hash/envio/CI no fechamento desta sessão.
 
 ### WEB-030 — Reproduzir pipeline e definir validação formal sem PR automático
 
-- Marco: M8. Prioridade: P1. Complexidade: G. Estado: PENDENTE.
+- Marco: M8. Prioridade: P1. Complexidade: G. Estado: EM_ANDAMENTO.
 - Dependências: WEB-029.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Runner local passa testes/PG, frontend/build, scanner/auditoria, browsers e integração; verificação Actions por SHA quando autorizada, sem alterar proteções/gatilhos por conveniência.
@@ -1196,15 +1198,15 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 
 ### WEB-031 — Ensaiar restauração, réplica e retorno compatível
 
-- Marco: M8. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Marco: M8. Prioridade: P0. Complexidade: G. Estado: BLOQUEADA.
 - Dependências: WEB-029; destino externo de teste autorizado se necessário.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Massa sintética restaurada isoladamente, schema/dados/recibo conferidos; réplica+agenda+alerta e retorno de imagem ensaiados, RPO/RTO medidos e limites aceitos.
-- Testes/verificação: `scripts/smoke_web_recovery.py, tests/test_web_backup_replication.py, test_vps_rollback.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R08, R09; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Testes/verificação: `scripts/smoke_web_recovery.py, tests/test_web_backup_replication.py, test_vps_rollback.py`. Restauração real positiva/recibo inválido negativo, outage e rollback aprovados; réplica isolada em doubles. Agenda/SSH positivo ainda sem aceite. Ver EV-M8-029/031.
+- Evidências: EV-M8-029/031, 2026-11-06; 11 migrations/uma avaliação/recibo restaurados, 6,305 s backup+restore local. Sem comprovação de réplica SSH positiva ou RPO no destino.
+- Riscos/bloqueios: R08/R09. Não há sshd local nem imagem SSH disponível; nenhum destino externo de teste autorizado nesta sessão. Responsável deve disponibilizar destino/conta/chave de teste ou autorizar preparação da ferramenta local. Não acessar VPS/backup operacional. WEB-032 permanece PENDENTE; doubles não aceitam réplica real.
 - Referências: REQ-INF-003; [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega parcial: branch `test/m6-m8-validacao-isolada`; commit/envio/CI no fechamento desta sessão.
 
 ### WEB-032 — Fechar release candidata e runbooks reproduzíveis
 
@@ -1217,6 +1219,58 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 - Riscos/bloqueios: R08, R09; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### EV-M8-029/031 — imagens e recuperação isoladas, 2026-11-06
+
+Escopo autorizado nesta sessão após M1: revalidar infraestrutura existente sem
+VPS, DNS, certificados operacionais ou dados reais. Base `851ac3a` preservada;
+branch `test/m6-m8-validacao-isolada`. Build serial usa allowlists Dockerfile
+*.dockerignore; dados/secrets não entram no contexto. Tags exclusivas
+`stroop-web-api:web029-20261106-851ac3a` e
+`stroop-web-proxy:web029-20261106-851ac3a`; essas imagens não foram publicadas.
+
+WEB-029: 17 testes de `tests.test_web_runtime tests.test_web_proxy_config`
+aprovados sem skips. Wrapper Python chamou `WebComposeSmoke(tempdir, True, api_image=...,
+proxy_image=...)`, `run()` e `cleanup()` com as tags acima; passou build/saúde API/PG/Nginx, proxy único público em portas loopback
+aleatórias, limites/headers/Host inválido, grants de leitura, coleta sintética,
+consulta/detalhe/CSV e reinício com persistência. Acrescentadas requisições reais
+que exigem 404 para nove caminhos de fontes/config/secret; não abrem arquivos
+operacionais: são URLs na pilha sintética. Smoke final com `build_images=False` também passou. IDs locais das imagens:
+API `sha256:117f2e999c8cc67d8e8c81e969a0e8142426b684eebe2361df77068863182dfd`;
+proxy `sha256:bd45523682e6337e29be89ceb1c14cf8779cab38861bbbb815ff05f838c7db1e`.
+Comando reproduzível equivalente: `.venv/bin/python scripts/smoke_web_compose.py
+--build-images --api-image stroop-web-api:web029-20261106-851ac3a
+--proxy-image stroop-web-proxy:web029-20261106-851ac3a`.
+
+Correções de isolamento/validação: nomes de bancos sintéticos agora seguem
+`stroop_etapa4_test_*`; projeto Compose de restore ganhou sufixo aleatório para
+não colidir com outra execução. Verificação pós-restauração confere vínculos,
+state/platform/session_id/assessment_id no recibo, além de schema, tentativas,
+métricas e estado. Nenhuma migration, dado real ou configuração operacional
+alterada. Primeiro smoke usou nome legado `stroop_w19`, mas em pilha nova
+exclusiva; repetição final usou prefixo correto. Sem falha de produto observada.
+
+WEB-031 parcial: `scripts/smoke_web_recovery.py` com as mesmas tags passou em
+três rodadas progressivas. Última: **6,305 s** backup+restore, **11 migrations,
+uma avaliação**, detecção de outage, candidato inválido/retorno da imagem e
+contagens preservadas. Novo caso negativo real altera somente o assessment_id
+do recibo da fixture temporária, cria backup e exige rejeição estrutural do
+restore; repara a fonte no finally. Última rodada confirmou
+`invalid_receipt_rejected=true`. Isso não mede RPO externo ou RTO da VPS.
+Rodadas anteriores positivas: 6,487 s e 6,261 s, sem descartar falhas.
+
+Regressão: 39 testes runtime/proxy/backup/replicação/monitor/rollback aprovados;
+`tests.test_hardening_producao` com PG descartável M6: **21 aprovados**, sem skips.
+Rodada ampliada inicial sem TEST_DATABASE_URL teve 56 passes e quatro skips de
+integração; não usada como aceite. A repetição PG acima comprova os quatro casos.
+Réplica em `tests.test_web_backup_replication` usa fetch double; timer é modelo
+estático nesses testes, portanto não comprova SSH/agenda real. Nenhum sshd local
+nos caminhos padrão nem imagem SSH disponível; não instalada dependência nova,
+nenhum destino externo/credencial foi presumido autorizado. WEB-031 permanece
+BLOQUEADA para réplica positiva real e limites operacionais; WEB-032 preserva
+suas dependências M7/WEB-030/031. Ambiente Docker 29.9.3, PostgreSQL 17.6,
+Python 3.12.3; cada harness encerra somente pilhas/volumes temporários próprios.
+Git diff --check aprovado. Hashes/envio/CI no fechamento desta execução.
 
 ## M9 — Validação técnica e metodológica
 
@@ -1528,8 +1582,7 @@ Base limpa `851ac3a`, fetch concluído, HEAD/upstream iguais; main `fe8f24f`,
 origin/main `db56b40`, preservados sem integração. Branch de entrega
 `test/m6-m8-validacao-isolada` mantém base M2/M3 ainda não integrada.
 
-Seleção global: WEB-022/023 (P0, M6) aceitas; WEB-029 (M8) em execução,
-WEB-030/031 após WEB-029. WEB-012 permanece EM_VALIDACAO aguardando aceite do
+Seleção global: WEB-022/023 (P0, M6) e WEB-029 (M8) aceitas; WEB-030/031 em execução. WEB-012 permanece EM_VALIDACAO aguardando aceite do
 responsável em EV-M3-012. WEB-021 BLOQUEADA por conta/cliente OIDC e ambiente de
 teste não disponibilizados/autorizados; não buscar credenciais operacionais.
 M4 depende de M3/M6; M5/M7 e gates finais M8/M9/M10 preservam dependências.

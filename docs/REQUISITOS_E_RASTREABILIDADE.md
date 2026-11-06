@@ -569,7 +569,7 @@ já existe ou participa da regressão geral. WEB-000 é exclusivamente documenta
 | REQ-SEG-002 | ADR-004 | M9 | WEB-033 | `docs/seguranca/` | `PLANEJADO: revisão do responsável DEC-03` | PLANEJADA; consultar WEB-033 no backlog |
 | REQ-SEG-003 | ADR-004 | M10 | WEB-041 | `stroop/persistence/web_sessions.py, política de operação` | `PLANEJADOS: testes research em WEB-041` | PLANEJADA; consultar WEB-041 no backlog |
 | REQ-INF-001 | ADR-002 + ADR-004 | M2 | WEB-007 | `scripts/migrations/, provision_web_database.py` | `tests/test_web_database_provision.py, tests/test_postgres_migrations.py` | Aceite em EV-M2-007/008; consultar WEB-007 no backlog |
-| REQ-INF-002 | ADR-002 + ADR-004 | M8 | WEB-029 | `compose.web.yaml, Dockerfile.api, Dockerfile.web` | `tests/test_web_proxy_config.py` | PLANEJADA; consultar WEB-029 no backlog |
+| REQ-INF-002 | ADR-002 + ADR-004 | M8 | WEB-029 | `compose.web.yaml, Dockerfile.api, Dockerfile.web` | `tests/test_web_proxy_config.py` | ACEITA em EV-M8-029/031 no backlog; build/Compose HTTPS sintético real |
 | REQ-INF-003 | ADR-002 + ADR-004 | M8 | WEB-031 | `scripts/backup_postgres.py, deploy/` | `tests/test_web_backup_replication.py` | PLANEJADA; consultar WEB-031 no backlog |
 | REQ-EXT-001 | ADR-004 | M1 | WEB-003 | `stroop/, api/, web/` | `tests/test_nucleo_compartilhado.py, tests/test_casos_uso_importacao.py, tests/test_multiplos_instrumentos.py` | EV-M1 real em WEB-003; fronteiras/contratos revalidados em 2026-11-04 |
 | REQ-EXT-002 | ADR-004 | M8 | WEB-030 | `scripts/verify_web_ci.py, .github/workflows/web.yml` | `tests/test_verify_web_ci.py` | PLANEJADA; consultar WEB-030 no backlog |

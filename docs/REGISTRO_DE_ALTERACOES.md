@@ -4,6 +4,17 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-06 — Infraestrutura sintética e integridade da restauração
+
+- Build/Compose HTTPS reais revalidados; smoke passou a exigir recusa de nove
+  caminhos de fontes/configuração no proxy.
+- Bancos de teste usam prefixo descartável e restaurações recebem projeto
+  exclusivo; verificação do recibo restaurado cobre vínculo e estado, com caso
+  negativo real e rollback de imagem ensaiado.
+- Documentado procedimento de validação formal por SHA via workflow_dispatch
+  existente, sem novos gatilhos, PR automático ou mudança de proteções.
+- Limites de réplica/agenda e evidências reais ficam em EV-M8-029/031 no backlog.
+
 ## 2026-11-06 — Revalidação de permissões e sessões em HTTPS
 
 - Conferidos perfis/projetos/revogação em PostgreSQL sintético e navegadores;

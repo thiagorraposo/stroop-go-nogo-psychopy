@@ -36,6 +36,7 @@ ROOT = Path(__file__).resolve().parents[1]
 COMPOSE = ROOT / "compose.web.yaml"
 API_IMAGE = "stroop-web-api:w19"
 PROXY_IMAGE = "stroop-web-proxy:w19"
+SYNTHETIC_DATABASE = "stroop_etapa4_test_compose"
 HOST = "synthetic.invalid"
 MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 
@@ -148,7 +149,7 @@ class WebComposeSmoke:
     @staticmethod
     def _dsn(user: str, password: str) -> str:
         return (f"postgresql://{user}:{quote(password, safe='')}@web-postgres:5432/"
-                "stroop_w19?connect_timeout=5")
+                f"{SYNTHETIC_DATABASE}?connect_timeout=5")
 
     def _create_certificate(self):
         _run([
@@ -165,7 +166,7 @@ class WebComposeSmoke:
         values = {
             "WEB_APP_ENV": "test",
             "WEB_PUBLIC_ORIGIN": f"https://{HOST}:{self.https_port}",
-            "WEB_POSTGRES_DB": "stroop_w19",
+            "WEB_POSTGRES_DB": SYNTHETIC_DATABASE,
             "WEB_POSTGRES_OWNER": "stroop_owner",
             "WEB_BIND_ADDRESS": "127.0.0.1",
             "WEB_HTTP_PORT": str(self.http_port),
@@ -330,6 +331,15 @@ class WebComposeSmoke:
         status, _, _ = self._request(tls=True, method='POST',
                                      path='/api/v1/projects', body=oversized)
         self._assert(status == 413)
+        # Exercise the real proxy: a SPA fallback must never serve source,
+        # configuration or secret paths, even when no matching file exists.
+        for path in (
+            '/.env', '/src/main.tsx', '/docs/', '/node_modules/',
+            '/production-secrets/', '/Dockerfile.web', '/package-lock.json',
+            '/assets/synthetic.js.map', '/scripts/synthetic.py',
+        ):
+            status, _, _ = self._request(tls=True, method='GET', path=path)
+            self._assert(status == 404)
 
     def _seed_admin_session(self) -> dict[str, str]:
         # Provision container reads credentials via *_FILE; session creation is
