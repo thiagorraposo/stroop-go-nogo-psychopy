@@ -37,10 +37,11 @@ de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
 Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
 não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
 
-Progresso atual: **19/45 entregáveis aceitos (WEB-000 a WEB-011, WEB-022/023, WEB-029/030 e WEB-042/043/044)**.
+Progresso atual: **20/45 entregáveis aceitos (WEB-000 a WEB-012, WEB-022/023, WEB-029/030 e WEB-042/043/044)**.
 WEB-005 é documental; WEB-006 aceita o receptor backend e contratos em banco
 sintético. M1 e M2 concluídos; atomicidade e paridade aceitas em EV-M2-007/008.
-A captura incremental no motor e seus gates temporais continuam em M3/M4.
+Captura incremental e gates temporais da fixture aceitos em M3; integração
+do produto com HTTPS/API/PG permanece em M4.
 
 ## Painel visual de acompanhamento
 
@@ -48,10 +49,10 @@ Atualizado em **2026-11-06**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **19 de 45 · 42,2%** | **26** | **M3 · suporte em validação; M6/M8 parciais** | M3: aceite WEB-012 pelo responsável; WEB-021 pronta tecnicamente em M6, exige autorização posterior do marco; WEB-031 aguarda destino externo |
+| **20 de 45 · 44,4%** | **25** | **M3 concluído · M6/M8 parciais** | Autorizar M6/WEB-021 para implementar autenticação local; WEB-031 aguarda destino externo |
 
 ```text
-Aceites   ████████░░░░░░░░░░░░   42,2%
+Aceites   █████████░░░░░░░░░░░   44,4%
 ```
 
 A barra global é aproximada; os números são exatos, com percentual arredondado.
@@ -71,7 +72,7 @@ A ordem da tabela segue os IDs; dependências e paralelismo estão na
 | [M0](#m0--auditoria-e-replanejamento-documental) | Auditoria e replanejamento documental | 🟩 **1/1** | ✅ Concluído |
 | [M1](#m1--fundação-e-baseline-reproduzível) | Fundação e baseline reproduzível | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M2](#m2--backend-e-contratos-de-dados-consolidados) | Backend e contratos de dados consolidados | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
-| [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | 🟩🟩🟩⬜🟩🟩🟩 **6/7** | ◐ Campanha aceita; suporte em validação |
+| [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | 🟩🟩🟩🟩🟩🟩🟩 **7/7** | ✅ Concluído |
 | [M4](#m4--fluxo-ponta-a-ponta-de-avaliações) | Fluxo ponta a ponta de avaliações | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | ⬜🟩🟩⬜ **2/4** | ◐ Parcial; autenticação local planejada |
@@ -96,8 +97,9 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 | ✅ [WEB-007](#web-007--comprovar-atomicidade-replay-e-papéis-postgresql) | Atomicidade, replay e papéis | PostgreSQL real sintético |
 | ✅ [WEB-008](#web-008--comprovar-paridade-oficial-de-métricas-e-ausência-de-medida) | Paridade das 12 métricas e ausência de medida | Domínio/API/CSV/PG/SQLite/UI e HTTPS focado |
 | ✅ [WEB-009](#web-009--conferir-snapshot-condições-e-paleta-efetiva-da-web) | Condições, paleta efetiva e tempos do snapshot WEB | Fontes Builder/CSV/JSON, DOM e testes de motor |
-| ✅ [WEB-010](#web-010--revalidar-plugins-jspsych-ciclo-de-vida-e-janela-de-resposta) | Plugins, ciclo de vida e regras de resposta/interrupção | jsPsych real, StrictMode, testes de teclado e navegadores visíveis; estabilidade de suporte ainda não aceita |
+| ✅ [WEB-010](#web-010--revalidar-plugins-jspsych-ciclo-de-vida-e-janela-de-resposta) | Plugins, ciclo de vida e regras de resposta/interrupção | jsPsych real, StrictMode, testes de teclado e navegadores visíveis; suporte restrito aceito separadamente em WEB-012 |
 | ✅ [WEB-011](#web-011--executar-campanha-de-engenharia-temporal-em-ambientes-declarados) | Campanha local de engenharia com transporte ativo | Vinte capturas completas, dez por navegador, uma falha de preparação preservada; API double, sem latência física |
+| ✅ [WEB-012](#web-012--registrar-viabilidade-e-limites-de-suporte-do-motor) | Viabilidade técnica local e limites do motor | Campanha EV-M3-011 e aceite explícito do responsável em EV-M3-012-ACEITE |
 | ✅ [WEB-042](#web-042--refinar-estímulos-e-hierarquia-visual-experimental) | Palavras com contorno branco sem cartão e centro preservado | DOM, dez cores/screenshots Chromium/Firefox e regressão funcional |
 | ✅ [WEB-043](#web-043--reformular-hud-e-retirar-precisão-agregada-do-participante) | HUD sem precisão, progresso real e cronômetro estável | DOM/árvore acessível, unidade e navegadores; gates de campanha separados |
 | ✅ [WEB-044](#web-044--validar-regressão-da-apresentação-experimental-refinada) | Regressão consolidada visual, funcional, métricas/CSV e observação temporal preparatória | Testes e fluxos consolidados; campanha WEB-011 aceita, suporte WEB-012 separado |
@@ -108,7 +110,7 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 
 ### Foco do marco atual
 
-| ✅ Aceito | ✅ Aceito | ✅ Aceito | ⬜ Em validação |
+| ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito |
 |---|---|---|---|
 | [WEB-009](#web-009--conferir-snapshot-condições-e-paleta-efetiva-da-web): condições e paleta | [WEB-010](#web-010--revalidar-plugins-jspsych-ciclo-de-vida-e-janela-de-resposta): plugins e lifecycle | [WEB-011](#web-011--executar-campanha-de-engenharia-temporal-em-ambientes-declarados): campanha temporal | [WEB-012](#web-012--registrar-viabilidade-e-limites-de-suporte-do-motor): suporte |
 
@@ -116,13 +118,13 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 |---|---|---|
 | WEB-042: estímulos/centro | WEB-043: HUD sem precisão | WEB-044: regressão visual/funcional/temporal |
 
-M2 permanece concluído em EV-M2 e EV-M2-007/008. M3 autorizado;
+M2 permanece concluído em EV-M2 e EV-M2-007/008. M3 concluído;
 WEB-009/010 preservam aceite. CHG-003 adiciona WEB-042/043 (CONCLUIDAS após revisão D3/D4 aprovada explicitamente pelo
 proprietário e critérios conferidos em EV-M3-042/043) e WEB-044 (CONCLUIDA,
 EV-M3-044). DEC-04 aprovada no alcance local de engenharia em 2026-11-05;
 WEB-011 CONCLUIDA em EV-M3-011: dez capturas completas por navegador,
-com falha adicional de preparação preservada. WEB-012 EM_VALIDACAO: relatório
-EV-M3-012 disponível; responsável deve aceitar suporte restrito ou bloquear motor.
+com falha adicional de preparação preservada. WEB-012 CONCLUIDA: responsável aceitou explicitamente o suporte restrito e os
+limites de EV-M3-012 em 2026-11-06; encerramento em EV-M3-012-ACEITE.
 
 **Acompanhar impedimentos:** [riscos](#registro-de-riscos) ·
 [decisões externas](#decisões-externas-e-condições-de-desbloqueio).
@@ -691,16 +693,17 @@ sessão removido ao fechar; recursos preexistentes preservados.
 
 ### WEB-012 — Registrar viabilidade e limites de suporte do motor
 
-- Marco: M3. Prioridade: P0. Complexidade: G. Estado: EM_VALIDACAO.
+- Marco: M3. Prioridade: P0. Complexidade: G. Estado: CONCLUIDA.
 - Dependências: WEB-011.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Relatório técnico discrimina automação/latência física e ambientes não medidos; responsável aceita suporte ou bloqueia motor; M3 atendido sem equivalência presumida. CHG-002: discriminar impacto medido do transporte e janela de perda observada, sem promessa de perda zero. CHG-003: aceite explicita apresentação visual e HUD suportados, versão e limitações da campanha final; nenhum suporte herdado de screenshots antigos.
 - Testes/verificação: relatório EV-M3-012 confronta campanha EV-M3-011, referência preparatória EV-M3-044, D5 e ADR-005; aprovação documental do alcance não substitui aceite do suporte observado.
-- Evidências: EV-M3-012, 2026-11-06; relatório pronto para revisão do responsável. Aceite explícito de suporte ainda não registrado; tarefa não concluída.
-- Riscos/bloqueios: R01/R02/R11 abertos. Responsável deve aceitar os limites observados ou bloquear motor; não ampliar matriz nem declarar equivalência por inferência.
+- Evidências: EV-M3-012, 2026-11-06; relatório e limites aceitos explicitamente pelo responsável em 2026-11-06, resposta “aceito”; conferência dos critérios e fechamento em EV-M3-012-ACEITE.
+- Riscos/bloqueios: R01/R02/R11 abertos. Aceite restrito à matriz observada; falhas históricas e perda de sufixo pendente preservadas. Integração M4 e validação física/metodológica M9 mantêm gates próprios.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md). CHG-003; R11.
 - Git da entrega: branch `feat/m3-motor-experimental`; relatório identificável por `git log -1 --format=%H --grep="docs: registra campanha DEC-04 e limites de suporte"`; envio/CI no fechamento EV-M3-011.
-- CHG-004: Sem mudança de estado/aceite: exige decisão explícita sobre os resultados e limites de EV-M3-012. Login local não comprova viabilidade, timing físico ou validade metodológica.
+- CHG-004 (histórico da revisão documental): Sem mudança de estado/aceite: exige decisão explícita sobre os resultados e limites de EV-M3-012. Login local não comprova viabilidade, timing físico ou validade metodológica.
+- Git do aceite: branch `docs/m3-aceite-suporte`, base `9979b64`; entrega identificável por `git log -1 --format=%H --grep="docs: registra aceite de suporte e encerra M3"`; envio/CI na Retomada vigente.
 
 ### EV-M3-009/010 — fontes, plugins e diagnóstico, 2026-11-05
 
@@ -1839,7 +1842,36 @@ explicitamente PLANEJADOS. Versionamento/envio conferidos no fechamento Git.
 
 ## Retomada
 
-### Retomada vigente — integração documental CHG-004, 2026-11-06
+### Retomada vigente — aceite de suporte e encerramento M3, 2026-11-06
+
+O responsável respondeu **“aceito”** à proposta concreta de suporte restrito e
+limites de EV-M3-012 apresentada nesta sessão. WEB-012 CONCLUIDA e **M3 7/7
+concluído**, com conferência em EV-M3-012-ACEITE. **20/45 aceitos (44,4%)**,
+25 sem aceite: 23 PENDENTES, WEB-021 PRONTA e WEB-031 BLOQUEADA.
+R01/R02/R11 permanecem abertos; aceite local não elimina falhas históricas,
+perda de pendências, integração M4 ou validação física/metodológica M9.
+
+Próxima ação exata: autorização posterior explícita de **M6/WEB-021**, próxima
+implementação tecnicamente pronta no caminho de integração (autenticação local).
+O aceite encerra M3, sem autorizar outro marco. M4 mantém dependência de M6;
+WEB-031 aguarda destino externo autorizado. Nenhuma continuidade excepcional.
+
+Git: branch `docs/m3-aceite-suporte`, criada da base `9979b64` limpa e alinhada
+a origin após fetch; main/origin/main preservadas, sem integração. Evidências
+funcionais históricas não reexecutadas; esta unidade registra decisão e valida
+somente documentação. Entrega identificável por `git log -1 --format=%H
+--grep='docs: registra aceite de suporte e encerra M3'`; fechamento de envio abaixo.
+Sem PR/merge/tag/deploy, migrations ou dados reais.
+
+Validação local desta unidade: `python3 scripts/verify_web_docs.py` aprovado
+(11 marcos, 45 tarefas, 50 requisitos, 12 riscos, cinco decisões, 20 aceitos,
+85 documentos, 612 links e 70 âncoras, sem ciclos); `python3 -m unittest
+tests.test_verify_web_docs -v`: sete testes aprovados, sem skips; `git diff
+--check` aprovado. Revisão do diff restrita aos três documentos desta entrega.
+Campanha, Vitest, browsers e testes Python funcionais não reexecutados: nenhum
+runtime mudou. CI desta branch será consultada por SHA após envio.
+
+### Retomada anterior — integração documental CHG-004, 2026-11-06
 
 Missão exclusivamente documental encerrada após validação/versionamento.
 **19/45 aceitos (42,2%)**, 26 sem aceite: 23 PENDENTES, WEB-012 EM_VALIDACAO,
@@ -2110,6 +2142,9 @@ explícita antes de concluir WEB-012/M3.
 
 ### EV-M3-012 — proposta de viabilidade e limites para revisão, 2026-11-06
 
+**Histórico da proposta:** aceite posterior registrado em EV-M3-012-ACEITE;
+o texto abaixo preserva os limites apresentados e o estado anterior à resposta.
+
 Relatório técnico pronto, **aceite do responsável ainda pendente**. A aprovação
 DEC-04 autorizou executar a campanha; não é aceitação de resultados futuros.
 
@@ -2139,6 +2174,30 @@ HTTPS/API/PG; M9 mantém validação física/metodológica. Não antecipar esses
 
 Responsável deve aceitar explicitamente estes limites ou bloquear o motor para
 investigação adicional. Sem essa decisão, WEB-012 EM_VALIDACAO e M3 não encerrado.
+
+### EV-M3-012-ACEITE — decisão do responsável e fechamento M3, 2026-11-06
+
+Após apresentação do relatório EV-M3-012 e pergunta explícita sobre aceitar o
+suporte restrito e seus limites para concluir WEB-012/M3, o proprietário respondeu
+**“aceito”**. Trata-se do aceite dos resultados observados, distinto da aprovação
+prévia de alcance DEC-04. Nenhuma ampliação da matriz foi solicitada.
+
+Conferência dos critérios de WEB-012 e do gate M3:
+
+| Critério | Evidência e alcance aceitos |
+|---|---|
+| Condições, regras, plugins e lifecycle | WEB-009/010, EV-M3-009/010; condições/tempos preservados e falhas históricas mantidas. |
+| Apresentação e HUD aprovados | WEB-042/043/044, EV-M3-042/043 e EV-M3-044; stroop-web-outline/1.0.0, sem caixa/precisão agregada, feedback individual preservado. |
+| Campanha final com transporte ativo e D5 | WEB-011/EV-M3-011; implementação 78f8120bd40869cdbb9d234cd9e4600ad91dcb96, diagnóstico 4d5ab56bec47a9d4885e48a20e3871f9e036e925 e relatório f9e94461cb23ec868658021734c9d94348694a5f; dez capturas completas por navegador, falha adicional de preparação preservada. |
+| Ambientes e suporte delimitados | EV-M3-012: viabilidade técnica local com Dedicated Worker, fixture web-0.1.0+visual.1.0.0.transport.1, equipamento/versões Chromium e Firefox medidos, 1280×720, primeiro plano e sem carga artificial concorrente. |
+| Transporte e janela de perda | Worker real/receptor HTTP double; ACK lento/perdido e 503 medidos. As 16 observações podem ficar pendentes durante o bloco; interrupção pode perder todo o sufixo, inclusive bloco inteiro. Sem garantia de perda zero. |
+| Aceite explícito e limites posteriores | Resposta “aceito” nesta sessão. Sem medição de latência física, equivalência PsychoPy/psicométrica, suporte móvel/outros ambientes, autorização de pesquisa real ou produção. Integração HTTPS/API/PG permanece M4; validação física/metodológica, M9. |
+
+Todos os critérios de WEB-012 e as sete tarefas de M3 estão comprovados dentro
+desse alcance; M3 encerrado. R01/R02/R11 e falhas sem causa determinada permanecem
+abertos para seus gates posteriores. Evidências funcionais acima são históricas,
+não reexecuções desta sessão. Nenhum runtime, protocolo, métrica/CSV ou gate
+alterado. Verificações documentais e Git desta unidade na Retomada vigente.
 
 ### Retomada anterior — regressão WEB-044 aceita, 2026-11-05
 

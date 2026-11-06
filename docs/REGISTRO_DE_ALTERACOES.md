@@ -4,6 +4,15 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-06 — Aceite explícito do suporte local do motor
+
+- Registrada resposta “aceito” do proprietário aos resultados e limites de
+  EV-M3-012, com conferência dos critérios de WEB-012 e do gate M3 no backlog.
+- Preservados ambientes/versões medidos, falhas históricas, janela de perda,
+  limites de integração e validação física/metodológica. Matriz alinhada ao aceite.
+- Unidade exclusivamente documental; nenhuma campanha ou teste funcional
+  reexecutado, runtime alterado ou autorização de outro marco inferida.
+
 ## 2026-11-06 — CHG-004: autenticação local e revisão de pendências
 
 - Decisão do proprietário integrada ao backlog e ADR-006: uma conta administrativa
