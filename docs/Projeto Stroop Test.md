@@ -1112,6 +1112,26 @@ Branch `feat/m6-autenticacao-local`; entrega identificável por `git log -1
 --format=%H --grep='feat(auth): implementa base transacional de credenciais locais'`.
 Envio/CI e SHA reais no fechamento desta evidência, sem PR/merge/deploy.
 
+#### Fechamento Git da base local — 2026-11-06
+
+Entrega **`188eef50e8ddce55f889179ea83913eedf792820`**, branch
+`feat/m6-autenticacao-local`, enviada com upstream; igualdade HEAD/upstream/
+`git ls-remote --heads origin feat/m6-autenticacao-local` confirmada.
+`gh run list --branch feat/m6-autenticacao-local --limit 5 --json
+headSha,status,conclusion,url` retornou `[]`: nenhuma execução Actions encontrada,
+sem dispatch/CI aprovada ou transferência de aprovação de outro SHA.
+`python3 scripts/verify_web_docs.py`, sete testes documentais e diff check
+aprovados após integração das evidências. Scanner final: 376 fontes sem achados.
+Revisados os 16 arquivos da entrega; migrations antigas intactas. Worktree limpa
+após commit/push da entrega, antes deste fechamento documental.
+
+Fechamento identificável por `git log -1 --format=%H
+--grep='docs: registra envio da base local de M6'`; conferir seu envio por
+HEAD/upstream/remoto sem commit artificial de autorreferência. Próxima ação
+continua a integração WEB-021 descrita na Retomada: nenhuma nova autorização
+necessária para trabalho sintético dentro de M6, nenhum avanço implícito a M4.
+Não houve PR, merge, tag, deploy, migração real ou acesso a dados/credenciais reais.
+
 ### WEB-022 — Comprovar matriz de perfis, projetos e revogações
 
 - Marco: M6. Prioridade: P0. Complexidade: M. Estado: CONCLUIDA.
