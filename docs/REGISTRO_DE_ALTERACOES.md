@@ -4,6 +4,19 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-06 — Campanha temporal com transporte ativo e relatório de suporte
+
+- Executadas dez capturas completas por navegador no equipamento local aprovado,
+  com worker real, ACK lento/perdido e servidor simulado indisponível. Conferidas
+  transições/duração D5, igualdade dos registros recebidos e domínio Python.
+- Preservados 19 passes e uma falha original de preparação sem trilha recuperável;
+  suplemento Chromium explícito passou. Corrigida coleta de diagnóstico da fixture
+  para não mascarar erros; motor/worker idênticos entre série e suplemento.
+- Registrados custos observados, descontinuidade civil e limites em EV-M3-011;
+  relatório de viabilidade EV-M3-012 disponível para aceite do responsável.
+- Regressões frontend/Python/visual aprovadas, sem dependências, migrations,
+  dados reais, integração de produto M4 ou serviços externos alterados.
+
 ## 2026-11-05 — Aprovação DEC-04 e preparação da campanha local
 
 - Proprietário aprovou expressamente o alcance local de engenharia DEC-04;

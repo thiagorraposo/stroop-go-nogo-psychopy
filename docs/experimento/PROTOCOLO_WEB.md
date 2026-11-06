@@ -340,3 +340,12 @@ WEB-042/043, não os gates de campanha, suporte ou encerramento de M3.
 |---|---|---|
 | D3 — Repeticao da pratica | Manter rodadas de 4 tentativas, sem limiar de desempenho; permitir repetir opcionalmente antes do principal, com nova ordem aleatoria e descarte das tentativas de treino para o resultado oficial. Manter 16 tentativas principais, tempos, contagens, cores e HUD atuais, incluindo precisao ao vivo e cronometro; principal sem feedback por tentativa | A repeticao opcional altera a dose de treino e foi aprovada metodologicamente para a WEB; sua implementacao nao altera o Builder local |
 | D4 — Identificacao | Usar `test_version=0.2.2-web.1`, mantendo `test_code=stroop_go_nogo_ptbr`; versao do aplicativo e plataforma `web` ficam em metadados separados a especificar em W02 | Identifica a variante de coleta sem prometer equivalencia. Nao adicionar colunas ao CSV oficial de 21 campos nem reutilizar silenciosamente `0.2.2` para tecnologia de medicao diferente |
+
+
+### Alcance DEC-04 local — 2026-11-05
+
+A aprovação posterior da campanha local de engenharia pelo proprietário consta
+em [DECISOES_DO_EXPERIMENTO](DECISOES_DO_EXPERIMENTO.md#dec-04--alcance-local-de-engenharia-aprovado-em-2026-11-05).
+Preserva integralmente D1/D2/D5/D6, sem transportar a exceção histórica W16 para
+M3. Matriz, recursos, evidências e limites ficam somente no backlog; aprovação
+do alcance não concede aceite dos resultados nem validação física/metodológica.

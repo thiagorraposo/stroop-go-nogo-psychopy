@@ -1,6 +1,6 @@
 # Projeto Stroop Test — backlog canônico da plataforma WEB
 
-Última verificação documental: **2026-11-05**. Missão e limites:
+Última verificação documental: **2026-11-06**. Missão e limites:
 [arquitetura](ARQUITETURA_WEB.md); inventário: [auditoria](AUDITORIA_REPLANEJAMENTO.md);
 especificação: [requisitos e matriz](REQUISITOS_E_RASTREABILIDADE.md).
 Este é o único registro executável de marcos, tarefas, estados, dependências,
@@ -37,21 +37,21 @@ de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
 Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
 não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
 
-Progresso atual: **14/45 entregáveis aceitos (WEB-000 a WEB-010 e WEB-042/043/044)**.
+Progresso atual: **15/45 entregáveis aceitos (WEB-000 a WEB-011 e WEB-042/043/044)**.
 WEB-005 é documental; WEB-006 aceita o receptor backend e contratos em banco
 sintético. M1 e M2 concluídos; atomicidade e paridade aceitas em EV-M2-007/008.
 A captura incremental no motor e seus gates temporais continuam em M3/M4.
 
 ## Painel visual de acompanhamento
 
-Atualizado em **2026-11-05**, a partir das fichas deste backlog.
+Atualizado em **2026-11-06**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **14 de 45 · 31,1%** | **31** | **M3 · campanha de engenharia em preparação** | Executar campanha local aprovada em [WEB-011](#web-011--executar-campanha-de-engenharia-temporal-em-ambientes-declarados) |
+| **15 de 45 · 33,3%** | **30** | **M3 · campanha aceita; suporte em validação** | Responsável revisar limites e aceitar suporte ou bloquear motor em [WEB-012](#web-012--registrar-viabilidade-e-limites-de-suporte-do-motor) |
 
 ```text
-Aceites   ██████░░░░░░░░░░░░░░   31,1%
+Aceites   ███████░░░░░░░░░░░░░   33,3%
 ```
 
 A barra global é aproximada; os números são exatos, com percentual arredondado.
@@ -71,7 +71,7 @@ A ordem da tabela segue os IDs; dependências e paralelismo estão na
 | [M0](#m0--auditoria-e-replanejamento-documental) | Auditoria e replanejamento documental | 🟩 **1/1** | ✅ Concluído |
 | [M1](#m1--fundação-e-baseline-reproduzível) | Fundação e baseline reproduzível | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M2](#m2--backend-e-contratos-de-dados-consolidados) | Backend e contratos de dados consolidados | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
-| [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | 🟩🟩⬜⬜🟩🟩🟩 **5/7** | ◐ Campanha local em preparação |
+| [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | 🟩🟩🟩⬜🟩🟩🟩 **6/7** | ◐ Campanha aceita; suporte em validação |
 | [M4](#m4--fluxo-ponta-a-ponta-de-avaliações) | Fluxo ponta a ponta de avaliações | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
@@ -97,13 +97,14 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 | ✅ [WEB-008](#web-008--comprovar-paridade-oficial-de-métricas-e-ausência-de-medida) | Paridade das 12 métricas e ausência de medida | Domínio/API/CSV/PG/SQLite/UI e HTTPS focado |
 | ✅ [WEB-009](#web-009--conferir-snapshot-condições-e-paleta-efetiva-da-web) | Condições, paleta efetiva e tempos do snapshot WEB | Fontes Builder/CSV/JSON, DOM e testes de motor |
 | ✅ [WEB-010](#web-010--revalidar-plugins-jspsych-ciclo-de-vida-e-janela-de-resposta) | Plugins, ciclo de vida e regras de resposta/interrupção | jsPsych real, StrictMode, testes de teclado e navegadores visíveis; estabilidade de suporte ainda não aceita |
+| ✅ [WEB-011](#web-011--executar-campanha-de-engenharia-temporal-em-ambientes-declarados) | Campanha local de engenharia com transporte ativo | Vinte capturas completas, dez por navegador, uma falha de preparação preservada; API double, sem latência física |
 | ✅ [WEB-042](#web-042--refinar-estímulos-e-hierarquia-visual-experimental) | Palavras com contorno branco sem cartão e centro preservado | DOM, dez cores/screenshots Chromium/Firefox e regressão funcional |
 | ✅ [WEB-043](#web-043--reformular-hud-e-retirar-precisão-agregada-do-participante) | HUD sem precisão, progresso real e cronômetro estável | DOM/árvore acessível, unidade e navegadores; gates de campanha separados |
 | ✅ [WEB-044](#web-044--validar-regressão-da-apresentação-experimental-refinada) | Regressão consolidada visual, funcional, métricas/CSV e observação temporal preparatória | Testes atuais e fluxos reutilizados na mesma fonte; campanha e suporte pendentes |
 
 ### Foco do marco atual
 
-| ✅ Aceito | ✅ Aceito | ⬜ Em andamento | ⬜ Sem aceite |
+| ✅ Aceito | ✅ Aceito | ✅ Aceito | ⬜ Em validação |
 |---|---|---|---|
 | [WEB-009](#web-009--conferir-snapshot-condições-e-paleta-efetiva-da-web): condições e paleta | [WEB-010](#web-010--revalidar-plugins-jspsych-ciclo-de-vida-e-janela-de-resposta): plugins e lifecycle | [WEB-011](#web-011--executar-campanha-de-engenharia-temporal-em-ambientes-declarados): campanha temporal | [WEB-012](#web-012--registrar-viabilidade-e-limites-de-suporte-do-motor): suporte |
 
@@ -115,8 +116,9 @@ M2 permanece concluído em EV-M2 e EV-M2-007/008. M3 autorizado;
 WEB-009/010 preservam aceite. CHG-003 adiciona WEB-042/043 (CONCLUIDAS após revisão D3/D4 aprovada explicitamente pelo
 proprietário e critérios conferidos em EV-M3-042/043) e WEB-044 (CONCLUIDA,
 EV-M3-044). DEC-04 aprovada no alcance local de engenharia em 2026-11-05;
-WEB-011 EM_ANDAMENTO, preparando worker e campanha na apresentação final.
-WEB-012 permanece PENDENTE da campanha e aceitação dos limites de suporte.
+WEB-011 CONCLUIDA em EV-M3-011: dez capturas completas por navegador,
+com falha adicional de preparação preservada. WEB-012 EM_VALIDACAO: relatório
+EV-M3-012 disponível; responsável deve aceitar suporte restrito ou bloquear motor.
 
 **Acompanhar impedimentos:** [riscos](#registro-de-riscos) ·
 [decisões externas](#decisões-externas-e-condições-de-desbloqueio).
@@ -673,27 +675,27 @@ sessão removido ao fechar; recursos preexistentes preservados.
 
 ### WEB-011 — Executar campanha de engenharia temporal em ambientes declarados
 
-- Marco: M3. Prioridade: P0. Complexidade: G. Estado: EM_ANDAMENTO.
+- Marco: M3. Prioridade: P0. Complexidade: G. Estado: CONCLUIDA.
 - Dependências: WEB-010, WEB-044; DEC-04 para matriz.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: 10 execuções sintéticas por ambiente selecionado, trilhas brutas/falhas preservadas, quadro e desvio total conferidos contra D5; sem substituir falha por rerun omitido. CHG-002: incluir transporte incremental ativo, ACK lento/perdido, retries e falha de servidor, sem alongar tentativas; comparar impacto contra D5. CHG-003: campanha na SHA do layout final aprovado, com contorno branco uniforme, sem retângulo/precisão agregada, progresso/cronômetro revisados e transporte incremental ativo. Registrar custo observado de renderização/HUD/retries; campanha somente no visual anterior não basta. Limites D5 e tolerâncias intactos.
-- Testes/verificação: `PLANEJADO: campanha técnica D5; web/pilots/w16-local.spec.ts como ferramenta, não prova física`. Arquivos citados existem; verificações PLANEJADAS não têm resultado. Adicional PLANEJADO: trilhas antes/depois identificadas por versão/SHA e falhas preservadas; comparar tempos e condições aprovadas DEC-04.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
+- Testes/verificação: `web/pilots/web011.spec.ts`, configuração `playwright.web011.config.ts`, fila/worker reais; campanha serial visível, 20 capturas completas aprovadas por D5 e domínio Python, uma falha original sem trilha preservada no relatório Playwright, suplemento explícito sem apagar a falha. Regressão: 292 Vitest, 51 Python, tipos/build e 6 Playwright visuais aprovados.
+- Evidências: EV-M3-011, 2026-11-05/06, SHA 78f8120; suplemento 4d5ab56 altera somente diagnóstico da fixture, com motor/worker idênticos. Critérios conferidos no relatório abaixo. Sem integração HTTPS/API/PG ou medição física.
 - Riscos/bloqueios: R01/R02/R11. DEC-04 desbloqueada para engenharia local pela resposta explícita do proprietário em 2026-11-05; matriz identificada em EV-M3-011. Não aprova validação física/metodológica M9, suporte ou redução de gates. WEB-012 depende da campanha e decisão de suporte.
 - Referências: REQ-EXP-003; [arquitetura](ARQUITETURA_WEB.md). REQ-UX-001 a REQ-UX-007; R11.
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega: branch `feat/m3-motor-experimental`, implementação `78f8120bd40869cdbb9d234cd9e4600ad91dcb96`, diagnóstico `4d5ab56bec47a9d4885e48a20e3871f9e036e925`; envio/CI no fechamento EV-M3-011.
 
 ### WEB-012 — Registrar viabilidade e limites de suporte do motor
 
-- Marco: M3. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Marco: M3. Prioridade: P0. Complexidade: G. Estado: EM_VALIDACAO.
 - Dependências: WEB-011.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Relatório técnico discrimina automação/latência física e ambientes não medidos; responsável aceita suporte ou bloqueia motor; M3 atendido sem equivalência presumida. CHG-002: discriminar impacto medido do transporte e janela de perda observada, sem promessa de perda zero. CHG-003: aceite explicita apresentação visual e HUD suportados, versão e limitações da campanha final; nenhum suporte herdado de screenshots antigos.
-- Testes/verificação: `PLANEJADO: revisão de evidências M3 e DEC-04`. Arquivos citados existem; verificações PLANEJADAS não têm resultado. Adicional PLANEJADO: revisão do protocolo visual e matriz DEC-04.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R01, R02; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Testes/verificação: relatório EV-M3-012 confronta campanha EV-M3-011, referência preparatória EV-M3-044, D5 e ADR-005; aprovação documental do alcance não substitui aceite do suporte observado.
+- Evidências: EV-M3-012, 2026-11-06; relatório pronto para revisão do responsável. Aceite explícito de suporte ainda não registrado; tarefa não concluída.
+- Riscos/bloqueios: R01/R02/R11 abertos. Responsável deve aceitar os limites observados ou bloquear motor; não ampliar matriz nem declarar equivalência por inferência.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md). CHG-003; R11.
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega: branch `feat/m3-motor-experimental`; relatório identificável por `git log -1 --format=%H --grep="docs: registra campanha DEC-04 e limites de suporte"`; envio/CI no fechamento EV-M3-011.
 
 ### EV-M3-009/010 — fontes, plugins e diagnóstico, 2026-11-05
 
@@ -1461,14 +1463,22 @@ WEB-034 mantêm critérios próprios. Histórico inicial CHG-003 acima preservad
 
 ## Retomada
 
-### Retomada vigente — DEC-04 local aprovada, 2026-11-05
+### Retomada vigente — campanha local concluída; suporte em revisão, 2026-11-06
 
-Marco autorizado M3, 14/45 aceitos, M3 5/7; sem avanço para M4.
-Proprietário respondeu “eu aprovo esse alcance para DEC-04” à proposta local
-explicitada na sessão. WEB-011 EM_ANDAMENTO; WEB-012 PENDENTE. Próxima ação:
-preparar Dedicated Worker e executar dez sessões sintéticas em cada ambiente
-local Chromium/Firefox visível, preservando falhas e D5; depois conferir suporte.
-Validação física/metodológica permanece pendente para M9, sem coleta/deploy.
+Marco autorizado M3, **15/45 aceitos (33,3%)**, 30 sem aceite; M3 **6/7**.
+WEB-011 CONCLUIDA: dez capturas completas válidas por navegador com transporte
+ativo e falhas de rede. A campanha original teve 19 passes e uma falha de
+preparação sem trilha; uma sessão Chromium adicional explícita passou, sem
+apagar nem converter a falha original em sucesso. Nenhuma falha D5 nas vinte
+capturas completas, todas validadas no domínio Python. Relatório em EV-M3-011.
+
+WEB-012 EM_VALIDACAO: proposta concreta em EV-M3-012. Próxima ação exata:
+responsável aceitar a viabilidade técnica restrita aos ambientes/fixture
+ensaiados ou bloquear motor para investigação adicional. A aprovação anterior
+DEC-04 autorizou alcance da campanha; não aprova antecipadamente seus resultados.
+M3 não encerrado. Não iniciar outro marco; M6 antecede o fluxo M4 e exige
+posterior autorização própria. Validação física/metodológica segue M9; sem
+pesquisa real, produção, PR, merge ou deploy.
 
 ### EV-M3-011 — aprovação do alcance e campanha local, 2026-11-05
 
@@ -1501,8 +1511,142 @@ ACK lento/perdido, replay original, 1/2/4/8 s e Retry-After, expiração e erros
 401/403/409/410. Inicialmente uma asserção do teste assumiu atributo de tentativa
 na fixação (só existe no estímulo); corrigida para verificar o sinal de fixação,
 sem mudar o runtime. Duas tipagens iniciais corrigidas (assinaturas distintas
-onerror/onmessageerror e parâmetro não utilizado). Campanha ainda PLANEJADA;
-nenhum aceite novo deriva desses testes ou da aprovação documental.
+onerror/onmessageerror e parâmetro não utilizado). Na preparação a campanha
+ainda era PLANEJADA; o aceite abaixo deriva dos ensaios, não da aprovação documental.
+
+#### Execução e conferência de WEB-011 — 2026-11-05/06
+
+Implementação e primeira série: **78f8120bd40869cdbb9d234cd9e4600ad91dcb96**.
+Suplemento: **4d5ab56bec47a9d4885e48a20e3871f9e036e925**, somente melhoria do
+harness para preservar diagnóstico quando a página perde a fixture, registrar
+navegações e não mascarar falha original com erro de cleanup. `git diff 78f8120
+4d5ab56 --exit-code -- web/src condicoes stroop` aprovado: mesmo motor, worker,
+condições e gates. Hash do diff web vazio nas vinte capturas, sem fonte local
+não versionada durante cada ensaio. Sem dependências instaladas/atualizadas.
+
+Ambiente: matriz local descrita acima; Node 24.15.0, npm 11.16.0, Python 3.12.3,
+Playwright 1.64.1. Chromium **156.0.8078.4**, Firefox **157.0**, ambos visíveis,
+viewport efetivo 1280×720 e foco/visibilidade conferidos. Screen reportado pelo
+browser é metadado de automação, distinto da configuração física xrandr: não é
+medição física. Prática jsPsych completa antes de cada principal, relógio real,
+ordem canônica sintética e uma pressão automatizada durante estímulo; não é
+resposta de participante nem teste do fluxo profissional/convite/API real.
+
+| Campanha com transporte ativo | Chromium | Firefox |
+|---|---|---|
+| Capturas completas válidas / tentativas totais | **10 / 11** | **10 / 10** |
+| Transições em capturas completas | 640 | 640 |
+| Período de quadro medido | 16,700 ms | 16,340–16,680 ms |
+| Maior erro absoluto de transição | **2,0 ms** | **4,0 ms** |
+| Maior erro absoluto do principal de 60 s | **1,8 ms** | **3,0 ms** |
+| Maior custo observado de enqueue/postMessage | 2,4 ms | 1,0 ms |
+| Observações completas recebidas pelo double | 160 | 160 |
+| Requests de checkpoint por bloco | 12–16 | 11–16 |
+
+Por navegador: três sessões saudáveis, três com ACK atrasado **4,5 s**, duas
+com primeiro ACK perdido **após commit simulado** e recuperação por consulta,
+duas com **503 durante todo o principal** e recuperação somente após término.
+Fila/JSON/HTTP/retries executam no Dedicated Worker; motor apenas copia após
+fim observado e início da próxima fixação. Um voo, agrupamento, replay do mesmo
+lote e fila de até 16 sem descarte. Comparados os 320 registros recebidos pelo
+double com os resultados em RAM: igualdade integral. ACK/hash do double é
+sintético; canonização/durabilidade/replay transacional reais permanecem
+comprovados em M2 e voltam à integração HTTPS/API/PG de M4, não neste ensaio.
+
+D5 conferido em cada uma das 1.280 transições contra o quadro da própria sessão;
+duração de cada bloco dentro de ±100 ms. As vinte conclusões foram submetidas
+sem ajuste de timestamps a `stroop.domain.web_results.validate_result` com
+CSV-fonte e ordem observada: **20/20 aprovadas**, 320 tentativas. Cópia/postMessage
+medido com performance.now; desvio combinado inclui renderização, contorno/HUD,
+callbacks, transporte e compositor. Não isola custo causal de cada componente.
+Retries/progresso são observados em trilhas, sem render React por quadro.
+
+Referência antes/depois: EV-M3-044 sem transporte tinha Firefox 157.0 com máximo
+2 ms de erro de transição e 2 ms de duração, uma captura; agora máximo 4/3 ms
+em dez. Ambas séries dentro de D5. Chrome preparatório era **157.0.8103.38**,
+distinto do Chromium atual: não comparar como ensaio causal pareado. Não
+alegar diferença estatística, ausência de custo ou melhoria científica.
+
+Falha preservada: réplica Chromium original 3/10, cenário lost, **26,663 s**,
+`window.web011` ausente ao tentar preservar captura. Snapshot mostra página
+inicial; não há trilha principal recuperável. O cleanup mascarou o erro anterior;
+a causa da perda de fixture/navegação não foi determinada. Resultado original
+continua **falhou**, sem atribuir gate D5 nem inventar timestamps. Horários civis
+mostram descontinuidade: réplica 3 iniciou 2026-11-05T23:46:16Z e a próxima
+2026-11-06T02:51:12Z; duração monotônica total do runner foi 27,9 min. Inspeção
+posterior: NTP ativo/sincronizado. Não atribuir causalidade à mudança de relógio
+nem usar data civil para RT. Preservados results.json e error-context originais.
+Suplemento explícito do mesmo cenário completou e confirmou 16 registros;
+não substitui a falha, não demonstra sua causa nem estabilidade universal.
+
+Investigação histórica: confrontadas transições atuais, foco e gates com
+EV-M3-009/010 e sua observação de intervalos rAF de até 50 ms. Nova campanha
+não reproduziu invalidação D5 nas vinte capturas; não há trace causal suficiente
+para atribuir as falhas antigas a código/CPU/compositor. R01/R02/R11 continuam
+abertos. Não alterados agendamento nominal, limites, suporte aprovado ou histórico.
+
+Comandos executados e resultados:
+
+- Em web: `npx playwright test --config playwright.web011.config.ts`:
+  **19 aprovados, 1 falha, zero skips/retries**, 27,9 min; série original intacta.
+- Em web: `npx playwright test --config playwright.web011.config.ts
+  --project chromium-local --grep 'replica 3/10 lost'
+  --output=test-results/web011-supplement --reporter=list`: **1 aprovado**,
+  1,4 min, suplemento separado; não sobrescreveu o relatório JSON original.
+- `npm --prefix web test`: **292/292**, 18 arquivos; `npm --prefix web run build`:
+  typecheck e Vite aprovados, sem skips. Worker foi ensaiado via Vite de teste;
+  integração/bundle de produto com transporte permanece M4.
+- `.venv/bin/python -m unittest tests.test_fase3_condicoes_tempos
+  tests.test_nucleo_compartilhado tests.test_web_export tests.test_web_results
+  tests.test_verify_web_docs -q`: **51 aprovados**, sem skips.
+- Em web: `WEB_TEST_PORT=4273 npx playwright test e2e/presentation.spec.ts
+  --workers=1 --trace=off --output=test-results/web011-visual`: **6 aprovados**,
+  29,9 s, dez cores/DOM/árvore acessível/HUD/feedback e 40 screenshots sintéticos;
+  relógio controlado/headless, distintos da campanha de relógio real acima.
+- Verificação Python inline das vinte engineering.json: montar payload com
+  resultado original, PROTOCOL_ID/TEST_VERSION, app_version da captura e frame;
+  chamar validate_result com CSV-fonte/ordem capturada, conferir igualdade dos
+  registros recebidos, limites D5 e SHA-256 do diff vazio. **20/20 aprovadas**.
+
+Artefatos exclusivamente sintéticos e ignorados: `web/test-results/web011/`
+(results.json original, 19 engineering.json, attachments, erro/contexto da falha),
+`web/test-results/web011-supplement/` (uma captura adicional),
+`web/test-results/web011-manifest.json` (20 caminhos/hashes/SHA de fonte) e
+`web/test-results/web011-visual/`. Sem logs/exportações/coletas versionados.
+Critérios WEB-011 conferidos; aceite de campanha de engenharia, não de suporte.
+Envio/CI e fechamento documental registrados após validação abaixo.
+
+### EV-M3-012 — proposta de viabilidade e limites para revisão, 2026-11-06
+
+Relatório técnico pronto, **aceite do responsável ainda pendente**. A aprovação
+DEC-04 autorizou executar a campanha; não é aceitação de resultados futuros.
+
+Proposta: aceitar **viabilidade técnica local do motor/jsPsych com Dedicated
+Worker** na apresentação stroop-web-outline/1.0.0 e app da fixture
+web-0.1.0+visual.1.0.0.transport.1, nas versões Chromium/Firefox e equipamento
+medidos, viewport 1280×720, em primeiro plano, sem carga artificial concorrente.
+Vinte capturas completas passaram D5, incluindo os cenários de rede descritos;
+a falha adicional de preparação e as invalidações históricas permanecem abertas.
+Não afirmar suporte sem falhas; os gates devem continuar invalidando violações.
+
+Janela de perda: no cenário saudável cada tentativa foi confirmada; no ensaio
+503 as **16 observações ficaram sem confirmação durante o bloco** e chegaram
+após recuperação. ACK lento agrupou tentativas; ACK perdido foi reconciliado
+por consulta. Uma queda antes de confirmação pode perder a tentativa em curso
+e todo sufixo pendente, inclusive o bloco inteiro. Não há limite garantido de
+uma tentativa nem promessa de perda zero; recibo parcial não é conclusão oficial.
+
+Limites: teclado automatizado, receptor HTTP double, sem HTTPS/API/PG integrado
+nesta campanha; nenhuma latência física de monitor/teclado medida, equivalência
+PsychoPy, avaliação psicométrica, pesquisa real ou produção. Outros equipamentos,
+SO, browsers/versões, dispositivos móveis, cargas e resoluções de timing não
+medidos. Screenshots em 1920×1080 validam apresentação, não campanha temporal
+nessa resolução. Falhas antigas não tiveram causa comprovada. M4 deve integrar
+worker, prontidão/start, expiração, entrega parcial/aborto e recibo oficial com
+HTTPS/API/PG; M9 mantém validação física/metodológica. Não antecipar esses aceites.
+
+Responsável deve aceitar explicitamente estes limites ou bloquear o motor para
+investigação adicional. Sem essa decisão, WEB-012 EM_VALIDACAO e M3 não encerrado.
 
 ### Retomada anterior — regressão WEB-044 aceita, 2026-11-05
 
