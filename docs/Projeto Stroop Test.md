@@ -2168,6 +2168,27 @@ Validação documental, scanner e `git diff --check` aprovados antes do commit;
 envio e consulta de Actions por SHA registrados no fechamento abaixo. Sem PR,
 merge, tag, deploy, migração real ou acesso a dados/secrets operacionais.
 
+#### Fechamento Git de M6 — 2026-11-06
+
+Entrega **`09f444ce1132fdc0db643d3028c30f1612a2cd66`**, enviada com upstream na
+branch `feat/m6-autenticacao-local`; igualdade `HEAD`, `origin/feat/m6-autenticacao-local`
+e `git ls-remote --heads origin feat/m6-autenticacao-local` confirmada nessa SHA.
+`gh run list --branch feat/m6-autenticacao-local --limit 5 --json headSha,status,conclusion,url`
+retornou `[]`: nenhuma execução Actions encontrada para `09f444c` (o workflow
+existente dispara em `push` para `main`, `pull_request` e `workflow_dispatch`);
+CI remota **não executada** para esta SHA, sem transferir aprovação de outra SHA.
+
+Validador documental final (`python3 scripts/verify_web_docs.py`): **11 marcos,
+45 tarefas, 50 requisitos, 12 riscos, cinco decisões, 22 aceitos, 86 documentos,
+622 links e 72 âncoras**, grafo sem ciclos; `python3 -m unittest tests.test_verify_web_docs -v`
+(**7/7 aprovados**, sem skips), `.venv/bin/python scripts/verify_web_ci.py sources`
+(**393 fontes versionadas verificadas**, zero achados) e `git diff --check`
+aprovados. Este fechamento documental é identificável por
+`git log -1 --format=%H --grep='docs: registra envio e fechamento de M6'`;
+conferir seu envio por `HEAD`/upstream/remoto, sem commit artificial de
+autorreferência. Próxima ação preservada: autorizar explicitamente **M4/WEB-013**.
+Nenhum PR, merge, tag, deploy ou acesso a dados reais executado.
+
 ### Retomada anterior — aceite de suporte e encerramento M3, 2026-11-06
 
 O responsável respondeu **“aceito”** à proposta concreta de suporte restrito e
