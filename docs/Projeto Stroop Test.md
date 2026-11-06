@@ -1225,9 +1225,8 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 Escopo autorizado nesta sessão após M1: revalidar infraestrutura existente sem
 VPS, DNS, certificados operacionais ou dados reais. Base `851ac3a` preservada;
 branch `test/m6-m8-validacao-isolada`. Build serial usa allowlists Dockerfile
-*.dockerignore; dados/secrets não entram no contexto. Tags exclusivas
-`stroop-web-api:web029-20261106-851ac3a` e
-`stroop-web-proxy:web029-20261106-851ac3a`; essas imagens não foram publicadas.
+*.dockerignore; dados/secrets não entram no contexto. Tag exclusiva `web029-20261106-851ac3a` nos repositórios locais
+`stroop-web-api` e `stroop-web-proxy`; essas imagens não foram publicadas.
 
 WEB-029: 17 testes de `tests.test_web_runtime tests.test_web_proxy_config`
 aprovados sem skips. Wrapper Python chamou `WebComposeSmoke(tempdir, True, api_image=...,
@@ -1239,8 +1238,8 @@ operacionais: são URLs na pilha sintética. Smoke final com `build_images=False
 API `sha256:117f2e999c8cc67d8e8c81e969a0e8142426b684eebe2361df77068863182dfd`;
 proxy `sha256:bd45523682e6337e29be89ceb1c14cf8779cab38861bbbb815ff05f838c7db1e`.
 Comando reproduzível equivalente: `.venv/bin/python scripts/smoke_web_compose.py
---build-images --api-image stroop-web-api:web029-20261106-851ac3a
---proxy-image stroop-web-proxy:web029-20261106-851ac3a`.
+--build-images --api-image IMAGEM_API_LOCAL --proxy-image IMAGEM_PROXY_LOCAL`,
+substituindo os dois nomes pelos repositórios e tag identificados acima.
 
 Correções de isolamento/validação: nomes de bancos sintéticos agora seguem
 `stroop_etapa4_test_*`; projeto Compose de restore ganhou sufixo aleatório para
@@ -1270,7 +1269,39 @@ nenhum destino externo/credencial foi presumido autorizado. WEB-031 permanece
 BLOQUEADA para réplica positiva real e limites operacionais; WEB-032 preserva
 suas dependências M7/WEB-030/031. Ambiente Docker 29.9.3, PostgreSQL 17.6,
 Python 3.12.3; cada harness encerra somente pilhas/volumes temporários próprios.
-Git diff --check aprovado. Hashes/envio/CI no fechamento desta execução.
+Agenda/alerta negativo real: `systemd-run --user` criou unit transitório
+exclusivo com `--on-active=1s --timer-property=AccuracySec=100ms`, executando
+`replicate_web_backup.py --config` de fixture temporária 0600 e chave ed25519
+sintética. SSH real só para 127.0.0.1/porta aleatória reservada sem listener:
+falha esperada gerou `status=unavailable`, `alert=true`,
+`error=replication_failed`, ExecMainStatus=1; nenhum ciphertext publicado.
+Stop/reset-failed somente do timer/service próprio e artefatos removidos.
+Esse caminho comprova disparo/alerta negativo, não réplica positiva.
+Git diff --check aprovado. Código em `357e28f39b132b0213998b5066051bdd7b2fa04d`,
+enviado e confirmado por HEAD/upstream/ls-remote. Hashes/envio/CI adicionais no
+fechamento desta execução.
+
+### EV-M8-030 — pipeline por SHA em execução, 2026-11-06
+
+Worktree sparse exclusiva `/tmp/stroop-web030-20261106`, exclusões de dados e
+secrets antes checkout; venv nova com locks exatos e pip check aprovado, npm ci
+somente isolado. PostgreSQL tmpfs exclusivo, banco `stroop_etapa4_test_web030`.
+Runner `verify_web_ci.py all` exige scanner/self-test, Python sem skips,
+frontend/build, auditorias, browsers gerais/temporais e HTTPS real. Doze testes
+do runner aprovados na preparação. Nenhuma mudança de proteção/gatilho ou PR.
+
+Primeira tentativa local em `357e28f` bloqueou em sources: dois achados
+`generic-api-key` nas linhas de documentação das tags de imagens locais,
+sem segredo real. Confirmado por inspeção somente dessas fontes sintéticas;
+reescrita da representação documental separa repositório/tag e preserva IDs
+reproduzíveis. Scanner/configuração/asserts intactos, sem allowlist/bypass.
+Verificação sources local subsequente passou 366 fontes. Demais estágios da
+primeira tentativa não executados; não há aceite parcial de pipeline.
+
+Actions inicial [42159772439](https://github.com/thiagorraposo/stroop-go-nogo-psychopy/actions/runs/42159772439)
+disparado pelo workflow_dispatch existente sobre `357e28f`, com headSha
+conferido; resultado será registrado no fechamento, não presumido aprovado.
+Nova SHA documental será usada para repetição integral local/remota.
 
 ## M9 — Validação técnica e metodológica
 
