@@ -1867,6 +1867,25 @@ CI histórica aprovada apenas em 0d79fd2/EV-M8-030; CI desta revisão não execu
 sem transferência de aprovação. Nenhum PR/merge/tag/deploy/migration ou dado real.
 
 
+#### Fechamento Git de CHG-004 — 2026-11-06
+
+Entrega documental **`be014bb71c3d3bf3fe8953624090d3fa101f59d0`**, branch
+`docs/autenticacao-local-roadmap`, enviada com upstream. Push bem sucedido e
+igualdade HEAD/upstream/`git ls-remote --heads origin docs/autenticacao-local-roadmap`
+confirmada nessa SHA. Validador reexecutado após commit: mesmos 11 marcos,
+45 tarefas, 50 requisitos, 12 riscos, cinco decisões e 19 aceitos; 85 documentos,
+611 links/69 âncoras válidos e grafo sem ciclos. Python observado 3.12.3.
+`gh run list --branch docs/autenticacao-local-roadmap --limit 5 --json
+headSha,status,conclusion,url` retornou `[]`: nenhuma execução Actions dessa
+branch; sem aprovação CI alegada. Nenhum workflow_dispatch solicitado/executado.
+
+Este fechamento registra resultados de envio/validação e limites da missão;
+é identificável por `git log -1 --format=%H --grep='docs: registra validação e envio da CHG-004'`.
+Seu envio é verificável por HEAD/upstream/remoto, sem autorreferência de SHA.
+A missão encerra documentalmente; próxima ação permanece aceite WEB-012 em M3,
+com WEB-021 pronta tecnicamente apenas para futura sessão autorizada de M6.
+Sem implementação, novo marco, PR, merge, tag, deploy ou dados reais.
+
 ### Retomada anterior — execução excepcional encerrada, 2026-11-06
 
 **19/45 aceitos (42,2%)**, 26 sem aceite; M3 6/7, M6 2/4, M8 2/4.
