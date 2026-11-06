@@ -4,6 +4,15 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-06 — Revalidação de permissões e sessões em HTTPS
+
+- Conferidos perfis/projetos/revogação em PostgreSQL sintético e navegadores;
+  novo E2E verifica CSRF cruzado, troca de credenciais, logout e replay real.
+- Preservadas proteções/runtime e separação entre ensaio com identidade sintética
+  e login Google interativo, que depende de ambiente e conta autorizados.
+- Evidências e limites em EV-M6-022/023 do backlog, sem alterar regras permanentes
+  de continuidade; autorização entre marcos vale apenas nesta sessão.
+
 ## 2026-11-06 — Campanha temporal com transporte ativo e relatório de suporte
 
 - Executadas dez capturas completas por navegador no equipamento local aprovado,

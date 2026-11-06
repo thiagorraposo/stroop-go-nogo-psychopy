@@ -539,8 +539,8 @@ já existe ou participa da regressão geral. WEB-000 é exclusivamente documenta
 | Requisito | Decisão | Marco | Tarefa | Componente | Teste/verificação | Evidência → aceite |
 |---|---|---|---|---|---|---|
 | REQ-AUT-001 | ADR-004 | M6 | WEB-021 | `api/auth.py, api/google_oidc.py` | `tests/test_web_oidc_callback.py` | PLANEJADA; consultar WEB-021 no backlog |
-| REQ-AUT-002 | ADR-004 | M6 | WEB-022 | `stroop/domain/auth.py, stroop/persistence/web_sessions.py` | `tests/test_web_auth.py` | PLANEJADA; consultar WEB-022 no backlog |
-| REQ-AUT-003 | ADR-004 | M6 | WEB-023 | `api/auth.py, api/sessions.py` | `tests/test_web_sessions.py` | PLANEJADA; consultar WEB-023 no backlog |
+| REQ-AUT-002 | ADR-004 | M6 | WEB-022 | `stroop/domain/auth.py, stroop/persistence/web_sessions.py` | `tests/test_web_auth.py` | ACEITA em EV-M6-022/023 no backlog; PG/API e HTTPS, OIDC externo separado |
+| REQ-AUT-003 | ADR-004 | M6 | WEB-023 | `api/auth.py, api/sessions.py` | `tests/test_web_sessions.py` | ACEITA em EV-M6-022/023 no backlog; dez casos HTTPS e regressão PG |
 | REQ-PAR-001 | ADR-004 | M4 | WEB-013 | `api/sessions.py, web/src/participant/` | `tests/test_web_sessions.py` | PLANEJADA; consultar WEB-013 no backlog |
 | REQ-PAR-002 | ADR-004/005 | M2 | WEB-005 | `Modelo lógico e formulário de sessão` | `Revisão documental DEC-01 em 2026-11-05; ensaios PLANEJADOS` | Aceite documental em EV-M2-005-R2; receptor/banco em EV-M2, worker/timing da fixture em EV-M3-011; integração de produto permanece M4 |
 | REQ-PAR-003 | ADR-004 | M4 | WEB-014 | `web/src/components/, api/models.py` | `tests/test_web_security_review.py` | PLANEJADA; consultar WEB-014 no backlog |

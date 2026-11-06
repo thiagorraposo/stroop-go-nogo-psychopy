@@ -37,7 +37,7 @@ de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
 Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
 não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
 
-Progresso atual: **15/45 entregáveis aceitos (WEB-000 a WEB-011 e WEB-042/043/044)**.
+Progresso atual: **17/45 entregáveis aceitos (WEB-000 a WEB-011, WEB-022/023 e WEB-042/043/044)**.
 WEB-005 é documental; WEB-006 aceita o receptor backend e contratos em banco
 sintético. M1 e M2 concluídos; atomicidade e paridade aceitas em EV-M2-007/008.
 A captura incremental no motor e seus gates temporais continuam em M3/M4.
@@ -48,10 +48,10 @@ Atualizado em **2026-11-06**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **15 de 45 · 33,3%** | **30** | **M3 · campanha aceita; suporte em validação** | Responsável revisar limites e aceitar suporte ou bloquear motor em [WEB-012](#web-012--registrar-viabilidade-e-limites-de-suporte-do-motor) |
+| **17 de 45 · 37,8%** | **28** | **M6/M8 · execução excepcional da sessão** | Validar infraestrutura [WEB-029](#web-029--revalidar-imagens-e-compose-isolado-em-https); M3 aguarda aceite de suporte WEB-012 |
 
 ```text
-Aceites   ███████░░░░░░░░░░░░░   33,3%
+Aceites   ████████░░░░░░░░░░░░   37,8%
 ```
 
 A barra global é aproximada; os números são exatos, com percentual arredondado.
@@ -74,7 +74,7 @@ A ordem da tabela segue os IDs; dependências e paralelismo estão na
 | [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | 🟩🟩🟩⬜🟩🟩🟩 **6/7** | ◐ Campanha aceita; suporte em validação |
 | [M4](#m4--fluxo-ponta-a-ponta-de-avaliações) | Fluxo ponta a ponta de avaliações | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
-| [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
+| [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | ⬜🟩🟩⬜ **2/4** | ◐ Parcial; login externo bloqueado |
 | [M7](#m7--integração-compatibilidade-histórica-e-transição) | Integração, compatibilidade histórica e transição | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M8](#m8--ci-infraestrutura-e-preparação-operacional) | CI, infraestrutura e preparação operacional | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M9](#m9--validação-técnica-e-metodológica) | Validação técnica e metodológica | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
@@ -101,6 +101,9 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 | ✅ [WEB-042](#web-042--refinar-estímulos-e-hierarquia-visual-experimental) | Palavras com contorno branco sem cartão e centro preservado | DOM, dez cores/screenshots Chromium/Firefox e regressão funcional |
 | ✅ [WEB-043](#web-043--reformular-hud-e-retirar-precisão-agregada-do-participante) | HUD sem precisão, progresso real e cronômetro estável | DOM/árvore acessível, unidade e navegadores; gates de campanha separados |
 | ✅ [WEB-044](#web-044--validar-regressão-da-apresentação-experimental-refinada) | Regressão consolidada visual, funcional, métricas/CSV e observação temporal preparatória | Testes atuais e fluxos reutilizados na mesma fonte; campanha e suporte pendentes |
+
+| ✅ [WEB-022](#web-022--comprovar-matriz-de-perfis-projetos-e-revogações) | Perfis, projetos, administração sem vínculo e revogação | PostgreSQL real sintético, API e HTTPS |
+| ✅ [WEB-023](#web-023--revalidar-sessão-cookies-csrf-e-isolamento-de-credenciais) | Sessões separadas, Origin/CSRF, expiração, logout e replay | PostgreSQL/API e navegadores em HTTPS local |
 
 ### Foco do marco atual
 
@@ -988,39 +991,39 @@ D5 e suporte exigem evidências próprias; nenhuma reutilização da exceção W
 
 ### WEB-021 — Revalidar OIDC e executar login real em ambiente de teste autorizado
 
-- Marco: M6. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Marco: M6. Prioridade: P0. Complexidade: G. Estado: BLOQUEADA.
 - Dependências: WEB-008; conta/cliente de teste autorizado.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Casos negativos e callback/PKCE/state/nonce passam; login/logout Google interativo documentado com identidade cadastrada e sem claims/tokens no artefato público.
 - Testes/verificação: `tests/test_web_oidc_callback.py, test_google_oidc.py; PLANEJADO: login real`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Riscos/bloqueios: R05; conta/cliente Google de teste e ambiente interativo ainda não autorizados/disponibilizados nesta sessão. Não inspecionar secrets operacionais. Responsável deve prover o ambiente/conta autorizados; WEB-024 permanece dependente. Casos sintéticos podem ser revalidados sem aceitar login real.
 - Referências: REQ-AUT-001; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 
 ### WEB-022 — Comprovar matriz de perfis, projetos e revogações
 
-- Marco: M6. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Marco: M6. Prioridade: P0. Complexidade: M. Estado: CONCLUIDA.
 - Dependências: WEB-008.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Consulta/importacao/admin e participante testados em operações positivas/negativas; admin sem projeto não herda resultados; revogação efetiva.
-- Testes/verificação: `tests/test_web_auth.py, test_web_assessments.py, test_web_sessions.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Testes/verificação: `tests/test_web_auth.py, test_web_assessments.py, test_web_sessions.py`. Executados em PG descartável, junto aos casos de autenticação/importação; dez casos HTTPS reais em Chromium/Firefox. Ver EV-M6-022/023.
+- Evidências: EV-M6-022/023, 2026-11-06; critérios positivos/negativos comprovados em banco sintético e HTTPS. OIDC externo permanece WEB-021.
+- Riscos/bloqueios: R05 preservado para revisão final; matriz local comprovada sem aprovação de OIDC externo.
 - Referências: REQ-AUT-002; [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega: branch `test/m6-m8-validacao-isolada`; entrega identificável por `git log -1 --format=%H --grep="test(web): comprova permissões e isolamento de sessões em M6"`; envio/CI no fechamento desta execução.
 
 ### WEB-023 — Revalidar sessão, cookies, CSRF e isolamento de credenciais
 
-- Marco: M6. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Marco: M6. Prioridade: P0. Complexidade: M. Estado: CONCLUIDA.
 - Dependências: WEB-022.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Origin e CSRF ausentes/divergentes negam; expiração/logout/replay e cookies separados comprovados em HTTPS; sem armazenamento durável.
-- Testes/verificação: `tests/test_web_auth.py, test_web_sessions.py; integração HTTPS`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R05, R07; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Testes/verificação: `tests/test_web_auth.py, test_web_sessions.py; integração HTTPS`. Executados em PG descartável, junto aos casos de autenticação/importação; dez casos HTTPS reais em Chromium/Firefox. Ver EV-M6-022/023.
+- Evidências: EV-M6-022/023, 2026-11-06; critérios positivos/negativos comprovados em banco sintético e HTTPS. OIDC externo permanece WEB-021.
+- Riscos/bloqueios: R05/R07 preservados para revisão final; nenhum impedimento nos critérios locais desta tarefa. Login real não aceito por estes ensaios.
 - Referências: REQ-AUT-003; [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega: branch `test/m6-m8-validacao-isolada`; entrega identificável por `git log -1 --format=%H --grep="test(web): comprova permissões e isolamento de sessões em M6"`; envio/CI no fechamento desta execução.
 
 ### WEB-024 — Concluir revisão de segurança com evidências negativas
 
@@ -1033,6 +1036,59 @@ D5 e suporte exigem evidências próprias; nenhuma reutilização da exceção W
 - Riscos/bloqueios: R05, R07; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: REQ-AUD-001, REQ-SEG-001; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### EV-M6-022/023 — autorização e sessões reais sintéticas, 2026-11-06
+
+Autorização excepcional desta sessão permite M6 após M2 aceito, sem dispensar
+conta/cliente externo para WEB-021. Base ensaiada `851ac3a`; novo teste HTTPS
+na branch `test/m6-m8-validacao-isolada`. Nenhuma alteração no runtime, grants,
+cookies, políticas, schema, método ou dependências. Novo teste
+`web/e2e/integrated/sessions-security.spec.ts` cobre lacuna de integração.
+
+Critérios conferidos: perfis consulta/importacao/admin em consulta, importação,
+convites e administração; administrador sem vínculo e acesso cruzado recebem
+404; consulta não escreve; bloqueio, expiração e revogação revalidados; papéis
+restritos de leitura/escrita provisionados no harness. Sessão participante usa
+cookie Secure/HttpOnly/SameSite=Lax, invisível ao JS; troca de tokens entre
+nomes de cookie falha. Origin ausente/divergente, CSRF ausente/divergente ou da
+outra sessão negam escrita/logout. Logout profissional invalida replay e
+mantém participante; logout participante remove cookie e invalida replay.
+Expiração participante não gera avaliação, armazenamento local permanece vazio.
+Cookie profissional de produção emitido pelo callback é conferido em teste
+HTTP com exchange OIDC double; no browser sua sessão é provisionada localmente.
+Isso não comprova login Google interativo, que continua bloqueado em WEB-021.
+
+Ambiente: Python 3.12.3, Node 24.15.0, PostgreSQL 17.6 em container exclusivo
+`stroop-session-m6-20261106`, tmpfs, porta aleatória loopback, banco
+`stroop_etapa4_test_m6`. HTTPS certificado efêmero, API real/papéis restritos e
+React build atual; Chromium/Firefox do Playwright 1.64.1. Sem dados reais,
+secrets operacionais, produção, PR/merge/deploy. Contagens/fixtures sintéticas.
+
+Comandos/resultados locais:
+
+- `PYTHONPATH=tests TEST_DATABASE_URL=<PG sintético> .venv/bin/python -m unittest
+  tests.test_web_auth tests.test_web_assessments tests.test_web_sessions
+  tests.test_authentication tests.test_web_oidc_callback tests.test_google_oidc -q`:
+  **76 aprovados**, sem skips; `tests.test_web_imports -q`: **4 aprovados**, sem skips.
+- `npm --prefix web test`: **292 aprovados**, 18 arquivos, sem skips.
+- `npm --prefix web run build`: tipos/build aprovados.
+- Em web: `TEST_DATABASE_URL=<PG sintético> npx playwright test --config
+  playwright.integration.config.ts sessions-security.spec.ts participant.spec.ts
+  dashboard.spec.ts --grep 'separa credenciais|cookie HttpOnly|painel HTTPS'`:
+  **10/10 aprovados**, cinco por navegador, sem retries/skip, 29,8 s. Inclui
+  leitura/detalhe/CSV e revogação por três perfis, sem aceitar antecipadamente M5.
+
+Falhas preservadas: primeira invocação Python por módulo não definiu PYTHONPATH
+exigido pelo import legado de test_web_oidc_callback: 72 executados, um erro de
+importação. Repetição com `PYTHONPATH=tests` passou os 76; nenhum teste enfraquecido.
+Primeira tipagem do novo E2E recusou união de headers opcionais; array recebeu
+tipo `Record<string,string>[]` e build passou. Aviso legado depreciação TestClient
+não motivou instalação/upgrade. Mensagem negativa de break-glass é esperada em
+teste de CLI; não foi recuperação operacional. Nenhuma falha funcional observada.
+
+WEB-022/023 aceitas; M6 permanece incompleto por WEB-021/024. WEB-024 mantém
+PENDENTE por dependência, sem review final artificial. Git/envio/CI consolidados
+no fechamento desta sessão; hash do próprio registro consultável no Git.
 
 ## M7 — Integração, compatibilidade histórica e transição
 
@@ -1116,7 +1172,7 @@ D5 e suporte exigem evidências próprias; nenhuma reutilização da exceção W
 
 ### WEB-029 — Revalidar imagens e Compose isolado em HTTPS
 
-- Marco: M8. Prioridade: P1. Complexidade: G. Estado: PENDENTE.
+- Marco: M8. Prioridade: P1. Complexidade: G. Estado: EM_ANDAMENTO.
 - Dependências: WEB-004.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Build e saúde reais, proxy único público, limites/headers e rejeição de fontes aprovados; pilha temporária separada dos volumes operacionais.
@@ -1463,7 +1519,24 @@ WEB-034 mantêm critérios próprios. Histórico inicial CHG-003 acima preservad
 
 ## Retomada
 
-### Retomada vigente — campanha local concluída; suporte em revisão, 2026-11-06
+### Retomada vigente — execução excepcional entre marcos, 2026-11-06
+
+Autorização temporária explícita do proprietário nesta sessão permite atravessar
+marcos e executar tarefas independentes com pré-requisitos satisfeitos. Não
+altera AGENTS, workflow, semântica permanente de continuidade ou gates externos.
+Base limpa `851ac3a`, fetch concluído, HEAD/upstream iguais; main `fe8f24f`,
+origin/main `db56b40`, preservados sem integração. Branch de entrega
+`test/m6-m8-validacao-isolada` mantém base M2/M3 ainda não integrada.
+
+Seleção global: WEB-022/023 (P0, M6) aceitas; WEB-029 (M8) em execução,
+WEB-030/031 após WEB-029. WEB-012 permanece EM_VALIDACAO aguardando aceite do
+responsável em EV-M3-012. WEB-021 BLOQUEADA por conta/cliente OIDC e ambiente de
+teste não disponibilizados/autorizados; não buscar credenciais operacionais.
+M4 depende de M3/M6; M5/M7 e gates finais M8/M9/M10 preservam dependências.
+Nenhum marco parcialmente bloqueado declarado concluído. Evidências desta
+execução serão registradas abaixo; aceites anteriores permanecem históricos.
+
+### Retomada anterior — campanha local concluída; suporte em revisão, 2026-11-06
 
 Marco autorizado M3, **15/45 aceitos (33,3%)**, 30 sem aceite; M3 **6/7**.
 WEB-011 CONCLUIDA: dez capturas completas válidas por navegador com transporte
