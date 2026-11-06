@@ -18,6 +18,10 @@ const sessionId = '00000000-0000-4000-8000-000000000130'
 for (const [index, scenario] of scenarios.entries()) {
   test(`DEC-04 replica ${index + 1}/10 ${scenario}`, async ({ page, context, browser }, info) => {
     const startedAt = new Date().toISOString()
+    const navigationEvents: { at: string; path: string }[] = []
+    page.on('framenavigated', frame => {
+      if (frame === page.mainFrame()) navigationEvents.push({ at: new Date().toISOString(), path: new URL(frame.url()).pathname })
+    })
     const expiresAt = new Date(Date.now() + 1_800_000).toISOString()
     let received = 0
     let running = false
@@ -62,54 +66,55 @@ for (const [index, scenario] of scenarios.entries()) {
     await expect(page.getByRole('main')).toBeFocused()
     await page.bringToFront()
     // Ensaiar motor/jsPsych/worker reais com HTTP double; integracao API/PG e UX ficam em M4.
-    await page.evaluate(async expiresAt => {
-      const enginePath = '/src/experiment/main.ts'
-      const practicePath = '/src/experiment/practice.ts'
-      const workerPath = '/src/transport/checkpoint-worker.ts'
-      const protocolPath = '/src/experiment/protocol.ts'
-      const apiPath = '/src/api/participant.ts'
-      const { mountPractice } = await import(/* @vite-ignore */ practicePath) as typeof import('../src/experiment/practice')
-      const { mountMain } = await import(/* @vite-ignore */ enginePath) as typeof import('../src/experiment/main')
-      const { prepareCheckpointWorker } = await import(/* @vite-ignore */ workerPath) as typeof import('../src/transport/checkpoint-worker')
-      const { MAIN_CONDITIONS } = await import(/* @vite-ignore */ protocolPath) as typeof import('../src/experiment/protocol')
-      const api = await import(/* @vite-ignore */ apiPath) as typeof import('../src/api/participant')
-      const host = document.createElement('div')
-      Object.assign(host.style, { position: 'fixed', inset: '0', zIndex: '9999' })
-      document.body.replaceChildren(host)
-      window.web011 = { statuses: [], copies: [], callbackTimes: [], cleanup() {} }
-      try {
-        const worker = await prepareCheckpointWorker({ session_id: '00000000-0000-4000-8000-000000000130',
-          csrf_token: 's'.repeat(43), expires_at: expiresAt, protocol_id: api.PROTOCOL_ID,
-          test_version: api.TEST_VERSION, platform: 'web', app_version: `${api.APP_VERSION}.transport.1` }, status => {
-            window.web011.statuses.push(status)
-            window.web011.callbackTimes.push(performance.now())
-          })
-        // Armar botao apos prontidao; nunca aguardar rede dentro da contagem.
-        const button = document.createElement('button')
-        button.textContent = 'Iniciar campanha sintética'
-        button.onclick = () => {
-          window.web011.started = performance.now()
-          const cleanup = mountMain(host, { order: MAIN_CONDITIONS,
-            onTimingTrace: trace => { window.web011.trace = trace },
-            onTrialComplete: (trial, period) => {
-              const before = performance.now()
-              worker.enqueue(trial, period)
-              window.web011.copies.push(performance.now() - before)
-            },
-            onComplete: result => { window.web011.result = result },
-            onInterrupted: reason => { window.web011.interruption = reason },
-          })
-          window.web011.cleanup = () => { cleanup(); worker.dispose() }
-        }
-        const practiceCleanup = mountPractice(host, {
-          onComplete: () => host.replaceChildren(button),
-          onInterrupted: reason => { window.web011.preparationError = `practice_${reason}` },
-        })
-        window.web011.cleanup = () => { practiceCleanup(); worker.dispose() }
-      } catch { window.web011.preparationError = 'transport_not_ready' }
-    }, expiresAt)
     let capture: Omit<Capture, 'cleanup'> | undefined
+    let drainCompleted = false
     try {
+      await page.evaluate(async expiresAt => {
+        const enginePath = '/src/experiment/main.ts'
+        const practicePath = '/src/experiment/practice.ts'
+        const workerPath = '/src/transport/checkpoint-worker.ts'
+        const protocolPath = '/src/experiment/protocol.ts'
+        const apiPath = '/src/api/participant.ts'
+        const { mountPractice } = await import(/* @vite-ignore */ practicePath) as typeof import('../src/experiment/practice')
+        const { mountMain } = await import(/* @vite-ignore */ enginePath) as typeof import('../src/experiment/main')
+        const { prepareCheckpointWorker } = await import(/* @vite-ignore */ workerPath) as typeof import('../src/transport/checkpoint-worker')
+        const { MAIN_CONDITIONS } = await import(/* @vite-ignore */ protocolPath) as typeof import('../src/experiment/protocol')
+        const api = await import(/* @vite-ignore */ apiPath) as typeof import('../src/api/participant')
+        const host = document.createElement('div')
+        Object.assign(host.style, { position: 'fixed', inset: '0', zIndex: '9999' })
+        document.body.replaceChildren(host)
+        window.web011 = { statuses: [], copies: [], callbackTimes: [], cleanup() {} }
+        try {
+          const worker = await prepareCheckpointWorker({ session_id: '00000000-0000-4000-8000-000000000130',
+            csrf_token: 's'.repeat(43), expires_at: expiresAt, protocol_id: api.PROTOCOL_ID,
+            test_version: api.TEST_VERSION, platform: 'web', app_version: `${api.APP_VERSION}.transport.1` }, status => {
+              window.web011.statuses.push(status)
+              window.web011.callbackTimes.push(performance.now())
+            })
+          // Armar botao apos prontidao; nunca aguardar rede dentro da contagem.
+          const button = document.createElement('button')
+          button.textContent = 'Iniciar campanha sintética'
+          button.onclick = () => {
+            window.web011.started = performance.now()
+            const cleanup = mountMain(host, { order: MAIN_CONDITIONS,
+              onTimingTrace: trace => { window.web011.trace = trace },
+              onTrialComplete: (trial, period) => {
+                const before = performance.now()
+                worker.enqueue(trial, period)
+                window.web011.copies.push(performance.now() - before)
+              },
+              onComplete: result => { window.web011.result = result },
+              onInterrupted: reason => { window.web011.interruption = reason },
+            })
+            window.web011.cleanup = () => { cleanup(); worker.dispose() }
+          }
+          const practiceCleanup = mountPractice(host, {
+            onComplete: () => host.replaceChildren(button),
+            onInterrupted: reason => { window.web011.preparationError = `practice_${reason}` },
+          })
+          window.web011.cleanup = () => { practiceCleanup(); worker.dispose() }
+        } catch { window.web011.preparationError = 'transport_not_ready' }
+      }, expiresAt)
       await expect(page.getByRole('button', { name: 'Iniciar campanha sintética' })).toBeVisible({ timeout: 25_000 })
       running = true
       await page.getByRole('button', { name: 'Iniciar campanha sintética' }).click()
@@ -122,13 +127,14 @@ for (const [index, scenario] of scenarios.entries()) {
       try {
         await expect.poll(() => page.evaluate(() => {
           const data = window.web011
-          return data.statuses.at(-1)?.confirmed === data.copies.length
-        }), { timeout: 22_000, intervals: [1000] }).toBe(true)
+          return Boolean(data && data.statuses.at(-1)?.confirmed === data.copies.length)
+        }), { timeout: 22_000, intervals: [1000] }).toBe(true).then(() => { drainCompleted = true }).catch(() => undefined)
       } finally {
         capture = await page.evaluate(() => {
+          if (!window.web011) return { statuses: [], copies: [], callbackTimes: [], preparationError: 'fixture_missing_after_navigation' }
           const { cleanup: _cleanup, ...data } = window.web011
           return data
-        })
+        }).catch(() => ({ statuses: [], copies: [], callbackTimes: [], preparationError: 'page_unavailable' }))
         const trace = capture.trace
         const errors = trace?.transitions.map(row => Math.abs(row.observed_elapsed_ms - row.planned_elapsed_ms)) ?? []
         const duration = trace?.outcome === 'completed' ? trace.transitions.at(-1)?.observed_elapsed_ms : null
@@ -140,18 +146,18 @@ for (const [index, scenario] of scenarios.entries()) {
           mode: 'headed-real-clock-real-worker-http-double', physical_latency_measured: false, server_integration_measured: false,
           environment: await page.evaluate(() => ({ userAgent: navigator.userAgent, platform: navigator.platform,
             viewport: [innerWidth, innerHeight], screen: [screen.width, screen.height], dpr: devicePixelRatio,
-            visible: document.visibilityState, focused: document.hasFocus() })),
+            visible: document.visibilityState, focused: document.hasFocus() })).catch(() => ({ unavailable: true })),
           summary: { outcome: trace?.outcome, reason: trace?.interruption_reason,
             frame_period_ms: trace?.frame_period_ms, transitions: trace?.transitions.length,
             max_transition_error_ms: errors.length ? Math.max(...errors) : null,
             duration_ms: duration, duration_error_ms: duration == null ? null : Math.abs(duration - 60000),
             max_copy_ms: capture.copies.length ? Math.max(...capture.copies) : null,
-            complete_trials_delivered: capture.copies.length, confirmed: received, requests },
-          capture, transport_calls: calls, received_observations: rows }
+            complete_trials_delivered: capture.copies.length, confirmed: received, requests, drain_completed: drainCompleted },
+          capture, navigation_events: navigationEvents, transport_calls: calls, received_observations: rows }
         const path = info.outputPath('engineering.json')
         await writeFile(path, JSON.stringify(artifact, null, 2))
         await info.attach('engineering-raw-and-summary', { path, contentType: 'application/json' })
-        await page.evaluate(() => window.web011.cleanup())
+        await page.evaluate(() => window.web011?.cleanup()).catch(() => undefined)
       }
     }
     // Evidencia preservada antes de qualquer assercao de aceite. Falhas nao sao substituidas.
@@ -162,6 +168,7 @@ for (const [index, scenario] of scenarios.entries()) {
     expect(Math.abs(trace.transitions.at(-1)!.observed_elapsed_ms - 60000)).toBeLessThanOrEqual(100)
     expect(capture!.copies).toHaveLength(16)
     expect(received).toBe(16)
+    expect(drainCompleted).toBe(true)
     expect(capture!.statuses.some(status => status.state === 'stopped')).toBe(false)
     if (scenario === 'lost') expect(lost).toBe(true)
     if (scenario === 'unavailable') expect(calls.some(call => call.status === '503')).toBe(true)
