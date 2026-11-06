@@ -1616,6 +1616,31 @@ Artefatos exclusivamente sintéticos e ignorados: `web/test-results/web011/`
 Critérios WEB-011 conferidos; aceite de campanha de engenharia, não de suporte.
 Envio/CI e fechamento documental registrados após validação abaixo.
 
+#### Fechamento Git e validação — 2026-11-06
+
+Branch `feat/m3-motor-experimental`. Implementação `78f8120bd40869cdbb9d234cd9e4600ad91dcb96`,
+diagnóstico `4d5ab56bec47a9d4885e48a20e3871f9e036e925`, relatório/aceite WEB-011
+**`f9e94461cb23ec868658021734c9d94348694a5f`**. Push dos três confirmado por
+HEAD/upstream/ls-remote nessa SHA, árvore limpa; nenhuma integração de main.
+Consulta `gh run list --branch feat/m3-motor-experimental --limit 5
+--json headSha,status,conclusion,url` retornou **[]** após envio: nenhuma execução
+Actions encontrada, não é CI aprovada. Evidências acima são locais.
+
+Validador documental: **11 marcos, 45 tarefas, 47 requisitos, 11 riscos, cinco
+decisões, 15 aceitos, 84 documentos, 569 links e 49 âncoras**, grafo sem ciclos;
+sete testes do validador e git diff --check aprovados. Históricos preservados,
+sem artifacts/exports/dados/segredos no staging. Nenhuma migration, produção,
+PR, merge, tag ou deploy. Git da implementação e SHA ensaiada distintos do
+fechamento documental, sem promover push a aceite funcional.
+
+Relatório EV-M3-012 apresentado ao responsável por pergunta nesta sessão;
+resposta de aceite de suporte ainda não recebida neste fechamento. WEB-012
+EM_VALIDACAO, M3 6/7; não avançar outro marco. O fechamento é identificável por
+`git log -1 --format=%H --grep='docs: registra envio da campanha DEC-04'`;
+conferir seu próprio envio por HEAD/upstream/remoto, sem commit artificial
+para autorreferenciar SHA. Se houver resposta posterior, registrar decisão
+explícita antes de concluir WEB-012/M3.
+
 ### EV-M3-012 — proposta de viabilidade e limites para revisão, 2026-11-06
 
 Relatório técnico pronto, **aceite do responsável ainda pendente**. A aprovação
