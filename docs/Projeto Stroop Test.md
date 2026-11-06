@@ -1871,6 +1871,18 @@ tests.test_verify_web_docs -v`: sete testes aprovados, sem skips; `git diff
 Campanha, Vitest, browsers e testes Python funcionais não reexecutados: nenhum
 runtime mudou. CI desta branch será consultada por SHA após envio.
 
+#### Fechamento Git do aceite M3 — 2026-11-06
+
+Entrega **`0730f37ba476340ec96e22cc5263c525a06f9ded`**, enviada com upstream
+na branch `docs/m3-aceite-suporte`; igualdade HEAD/upstream/ls-remote confirmada.
+`gh run list --branch docs/m3-aceite-suporte --limit 5 --json
+headSha,status,conclusion,url` retornou `[]`: nenhuma execução Actions encontrada;
+CI não executada, sem aprovação transferida de outra SHA. Não houve dispatch.
+Fechamento documental identificável por `git log -1 --format=%H
+--grep='docs: registra envio do aceite M3'`; conferir envio por HEAD/upstream/remoto.
+Próxima ação preservada: autorizar explicitamente M6/WEB-021. Nenhum outro marco
+iniciado, PR/merge ou deploy executado.
+
 ### Retomada anterior — integração documental CHG-004, 2026-11-06
 
 Missão exclusivamente documental encerrada após validação/versionamento.
