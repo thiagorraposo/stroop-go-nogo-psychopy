@@ -24,6 +24,10 @@ LOCK_ID = 849403019
 # DML operacional; nunca conceder UPDATE/INSERT de usuarios ou mapa legado.
 WRITER = {
     'schema_migrations': ('SELECT',),
+    'web_local_credentials': ('SELECT', 'UPDATE (password_hash,credential_version,updated_at)'),
+    'web_local_sessions': ('SELECT', 'INSERT', 'UPDATE (last_activity_at,revoked_at)', 'DELETE'),
+    'web_local_auth_limits': ('SELECT', 'INSERT', 'UPDATE', 'DELETE'),
+    'web_local_auth_events': ('INSERT (principal_id,action)',),
     'app_users': ('SELECT (issuer,subject,email,role,active)',),
     'auth_audit_events': ('SELECT (issuer,subject,outcome,occurred_at)',
                           'INSERT (issuer,subject,action,outcome,request_id)'),

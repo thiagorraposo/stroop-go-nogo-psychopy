@@ -4,6 +4,17 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-06 — Base transacional para credenciais locais
+
+- Iniciada implementação autorizada de M6: identidade local própria, migration
+  aditiva 0012, Argon2id, bootstrap/recuperação por terminal e transações de sessão,
+  revogação, rotação e limite por identificador, preservando legado e vínculos.
+- Acrescentadas regressões sintéticas de concorrência, rollback, expiração,
+  parâmetros, compatibilidade e privilégios; reader continua sem acesso a hash,
+  writer sem criar contas ou alterar app_users.
+- Unidade preparatória: API, formulário, Compose e corte OIDC ainda aguardam
+  integração e ensaios HTTPS. Evidência e continuidade somente no backlog.
+
 ## 2026-11-06 — Aceite explícito do suporte local do motor
 
 - Registrada resposta “aceito” do proprietário aos resultados e limites de

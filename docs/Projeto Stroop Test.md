@@ -19,7 +19,8 @@ de prontidão técnica. A missão documental encerrou em M0; o comando posterior
 O comando de 2026-11-05 autorizou M2, já concluído. Novo `continue o projeto`
 autoriza M3, condicionado às decisões de suas tarefas. Em 2026-11-05, o proprietário
 aprovou DEC-04 no alcance local de engenharia descrito em EV-M3-011; validação
-física/metodológica permanece pendente para M9.
+física/metodológica permanece pendente para M9. Após o aceite de M3, novo
+`continue o projeto` em 2026-11-06 autoriza M6/WEB-021, conforme Retomada vigente.
 
 Uma tarefa CONCLUIDA tem todos critérios, comandos/resultados/data, componente,
 referências de teste e Git. Documento é evidência suficiente apenas para entrega
@@ -49,7 +50,7 @@ Atualizado em **2026-11-06**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **20 de 45 · 44,4%** | **25** | **M3 concluído · M6/M8 parciais** | Autorizar M6/WEB-021 para implementar autenticação local; WEB-031 aguarda destino externo |
+| **20 de 45 · 44,4%** | **25** | **M6 autorizado · M3 concluído** | Implementar e validar M6/WEB-021; WEB-031 aguarda destino externo |
 
 ```text
 Aceites   █████████░░░░░░░░░░░   44,4%
@@ -75,7 +76,7 @@ A ordem da tabela segue os IDs; dependências e paralelismo estão na
 | [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | 🟩🟩🟩🟩🟩🟩🟩 **7/7** | ✅ Concluído |
 | [M4](#m4--fluxo-ponta-a-ponta-de-avaliações) | Fluxo ponta a ponta de avaliações | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
-| [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | ⬜🟩🟩⬜ **2/4** | ◐ Parcial; autenticação local planejada |
+| [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | ⬜🟩🟩⬜ **2/4** | ◐ Parcial; autenticação local em implementação |
 | [M7](#m7--integração-compatibilidade-histórica-e-transição) | Integração, compatibilidade histórica e transição | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M8](#m8--ci-infraestrutura-e-preparação-operacional) | CI, infraestrutura e preparação operacional | 🟩🟩⬜⬜ **2/4** | ◐ Parcial; réplica externa e release pendentes |
 | [M9](#m9--validação-técnica-e-metodológica) | Validação técnica e metodológica | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
@@ -109,6 +110,11 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 | ✅ [WEB-030](#web-030--reproduzir-pipeline-e-definir-validação-formal-sem-pr-automático) | Pipeline integral local e Actions por SHA; procedimento sem PR | Scanner/auditorias, PG, frontend, navegadores e HTTPS reais |
 
 ### Foco do marco atual
+
+M6 autorizado pelo novo `continue o projeto` de 2026-11-06. WEB-021
+EM_ANDAMENTO: base transacional local em implementação; WEB-022/023 mantêm
+aceite histórico e exigem regressões novas em WEB-021/024. WEB-024 PENDENTE.
+O quadro seguinte preserva o último marco encerrado, M3.
 
 | ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito |
 |---|---|---|---|
@@ -1000,15 +1006,111 @@ D5 e suporte exigem evidências próprias; nenhuma reutilização da exceção W
 
 ### WEB-021 — Implementar autenticação local e integrar login profissional seguro
 
-- Marco: M6. Prioridade: P0. Complexidade: G. Estado: PRONTA.
+- Marco: M6. Prioridade: P0. Complexidade: G. Estado: EM_ANDAMENTO.
 - Dependências: WEB-008.
 - Responsável: Codex na execução autorizada de M6; proprietário/operador na custódia e instituição no eventual uso real.
 - Critérios de aceite: Login local válido cria sessão nova e abre dashboard; senha inválida, usuário inexistente/bloqueado e acesso não autenticado negam genericamente. Conta única administrativa, sem cadastro público/default/hardcode; Argon2id, provisionamento, alteração/recuperação administrativa e revogação atômica após senha. Rate limiting por conta/origem, cookies seguros, CSRF/Origin inclusive login, inatividade e limite absoluto, logout/invalidação e revogação administrativa conforme contrato. React/FastAPI/PG/HTTPS reais; preservar projetos, grants, último admin, convites e dados históricos; compatibilidade/migração aditiva testadas antes do corte de OIDC. Regressões novas de WEB-022/023 obrigatórias aqui, consolidadas em WEB-024.
-- Testes/verificação: PLANEJADOS AUTH-L01–L09 em [validação](VALIDACAO_WEB.md#autenticação-local--plano-de-verificação-chg-004); regressão das suites existentes auth/admin/sessions/assessments e E2E integrado em Chromium/Firefox. Sem teste funcional executado nesta missão.
-- Evidências: CHG-004/ADR-006 são especificação PLANEJADA, sem implementação/teste/aceite local. Histórico preservado: antigos callback/PKCE/state/nonce sintéticos em EV-M6-022/023 e EV-M8-030; login Google interativo não comprovado. Esses testes não aceitam a alternativa local.
-- Riscos/bloqueios: R05/R07/R12. Bloqueio anterior por conta/cliente Google deixa de ser dependência alvo; falta implementar/testar em sessão futura autorizada. PRONTA significa dependências técnicas satisfeitas, sem autorizar avanço de M3 a M6. Nunca abrir secrets operacionais.
+- Testes/verificação: PLANEJADOS AUTH-L01–L09 em [validação](VALIDACAO_WEB.md#autenticação-local--plano-de-verificação-chg-004); regressão das suites existentes auth/admin/sessions/assessments e E2E integrado em Chromium/Firefox. Base local verificada em EV-M6-021-BASE; HTTP/React/HTTPS e corte continuam PLANEJADOS.
+- Evidências: EV-M6-021-BASE é entrega parcial de persistência/credencial/CLI; não aceita login WEB. CHG-004/ADR-006 permanecem a especificação do alvo integral. Histórico preservado: antigos callback/PKCE/state/nonce sintéticos em EV-M6-022/023 e EV-M8-030; login Google interativo não comprovado. Esses testes não aceitam a alternativa local.
+- Riscos/bloqueios: R05/R07/R12. Bloqueio anterior por conta/cliente Google deixa de ser dependência alvo; implementação autorizada pelo novo `continue o projeto` em 2026-11-06; base local em EV-M6-021-BASE. Falta integrar API/React/HTTPS e concluir regressões antes do corte. Nunca abrir secrets operacionais.
 - Referências: REQ-AUT-001/004/005, REQ-AUT-002/003; [ADR-006](arquitetura/ADR-006-autenticacao-local.md), CHG-004.
-- Git parcial histórico: `test/m6-m8-validacao-isolada`, EV-M6-022/023 e EV-M8-030; nenhuma entrega local aceita. Versionamento desta revisão em EV-CHG-004.
+- Git parcial atual: `feat/m6-autenticacao-local`, EV-M6-021-BASE; sem aceite integral. Histórico: `test/m6-m8-validacao-isolada`, EV-M6-022/023 e EV-M8-030. Versionamento da especificação em EV-CHG-004; desta base em EV-M6-021-BASE.
+
+### EV-M6-021-BASE — credencial e persistência locais, 2026-11-06
+
+Unidade parcial de WEB-021, autorizada pelo novo `continue o projeto` após M3.
+DDL/associação/grants documentados antes da aplicação sintética em
+`docs/dados/MODELO_DE_DADOS.md`. Migration **0012** acrescenta namespace próprio
+`urn:stroop:local` ao registro de autorização e associa UUID imutável a credencial;
+FKs e registros históricos não são reescritos. Credenciais, sessões, eventos
+fechados e buckets persistentes têm tabelas separadas de OIDC. Sem novo vínculo
+implícito ou mudança no schema científico; 0001–0011 intactas.
+
+Domínio valida username ASCII normalizado e senha Unicode íntegra. Adaptador
+usa [PasswordHasher Argon2id](https://argon2-cffi.readthedocs.io/en/stable/api.html),
+`argon2-cffi==25.1.0`/bindings `26.1.0`, selecionados por fonte oficial e índice
+PyPI; versões compartilhadas preservadas. Instalação somente dessas duas novas
+dependências necessárias, com `--no-deps`, sem upgrade incidental. Parâmetros
+64 MiB/t=3/p=1, salt aleatório e hash fictício; semáforo limita verificações por
+processo. Lista local inicial de senhas comuns é mínima, não uma base abrangente
+de vazamentos: sua ampliação/revisão e custo sob carga continuam na integração
+e revisão WEB-024. Nenhuma consulta de senha a serviço externo.
+
+Casos de uso/persistência implementam bootstrap único serializado, recuperação,
+login com versão e troca de senha/revogação atômicos, limite de cinco falhas por
+identificador/15 minutos, renovação de cookie lógico anterior, sessão com teto
+8 h/inatividade 30 min, polling sem renovar e atividade explícita. Revalidação de
+versão/bloqueio/perfil preserva autorização; contexto/atividade ainda aguardam
+integração HTTP com autorização por objeto/projeto. Limite por origem, envelopes,
+CSRF/login e corte não estão implementados pela base isolada. Writer não cria
+contas nem altera `app_users`; bloqueio usa `web_lock_emitter`. Reader não lê hash.
+
+CLI nova `scripts/gerenciar_conta_local.py` (caminho e módulo): `bootstrap
+<username>` ou `recover <username>`, `API_OPERATOR_DATABASE_URL` ou seu `_FILE`
+protegidos, exclusivos do operador. Exige terminal stdin/stderr e entrada oculta
+com confirmação; recusa fallback de getpass com eco. Recuperação exige digitar
+RECUPERAR, revoga sessões e não concede projetos. Nenhuma senha em argv;
+comando legado preservado. Não foi usada com conta/banco reais.
+
+Ambiente: Python 3.12.3; PostgreSQL 17.11 em container novo exclusivo
+`stroop-m6-local-20261106`, tmpfs/porta aleatória somente loopback (32776), bancos
+`stroop_etapa4_test_m6_local` e `stroop_etapa4_test_m6_terminal`. DSNs e frases
+somente sintéticos. Nenhum serviço preexistente foi reutilizado/alterado. Container e bancos
+descartáveis removidos após as verificações; logs somente temporários fora do Git.
+
+Validações desta unidade (DSNs sempre descartáveis, prefixo exigido):
+
+- `TEST_DATABASE_URL=<PG sintético> PYTHONPATH=tests .venv/bin/python -m unittest
+  discover -s tests -q`: **408 aprovados em 146,321 s, sem skips**, na rodada final.
+  Inclui regressões existentes de autenticação OIDC, API, sessões participantes,
+  permissões, métricas, exportação, migrations e infraestrutura; não equivale
+  a integração HTTP local, pois o alvo ainda não usa os novos casos de uso.
+- `TEST_DATABASE_URL=<PG sintético> PYTHONPATH=tests .venv/bin/python -m unittest
+  tests.test_local_auth tests.test_postgres_migrations
+  tests.test_web_database_provision tests.test_verify_web_docs -q`:
+  **38 aprovados, sem skips**, incluindo 11 novos testes locais. Cobre parâmetros/
+  salt, senha íntegra/Unicode/ASCII username, semáforo, CLI sem stdin inseguro,
+  bootstrap concorrente, recuperação e rotação atômicas com rollback e corrida
+  de login, cinco falhas concorrentes, janela expirada, cookie lógico substituído,
+  teto/inatividade, polling sem atividade, versão, bloqueio/perfil, writer/reader
+  e upgrade com identidade/projeto/vínculo Google preservados.
+- CLI em PTY real: bootstrap pelo caminho e recuperação pelo módulo, ambos
+  **exit 0**, entrada/confirmacão da senha sem eco; confirmação RECUPERAR explícita.
+  Consulta fechada após commit: versão 2, eventos bootstrap/recovery e zero vínculos.
+- Argon2id medido sem imprimir material secreto, cinco hashes e cinco verificações:
+  medianas **128,2 ms/129,5 ms**, máximos **152,7 ms/163,9 ms**; 64 MiB/t=3/p=1.
+  Medida local com a regressão em andamento, sem conclusão de capacidade/DoS.
+- `.venv/bin/python -m pip check`: aprovado. `.venv/bin/python
+  scripts/verify_web_ci.py audit`: **npm e pip-audit sem vulnerabilidades conhecidas**;
+  ferramenta de auditoria isolada temporária pelo runner já existente, sem
+  alteração de dependências adicionais do projeto. Não equivale à revisão WEB-024.
+- `.venv/bin/python scripts/verify_web_ci.py sources`: scanner oficial sem achados,
+  fontes versionadas e novos arquivos staged; dados/secrets/histórico excluídos
+  conforme o runner. Documentação e `git diff --check` aprovados antes do commit.
+- Frontend/Vitest/tipos/build/Playwright/HTTPS **não reexecutados nesta unidade**:
+  nenhum código de API ou frontend alterado; integração local continua gate da
+  próxima unidade de WEB-021. Migrations só nos dois bancos sintéticos citados.
+
+Falhas preservadas: primeira rodada local teve sete aprovações/um erro de
+privilégio no FOR SHARE direto em app_users; trocado por web_lock_emitter, sem
+conceder UPDATE. Rodada seguinte de 28 testes teve duas falhas de expectativas
+estáticas do catálogo (nova migration e três FKs); atualizadas para 0012/30 FKs,
+sem remover verificações. Teste novo de teto usava clock_timestamp separado
+em cada campo da fixture, ultrapassando 8 h por microssegundos; uma rodada
+focada e a primeira integral (**407 executados, um erro**) registraram a mesma
+violação de CHECK. Fixture passou a usar CURRENT_TIMESTAMP único; constraints
+intactas. Os 38 focados e os 408 integrais finais passaram após correção.
+Avisos legados de TestClient e mensagens negativas de launcher/CLI/auditoria
+são esperados pela suíte; nenhuma atualização incidental para suprimi-los.
+
+Aceite **não concedido**: API/React/HTTPS, limite por origem e troca de senha,
+limpeza/limite de cardinalidade de buckets vencidos, gestão/último admin local,
+revogação administrativa HTTP, lista local ampliada, Compose/configuração,
+regressões e corte OIDC ainda exigem trabalho/validação. M6 permanece 2/4;
+20/45 aceitos (44,4%) intactos. Nenhum aceite WEB-021/024 ou avanço de marco.
+Branch `feat/m6-autenticacao-local`; entrega identificável por `git log -1
+--format=%H --grep='feat(auth): implementa base transacional de credenciais locais'`.
+Envio/CI e SHA reais no fechamento desta evidência, sem PR/merge/deploy.
 
 ### WEB-022 — Comprovar matriz de perfis, projetos e revogações
 
@@ -1842,7 +1944,23 @@ explicitamente PLANEJADOS. Versionamento/envio conferidos no fechamento Git.
 
 ## Retomada
 
-### Retomada vigente — aceite de suporte e encerramento M3, 2026-11-06
+### Retomada vigente — implementação M6 autorizada, 2026-11-06
+
+Novo `continue o projeto` após encerramento M3 autoriza a próxima entrega
+indicada neste backlog, M6/WEB-021 e suas dependências internas; sem avanço a
+M4/M8 ou produção. WEB-021 EM_ANDAMENTO; WEB-024 depende de seu aceite.
+Base `b7c9eec357f2bf0cb922e12f95e6560be434e241`, worktree inicialmente limpa,
+fetch conferido e upstream alinhado. Branch `feat/m6-autenticacao-local`
+preserva a cadeia ainda não integrada; main/origin/main não alteradas.
+Próxima ação: integrar os casos de uso locais à API/React, aplicar limites por
+origem e por conta também à troca de senha, renovar atividade somente em
+operações autorizadas, adaptar gestão/último admin e fixtures, validar
+AUTH-L01–L09 em HTTPS/API/PG e então cortar OIDC. Não usar a base isolada
+como autenticação disponível: routers/configuração/Compose atuais ainda são
+OIDC e não foram alterados nesta unidade.
+Sem migração real, secrets operacionais, PR/merge/deploy ou dados reais.
+
+### Retomada anterior — aceite de suporte e encerramento M3, 2026-11-06
 
 O responsável respondeu **“aceito”** à proposta concreta de suporte restrito e
 limites de EV-M3-012 apresentada nesta sessão. WEB-012 CONCLUIDA e **M3 7/7

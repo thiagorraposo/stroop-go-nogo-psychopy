@@ -337,3 +337,24 @@ custódia criptografada, restauração isolada e revogação de sessões restaur
 antes de reabrir acesso, impedindo ressurgimento de credenciais revogadas; se
 senha restaurada for antiga, redefinir por operador antes da abertura. Testar
 sem tocar banco real. DDL/migração real exige autorização específica futura.
+
+### DDL de implementação M6 — associação local
+
+A evolução 0012 acrescenta o namespace real `urn:stroop:local` ao registro de
+autorização `app_users`; não é issuer Google nem claim OIDC. `subject` local é
+UUID imutável gerado no bootstrap. `web_local_credentials` associa esse par à
+credencial, sem duplicar role/active. Assim FKs existentes de projetos, membros,
+convites, importações e auditoria continuam válidas, sem UPDATE de histórico,
+cópia de vínculos ou nova interpretação de identidade. `web_lock_emitter`
+continua a bloquear a mesma linha de autorização. A estrutura de sessão local
+é independente de `web_professional_sessions` e não usa prazo OIDC fictício.
+
+Compatibilidade: 0001–0011 permanecem intactas; linhas Google continuam legíveis
+pelo legado. Antes do corte, sessões OIDC continuam no mecanismo existente;
+o corte de API será uma unidade posterior com regressão integrada. Rollback
+antes do corte pode ignorar tabelas locais; depois do corte exige acesso fechado
+até revisão específica, sem reativação OIDC ou down migration. Writer recebe
+somente leitura/atualização de credencial existente, sessões e contador; não
+INSERT/DELETE de credenciais nem DML de `app_users`. Bootstrap é exclusivo do
+operador. Reader não recebe acesso às novas tabelas. Compatibilidade/grants da base isolada têm ensaio em EV-M6-021-BASE no
+backlog; integração HTTP/HTTPS e aceite integral mantêm os gates de WEB-021.
