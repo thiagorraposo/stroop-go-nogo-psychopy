@@ -147,3 +147,105 @@ export function createEvaluator(
     signal,
   );
 }
+
+export type EvaluatorAssessmentLink = {
+  assessment_id: string;
+  project_id: string;
+  project_code: string;
+  test_code: string;
+  test_version: string;
+  visit: string;
+  created_at: string;
+};
+
+export type EvaluatorDetail = EvaluatorRecord & {
+  assessments: EvaluatorAssessmentLink[];
+};
+
+export type UpdateEvaluatorInput = {
+  full_name?: string;
+  initials?: string | null;
+  active?: boolean;
+  reason_code: string;
+};
+
+export function getEvaluator(
+  evaluatorId: string,
+  signal?: AbortSignal,
+): Promise<EvaluatorDetail> {
+  if (!validId(evaluatorId)) {
+    throw new ApiError('invalid_request', 422);
+  }
+  return request(
+    `/api/v1/evaluators/${evaluatorId}`,
+    { method: 'GET', headers: { Accept: 'application/json' } },
+    async response => {
+      if (response.status !== 200) throw new ApiError('invalid_response', response.status);
+      let body: unknown;
+      try {
+        body = await response.json();
+      } catch {
+        throw new ApiError('invalid_response', response.status);
+      }
+      if (!record(body)) throw new ApiError('invalid_response', response.status);
+      const base = decodeEvaluator(body, response.status);
+      const assessments: EvaluatorAssessmentLink[] = Array.isArray(body.assessments)
+        ? body.assessments.filter(record).map(a => ({
+            assessment_id: String(a.assessment_id),
+            project_id: String(a.project_id),
+            project_code: String(a.project_code),
+            test_code: String(a.test_code),
+            test_version: String(a.test_version),
+            visit: String(a.visit),
+            created_at: String(a.created_at),
+          }))
+        : [];
+      return { ...base, assessments };
+    },
+    signal,
+  );
+}
+
+export function updateEvaluator(
+  evaluatorId: string,
+  input: UpdateEvaluatorInput,
+  csrfToken: string,
+  signal?: AbortSignal,
+): Promise<EvaluatorRecord> {
+  if (!validId(evaluatorId)) {
+    throw new ApiError('invalid_request', 422);
+  }
+  const payload: Record<string, unknown> = {
+    reason_code: input.reason_code.trim() || 'correcao_cadastral',
+  };
+  if (input.full_name !== undefined) {
+    const trimmed = input.full_name.trim().replace(/\s+/g, ' ');
+    if (trimmed.length < 2 || trimmed.length > 120) throw new ApiError('invalid_request', 422);
+    payload.full_name = trimmed;
+  }
+  if (input.initials !== undefined) {
+    payload.initials = input.initials ? input.initials.trim().toUpperCase() : null;
+  }
+  if (input.active !== undefined) {
+    payload.active = Boolean(input.active);
+  }
+  return request(
+    `/api/v1/evaluators/${evaluatorId}`,
+    {
+      method: 'PATCH',
+      headers: headers(csrfToken),
+      body: JSON.stringify(payload),
+    },
+    async response => {
+      if (response.status !== 200) throw new ApiError('invalid_response', response.status);
+      let body: unknown;
+      try {
+        body = await response.json();
+      } catch {
+        throw new ApiError('invalid_response', response.status);
+      }
+      return decodeEvaluator(body, response.status);
+    },
+    signal,
+  );
+}

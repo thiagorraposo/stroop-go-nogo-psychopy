@@ -5,7 +5,6 @@ import { ApiError, apiErrorMessage, getProfessionalProfile, logoutProfessional }
 import type { ProfessionalProfile } from './api/client'
 import { ParticipantFlow } from './components/ParticipantFlow'
 import { ProfessionalDashboard } from './components/ProfessionalDashboard'
-import { AdministrationPanel } from './components/AdministrationPanel'
 import { ProfessionalLogin, ProfessionalPassword } from './components/ProfessionalCredentials'
 import { JourneyIndicator } from './components/JourneyIndicator'
 
@@ -72,7 +71,6 @@ function ProfessionalAccess() {
   const [revision, setRevision] = useState(0)
   const [ending, setEnding] = useState(false)
   const [logoutError, setLogoutError] = useState(false)
-  const [area, setArea] = useState<'resultados' | 'administracao'>('resultados')
   useEffect(() => {
     const controller = new AbortController()
     setState({ phase: 'loading' })
@@ -91,9 +89,6 @@ function ProfessionalAccess() {
     const remaining = Math.max(0, Date.parse(state.profile.expires_at) - Date.now())
     const timer = setTimeout(() => setRevision(value => value + 1), remaining)
     return () => clearTimeout(timer)
-  }, [state])
-  useEffect(() => {
-    if (state.phase !== 'ready' || state.profile.role !== 'administracao') setArea('resultados')
   }, [state])
   useEffect(() => {
     const clear = () => flushSync(() => setState({ phase: 'login' }))
@@ -133,13 +128,7 @@ function ProfessionalAccess() {
       <button className="button secondary" disabled={ending} onClick={() => void endSession(state.profile)}>{ending ? 'Encerrando…' : 'Encerrar sessão'}</button>
       {!ending && <>
         <ProfessionalPassword profile={state.profile} onEnded={() => setState({ phase: 'login' })} />
-        {state.profile.role === 'administracao' && <nav aria-label="Áreas profissionais" className="professional-areas">
-          <button className="button secondary" aria-pressed={area === 'resultados'} onClick={() => setArea('resultados')}>Resultados</button>{' '}
-          <button className="button secondary" aria-pressed={area === 'administracao'} onClick={() => setArea('administracao')}>Administração</button>
-        </nav>}
-        {area === 'administracao' && state.profile.role === 'administracao'
-          ? <AdministrationPanel profile={state.profile} />
-          : <ProfessionalDashboard profile={state.profile} />}
+        <ProfessionalDashboard profile={state.profile} />
       </>}
     </>}
   </section>

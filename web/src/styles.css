@@ -207,3 +207,28 @@ kbd { font: inherit; font-size: .9em; border: 1px solid #b7bfca; border-radius: 
 .professional-credentials button { justify-self: start; }
 .password-settings { margin: 1.25rem 0; }
 .password-settings summary { cursor: pointer; font-weight: 700; }
+
+/* Módulos administrativos e cadastros centrais (ADR-007 / REQ-UX-012) */
+.tabular-nums { font-variant-numeric: tabular-nums; }
+.professional-modules { margin-bottom: 1.5rem; }
+.registry-panel { margin-top: 1.5rem; }
+.panel-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 1.25rem; }
+.filter-bar { display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end; margin: 1rem 0; }
+.filter-bar label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; }
+.filter-bar input, .filter-bar select { min-width: 180px; padding: 8px 10px; border: 1px solid #8793a6; border-radius: 4px; }
+.form-field { margin-bottom: 1rem; }
+.form-field label { display: block; font-weight: 600; margin-bottom: 4px; }
+.form-field input { width: 100%; max-width: 32rem; padding: 8px 10px; border: 1px solid #8793a6; border-radius: 4px; }
+.form-actions { display: flex; gap: 8px; margin-top: 1.25rem; }
+.status-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600; }
+.status-active { background: #e6f4ea; color: #137333; }
+.status-inactive { background: #fce8e6; color: #c5221f; }
+.homonym-alert { border-left: 4px solid #f9ab00; background: #fef7e0; padding: 1rem; margin: 1rem 0; }
+.homonym-alert h4 { margin: 0 0 8px; color: #b06000; }
+.homonym-list { margin: 8px 0; padding-left: 1.25rem; }
+.checkbox-label { display: flex; align-items: flex-start; gap: 8px; margin-top: 8px; cursor: pointer; }
+.pagination-bar { display: flex; align-items: center; gap: 12px; margin-top: 1rem; }
+.export-hub-panel .export-hub-card { margin-top: 1.25rem; }
+.export-hub-panel .export-info-card { margin-top: 1.25rem; }
+.export-hub-panel ul { padding-left: 1.25rem; line-height: 1.6; }
+.project-selector-wrapper { margin: 1rem 0; }
