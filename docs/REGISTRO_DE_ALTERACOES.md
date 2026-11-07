@@ -4,6 +4,20 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-07 — Incorporação de Pull Request, Push e Merge Commit tradicional ao workflow
+
+- Por instrução do responsável, o workflow do projeto adota formalmente o ciclo
+  com commits e pushes autônomos (`git push -u origin BRANCH`), abertura e
+  atualização de Pull Requests (`gh pr create`) para `main` e integração
+  exclusivamente por Merge Commit tradicional (`gh pr merge --merge`),
+  preservando o histórico integral dos commits (sem Squash Merge, sem Rebase
+  Merge e sem push direto em `main`).
+- Auto-merge do GitHub permanece desabilitado; aguardar a conclusão dos checks
+  obrigatórios da CI (`verify`) antes do merge.
+- Documentos de governança e fluxo alinhados: `AGENTS.md`, `CONTRIBUTING.md`,
+  `docs/WORKFLOW_CODEX_CLI.md`, `docs/desenvolvimento/CI_WEB.md` e
+  `docs/desenvolvimento/WORKFLOW_CODEX_CLI.md`.
+
 ## 2026-11-06 — Fluxo ponta a ponta de avaliações e transporte incremental (M4)
 
 - Integrado o Dedicated Worker incremental (`checkpoint-worker.ts`) ao fluxo real
