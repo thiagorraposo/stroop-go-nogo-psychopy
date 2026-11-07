@@ -351,3 +351,43 @@ estável. O cronômetro mantém a origem monotônica principal; não há relógi
 na prática. Nenhum elemento de desempenho agregado é criado. Tokens e centro
 experimental independem da quantidade de itens no HUD. Evidências e ambientes
 reais dos ensaios, incluindo falhas, ficam apenas no backlog canônico.
+
+## WEB — reformulação funcional e UX da interface administrativa (CHG-005 — 2026-11-07)
+
+Especificação da experiência profissional planejada em `CHG-005` ([ADR-007](../arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md)), integrada às tarefas `WEB-045` e `WEB-046` (`M4`), `WEB-047` e `WEB-017`–`WEB-020` (`M5`) e `WEB-025` (`M7`). As seções históricas `W13A`, `W15A`–`W15E` permanecem acima como registro do baseline anterior. **Esta reformulação aplica-se exclusivamente à área profissional autenticada; o motor experimental jsPsych, estímulos, contorno branco `stroop-web-outline/1.0.0`, HUD, dez cores e temporização D5 permanecem inalterados.**
+
+### 1. Arquitetura de informação e fluxo de trabalho profissional
+
+O percurso principal da equipe segue a sequência integrada:
+
+**Login da equipe → Dashboard (Visão geral) → Pacientes / Avaliadores → Preparar avaliação → Executar teste → Armazenar resultados → Consultar, analisar e exportar.**
+
+A navegação administrativa organiza-se em oito áreas com hierarquia visual clara, estados ativos e atalhos contextuais:
+
+1. **Visão geral (Dashboard):** indicadores sintéticos (KPIs), atividade recente, evolução temporal de coletas e atalhos rápidos para `Preparar avaliação`, `Cadastrar paciente` e `Exportar dados`.
+2. **Pacientes:** listagem pesquisável e paginada, cadastro de novo paciente com verificação de duplicidade/homônimos, edição cadastral auditada, inativação lógica e ficha detalhada com histórico longitudinal de projetos, visitas, sessões e avaliações.
+3. **Avaliadores:** listagem pesquisável e paginada de avaliadores responsáveis, cadastro com verificação de duplicidade, edição e inativação lógica, e ficha detalhada com histórico de avaliações conduzidas (sem criar conta de login individual).
+4. **Preparar avaliação:** assistente/formulário estruturado que seleciona (ou cadastra inline) o paciente e o avaliador responsável, seleciona projeto e instrumento, preenche visita e iniciais (pré-preenchidas do cadastro do paciente), valida vínculos, apresenta **resumo para conferência** e emite o convite de uso único sem digitação manual de IDs internos.
+5. **Avaliações e histórico:** acompanhamento operacional de convites emitidos, sessões em andamento/concluídas/interrompidas/expiradas, inspeção de checkpoints incrementais (`ADR-005`) e invalidação auditável quando aplicável.
+6. **Resultados e análises:** consulta combinada com catálogo completo de filtros, tabelas analíticas de avaliações, tentativas e métricas oficiais, e visualizações interativas descritivas.
+7. **Exportações:** configuração de exportação CSV do conjunto filtrado por nível de granularidade (`pacientes`, `avaliacoes`, `tentativas`, `metricas`, `stroop_21_colunas`), seleção de colunas, modo de identificação (`deidentified` padrão vs. `nominal` autorizado), pré-visualização com contagem de linhas e resumo dos critérios aplicados antes do download.
+8. **Administração / configurações:** gestão de projetos, membros/vínculos por projeto, sessão/senha da conta local compartilhada (`ADR-006`) e associação auditada de registros legados (`WEB-027`). A área de importação manual de CSV (`CsvImportPanel`) é **retirada** do produto (`WEB-025`).
+
+### 2. Dashboard principal e indicadores descritivos
+
+O painel `Visão geral` apresenta cartões KPI e gráficos descritivos calculados sobre os projetos autorizados:
+
+- **Total de pacientes cadastrados** (ativos e com participação nos projetos autorizados).
+- **Avaliações válidas realizadas** por período (hoje, últimos 7/30 dias, total), por instrumento (`test_code`), por projeto, por status de sessão (`completed`, `preparing`/`running`, `aborted`/`invalidated`/`expired`) e por avaliador responsável.
+- **Evolução temporal de coletas:** série temporal de avaliações concluídas por dia/semana/mês.
+- **Resumos descritivos das métricas oficiais (Stroop Go/No-Go):** precisão total (%), precisão Go (%), precisão No-Go (%), contagens de `hits`, `omission_errors`, `correct_rejections`, `commission_errors` e tempos de reação (`mean`, `sd`, `median`, `iqr` em segundos/ms sobre `hits`).
+- **Rigor metodológico na apresentação:** todo indicador exibe explicitamente sua **origem**, **definição**, **unidade de medida** e **tratamento de valores nulos** (ex.: RT exibido como `Ausente` quando `hits = 0`, nunca convertido em zero). É estritamente proibido exibir diagnóstico clínico, escore normativo, percentil populacional ou classificação "acima/abaixo da média".
+
+### 3. Visualizações interativas, tabelas e estados de interface
+
+- **Visualizações interativas (`Resultados e análises`):**
+  - Evolução longitudinal do paciente através de visitas e avaliações (precisão total/Go/No-Go e RT mediano/IIQ ao longo do tempo).
+  - Distribuição de tempos de reação e comparação descritiva por condição experimental (`congruent` vs. `incongruent`) e por tipo de resposta/erro (`hit`, `omission`, `correct_rejection`, `commission`).
+  - Distribuição de avaliações e erros por projeto, visita e avaliador responsável, sempre acompanhada de tabela acessível equivalente.
+- **Tabelas e listagens:** busca textual com debounce, filtros visíveis como *chips* removíveis, ordenação por coluna, paginação com tamanho configurável, ações contextuais por linha (abrir ficha do paciente, inspecionar detalhe da avaliação, exportar CSV individual de 21 colunas) e estados claros de carregamento (*skeleton*/progresso), lista vazia (*empty state* orientativo) e erro recuperável.
+- **Critérios de sistema visual e acessibilidade (`REQ-UX-012`):** tipografia legível com algarismos tabulares (`font-variant-numeric: tabular-nums`) em códigos, métricas e timestamps; contraste compatível com WCAG AA nas telas administrativas; navegação completa por teclado com `:focus-visible` nítido; modais/etapas de confirmação antes de inativar cadastro, emitir convite ou revogar sessão; responsividade para desktops e notebooks de pesquisa.

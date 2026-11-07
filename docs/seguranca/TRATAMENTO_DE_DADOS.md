@@ -140,3 +140,24 @@ Os controles WEB desta extensao sao requisitos para as etapas futuras; nao
 declarar que ja existem por estarem documentados. Evidencias de autorizacao,
 replay/revogacao, minimizacao/exportacao e recuperacao seguem o
 [roadmap](../ROADMAP_WEB.md) e o [threat model](THREAT_MODEL.md).
+
+## Evolução CHG-005 — cadastros centrais nominais, inativação lógica e exportação controlada (2026-11-07)
+
+A revisão formal de `DEC-01` ([ADR-007](../arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md)) altera a diretriz anterior que mantinha apenas pseudônimos por projeto sem cadastro nominal no servidor. As seções anteriores permanecem como registro histórico das fases `W01`–`W16` e `M1`–`M6`. Para a versão alvo `CHG-005`, aplicam-se as seguintes regras de governança e proteção de dados (LGPD):
+
+1. **Dados cadastrais autorizados e minimização estrita:**
+   - `web_patients`: coleta apenas `full_name` (`participant_name`, 2–120 caracteres), `initials` (opcional, 0–16 caracteres) e nota curta de desambiguação operacional, além de `id UUID` e `participant_code` gerados automaticamente pelo sistema.
+   - `web_evaluators`: coleta apenas `full_name`, `initials` opcional, `id UUID` e `evaluator_code` gerado automaticamente.
+   - Continua proibido coletar CPF, RG, data de nascimento, endereço, telefone, e-mail do participante, diagnóstico clínico ou dados demográficos não previstos no formulário original do PsychoPy (`stroop_go_nogo_ptbr.psyexp`).
+2. **Segregação entre identidade nominal e resultados experimentais:**
+   - As tabelas científicas (`assessments`, `trials`, `web_assessment_metrics`) armazenam apenas os códigos estáveis (`participant_code` e `evaluator_code`) e os UUIDs de vínculo (`patient_id`, `evaluator_uuid` em `web_assessments`/`web_invitations`), mantendo `full_name` e `initials` isolados nas tabelas cadastrais (`web_patients` e `web_evaluators`).
+   - Logs operacionais, mensagens de erro, URLs, nomes de arquivos e artefatos de telemetria continuam proibidos de conter `full_name`, `initials` ou códigos de convite.
+3. **Inativação lógica, correção auditável e retenção:**
+   - Cadastros de pacientes e avaliadores com vínculos históricos não sofrem exclusão destrutiva (`ON DELETE RESTRICT`); utiliza-se inativação lógica (`active = false`) para impedir novas seleções preservando a integridade longitudinal da pesquisa.
+   - Correções de grafia ou de vínculo incorreto geram registro obrigatório em `web_registry_audit_events`.
+   - O atendimento a direitos de titulares (retificação, oposição, eliminação/anonimização quando cabível após o prazo legal de guarda da pesquisa) deve ser definido institucionalmente em `DEC-03` (`WEB-033`) antes de habilitar qualquer projeto no modo `research`.
+4. **Retirada da importação CSV e controle de exportação:**
+   - O recebimento de arquivos CSV pelo usuário é retirado do produto em `M7` (`WEB-025`).
+   - Exportações CSV realizadas na plataforma operam por padrão em modo **desidentificado** (`participant_code` / `evaluator_code`); a exportação com nomes completos (`identification_mode = "nominal"`) depende de autorização explícita de perfil e da habilitação `DEC-03` do projeto, sendo auditada em `auth_audit_events`.
+5. **Limitação da conta local compartilhada (`R12`):**
+   - Enquanto o produto utilizar conta local única compartilhada pela equipe (`ADR-006`), a identificação do avaliador responsável em cada avaliação é declarada por seleção cadastral (`web_evaluators`), não constituindo prova criptográfica de autoria individual do operador autenticado. Essa limitação deve constar expressamente na avaliação institucional `DEC-03` antes de uso com dados reais.

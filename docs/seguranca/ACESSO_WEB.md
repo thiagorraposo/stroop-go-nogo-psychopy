@@ -175,3 +175,14 @@ Prazos e objetivos de recuperacao estao no
 Esta revisao de cenarios fecha a especificacao; evidencias executaveis de
 autenticacao, concorrencia, autorizacao e navegador pertencem as etapas
 W06–W14. Nao confundir revisao documental com aprovacao de uso real.
+
+## Cadastros centrais, avaliador responsável e exportação em CHG-005 (2026-11-07)
+
+Com a revisão formal de `DEC-01` e aprovação de [ADR-007](../arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md):
+
+1. **Conta local compartilhada vs. avaliador responsável:** a autenticação na aplicação permanece realizada pela conta local única da equipe (`ADR-006`, concluída em `M6`), que identifica o operador técnico (`issued_by_issuer`/`issued_by_subject`). O avaliador responsável pela condução do teste (`web_evaluators.id` / `evaluator_code` / `full_name`) é uma entidade cadastral separada, selecionada obrigatoriamente na preparação da sessão (`WEB-046`), sem criação de conta de login individual para cada avaliador.
+2. **Cadastro central de pacientes (`web_patients`):** o sistema armazena `full_name` (`participant_name` do formulário original do PsychoPy) e `initials` opcional em tabela cadastral segregada da tabela de resultados científicos (`assessments`), gerando automaticamente `id UUID` e `participant_code` estável (`participant_id`). Nenhum dado nominal é exposto no bootstrap/sessão do participante (`/api/v1/participant/*`).
+3. **Controle de acesso cruzado e exportação:**
+   - A consulta e seleção de pacientes e avaliadores exige sessão profissional autenticada e vínculo ativo com projeto autorizado; tentativas de acesso a projetos sem vínculo continuam respondendo `404 Not Found`.
+   - A exportação CSV opera por padrão no modo **desidentificado** (`identification_mode = "deidentified"`), exportando `participant_code` e `evaluator_code` e preservando `participant_name = NAO_COLETADO`. A exportação nominal (`identification_mode = "nominal"`) exige perfil autorizado e habilitação institucional explícita do projeto (`DEC-03` / `WEB-033` / `WEB-041`).
+4. **Retirada do upload CSV:** a importação manual de CSV pelo navegador é removida do produto em `M7` (`WEB-025`); dados operacionais entram exclusivamente pelo fluxo autenticado de cadastro, preparação e execução da plataforma.

@@ -18,7 +18,7 @@ de Streamlit na operação final. PsychoPy não será runtime Web.
 
 ```mermaid
 flowchart LR
-  A[Avaliador autenticado] --> R[React: gestão e análise]
+  A[Equipe com conta local] --> R[React: Dashboard, Pacientes, Avaliadores, Preparação e Análise]
   R --> N[Nginx HTTPS mesma origem]
   P[Participante com convite] --> E[React Host e jsPsych]
   E --> N
@@ -27,7 +27,7 @@ flowchart LR
   U --> D[Domínio: contratos e métricas]
   U --> S[Persistência SQL]
   S --> B[(PostgreSQL)]
-  C[CSV complementar] --> U
+  U --> C[Exportação CSV avançada]
 ```
 
 | Fronteira | Responsabilidade e dependências permitidas | Situação / alvo |
@@ -51,6 +51,10 @@ Alvo CHG-004: avaliador com login local → projeto autorizado → criação de 
 código pseudonimizado e visita → identificação por resgate → instruções → prática
 → principal no navegador → conclusão validada na API → transação PG → recibo →
 métricas oficiais → painel React → exportação autorizada.
+
+Alvo CHG-005 ([ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md)):
+**Login da equipe (conta local única) → Dashboard → Pacientes / Avaliadores → Preparar avaliação (seleção cadastral, geração automática de IDs e conferência) → Executar teste → Armazenar resultados → Consultar, analisar e exportar CSV.**
+A importação manual de CSV deixa de existir no produto WEB; o CSV é estritamente formato de exportação.
 
 O código atual materializa a preparação via convite/sessão, não como resultado
 oficial já criado. M2 deve manter distinta a avaliação planejada da concluída;
@@ -103,13 +107,14 @@ na tarefa WEB-005. Operações já presentes, a revalidar:
 
 | Grupo sob /api/v1 | Operação / vínculo planejado |
 |---|---|
-| auth/login, me, logout | Alvo: senha no backend e sessão opaca; callback Google somente no código atual/histórico |
+| auth/login, me, logout, password | Alvo (implementado em M6): senha local no backend e sessão opaca; callback Google cortado fora de `APP_ENV=test` |
+| patients e evaluators | Alvo CHG-005 (`WEB-045`/`047`): CRUD centralizado, busca de duplicidade/homônimos, inativação lógica e histórico longitudinal |
 | projects e members | Criar/listar projetos e vínculos explícitos por papel |
-| projects/{id}/invitations | Avaliador prepara sessão, emite/revoga convite de uso único |
-| participant/redeem, session, start, abort, complete, logout | Fluxo experimental isolado da sessão profissional |
-| projects/{id}/assessments, options, detalhe/export | Lista/facetas/detalhe/tentativas/CSV por escopo autorizado |
-| projects/{id}/imports/{operation_id} | CSV minimizado, UUID idempotente, reconsulta de estado |
-| assessments/export | CSV agregado do conjunto filtrado autorizado |
+| projects/{id}/invitations | Alvo CHG-005 (`WEB-046`): seleção de paciente e avaliador, instrumento, visita e iniciais, geração automática de códigos, conferência e convite de uso único |
+| participant/redeem, session, start, abort, complete, logout | Fluxo experimental isolado da sessão profissional + checkpoints incrementais (`ADR-005`) |
+| projects/{id}/assessments, options, detalhe/export | Lista/facetas/detalhe/tentativas/CSV por escopo autorizado com catálogo expandido de filtros (`WEB-017`/`019`) |
+| projects/{id}/imports/{operation_id} | Presente no código atual; **a retirar da interface e do modo produto em M7 (`WEB-025`)** |
+| exports/preview, exports/download, assessments/export | Alvo CHG-005 (`WEB-020`): exportação CSV avançada multi-granularidade com pré-visualização, seleção de colunas e critérios aplicados |
 | admin/users | Gestão de contas sem excluir coletas nem desproteger último administrador |
 | /health/live e /health/ready fora do prefixo | Saúde mínima e migrations compatíveis; nunca aplicar schema automaticamente |
 
@@ -231,3 +236,13 @@ Motores entregam número de concluídas e elapsed, preservando agendamento/RT.
 Estilos em `styles.css` aplicam contorno apenas durante a palavra-estímulo,
 com token uniforme. Metadados `visual` no snapshot e sufixo visual em app_version
 identificam esta revisão; a persistência e os contratos fechados não mudam.
+
+## Evolução funcional e UX administrativa — integração de CHG-005
+
+Conforme [ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md) e a revisão de `DEC-01` (2026-11-07):
+
+1. **Separação entre autenticação e identificação do avaliador:** a conta local única (`ADR-006`, concluída em `M6`) autentica o acesso da equipe à aplicação (`principal_id`), enquanto a entidade central `web_evaluators` identifica nominalmente e por código automático (`evaluator_code`) o avaliador responsável selecionado em cada sessão/avaliação.
+2. **Cadastro centralizado de pacientes (`web_patients`) e avaliadores (`web_evaluators`):** implementados em `M4` (`WEB-045`, `WEB-046`) e expandidos em `M5` (`WEB-047`), com geração automática de identificadores internos estáveis (`UUID` e `participant_code`/`evaluator_code`), verificação de duplicidade e homônimos, inativação lógica sem exclusão destrutiva (`ON DELETE RESTRICT`) e reutilização transversal entre projetos, visitas, instrumentos e sessões.
+3. **Formulário completo de preparação da avaliação (`WEB-046`):** recupera os campos pertinentes do formulário original do PsychoPy Builder (`project`, `participant_id` automático, `participant_name`, `initials`, `visit`, `evaluator` e `test_code`), com preenchimento por seleção cadastral e etapa de resumo para conferência antes da emissão do convite.
+4. **Retirada da importação CSV do produto (`M7` / `WEB-025`):** dados operacionais são cadastrados e coletados diretamente no sistema; a tela `CsvImportPanel` e o upload CSV pelo usuário são retirados do produto WEB, mantendo módulos internos de ingestão/CLIs isolados para compatibilidade histórica e migração técnica autorizada.
+5. **Reformulação da interface administrativa, filtros e exportação CSV avançada (`M5` / `WEB-017`–`WEB-020`, `WEB-047`):** a área profissional organiza-se em `Visão geral (Dashboard)`, `Pacientes`, `Avaliadores`, `Preparar avaliação`, `Avaliações e histórico`, `Resultados e análises`, `Exportações` e `Administração/configurações`, com catálogo completo de filtros combinados, visualizações interativas descritivas e exportação CSV em múltiplas granularidades (`pacientes`, `avaliacoes`, `tentativas`, `metricas` e `stroop_21_colunas`), sem tocar no motor experimental jsPsych.

@@ -370,3 +370,85 @@ principal local pela função runtime é recusada, mantendo bootstrap exclusivo 
 operador. Assinatura/grants permanecem; reader/writer não ganham DML de usuários
 ou acesso adicional a hash. Aplicação/ensaios somente em PG sintético autorizado
 de WEB-021, com regressões de último admin/concorrência e compatibilidade.
+
+## Cadastros centrais, preparação completa e exportação avançada — evolução planejada CHG-005
+
+Conforme [ADR-007](../arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md) e a revisão formal de `DEC-01` (2026-11-07), a plataforma passa a manter cadastros centrais de **pacientes** e **avaliadores responsáveis**, recuperando os campos do formulário original do PsychoPy Builder (`stroop_go_nogo_ptbr.psyexp`, rotina `formulario_sessao` / `controle_formulario_sessao`) e separando a identidade nominal dos resultados experimentais. Nenhuma migration existente (`0001`–`0013`) é reescrita; a evolução será materializada de forma aditiva em `WEB-045` (`0014_central_patients_evaluators.sql`), sem execução nesta missão documental.
+
+### Tabela de correspondência com o formulário original do PsychoPy
+
+Fontes auditadas no repositório: `stroop_go_nogo_ptbr.psyexp` (linhas 106–108 e 342–370), [CSV_UNIFICADO.md](../experimento/CSV_UNIFICADO.md), `services/session_invitation.py` e `persistence/postgres_sessions.py`.
+
+| Campo original (`psyexp` / CSV) | Significado no domínio | Origem no PsychoPy local | Campo / entidade na plataforma WEB (`CHG-005`) | Obrigatoriedade | Regra de validação | Persistência no PostgreSQL |
+|---|---|---|---|---|---|---|
+| `project` | Projeto ou estudo ao qual a sessão pertence | Digitado manualmente em `formulario_sessao` (`form_values['project']`) | Seleção do projeto autorizado (`project_id` UUID → `web_projects.code`) | Obrigatório | Projeto existente, ativo (`web_projects.active = true`) e com vínculo ativo para a conta operadora | `web_projects(id, code, name)`, `web_invitations.project_id`, `assessments.project` |
+| `participant_id` | Identificador estável do participante | Digitado manualmente em `formulario_sessao` (`form_values['participant_id']`) | Gerado automaticamente pelo sistema no cadastro central (`web_patients.participant_code`, ex.: `PAT-YYYYMMDD-NNNNNN`) e selecionado na preparação sem digitação manual | Obrigatório (gerado pelo sistema) | Regex `^[A-Za-z0-9_-]{2,64}$`, único globalmente em `web_patients.participant_code` e por projeto em `web_project_participants(project_id, participant_id)` | `web_patients(id, participant_code)`, `web_project_participants(id, project_id, participant_id, patient_id)`, `web_invitations.participant_id`, `assessments.participant_id` |
+| `participant_name` | Nome completo do paciente/participante | Digitado manualmente em `formulario_sessao` (`form_values['participant_name']`) | Cadastrado em `web_patients.full_name` e selecionado na preparação da avaliação | Obrigatório no cadastro central de pacientes | Texto após `strip()` com `2 <= len <= 120`, sem caracteres de controle; normalizado para busca fonética/sem acento | `web_patients.full_name` (segregado da tabela científica; snapshot/vínculo via `patient_id` em `web_project_participants` e `web_invitations`) |
+| `initials` | Iniciais do paciente para conferência visual/operacional | Digitado manualmente em `formulario_sessao` (`form_values['initials']`, opcional) | Cadastrado/sugerido em `web_patients.initials` e exibido/confirmado na preparação da sessão | Opcional | Texto após `strip()` com `0 <= len <= 16`, sem caracteres de controle | `web_patients.initials` e `web_invitations.participant_initials` |
+| `visit` | Identificação da visita ou onda de coleta (ex.: `V1`, `basal`, `retorno_30d`) | Digitado manualmente em `formulario_sessao` (`form_values['visit']`) | Informado/selecionado na preparação da avaliação (`visit`) | Obrigatório | Texto após `strip()` com `1 <= len <= 64`, sem caracteres de controle | `web_participant_visits(id, project_id, participant_uuid, visit_label)`, `web_invitations.visit_label`, `assessments.visit` |
+| `evaluator` | Avaliador(a) responsável pela preparação e condução da sessão | Digitado manualmente em `formulario_sessao` (`form_values['evaluator']`) | Selecionado a partir do cadastro central de avaliadores (`web_evaluators.id` / `evaluator_code` / `full_name`), distinto da conta local de login | Obrigatório | Avaliador existente e ativo (`web_evaluators.active = true`); `full_name` `2 <= len <= 120`, `evaluator_code` `^[A-Za-z0-9_-]{2,64}$` gerado pelo sistema | `web_evaluators(id, evaluator_code, full_name)`, `web_invitations(evaluator_uuid, evaluator_id)`, `web_assessments.evaluator_uuid`, `assessments.evaluator` |
+| `test_code` | Código do instrumento cognitivo aplicado | Fixado na inicialização (`'stroop_go_nogo_ptbr'`) | Selecionado na preparação da avaliação entre instrumentos registrados no catálogo (`test_code`) | Obrigatório | Instrumento registrado em `domain/instruments.py` (padrão `stroop_go_nogo_ptbr`) | `web_invitations.test_code`, `assessments.test_code` |
+| `test_version` | Versão metodológica do instrumento | Fixado na inicialização (`'0.2.2'`) | Gerado automaticamente pelo sistema a partir do catálogo (`0.2.2-web.1`) | Automático (não editável) | Imutável por versão do instrumento | `web_invitations.test_version`, `assessments.test_version` |
+| `assessment_id` | Identificador único da avaliação concluída | Gerado automaticamente (`str(uuid.uuid4())`) | Gerado automaticamente pelo sistema ao materializar a avaliação oficial | Automático (não editável) | UUID v4 único | `assessments.assessment_id`, `web_assessments.assessment_id` |
+| `assessment_date` | Data civil de início da avaliação (`YYYY-MM-DD`) | Gerado automaticamente (`_started_at.date().isoformat()`) | Derivado automaticamente de `started_at` no servidor | Automático (não editável) | Data ISO `YYYY-MM-DD` | `assessments.assessment_date` |
+| `started_at` | Timestamp ISO 8601 do início efetivo da sessão | Gerado automaticamente (`_started_at.isoformat()`) | Gerado automaticamente pelo servidor na ativação/início | Automático (não editável) | Timestamp ISO 8601 UTC | `web_participant_sessions.started_at`, `assessments.started_at` |
+
+### Modelo lógico e separação de entidades (`CHG-005`)
+
+A arquitetura diferencia explicitamente sete níveis de domínio, evitando fusão entre cadastro pessoal e execução experimental:
+
+1. **Paciente (`web_patients`):**
+   - `id UUID PRIMARY KEY` (identificador interno imutável gerado pelo sistema).
+   - `participant_code TEXT NOT NULL UNIQUE` (código legível estável gerado automaticamente pelo sistema, ex.: `PAT-20261107-000001`, compatível com `^[A-Za-z0-9_-]{2,64}$`).
+   - `full_name TEXT NOT NULL` (`CHECK (char_length(btrim(full_name)) BETWEEN 2 AND 120)`).
+   - `normalized_name TEXT NOT NULL` (nome normalizado sem acentos e em minúsculas para pesquisa e detecção de possíveis duplicidades/homônimos).
+   - `initials TEXT NOT NULL DEFAULT ''` (`CHECK (char_length(btrim(initials)) <= 16)`).
+   - `disambiguation_note TEXT NOT NULL DEFAULT ''` (observação curta opcional de confirmação operacional, ex.: referência interna autorizada do estudo, limitada a 160 caracteres, sem criar campos clínicos/demográficos).
+   - `is_homonym_confirmed BOOLEAN NOT NULL DEFAULT false` (indica se o cadastro foi confirmado explicitamente pelo operador diante de homônimo existente).
+   - `active BOOLEAN NOT NULL DEFAULT true` (estado cadastral para inativação lógica sem exclusão destrutiva).
+   - `created_at TIMESTAMPTZ NOT NULL`, `updated_at TIMESTAMPTZ NOT NULL`, `created_by_issuer TEXT NOT NULL`, `created_by_subject TEXT NOT NULL`.
+
+2. **Avaliador responsável (`web_evaluators`):**
+   - `id UUID PRIMARY KEY` (identificador interno imutável gerado pelo sistema).
+   - `evaluator_code TEXT NOT NULL UNIQUE` (código estável gerado automaticamente pelo sistema, ex.: `EVA-000001`, compatível com `^[A-Za-z0-9_-]{2,64}$`).
+   - `full_name TEXT NOT NULL` (`CHECK (char_length(btrim(full_name)) BETWEEN 2 AND 120)`).
+   - `normalized_name TEXT NOT NULL` (para busca e prevenção de duplicidade).
+   - `initials TEXT NOT NULL DEFAULT ''` (`CHECK (char_length(btrim(initials)) <= 16)`).
+   - `active BOOLEAN NOT NULL DEFAULT true` (inativação lógica; avaliadores inativos mantêm todo o histórico de avaliações, mas não aparecem como opção ativa em novas sessões).
+   - `created_at TIMESTAMPTZ NOT NULL`, `updated_at TIMESTAMPTZ NOT NULL`, `created_by_issuer TEXT NOT NULL`, `created_by_subject TEXT NOT NULL`.
+
+3. **Participação / vínculo com projeto (`web_project_participants`):**
+   - Mantém `id UUID PRIMARY KEY`, `project_id UUID NOT NULL`, `participant_id TEXT NOT NULL` (`UNIQUE (project_id, participant_id)`).
+   - Acrescenta coluna aditiva `patient_id UUID NULL REFERENCES web_patients(id) ON DELETE RESTRICT`.
+   - Para todas as novas preparações a partir de `WEB-045`/`WEB-046`, `patient_id` é preenchido obrigatoriamente e `participant_id` recebe `web_patients.participant_code` (permitindo que o mesmo paciente participe de múltiplos projetos mantendo o mesmo `patient_id` e `participant_code`). Registros históricos anteriores a `CHG-005` conservam `patient_id IS NULL` até associação explícita auditada (`WEB-027`).
+
+4. **Visita (`web_participant_visits`):**
+   - Permanece vinculada a `(project_id, participant_uuid, visit_label)`. Um mesmo paciente pode realizar múltiplas visitas no mesmo projeto ou em projetos distintos, e repetir avaliações do mesmo instrumento ou de instrumentos diferentes na mesma visita.
+
+5. **Preparação / convite (`web_invitations`) e sessão experimental (`web_participant_sessions`):**
+   - `web_invitations` acrescenta `patient_id UUID NULL REFERENCES web_patients(id) ON DELETE RESTRICT`, `evaluator_uuid UUID NULL REFERENCES web_evaluators(id) ON DELETE RESTRICT` e `participant_initials TEXT NOT NULL DEFAULT ''`.
+   - Preserva `issued_by_issuer` e `issued_by_subject` para registrar a **conta técnica autenticada** que operou o sistema, enquanto `evaluator_uuid` e `evaluator_id` (`evaluator_code`) identificam o **avaliador responsável** selecionado na preparação.
+
+6. **Avaliação oficial e resultado (`web_assessments` / `assessments` / `trials` / `web_assessment_metrics`):**
+   - `web_assessments` referencia `invitation_id`, `patient_id` (aditivo, `ON DELETE RESTRICT`) e `evaluator_uuid` (aditivo, `ON DELETE RESTRICT`).
+   - A tabela científica `assessments` mantém `participant_id` (código estável do participante) e `evaluator` (`evaluator_code` estável do avaliador), preservando a separação física entre a tabela de resultados científicos e os nomes completos armazenados em `web_patients` e `web_evaluators`.
+   - Quando uma exportação CSV nominal for explicitamente solicitada e autorizada pela governança do projeto (`DEC-03`), a camada de leitura faz `LEFT JOIN` controlado com `web_patients` e `web_evaluators`; no modo padrão desidentificado, exporta os códigos estáveis (`participant_code` / `evaluator_code`) e preserva `participant_name = NAO_COLETADO` (ou código autorizado), sem expor dados nominais indevidamente.
+
+7. **Histórico de alterações cadastrais e correção de vínculos (`web_registry_audit_events` e `web_legacy_entity_links`):**
+   - `web_registry_audit_events`: registra toda criação, edição cadastral, inativação/reativação e correção administrativa de vínculo de paciente ou avaliador (`event_id UUID`, `entity_type IN ('patient', 'evaluator', 'participant_link', 'invitation_link')`, `entity_id UUID`, `action TEXT`, `actor_issuer TEXT`, `actor_subject TEXT`, `reason_code TEXT`, `occurred_at TIMESTAMPTZ`, sem gravar segredos ou payloads livres em logs operacionais).
+   - `web_legacy_entity_links`: registra a associação manual, autorizada e verificável entre um `web_project_participants.id` (ou `evaluator` textual histórico) anterior a `CHG-005` e um `web_patients.id` / `web_evaluators.id` central, exigindo confirmação humana explícita e proibindo reconciliação automática por igualdade de string.
+
+### Regras de integridade, verificação de duplicidade, concorrência e exclusão lógica
+
+- **Verificação de duplicidade e homônimos:**
+  - Índices de busca: `INDEX ON web_patients (normalized_name)`, `INDEX ON web_patients (participant_code)`, `INDEX ON web_evaluators (normalized_name)`, `INDEX ON web_evaluators (evaluator_code)`.
+  - Antes de inserir novo paciente ou avaliador, a API consulta registros com `normalized_name` igual ou prefixo/similaridade, retornando possíveis correspondências com atributos mínimos de confirmação: `participant_code` / `evaluator_code`, `full_name`, `initials`, `disambiguation_note`, projetos vinculados, última visita registrada e `created_at`.
+  - Caso já exista registro com o mesmo `normalized_name` e o operador não envie flag explícita de confirmação de homônimo (`confirm_homonym = true`), a API recusa a criação com `409 Conflict` (`duplicate_candidate_found`) e lista os candidatos para seleção ou confirmação consciente.
+- **Concorrência na geração de códigos e vínculos:**
+  - Os códigos automáticos (`PAT-...` e `EVA-...`) utilizam sequência ou gerador transacional livre de colisão com `UNIQUE` constraint no PostgreSQL.
+  - Emissões concorrentes de preparação para o mesmo `(project_id, patient_id, visit_label)` resolvem `web_project_participants` e `web_participant_visits` de forma idempotente (`ON CONFLICT DO NOTHING` / `SELECT FOR UPDATE`), criando convites/sessões distintos sem duplicar o participante ou a visita.
+- **Proibição de exclusão destrutiva:**
+  - Todas as FKs de resultados, sessões, convites, visitas e participações para `web_patients` e `web_evaluators` usam `ON DELETE RESTRICT`.
+  - O papel de runtime (`stroop_app_writer`) não recebe permissão `DELETE` em `web_patients`, `web_evaluators`, `web_project_participants`, `web_participant_visits`, `web_invitations`, `assessments` ou `trials`. A remoção operacional no CRUD é sempre **inativação lógica** (`active = false`).
+  - Correções de nome ou iniciais em `web_patients` / `web_evaluators` atualizam o cadastro central e registram evento em `web_registry_audit_events`, preservando intactos todos os UUIDs e vínculos históricos das avaliações já realizadas.
+  - Caso uma avaliação tenha sido preparada com paciente ou avaliador incorreto por erro humano, o procedimento autorizado (`WEB-047`) realiza **revinculação administrativa auditada** (ou invalidação da sessão não concluída e emissão de novo convite), nunca exclusão destrutiva do resultado.

@@ -1,6 +1,6 @@
 # Projeto Stroop Test — backlog canônico da plataforma WEB
 
-Última verificação documental: **2026-11-06**. Missão e limites:
+Última verificação documental: **2026-11-07**. Missão e limites:
 [arquitetura](ARQUITETURA_WEB.md); inventário: [auditoria](AUDITORIA_REPLANEJAMENTO.md);
 especificação: [requisitos e matriz](REQUISITOS_E_RASTREABILIDADE.md).
 Este é o único registro executável de marcos, tarefas, estados, dependências,
@@ -20,8 +20,7 @@ O comando de 2026-11-05 autorizou M2, já concluído. Novo `continue o projeto`
 autoriza M3, condicionado às decisões de suas tarefas. Em 2026-11-05, o proprietário
 aprovou DEC-04 no alcance local de engenharia descrito em EV-M3-011; validação
 física/metodológica permanece pendente para M9. Após o aceite de M3, novo `continue o projeto` em 2026-11-06 autorizou M6, já
-concluído. Novo `continue o projeto` em 2026-11-06 autorizou M4 até seu
-encerramento, conforme Retomada vigente.
+concluído. Novo `continue o projeto` em 2026-11-06 concluiu o escopo inicial de M4 (`WEB-013` a `WEB-016`). Em 2026-11-07, a missão documental `CHG-005` ([ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md)) revisou formalmente `DEC-01` e expandiu `M4` (`WEB-045`, `WEB-046`) e `M5` (`WEB-047`), além de atualizar `M5`, `M7`, `M8`, `M9` e `M10`.
 
 Uma tarefa CONCLUIDA tem todos critérios, comandos/resultados/data, componente,
 referências de teste e Git. Documento é evidência suficiente apenas para entrega
@@ -39,23 +38,22 @@ de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
 Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
 não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
 
-Progresso atual: **26/45 entregáveis aceitos (WEB-000 a WEB-016, WEB-021 a WEB-024, WEB-029/030 e WEB-042/043/044)**.
+Progresso atual: **26/48 entregáveis aceitos (WEB-000 a WEB-016, WEB-021 a WEB-024, WEB-029/030 e WEB-042/043/044)**.
 WEB-005 é documental; WEB-006 aceita o receptor backend e contratos em banco
-sintético. M1, M2, M3, M4 e M6 concluídos; atomicidade e paridade aceitas em EV-M2-007/008;
-autenticação local e revisão de segurança aceitas em EV-M6-021/024; fluxo ponta a
-ponta de avaliações com Dedicated Worker incremental e HTTPS/API/PG reais aceito
-em EV-M4-013/016.
+sintético. M1, M2, M3 e M6 concluídos; atomicidade e paridade aceitas em EV-M2-007/008;
+autenticação local e revisão de segurança aceitas em EV-M6-021/024; baseline de M4 (`WEB-013` a `WEB-016`) aceita
+em EV-M4-013/016, com expansão de cadastros centrais e formulário completo (`WEB-045` e `WEB-046`) planejada em CHG-005.
 
 ## Painel visual de acompanhamento
 
-Atualizado em **2026-11-06**, a partir das fichas deste backlog.
+Atualizado em **2026-11-07**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **26 de 45 · 57,8%** | **19** | **M4 concluído · M5 próximo** | Autorizar M5/WEB-017; WEB-031 aguarda destino externo |
+| **26 de 48 · 54,2%** | **22** | **M4 em expansão CHG-005 (4/6)** | Executar WEB-045 → WEB-046 em M4 com `continue o projeto`; WEB-031 aguarda destino externo |
 
 ```text
-Aceites   ████████████░░░░░░░░   57,8%
+Aceites   ███████████░░░░░░░░░   54,2%
 ```
 
 A barra global é aproximada; os números são exatos, com percentual arredondado.
@@ -76,8 +74,8 @@ A ordem da tabela segue os IDs; dependências e paralelismo estão na
 | [M1](#m1--fundação-e-baseline-reproduzível) | Fundação e baseline reproduzível | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M2](#m2--backend-e-contratos-de-dados-consolidados) | Backend e contratos de dados consolidados | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | 🟩🟩🟩🟩🟩🟩🟩 **7/7** | ✅ Concluído |
-| [M4](#m4--fluxo-ponta-a-ponta-de-avaliações) | Fluxo ponta a ponta de avaliações | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
-| [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
+| [M4](#m4--fluxo-ponta-a-ponta-de-avaliações) | Fluxo ponta a ponta de avaliações | 🟩🟩🟩🟩⬜⬜ **4/6** | ◐ Parcial; expansão CHG-005 (`WEB-045`/`046`) pendente |
+| [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | ⬜⬜⬜⬜⬜ **0/5** | ○ Pendente |
 | [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M7](#m7--integração-compatibilidade-histórica-e-transição) | Integração, compatibilidade histórica e transição | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M8](#m8--ci-infraestrutura-e-preparação-operacional) | CI, infraestrutura e preparação operacional | 🟩🟩⬜⬜ **2/4** | ◐ Parcial; réplica externa e release pendentes |
@@ -119,19 +117,15 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 
 ### Foco do marco atual
 
-M4 concluído (**4/4**) nesta sessão em `EV-M4-013/016`: `WEB-013`, `WEB-014`,
-`WEB-015` e `WEB-016` CONCLUIDAS com evidências reais positivas/negativas em
-React/FastAPI/PostgreSQL/HTTPS (Chromium e Firefox). Próximo marco na ordem
-crítica: **M5** (`WEB-017` e `WEB-018` PRONTAS tecnicamente), aguardando nova
-instrução explícita (`continue o projeto`) que autorize o marco.
+Em `M4`, as entregas `WEB-013`, `WEB-014`, `WEB-015` e `WEB-016` permanecem **CONCLUIDAS** (`EV-M4-013/016`). O replanejamento funcional `CHG-005` ([ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md), revisão de `DEC-01`) acrescentou `WEB-045` (**PRONTA**) e `WEB-046` (**PENDENTE**) a **M4** (**4/6**) para consolidar os cadastros centrais de pacientes e avaliadores e o formulário completo de preparação da sessão antes de avançar para **M5** (`WEB-017`–`WEB-020` e `WEB-047`).
 
-| ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito |
-|---|---|---|---|
-| [WEB-013](#web-013--integrar-preparação-profissional-e-identificação-por-convite): preparação e convite | [WEB-014](#web-014--validar-instruções-prática-e-início-principal-no-fluxo-real): instruções e prática | [WEB-015](#web-015--ensaiar-envio-falhas-de-rede-e-recuperação-de-recibo): worker incremental e recibo | [WEB-016](#web-016--aceitar-avaliação-completa-com-consulta-persistida): avaliação completa e consulta |
+| ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito | 🟢 Pronta | ○ Pendente |
+|---|---|---|---|---|---|
+| [WEB-013](#web-013--integrar-preparação-profissional-e-identificação-por-convite): preparação base | [WEB-014](#web-014--validar-instruções-prática-e-início-principal-no-fluxo-real): instruções e prática | [WEB-015](#web-015--ensaiar-envio-falhas-de-rede-e-recuperação-de-recibo): worker e recibo | [WEB-016](#web-016--aceitar-avaliação-completa-com-consulta-persistida): avaliação completa | [WEB-045](#web-045--modelar-e-implementar-fundação-de-cadastros-centrais-de-pacientes-e-avaliadores-e-vínculos-de-preparação): cadastros base | [WEB-046](#web-046--integrar-formulário-completo-de-preparação-da-avaliação-com-seleção-cadastral-e-conferência): formulário completo |
 
 M2 permanece concluído em EV-M2 e EV-M2-007/008. M3 permanece concluído (7/7)
-em EV-M3-012-ACEITE. M6 permanece concluído (4/4) em EV-M6-021/024. M4 encerrado
-(4/4) em EV-M4-013/016; não avançar para M5 sem autorização explícita.
+em EV-M3-012-ACEITE. M6 permanece concluído (4/4) em EV-M6-021/024. M4 encontra-se em
+expansão (4/6) por CHG-005; encerrar `WEB-045` e `WEB-046` em M4 antes de iniciar M5.
 
 **Acompanhar impedimentos:** [riscos](#registro-de-riscos) ·
 [decisões externas](#decisões-externas-e-condições-de-desbloqueio).
@@ -145,7 +139,7 @@ validar que as contagens continuam correspondendo aos estados das tarefas.
 
 Prioridade inicial: WEB-001 → WEB-002/003 → WEB-004. Depois M2 e M3 podem seguir
 em paralelo, e M8 pode preparar pilha isolada. M6 depende de M2 e antecede M4.
-Caminho crítico de integração: M0 → M1 → M2 → M6 → M4 → M5 → M7 → M8(gate final)
+Caminho crítico de integração: M0 → M1 → M2 → M6 → M4 (WEB-013..016 → WEB-045 → WEB-046) → M5 (WEB-017/018/047 → WEB-019 → WEB-020) → M7 (WEB-025 → WEB-026 → WEB-027 → WEB-028) → M8(gate final WEB-032)
 → M9 → M10 (WEB-041 → WEB-037/038/039/040). Ramo temporal M1 → M3 → M4/M9 é igualmente impeditivo; M3 deve ser
 validado cedo. M8 inicia após M1, mas WEB-032 depende de M7. Em M9, WEB-033,
 WEB-034 e WEB-035 são independentes após seus pré-requisitos e convergem em WEB-036.
@@ -1039,76 +1033,110 @@ Falhas intermediárias preservadas nesta sessão:
   Chromium e Firefox).
 
 Conferência de todos os critérios de `WEB-013`, `WEB-014`, `WEB-015`, `WEB-016`
-e do marco `M4`: todos comprovados. `WEB-013`, `WEB-014`, `WEB-015` e `WEB-016`
-passam a `CONCLUIDA`, encerrando **M4 (4/4)** e elevando o progresso global para
-**26/45 (57,8%)**. Com `WEB-016` concluída, `WEB-017` e `WEB-018` em **M5**
-passam a `PRONTA` tecnicamente, aguardando autorização explícita do marco M5.
-Git, envio e CI registrados no fechamento da Retomada vigente.
+e do escopo inicial de `M4`: todos comprovados. `WEB-013`, `WEB-014`, `WEB-015` e `WEB-016`
+passam a `CONCLUIDA` (`EV-M4-013/016`). Com a expansão `CHG-005` (2026-11-07), `M4` recebe `WEB-045` (`PRONTA`) e `WEB-046` (`PENDENTE`) para implementar os cadastros centrais fundamentais de pacientes e avaliadores e o formulário completo de preparação da sessão antes de avançar para `M5`.
+Git, envio e CI registrados no fechamento da Retomada correspondente.
+
+### WEB-045 — Modelar e implementar fundação de cadastros centrais de pacientes e avaliadores e vínculos de preparação
+
+- Marco: M4. Prioridade: P0. Complexidade: G. Estado: PRONTA.
+- Dependências: WEB-016, WEB-024.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Migration aditiva `0014_central_patients_evaluators.sql` (sem reescrever `0001`–`0013`) criando `web_patients`, `web_evaluators`, `web_registry_audit_events` e `web_legacy_entity_links`, além de colunas aditivas `patient_id` e `evaluator_uuid` (`ON DELETE RESTRICT`) em `web_project_participants`, `web_invitations` e `web_assessments`; geração automática e livre de colisão de `id UUID` e códigos estáveis `participant_code` (`PAT-...`) e `evaluator_code` (`EVA-...`); validação de `full_name` (2–120 chars) e `initials` (0–16 chars); busca normalizada e prevenção de duplicidade/homônimos (`409 duplicate_candidate_found` sem `confirm_homonym=true`); separação estrita entre conta local compartilhada de autenticação (`issued_by`) e avaliador responsável (`evaluator_uuid`); proibição de `DELETE` físico pelo runtime (`active=false` para inativação lógica); preservação de registros históricos anteriores a `CHG-005`.
+- Testes/verificação: `PLANEJADO: CAD-01, CAD-02 e CAD-03 em tests/test_web_patients.py, tests/test_web_evaluators.py, tests/test_postgres_migrations.py e tests/test_web_database_provision.py com PostgreSQL descartável stroop_etapa4_test*`.
+- Evidências: PLANEJADAS; nenhuma migration ou código implementado nesta missão documental `CHG-005`. Ao executar, registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R05, R06, R07, R12, R13; revisão formal de `DEC-01` aprovada pelo proprietário em `CHG-005` (`ADR-007`). Uso com pessoas reais permanece bloqueado até `DEC-03`/`WEB-033`.
+- Referências: REQ-PAR-004, REQ-AVA-004, REQ-INF-001, REQ-AUD-001; [ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md), [modelo de dados](dados/MODELO_DE_DADOS.md), [contrato HTTP](desenvolvimento/CONTRATO_API_WEB.md).
+- Git da entrega: branch/commit/push/CI a registrar na execução autorizada.
+
+### WEB-046 — Integrar formulário completo de preparação da avaliação com seleção cadastral e conferência
+
+- Marco: M4. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-045.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Formulário de preparação da avaliação em React e API recuperando integralmente os campos pertinentes do formulário original do PsychoPy Builder (`project`, `participant_id` automático via seleção de paciente, `participant_name`, `initials`, `visit`, `evaluator` via seleção de avaliador responsável e `test_code`); possibilidade de selecionar paciente/avaliador existente com busca e alerta de homônimos ou cadastrar inline sem digitar IDs internos manualmente; pré-preenchimento de dados cadastrados evitando dupla digitação; metadados técnicos (`assessment_id`, `session_id`, `invitation_id`, `assessment_date`, `started_at`, `test_version`, `protocol_id`, `app_version`) mantidos automáticos e não editáveis; etapa explícita de **resumo para conferência** antes de emitir o convite; preservação integral do convite de uso único, sessão de 30 min, prática, interrupção D2, persistência incremental por Dedicated Worker (`ADR-005`), recibo e 12 métricas oficiais, sem expor dados nominais no bootstrap do participante.
+- Testes/verificação: `PLANEJADO: PREP-01 e E2E-FLOW-01 em tests/test_web_sessions.py, Vitest (SessionInvitation.test.tsx) e Playwright HTTPS/API/PG reais em Chromium e Firefox (web/e2e/integrated/invitations.spec.ts e participant.spec.ts)`.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa executado nesta fase documental. Ao executar, registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R03, R05, R12, R13; depende de `WEB-045`.
+- Referências: REQ-AVA-005, REQ-PAR-004, REQ-AVA-004, REQ-AVA-001, REQ-AVA-002; [ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md), [UX](experimento/UX_DECISIONS.md).
+- Git da entrega: branch/commit/push/CI a registrar na execução autorizada.
 
 ## M5 — Interface administrativa e analítica React
 
-- Objetivo: Comprovar capacidades necessárias para dispensar Streamlit na operação final.
-- Justificativa: Já existe UI; auditar paridade evita perder ferramentas úteis.
-- Inclui: Filtros/listas, contas/projetos/vínculos, detalhe, gráficos descritivos e exportação filtrada.
-- Exclui: Relatórios clínicos, novos instrumentos, redesign sem requisito.
-- Pré-requisitos: M4 aceito e autorização profissional revalidada em M6.
+- Objetivo: Comprovar capacidades necessárias para dispensar Streamlit na operação final e consolidar a experiência administrativa completa da plataforma (`CHG-005`).
+- Justificativa: Já existe UI base; expandir para os 8 módulos administrativos, CRUD completo de pacientes e avaliadores, catálogo avançado de filtros e exportação CSV multi-granularidade consolida o sistema como fonte operacional única.
+- Inclui: Arquitetura de informação em 8 módulos (`Visão geral`, `Pacientes`, `Avaliadores`, `Preparar avaliação`, `Avaliações e histórico`, `Resultados e análises`, `Exportações`, `Administração/configurações`), CRUD administrativo completo de pacientes e avaliadores com histórico longitudinal (`WEB-047`), catálogo completo de filtros combinados (`WEB-017`), contas/projetos/vínculos (`WEB-018`), detalhe/visualizações interativas descritivas (`WEB-019`) e exportação CSV avançada multi-granularidade (`WEB-020`).
+- Exclui: Relatórios clínicos/normativos, novos instrumentos cognitivos não aprovados, alteração do motor experimental jsPsych.
+- Pré-requisitos: M4 integralmente aceito (incluindo `WEB-045` e `WEB-046`) e autorização profissional revalidada em M6.
 - Dependências: M4.
-- Entregáveis: Operação profissional reproduzível no React com escopo consistente.
-- Componentes afetados: `web/src/components/, dashboard/, api/assessments.py, administration.py`.
-- Testes necessários: Vitest/DOM e E2E reais; acesso cruzado/último admin/CSV filtrado; acessibilidade básica fora do motor.
-- Critérios de aceite: Todas capacidades incluídas operáveis, sem nomes/iniciais em resultados nem perda de unidades/proveniência.
-- Riscos: R05, R10.
-- Decisões externas: Proprietário revisa lacunas materiais de paridade no M7; não inventar relatórios.
+- Entregáveis: Operação profissional completa reproduzível no React com escopo consistente e UX acessível.
+- Componentes afetados: `web/src/components/, dashboard/, api/patients.py, evaluators.py, assessments.py, administration.py`.
+- Testes necessários: Vitest/DOM e E2E reais em Chromium/Firefox (DASH-01, CAD-02/03, EXP-CSV-01, E2E-FLOW-01); acesso cruzado/último admin/CSV filtrado; acessibilidade WCAG AA fora do motor.
+- Critérios de aceite: Todas as capacidades incluídas operáveis, separação controlada entre identificação desidentificada padrão e dados nominais autorizados, e zero perda de unidades/proveniência.
+- Riscos: R04, R05, R07, R10, R12, R13.
+- Decisões externas: Proprietário revisa cobertura final de substituição operacional no M7 (`WEB-028`); exportação nominal de dados reais sujeita a `DEC-03`.
 - Encerramento: todas as tarefas do marco CONCLUIDAS, critérios acima comprovados e evidência consolidada por SHA; sem aceite presumido por documentação ou código existente.
 
 ### WEB-017 — Revalidar filtros, lista e agregações autorizadas
 
-- Marco: M5. Prioridade: P1. Complexidade: M. Estado: PRONTA.
-- Dependências: WEB-016.
+- Marco: M5. Prioridade: P1. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-046, WEB-024.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: Filtros/paginação/contagens cobrem conjunto coerente; troca de projeto e respostas tardias não vazam dados; UI acessível fora do motor. CHG-002: sessões incompletas e avaliações invalidadas não entram nos conjuntos válidos/agregações, com acesso a parciais separado e autorizado.
-- Testes/verificação: `tests/test_web_assessments.py, web/src/dashboard/analysis.test.ts; Playwright`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Critérios de aceite: Filtros/paginação/contagens cobrem conjunto coerente; troca de projeto e respostas tardias não vazam dados; UI acessível fora do motor. CHG-002: sessões incompletas e avaliações invalidadas não entram nos conjuntos válidos/agregações, com acesso a parciais separado e autorizado. CHG-005: implementar módulo `Visão geral (Dashboard)` (KPIs de pacientes cadastrados, avaliações por período/instrumento/projeto/status/avaliador, evolução temporal e resumos descritivos das métricas oficiais com origem, definição, unidade e tratamento de nulos explícitos) e o catálogo completo de filtros combinados (`REQ-REL-004`: paciente/código/busca textual, avaliador responsável, projeto, instrumento, versão, visita, período, status, condição experimental, tipo de resposta/erro, faixas de precisão e RT, multisseleção, ordenação e tratamento explícito de RT ausente).
+- Testes/verificação: `tests/test_web_assessments.py, web/src/dashboard/analysis.test.ts; Playwright (DASH-01)`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
-- Referências: REQ-REL-001; [arquitetura](ARQUITETURA_WEB.md).
+- Riscos/bloqueios: R04, R05, R13; aguarda conclusão de `WEB-046` em M4.
+- Referências: REQ-REL-001, REQ-REL-004; [arquitetura](ARQUITETURA_WEB.md), [contrato HTTP](desenvolvimento/CONTRATO_API_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
-- CHG-004: Login local em WEB-021 fornece entrada protegida; revalidar 401/403/404, filtros/gráficos e logout/expiração sem redesign ou redução de relatórios (AUTH-L07).
+- CHG-004: Login local em WEB-021 fornece entrada protegida; revalidar 401/403/404, filtros/gráficos e logout/expiração (AUTH-L07).
 
 ### WEB-018 — Revalidar administração React de contas e vínculos
 
-- Marco: M5. Prioridade: P1. Complexidade: M. Estado: PRONTA.
-- Dependências: WEB-016.
+- Marco: M5. Prioridade: P1. Complexidade: M. Estado: PENDENTE.
+- Dependências: WEB-046, WEB-024.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: Permissões e bloqueio/revogação reais; proteção do último admin sob concorrência, sem exclusão de coletas ou herança de acesso a resultados.
+- Critérios de aceite: Permissões e bloqueio/revogação reais; proteção do último admin sob concorrência, sem exclusão de coletas ou herança de acesso a resultados. CHG-005: integrar a área `Administração/configurações` à navegação administrativa de 8 módulos, mantendo explícita na UI e na API a distinção entre a conta local compartilhada de autenticação (`ADR-006`) e o cadastro central de avaliadores responsáveis (`WEB-047`).
 - Testes/verificação: `tests/test_web_administration_provisioned.py; Playwright administrativo`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Riscos/bloqueios: R05, R12; aguarda conclusão de `WEB-046` em M4.
 - Referências: REQ-REL-003; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 - CHG-004: Adequar UI administrativa à conta local única; gestão de vínculos/perfis/bloqueio preservada, sem cadastro público ou oferta de novas contas nesta versão. Contrato antigo de criação OIDC permanece histórico; AUTH-L06/L07 regressa último admin e acesso por projeto.
 
+### WEB-047 — Implementar CRUD administrativo completo de pacientes e avaliadores, histórico longitudinal e correção auditada de vínculos
+
+- Marco: M5. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-046, WEB-017.
+- Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
+- Critérios de aceite: Módulos dedicados `Pacientes` e `Avaliadores` na interface profissional React e endpoints correspondentes: listagens pesquisáveis, filtráveis e paginadas; criação com verificação de duplicidade/homônimos e confirmação consciente; edição cadastral com registro em `web_registry_audit_events`; inativação/reativação lógica (`active`) sem exclusão destrutiva; ficha detalhada do paciente exibindo projetos vinculados, visitas, sessões e histórico longitudinal de avaliações e resultados; ficha detalhada do avaliador exibindo projetos/instrumentos e histórico de avaliações conduzidas; procedimento administrativo auditado para correção de vínculo incorreto de paciente/avaliador sem apagar avaliações; conformidade de design system e acessibilidade (`REQ-UX-012`).
+- Testes/verificação: `PLANEJADO: CAD-02, CAD-03 e DASH-01 em tests/test_web_patients.py, tests/test_web_evaluators.py, Vitest (PatientsPanel.test.tsx, EvaluatorsPanel.test.tsx) e Playwright HTTPS/API/PG reais em Chromium e Firefox`.
+- Evidências: PLANEJADAS; nenhum teste desta tarefa executado nesta fase documental. Ao executar, registrar comando, resultado, data e SHA.
+- Riscos/bloqueios: R05, R06, R07, R12, R13; depende de `WEB-046` e `WEB-017`.
+- Referências: REQ-PAR-005, REQ-PAR-004, REQ-AVA-004, REQ-UX-012, REQ-AUD-001; [ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md), [UX](experimento/UX_DECISIONS.md).
+- Git da entrega: branch/commit/push/CI a registrar na execução autorizada.
+
 ### WEB-019 — Validar detalhe, tentativas, métricas e proveniência
 
-- Marco: M5. Prioridade: P1. Complexidade: M. Estado: PENDENTE.
-- Dependências: WEB-017.
+- Marco: M5. Prioridade: P1. Complexidade: G. Estado: PENDENTE.
+- Dependências: WEB-017, WEB-047.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: Unidades/ausência RT, quatro respostas e versões visíveis; sem nomes/iniciais; gráficos e rótulos descritivos com testes UI/API. CHG-003: revisar somente tokens/componentes compartilhados, teclado/foco/legibilidade, loading/erro e resoluções; dashboard mantém precisão/gráficos autorizados. Não redesenhar integralmente o painel nem ocultar métricas administrativas.
-- Testes/verificação: `tests/test_web_assessments.py, test_web_results.py; Vitest/Playwright`. Arquivos citados existem; verificações PLANEJADAS não têm resultado. Adicional PLANEJADO: componentes Vitest, árvore acessível e Chromium/Firefox; regressão de ResearchVisualizations/ResultsTable/analysis.
+- Critérios de aceite: Unidades/ausência RT, quatro respostas e versões visíveis; gráficos e rótulos descritivos com testes UI/API. CHG-003: revisar tokens/componentes compartilhados, teclado/foco/legibilidade, loading/erro e resoluções; dashboard mantém precisão/gráficos autorizados. CHG-005: consolidar os módulos `Avaliações e histórico` (acompanhamento operacional de convites/sessões, checkpoints `ADR-005` e invalidações) e `Resultados e análises` (`REQ-REL-005`: detalhe completo com vínculos de paciente e avaliador responsável, visualizações interativas de evolução longitudinal do paciente entre visitas/testes, distribuição de RTs, precisão e erros por condição experimental Go/No-Go e congruente/incongruente, projeto, visita e avaliador, sempre com tabelas acessíveis equivalentes e sem normas clínicas).
+- Testes/verificação: `tests/test_web_assessments.py, test_web_results.py; Vitest/Playwright (DASH-01)`. Arquivos citados existem; verificações PLANEJADAS não têm resultado. Adicional PLANEJADO: componentes Vitest, árvore acessível e Chromium/Firefox; regressão de ResearchVisualizations/ResultsTable/analysis.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R04; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
-- Referências: REQ-MET-003, REQ-REL-002; [arquitetura](ARQUITETURA_WEB.md). REQ-UX-006/011.
+- Riscos/bloqueios: R04, R05, R13; depende de `WEB-017` e `WEB-047`.
+- Referências: REQ-MET-003, REQ-REL-002, REQ-REL-005; [arquitetura](ARQUITETURA_WEB.md), [UX](experimento/UX_DECISIONS.md). REQ-UX-006/011/012.
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 
 ### WEB-020 — Conferir exportação do conjunto filtrado no React
 
-- Marco: M5. Prioridade: P1. Complexidade: M. Estado: PENDENTE.
+- Marco: M5. Prioridade: P1. Complexidade: G. Estado: PENDENTE.
 - Dependências: WEB-018, WEB-019.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: CSV individual/agregado coincide com consulta autorizada; revogação pré-download nega; células protegidas; M5 aceito. CHG-003: remoção do HUD não altera CSV individual/agregado nem relatórios e 12 métricas.
-- Testes/verificação: `tests/test_web_export.py, test_web_aggregate_export.py; HTTPS real`. Arquivos citados existem; verificações PLANEJADAS não têm resultado. Adicional PLANEJADO: paridade de exportações/relatórios existentes contra fixtures sintéticas.
+- Critérios de aceite: CSV individual/agregado coincide com consulta autorizada; revogação pré-download nega; células protegidas; M5 aceito. CHG-003: remoção do HUD não altera CSV individual/agregado nem relatórios e 12 métricas. CHG-005: implementar módulo `Exportações` (`REQ-CSV-005`) com exportação CSV do subconjunto filtrado nas granularidades `pacientes`, `avaliacoes`, `tentativas`, `metricas` e `stroop_21_colunas`, seleção de colunas permitidas, pré-visualização com contagem de linhas (`POST /api/v1/exports/preview`), identificação explícita dos critérios aplicados, modo `deidentified` por padrão e modo `nominal` restrito a autorização de perfil e habilitação `DEC-03`, exclusão estrita de sessões parciais/invalidadas e neutralização contra *CSV formula injection*.
+- Testes/verificação: `tests/test_web_export.py, test_web_aggregate_export.py; HTTPS real (EXP-CSV-01)`. Arquivos citados existem; verificações PLANEJADAS não têm resultado. Adicional PLANEJADO: paridade de exportações multi-granularidade contra fixtures sintéticas.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R05; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
-- Referências: REQ-CSV-003; [arquitetura](ARQUITETURA_WEB.md). REQ-UX-006.
+- Riscos/bloqueios: R04, R05, R07, R13; depende de `WEB-018` e `WEB-019`.
+- Referências: REQ-CSV-003, REQ-CSV-005; [arquitetura](ARQUITETURA_WEB.md), [contrato HTTP](desenvolvimento/CONTRATO_API_WEB.md). REQ-UX-006.
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 
 ## M6 — Autenticação, permissões e segurança
@@ -1532,18 +1560,18 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 
 ## M7 — Integração, compatibilidade histórica e transição
 
-- Objetivo: Preparar substituição operacional sem retirar legado nem modificar coletas.
-- Justificativa: Coexistência segura e paridade devem preceder desativação.
-- Inclui: CSV complementar, vínculo explícito legado, matriz de capacidades e plano de transição.
-- Exclui: Remoção de PsychoPy/Streamlit, migração real ou acesso a banco de coleta.
+- Objetivo: Retirar a importação manual de CSV do produto WEB (`CHG-005`), comprovar compatibilidade histórica de exportação e vínculos legados verificáveis, e preparar a substituição operacional sem retirar legado nem modificar coletas.
+- Justificativa: Dados operacionais passam a ser cadastrados e produzidos diretamente na plataforma WEB; CSV permanece exclusivamente como funcionalidade de exportação para o usuário.
+- Inclui: Retirada de `CsvImportPanel` e de rotas de upload CSV do modo produto (`WEB-025`), roundtrip dos CSVs exportados com pipeline/CLIs (`WEB-026`), vínculo explícito legado e associação verificável de registros pseudonimizados anteriores a cadastros centrais (`WEB-027`), e matriz de cobertura operacional (`WEB-028`).
+- Exclui: Remoção física de PsychoPy/Streamlit/CLIs, migração automática por coincidência de nome/código ou acesso a banco de coleta real.
 - Pré-requisitos: M5 e M6 aceitos.
 - Dependências: M5, M6.
-- Entregáveis: Intercâmbio sintético e cobertura funcional revisada pelo proprietário.
-- Componentes afetados: `stroop/ingestion/, api/imports.py, web/src/imports/, CLIs, docs/operacao/`.
-- Testes necessários: Roundtrip, sanitização, idempotência, legado por mapa explícito; CLIs/launchers e consultas preservados.
-- Critérios de aceite: Cobertura necessária comprovada, lacunas resolvidas/explicitamente excluídas com aprovação; sem concessão de acesso por rótulo.
-- Riscos: R06, R08.
-- Decisões externas: Revisão do proprietário da cobertura; retirada física é autorização futura independente.
+- Entregáveis: Produto WEB sem upload CSV de usuário, intercâmbio sintético de exportação e cobertura funcional revisada pelo proprietário.
+- Componentes afetados: `web/src/components/ProfessionalDashboard.tsx, CsvImportPanel.tsx, api/imports.py, stroop/ingestion/, CLIs, docs/operacao/`.
+- Testes necessários: Ausência de upload CSV no modo produto, roundtrip de exportação, legado e associação de entidades por mapa explícito auditado; CLIs/launchers e consultas preservados (EXP-CSV-01).
+- Critérios de aceite: Retirada de importação CSV no produto comprovada, cobertura necessária validada e sem concessão de acesso ou fusão cadastral por coincidência textual.
+- Riscos: R06, R07, R08, R13.
+- Decisões externas: Revisão do proprietário da cobertura (`WEB-028`); retirada física de Streamlit/legado é autorização futura independente.
 - Encerramento: todas as tarefas do marco CONCLUIDAS, critérios acima comprovados e evidência consolidada por SHA; sem aceite presumido por documentação ou código existente.
 
 ### WEB-025 — Revalidar importação minimizada e status idempotente
@@ -1551,11 +1579,11 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 - Marco: M7. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
 - Dependências: WEB-020, WEB-024.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: Arquivo original intacto, minimização em RAM e rejeição server-side de nominal; erros, limites e UUID/estado/duplicata comprovados.
-- Testes/verificação: `tests/test_web_imports.py, web/src/imports/minimize.test.ts; HTTPS real`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Critérios de aceite: CHG-005 (`REQ-CSV-004`): retirar a tela de importação CSV (`CsvImportPanel.tsx`), comandos visíveis de importação no dashboard e bloquear/retirar os endpoints de upload CSV (`POST/GET /api/v1/projects/{project_id}/imports/{operation_id}` retornando `404`/`410`) no modo operacional do produto WEB, garantindo que dados operacionais entrem apenas pelo fluxo de cadastro e execução da plataforma. Preservar isoladamente os módulos internos `stroop/ingestion/` e validadores para compatibilidade técnica/CLI e testes unitários sintéticos, mantendo o escopo histórico documentado.
+- Testes/verificação: `tests/test_web_imports.py; Vitest e Playwright em HTTPS real comprovando ausência de upload CSV na UI e bloqueio no modo produto (EXP-CSV-01)`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R07; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
-- Referências: REQ-CSV-002; [arquitetura](ARQUITETURA_WEB.md).
+- Riscos/bloqueios: R06, R07; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Referências: REQ-CSV-002, REQ-CSV-004; [ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md), [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 
 ### WEB-026 — Comprovar intercâmbio histórico por fixtures sintéticas
@@ -1563,7 +1591,7 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 - Marco: M7. Prioridade: P1. Complexidade: M. Estado: PENDENTE.
 - Dependências: WEB-025.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: CSV 21 campos roundtrip API/CLI, unidades e tentativas main preservados; sem leitura/migração de coletas existentes.
+- Critérios de aceite: CSV 21 campos exportado pela plataforma WEB (`stroop_21_colunas`) e demais granularidades aplicáveis compatíveis em roundtrip com os validadores Python/SQLite e CLIs preservados; unidades e 16 tentativas `main` íntegras; sem depender de upload CSV na interface WEB e sem leitura/migração de coletas existentes.
 - Testes/verificação: `tests/test_csv_unificado.py, test_importar_csv_sqlite.py, test_web_export.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
 - Riscos/bloqueios: R04, R06; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
@@ -1573,13 +1601,13 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 ### WEB-027 — Revalidar vínculo explícito de dados legados
 
 - Marco: M7. Prioridade: P1. Complexidade: M. Estado: PENDENTE.
-- Dependências: WEB-026.
+- Dependências: WEB-026, WEB-047.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: Projeto de rótulo coincidente sem mapa não acessa; mapa autorizado e desativação cobertos; reader somente leitura; sem provisionar mapa real.
-- Testes/verificação: `tests/test_web_assessments.py, test_web_database_provision.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Critérios de aceite: Projeto de rótulo coincidente sem mapa não acessa (`web_legacy_project_links`); mapa autorizado e desativação cobertos; reader somente leitura; sem provisionar mapa real. CHG-005: validar procedimento autorizado, verificável e auditado (`web_legacy_entity_links` e `web_registry_audit_events`) para associar registros pseudonimizados anteriores (`web_project_participants` / `evaluator` textual histórico) aos cadastros centrais `web_patients` e `web_evaluators`, proibindo reconciliação ou fusão automática por coincidência de nome ou código.
+- Testes/verificação: `tests/test_web_assessments.py, test_web_database_provision.py; PLANEJADO: testes de associação explícita de entidades legadas (EXP-CSV-01/CAD-02)`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R06; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
-- Referências: REQ-AUD-002; [arquitetura](ARQUITETURA_WEB.md).
+- Riscos/bloqueios: R06, R13; depende de `WEB-026` e `WEB-047`.
+- Referências: REQ-AUD-002, REQ-PAR-005; [ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md), [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 
 ### WEB-028 — Revisar cobertura e plano de substituição operacional
@@ -1587,13 +1615,14 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 - Marco: M7. Prioridade: P1. Complexidade: G. Estado: PENDENTE.
 - Dependências: WEB-027.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: Matriz Streamlit/React com capacidades requeridas testadas, lacunas tratadas e proprietário aprova transição; legado permanece, sem remoção; M7 aceito.
-- Testes/verificação: `PLANEJADO: revisão de cobertura e regressão CLIs/launchers`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
+- Critérios de aceite: Matriz Streamlit/React com capacidades requeridas testadas, incluindo o fluxo completo `CHG-005` (cadastros centrais de pacientes e avaliadores, preparação completa sem digitação manual de IDs, execução, dashboard/filtros/visualizações, exportação CSV multi-granularidade e ausência de importação CSV no produto), lacunas tratadas e proprietário aprova transição; Streamlit e CLIs legados permanecem preservados sem remoção física; M7 aceito.
+- Testes/verificação: `PLANEJADO: revisão de cobertura, E2E-FLOW-01 e regressão CLIs/launchers`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
 - Riscos/bloqueios: R08, R10; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
-- Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
+- Referências: requisitos transversais do marco, ADR-004 e ADR-007; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 - CHG-004: Paridade deve comparar capacidades autorizadas Streamlit/React, incluindo login local, logout/sessões e limitação de autoria individual (AUTH-L07). Aprovação do proprietário continua necessária; nenhuma remoção Streamlit autorizada.
+- CHG-005: Comprovar que a plataforma WEB substitui controles externos de cadastro e upload CSV, mantendo CSV exclusivamente como exportação.
 
 ## M8 — CI, infraestrutura e preparação operacional
 
@@ -1649,6 +1678,7 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 - Referências: REQ-INF-003; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega parcial: branch `test/m6-m8-validacao-isolada`; commit/envio/CI no fechamento desta sessão.
 - CHG-004: Réplica externa independente continua obrigatória; após evolução de schema local, WEB-032 revalida restauração de hashes/sessões com custódia e invalidação de sessões restauradas para não ressuscitar acessos. RPO/RTO externo requer medição e aceite, não conta Google.
+- CHG-005: Como o backup PostgreSQL passará a incluir tabelas cadastrais nominais (`web_patients` e `web_evaluators` da migration `0014`), o ensaio de restauração e réplica criptografada deve comprovar integridade dos cadastros, vínculos e trilhas de auditoria sem expor nomes em logs operacionais.
 
 ### WEB-032 — Fechar release candidata e runbooks reproduzíveis
 
@@ -1662,6 +1692,7 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 - CHG-004: Candidata deve incluir WEB-024 local aceita, AUTH-L08/L09, manifesto/schema/locks novos, runbooks sem cliente Google obrigatório, provisionamento/recuperação e invalidação de sessões no restore/rollback. Réplica externa WEB-031 e M7 continuam impeditivos; nenhuma publicação.
+- CHG-005: Candidata deve incluir schema aditivo `0014`, suítes `CAD-01..03`, `PREP-01`, `DASH-01`, `EXP-CSV-01` e `E2E-FLOW-01` verdes no pipeline por SHA, e smoke Compose atualizado para o fluxo com cadastro central de pacientes/avaliadores e sem upload CSV de produto.
 
 ### EV-M8-029/031 — imagens e recuperação isoladas, 2026-11-06
 
@@ -1812,7 +1843,7 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Componentes afetados: `docs/VALIDACAO_WEB.md, homologação, segurança, protocolo e gates existentes`.
 - Testes necessários: Campanha de engenharia e física conforme DEC-04; paridade matemática, dados e limites de capacidade; sem dados reais implícitos.
 - Critérios de aceite: Falhas resolvidas ou escopo de suporte explicitamente reduzido com aprovação; nenhuma alegação além das evidências; prontidão real decidida.
-- Riscos: R01, R02, R07.
+- Riscos: R01, R02, R07, R12, R13.
 - Decisões externas: DEC-03/04 para prontidão; DEC-05 é autorização posterior a M9; se estudo científico necessário, planejar protocolo separado e não fabricar resultados.
 - Encerramento: todas as tarefas do marco CONCLUIDAS, critérios acima comprovados e evidência consolidada por SHA; sem aceite presumido por documentação ou código existente.
 
@@ -1824,10 +1855,11 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Critérios de aceite: Responsável registra política, finalidades, minimização/retenção, informação aplicável, responsabilidades e eventual autorização institucional; sem inferir consentimento legal.
 - Testes/verificação: `PLANEJADO: revisão institucional/documental DEC-03`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R07; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Riscos/bloqueios: R07, R12, R13; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: REQ-SEG-002; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 - CHG-004: DEC-03 deve avaliar expressamente uso compartilhado, ausência de atribuição individual, custódia/distribuição/troca na saída de profissional e adequação a dados reais; rejeição exige contas individuais em mudança futura antes do uso, sem aprovação presumida. REQ-AUT-006, R07/R12; evidência institucional ainda ausente.
+- CHG-005: Com a revisão de `DEC-01` ([ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md)), `DEC-03` e `WEB-033` devem aprovar formalmente a base legal/institucional para coleta e armazenamento de nome completo (`participant_name`) e iniciais no cadastro central de pacientes e avaliadores, critérios de confirmação diante de homônimos, regras de exportação nominal vs. desidentificada e política de inativação lógica/retenção antes de qualquer uso real.
 
 ### WEB-034 — Executar validação temporal e metodológica aprovada
 
@@ -1854,6 +1886,7 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 - CHG-004: Homologar candidata local por SHA: AUTH-L01–L09, segurança/privacidade, provisão sintética e recuperação; nenhum resultado OIDC histórico aprova login local ou ambiente VPS.
+- CHG-005: Homologar o fluxo completo `E2E-FLOW-01` (login → dashboard → pacientes/avaliadores → preparar avaliação → executar teste → armazenar resultado → consultar, analisar e exportar CSV) e concorrência na criação de cadastros/convites no ambiente autorizado.
 
 ### WEB-036 — Obter aceite técnico e decisão explícita de liberação
 
@@ -1863,10 +1896,11 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Critérios de aceite: Responsável aceita prontidão técnica/metodológica e limites de suporte após 033/034/035; não concede deploy/coleta real. Barreira synthetic preservada; pedido concreto de DEC-05 pode ser preparado depois de M9.
 - Testes/verificação: `PLANEJADO: ata de aceite por responsável e revisão das barreiras de operação`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R01, R07; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Riscos/bloqueios: R01, R07, R12, R13; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: REQ-SEG-003; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 - CHG-004: Aceite técnico inclui riscos residuais R05/R07/R12 e decisão de adequação de conta compartilhada em WEB-033; DEC-05, deploy e coleta permanecem separados.
+- CHG-005: Inclui revisão dos riscos R13 (homônimos e proteção de cadastros nominais) e confirmação das barreiras contra exportação nominal não autorizada antes de `DEC-05`.
 
 ## M10 — Implantação controlada e documentação operacional
 
@@ -1880,7 +1914,7 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Componentes afetados: `Runbooks, release, infraestrutura autorizada e documentação de operação`.
 - Testes necessários: Smoke pós-publicação sem dados reais, ensaio isolado de restauração/rollback e aceite operacional.
 - Critérios de aceite: Release íntegra, riscos/limites conhecidos, runbooks e custódia entregues; uso real só se DEC-05 autorizado.
-- Riscos: R07, R08, R09.
+- Riscos: R07, R08, R09, R12, R13.
 - Decisões externas: Autorização de deploy somente antes de WEB-038, após plano concreto; credenciais/recursos; integração main se desejada exige autorização separada; coleta e retirada legado independentes.
 - Encerramento: todas as tarefas do marco CONCLUIDAS, critérios acima comprovados e evidência consolidada por SHA; sem aceite presumido por documentação ou código existente.
 
@@ -1896,6 +1930,7 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 - CHG-004: Plano concreto identifica provisionamento local protegido, custódia, rotação/revogação, schema compatível e rollback sem reabrir OIDC/sessões antigas; nenhum segredo no manifesto.
+- CHG-005: Plano identifica aplicação controlada da migration aditiva `0014` (`web_patients`, `web_evaluators`, `web_registry_audit_events`, `web_legacy_entity_links`) e proteção de backups contendo cadastros nominais.
 
 ### WEB-038 — Executar implantação controlada autorizada e smoke
 
@@ -1909,6 +1944,7 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 - CHG-004: Somente após autorização específica: provisionar/verificar conta local no ambiente alvo por procedimento protegido, smoke HTTPS/login/logout/negações, sem publicar senha/segredos; deploy não autoriza coleta.
+- CHG-005: Smoke pós-deploy exercita exclusivamente registros sintéticos de paciente/avaliador (inativados após o ensaio), confirma ausência de upload CSV de usuário e verifica exportação desidentificada padrão.
 
 ### WEB-039 — Confirmar recuperação e handoff operacional
 
@@ -1922,6 +1958,7 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 - CHG-004: Handoff inclui recuperação administrativa, rotação na alteração da equipe, revogação de todas as sessões e restore sem ressuscitar acesso; demonstrar custódia e recuperação externa/RPO/RTO.
+- CHG-005: Handoff operacional inclui procedimentos de inativação lógica de pacientes/avaliadores, correção auditada de vínculos e custódia de exportações nominais autorizadas.
 
 ### WEB-040 — Encerrar transição com aceite do proprietário
 
@@ -1931,7 +1968,7 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Critérios de aceite: Aceite final identifica limites, suporte, política de uso e incidentes; legado preservado salvo autorização específica; liberação real, se concedida, rastreada e verificada; M10 aceito.
 - Testes/verificação: `PLANEJADO: aceite operacional e revisão final de rastreabilidade`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R07, R10; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
+- Riscos/bloqueios: R07, R10, R12, R13; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
 - Referências: requisitos transversais do marco e ADR-004; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 - CHG-004: Aceite operacional explicita conta compartilhada, limites de auditoria e política institucional; transição, uso real e eventual retirada Streamlit exigem aprovações próprias.
@@ -1941,18 +1978,19 @@ Chromium 156.0.8078.4 e Firefox 157.0, locks exatos sem upgrade.
 - Marco: M10. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
 - Dependências: WEB-036, DEC-03 e autorização DEC-05 específica para a implementação/configuração de pesquisa; nenhuma ação sobre dados reais por implicação.
 - Responsável: Codex no código e testes; proprietário/instituição nas regras e autorização; operador na ativação real separada.
-- Critérios de aceite: especificar e implementar o contrato já previsto em seguranca/ACESSO_WEB.md para modo research, aviso versionado, elegibilidade/informação aplicáveis, confirmação datada por responsável e habilitação administrativa explícita por projeto. Default continua synthetic; ausência/incompletude/revogação da configuração bloqueia emissão/resgate research. Não alterar D1–D6, métricas nem acrescentar coleta nominal. Qualquer schema novo é aditivo e testado apenas em banco sintético. Revalidar autorização, integração e critérios M9 afetados na nova SHA candidata antes de WEB-037; registrar se requisito metodológico novo exigir replanejamento em vez de implementar por inferência.
+- Critérios de aceite: especificar e implementar o contrato já previsto em seguranca/ACESSO_WEB.md para modo research, aviso versionado, elegibilidade/informação aplicáveis, confirmação datada por responsável e habilitação administrativa explícita por projeto. Default continua synthetic; ausência/incompletude/revogação da configuração bloqueia emissão/resgate research. Não alterar D1–D6 nem métricas. Qualquer schema novo é aditivo e testado apenas em banco sintético. Revalidar autorização, integração e critérios M9 afetados na nova SHA candidata antes de WEB-037; registrar se requisito metodológico novo exigir replanejamento em vez de implementar por inferência.
 - Testes/verificação: PLANEJADOS, novos testes de configuração completa/incompleta, modos, papéis, revisão/retirada da habilitação e aviso no fluxo real com participantes inequivocamente sintéticos; regressão Python/PG, frontend e HTTPS real. Arquivos/testes novos só serão nomeados quando implementados.
 - Evidências: PLANEJADAS; nenhuma configuração/código de coleta real implementado nesta sessão.
-- Riscos/bloqueios: R05/R07; sem DEC-03/05 permanece PENDENTE/BLOQUEADA conforme impedimento observado. Não há tarefa independente que permita declarar operação real concluída sem esta entrega.
+- Riscos/bloqueios: R05/R07/R12/R13; sem DEC-03/05 permanece PENDENTE/BLOQUEADA conforme impedimento observado. Não há tarefa independente que permita declarar operação real concluída sem esta entrega.
 - Referências: REQ-SEG-003, REQ-SEG-002, REQ-PAR-003, REQ-AVA-001; ARQUITETURA_WEB e seguranca/ACESSO_WEB.md.
 - Git: branch/commit/push/CI a registrar na execução autorizada; não habilitar produção por commit ou teste.
 - CHG-004: Configuração research exige DEC-03/05, política de conta local e privilégios/vínculos explícitos, proteção de credenciais e autoria limitada; testar barreiras com conta sintética antes da ativação real separada.
+- CHG-005: A habilitação `research` controla também a permissão para exportação CSV em modo `nominal` (`identification_mode = "nominal"`), mantendo bloqueada a exportação nominal enquanto o projeto estiver em `synthetic` ou sem `DEC-03` configurada.
 
 ## Registro de riscos
 
 Probabilidade qualitativa é hipótese de planejamento, não estatística. Severidade
-considera integridade, validade e continuidade. R01–R10 ABERTOS desde 2026-11-04; R11 registrado em 2026-11-05. A presença
+considera integridade, validade e continuidade. R01–R10 ABERTOS desde 2026-11-04; R11 registrado em 2026-11-05; R12 em 2026-11-06; R13 em 2026-11-07. A presença
 de mitigação no código não elimina risco sem ensaio. Atualizar somente aqui.
 
 | ID | Descrição e causa | Impacto | Probabilidade | Severidade | Mitigação e evidência exigida | Marco | Responsável | Estado |
@@ -1961,19 +1999,20 @@ de mitigação no código não elimina risco sem ensaio. Atualizar somente aqui.
 | R02 | Confundir PsychoPy, variante WEB e aceites históricos | Conclusões científicas indevidas | Alta | Crítica | D1–D6 e versões separadas, preservar falhas W16, validação metodológica distinta; identificar apresentação antes/depois e variante aprovada frente a D3/D4 | M2/M3/M9 | Metodológico | ABERTO |
 | R03 | RAM até envio final, falha/reload/expiração e corrida de commit | Perda ou duplicação de tentativas/resultados | Alta | Crítica | CHG-002/ADR-005; validar estratégia incremental e matriz antes de código; ensaiar ACK/replay, perda do sufixo e corridas; final-only rejeitado | M2/M4 | Backend + produto | ABERTO |
 | R04 | Diferenças de sentinela RT, unidade, mediana/arredondamento entre consumidores | Regressão nos cálculos/análises | Média | Alta | Golden fixtures sintéticas e paridade núcleo/API/CSV/UI, sem mudança silenciosa | M1/M2/M5 | Técnico | ABERTO |
-| R05 | Substituir OIDC por senha local ou alterar perfis/vínculos sem revalidar negações | Acesso cruzado, sessão indevida, perda de administração | Média | Crítica | WEB-021/024: Argon2id, antiabuso, login local HTTPS/API/PG real, CSRF/Origin/IDOR, inatividade/teto, rotação/revogação, último admin, reader/writer; evidências futuras AUTH-L01–L09 | M6/M4/M5 | Segurança/técnico | ABERTO |
-| R06 | Novo schema ou rótulo de projeto apropria/muda histórico | Corrupção ou acesso a coletas | Média | Crítica | Aditividade, mapa explícito, fixtures, nenhum dado real sem autorização | M2/M7 | Backend + proprietário | ABERTO |
-| R07 | Pseudônimo tratado como anônimo; coleta/liberação sem política institucional | Exposição de pessoas e uso indevido | Média | Crítica | DEC-03/05, minimização e barreira synthetic, sem nomes/logs, revisão institucional incluindo adequação da conta compartilhada e R12 | M6/M9/M10 | Proprietário/instituição | ABERTO |
+| R05 | Substituir OIDC por senha local ou alterar perfis/vínculos/cadastros sem revalidar negações | Acesso cruzado a pacientes, avaliações ou exportações nominais, sessão indevida, perda de administração | Média | Crítica | WEB-021/024 aceitas; CHG-005 exige revalidar escopo por projeto em `/api/v1/patients`, `/api/v1/evaluators` e `/api/v1/exports/*` (CAD-02/03, EXP-CSV-01) | M6/M4/M5 | Segurança/técnico | ABERTO |
+| R06 | Novo schema, rótulo de projeto ou associação de legado apropria/muda histórico | Corrupção de coletas ou fusão indevida de participantes legados | Média | Crítica | Migration 0014 aditiva (`ON DELETE RESTRICT`), `web_legacy_project_links` e `web_legacy_entity_links` explícitos e auditados sem fusão automática por coincidência de nome/código (`WEB-045`/`WEB-027`) | M2/M4/M7 | Backend + proprietário | ABERTO |
+| R07 | Armazenamento de nomes completos de pacientes/avaliadores e coleta/exportação sem política institucional | Exposição de dados pessoais nominais (LGPD) e uso indevido | Alta | Crítica | Segregação física entre `web_patients`/`web_evaluators` e `assessments`, exportação `deidentified` por padrão, `nominal` restrito a autorização e `DEC-03`/`DEC-05` (`WEB-045`/`020`/`033`/`041`), zero dados nominais em logs/URLs/bootstrap participante | M4/M5/M9/M10 | Proprietário/instituição | ABERTO |
 | R08 | Publicação interrompe aplicação; backup não restaurável/retorno incompatível | Indisponibilidade/perda | Média | Crítica | Ensaio isolado schema/dados/imagens, réplica/agenda/alerta, deploy autorizado e retorno | M7/M8/M10 | Operador/proprietário | ABERTO |
 | R09 | Dependências de VPS/DNS/TLS/provisionamento local/chaves/destino externo ou CI sem PR | Bloqueio de homologação/recuperação e falsa prontidão | Média | Alta | Preparar local independente; inventário de recursos e validação por SHA, sem mudar proteção para contornar bloqueio | M1/M8/M10 | Operador + técnico | ABERTO |
 | R10 | Reescrever o que existe, ampliar instrumentos e manter backlogs concorrentes | Retrabalho e escopo sem controle | Alta | Alta | Auditoria, backlog único, critérios pequenos, IDs e controle de mudança; sem crédito histórico automático | Todos | Coordenador técnico | ABERTO |
-
 | R11 | Contorno/retirada da caixa e precisão, HUD e diferenças de renderização alteram percepção/saliência/atenção | Versões experimentais incompatíveis e evidência anterior insuficiente | Média | Alta | Aprovação visual D3/D4 pelo proprietário registrada; conferir dez cores/screenshots sintéticos Chromium/Firefox, versão/SHA distinta, WEB-044/011 e revisão WEB-034 com DEC-04. Não inferir melhoria de desempenho/validade pela redução de informação potencialmente distrativa | M3/M4/M9 | Técnico + metodológico | ABERTO |
-| R12 | Conta administrativa compartilhada: vazamento/reuso da senha, saída de integrante e autoria indistinguível | Sem atribuição individual, revogação por pessoa impossível, possível inadequação institucional para dados reais | Alta | Crítica | Proprietário/operador: custódia protegida, senha exclusiva, troca na alteração da equipe e revogação global; WEB-021/024/033/039 demonstram controles e decisão DEC-03. Hash/HTTPS não eliminam risco; contas individuais futuras exigem novo escopo | M6/M9/M10 | Proprietário + segurança + instituição | ABERTO |
+| R12 | Conta administrativa compartilhada: vazamento/reuso da senha, saída de integrante e autoria técnica indistinguível da identificação declarada do avaliador | Sem atribuição individual por credencial, revogação por pessoa impossível, seleção de `evaluator_id` depende de declaração operacional | Alta | Crítica | Proprietário/operador: custódia protegida, senha exclusiva, troca na alteração da equipe e revogação global; `CHG-005` separa `issued_by` (conta autenticada) de `evaluator_uuid` (avaliador responsável cadastrado em `web_evaluators`); adequação institucional avaliada em `DEC-03`/`WEB-033` | M6/M4/M5/M9/M10 | Proprietário + segurança + instituição | ABERTO |
+| R13 | Homônimos, duplicidade de cadastro por concorrência ou erro humano de vinculação paciente/avaliador sem documento civil no formulário original | Criação duplicada do mesmo paciente ou associação de sessão à pessoa errada | Média | Alta | Busca prévia obrigatória por `normalized_name`/iniciais/código, bloqueio `409 duplicate_candidate_found` exigindo `confirm_homonym=true`, etapa de resumo/conferência antes do convite (`WEB-046`), inativação lógica sem exclusão destrutiva e revinculação administrativa auditada (`WEB-047`) | M4/M5/M7/M9 | Produto + técnico + metodológico | ABERTO |
 
 Risco mais importante: R01, com R02 como limite de interpretação. R03 é o
-principal risco de integridade do fluxo atual: DEC-02 foi aprovada; integração
-real da captura e tratamento de perda no produto permanecem gates M4.
+principal risco de integridade do fluxo experimental; R07, R12 e R13 concentram
+a governança de dados nominais, homônimos e conta compartilhada introduzida por
+`CHG-004` e `CHG-005`.
 
 ## Decisões externas e condições de desbloqueio
 
@@ -1983,9 +2022,9 @@ versão experimental. Somente bloquear tarefa dependente, sem paralisar document
 
 | ID | Questão / hipótese preservada | Responsável | Condição objetiva / impacto | Tarefas relacionadas | Estado |
 |---|---|---|---|---|---|
-| DEC-01 | Participante pseudonimizado por projeto, múltiplas visitas/avaliações e preparação por convite; sem cadastro central ou agenda separada nesta versão | Proprietário; decisão explícita em 2026-11-05 | APROVADA a direção; vínculos estáveis e evolução aditiva no modelo. Contratos/receptor/atomicidade aceitos em EV-M2/EV-M2-007/008; integração do participante permanece M4. Retenção institucional continua DEC-03 | WEB-005/006/007/013 | APROVADA |
-| DEC-02 | Final-only rejeitado; persistência incremental com recibo/idempotência e preservação de incompletas/ inválidas, sem retomada; nova sessão com prática | Proprietário + metodológico; diretriz e validação explícitas em 2026-11-05 | Resposta “valido” à proposta `270377b` aprova ADR-005, contrato alvo, matriz D2/D5 e perda residual; gate documental WEB-005 satisfeito. Receptor aceito em M2 e worker/campanha local em EV-M3-011; integração real do produto permanece M4 | WEB-005/006/007/011/012/015 | APROVADA |
-| DEC-03 | Regras institucionais de informação, consentimento aplicável, retenção e incidentes | Proprietário/instituição | Documento aprovado e responsabilidades/canal definidos; nenhuma base legal inventada pelo Codex | WEB-033/036 | PENDENTE |
+| DEC-01 | Histórico (2026-11-05): participante pseudonimizado por projeto sem cadastro central. **Revisão formal CHG-005 (2026-11-07, ADR-007):** cadastro central de pacientes (`web_patients`) e avaliadores (`web_evaluators`) com IDs e códigos gerados automaticamente, nome completo e iniciais do formulário original do PsychoPy, reutilização entre projetos/visitas/instrumentos e separação entre tabela nominal e resultados científicos | Proprietário; decisão inicial em 2026-11-05 e revisão formal em 2026-11-07 (`CHG-005`) | APROVADA a revisão formal ([ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md)). Aceites históricos `WEB-005`/`006`/`007`/`013` preservados. Expansão aditiva autorizada para especificação e implementação sintética em `WEB-045`, `WEB-046`, `WEB-047` e `WEB-027`. Caso o estudo exija atributo adicional de desambiguação civil além de nome/iniciais/código/histórico, definir em `DEC-03` antes de coleta real | WEB-005/006/007/013/045/046/047/027 | APROVADA |
+| DEC-02 | Final-only rejeitado; persistência incremental com recibo/idempotência e preservação de incompletas/ inválidas, sem retomada; nova sessão com prática | Proprietário + metodológico; diretriz e validação explícitas em 2026-11-05 | Resposta “valido” à proposta `270377b` aprova ADR-005, contrato alvo, matriz D2/D5 e perda residual; gate documental WEB-005 satisfeito. Receptor aceito em M2, worker/campanha local em EV-M3-011 e integração real aceita em EV-M4-013/016 | WEB-005/006/007/011/012/015 | APROVADA |
+| DEC-03 | Regras institucionais de informação, consentimento aplicável, base legal para dados nominais de pacientes/avaliadores (`CHG-005`), exportação nominal, conta compartilhada (`R12`), retenção e incidentes | Proprietário/instituição | Documento aprovado e responsabilidades/canal definidos antes de habilitar projetos `research` (`WEB-033`/`WEB-041`); nenhuma base legal ou regra de identificação civil inventada pelo Codex | WEB-033/036/041 | PENDENTE |
 | DEC-04 | Matriz local e alcance de engenharia; validação física/metodológica permanece gate M9 | Proprietário/responsável metodológico; aprovação explícita em 2026-11-05 | Resposta “eu aprovo esse alcance para DEC-04” aprova proposta de dez sessões sintéticas por ambiente local Chromium/Firefox visíveis, layout final e transporte/falhas ativos. Equipamento observado em EV-M3-011; D1/D5 intactos. Não aprova suporte por antecipação nem validação física/metodológica WEB-034 | WEB-011/012/034 | APROVADA |
 | DEC-05 | Após prontidão M9, autorizar separadamente configuração research, deploy e eventual uso real | Proprietário + metodológico/operador | WEB-036 comprovada; registrar autorização específica antes de WEB-041 e, para produção/uso, de WEB-038/040; mudanças da candidata passam revalidação dos gates afetados; não retirar synthetic apenas por aprovação técnica | WEB-041/038/040 | PENDENTE |
 
@@ -2268,9 +2307,52 @@ PG/React/build/Playwright, scanners e Actions **não executados nesta missão**;
 nenhum ensaio OIDC/local, serviço remoto, PR/merge/deploy ou coleta. Testes futuros
 explicitamente PLANEJADOS. Versionamento/envio conferidos no fechamento Git.
 
+### CHG-005 — Replanejamento funcional e UX: cadastros centrais de pacientes e avaliadores, preparação completa, exportação CSV avançada e retirada de upload CSV
+
+- Data: `2026-11-07`.
+- Origem: solicitação explícita do responsável pelo repositório para incorporar o novo fluxo profissional (`Login da equipe → Dashboard → Pacientes/Avaliadores → Preparar avaliação → Executar teste → Armazenar resultados → Consultar, analisar e exportar`), cadastros centralizados de pacientes e avaliadores com IDs automáticos (`PAT-...`/`EVA-...`) e nome completo, formulário completo de preparação da sessão alinhado ao PsychoPy Builder (`stroop_go_nogo_ptbr.psyexp`), revisão formal de `DEC-01` (`ADR-007`), retirada de importação CSV do produto (`REQ-CSV-004`), exportação CSV avançada multi-granularidade (`REQ-CSV-005`) e reformulação modular e acessível da interface administrativa (`REQ-REL-004/005`, `REQ-UX-012`), em escopo exclusivamente documental.
+- Racional: concentrar na plataforma WEB o cadastro reutilizável de pacientes e avaliadores entre múltiplos testes, projetos e visitas, eliminando digitação manual de IDs internos e upload operacional de CSV pelo usuário, ampliando a capacidade analítica e de exportação multi-granularidade sem alterar o motor experimental jsPsych (`WEB-042/043/044`).
+- Requisitos impactados: revisão de `REQ-PAR-001`..`003`, `REQ-AVA-001`..`003`, `REQ-REL-001`..`003`, `REQ-CSV-001`..`003`, `REQ-AUD-001`..`002`, `REQ-SEG-002`..`003`; criação de nove novos requisitos sequenciais (`REQ-PAR-004`, `REQ-PAR-005`, `REQ-AVA-004`, `REQ-AVA-005`, `REQ-REL-004`, `REQ-REL-005`, `REQ-CSV-004`, `REQ-CSV-005`, `REQ-UX-012`), totalizando `59` requisitos na matriz de rastreabilidade.
+- Tarefas impactadas: criação de `WEB-045` (`PRONTA`, backend/schema de cadastros centrais em `M4`), `WEB-046` (`PENDENTE`, formulário completo de preparação em `M4`) e `WEB-047` (`PENDENTE`, UI React de cadastros e reformulação de oito módulos em `M5`); atualização de `WEB-017`..`WEB-020` (`M5`), `WEB-025`..`WEB-028` (`M7`), `WEB-031`..`WEB-032` (`M8`), `WEB-033`..`WEB-036` (`M9`) e `WEB-037`..`WEB-041` (`M10`). Os `26` entregáveis já `CONCLUIDA` (`M0`, `M1`, `M2`, `M3`, `WEB-013`..`016` em `M4` e `M6`) preservam integralmente seus aceites e evidências históricas (`54,2%`, `26/48`).
+- Decisões e riscos impactados: revisão formal de `DEC-01` (substituída por `ADR-007` com preservação do texto histórico), atualização de `DEC-03` (conta local compartilhada + proteção de dados nominais e exportação `deidentified` vs. `nominal`), atualização de `R05`, `R06`, `R07`, `R12` e inclusão de `R13` (exposição nominal, homônimos e exclusão indevida nos cadastros centrais).
+- Documentos sincronizados: [Projeto Stroop Test.md](Projeto%20Stroop%20Test.md), [REQUISITOS_E_RASTREABILIDADE.md](REQUISITOS_E_RASTREABILIDADE.md), [ARQUITETURA_WEB.md](ARQUITETURA_WEB.md), [ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md), [MODELO_DE_DADOS.md](dados/MODELO_DE_DADOS.md), [CONTRATO_API_WEB.md](desenvolvimento/CONTRATO_API_WEB.md), [UX_DECISIONS.md](experimento/UX_DECISIONS.md), [ACESSO_WEB.md](seguranca/ACESSO_WEB.md), [TRATAMENTO_DE_DADOS.md](seguranca/TRATAMENTO_DE_DADOS.md) e [VALIDACAO_WEB.md](VALIDACAO_WEB.md).
+
+### EV-CHG-005 — auditoria de cobertura, correspondência PsychoPy e validação documental, 2026-11-07
+
+#### Matriz compacta de auditoria de cobertura pré-replanejamento
+
+| Requisito da solicitação (`CHG-005`) | Classificação | Evidência auditada no código e docs | Lacuna identificada | Marco / Tarefa | Ação documental executada |
+| --- | --- | --- | --- | --- | --- |
+| **3.1. Autenticação por conta local compartilhada (`username` + `password`) sem Google OIDC** | `IMPLEMENTADO E VALIDADO` | `ADR-006`, `CHG-004`, `WEB-021`/`022`/`023`/`024` (`CONCLUIDA` em `EV-M6-021/024`, commit `7e77ef8`), `web/backend/auth.py`, `LoginForm.tsx` | Identificação do avaliador na sessão ainda era texto livre sem vínculo a cadastro central (`web_evaluators`); governança `DEC-03` segue pendente para dados reais | `M6` (`WEB-021`..`024` mantidas `CONCLUIDA`), `M4` (`WEB-045`/`046`), `M9` (`WEB-033`) | Reutilizados requisitos/aceites de `CHG-004`; documentada separação entre conta local compartilhada e `evaluator_id` cadastrado (`R12`, `DEC-03`, `ACESSO_WEB.md`) |
+| **4. Cadastro centralizado de pacientes (CRUD, UUID + `PAT-...`, nome completo, reutilização entre projetos/visitas/instrumentos, homônimos e inativação lógica)** | `INCOMPATÍVEL COM DECISÃO ANTERIOR` / `NÃO PREVISTO` | `DEC-01` anterior vedava nome civil e cadastro global; `web/backend/db.py` (`web_participants`) armazenava apenas `(project_id, participant_code)` sem tabela nominal central nem endpoints `/patients` | Inexistência de tabela `web_patients`, detecção de homônimos (`409 duplicate_candidate_found`), auditoria de edição (`web_registry_audit_events`), bloqueio `ON DELETE RESTRICT` e UI CRUD | `M4` (`WEB-045`, `WEB-046`), `M5` (`WEB-047`), `M7` (`WEB-027`, `WEB-028`) | Revisada formalmente `DEC-01` via `ADR-007`; criados `REQ-PAR-004`/`005`, `WEB-045` (`PRONTA`) e `WEB-047`; especificados schema em `MODELO_DE_DADOS.md` e endpoints `/api/v1/patients` em `CONTRATO_API_WEB.md` |
+| **5. Cadastro centralizado de avaliadores (CRUD, UUID + `EVA-...`, nome completo, histórico, sem login individual automático)** | `NÃO PREVISTO` | Em `InvitationCreateRequest` (`web/backend/schemas.py`) e `assessments`, `evaluator` era string livre (`1..64` chars), sem tabela `web_evaluators` nem CRUD dedicado | Inexistência de cadastro reutilizável de avaliadores, código estável `EVA-...`, vínculo `evaluator_id` e tela administrativa de avaliadores | `M4` (`WEB-045`, `WEB-046`), `M5` (`WEB-047`) | Criados `REQ-AVA-004`, `WEB-045` e `WEB-047`; especificados `web_evaluators` em `MODELO_DE_DADOS.md` e `/api/v1/evaluators` em `CONTRATO_API_WEB.md` |
+| **6. Formulário completo de preparação da sessão alinhado ao PsychoPy Builder (`project`, paciente, `initials`, `visit`, avaliador, `instrument_code`, resumo pré-emissão)** | `PARCIALMENTE IMPLEMENTADO` | `InvitationPreparationPanel.tsx` e `POST /api/v1/projects/{project_id}/invitations` (`WEB-013`/`016`) já exigiam `participant_id`, `initials`, `visit`, `evaluator` e `instrument_code`, porém com digitação manual a cada teste | Exigia digitação manual de `participant_id` e `evaluator`, sem seleção/cadastro inline de paciente/avaliador, sem auto-preenchimento e sem etapa explícita de resumo pré-emissão | `M4` (`WEB-046`) | Produzida tabela de correspondência com `stroop_go_nogo_ptbr.psyexp` em `MODELO_DE_DADOS.md`; criados `REQ-AVA-005` e `WEB-046` preservando `WEB-013`..`016` |
+| **7. Separação entre identidade nominal e resultados experimentais + associação auditável de legados sem merge automático** | `PARCIALMENTE IMPLEMENTADO` / `INCOMPATÍVEL COM DECISÃO ANTERIOR` | `assessments` e `trials` já são isolados em `stroop/persistence/` (`001_initial_stroop_schema.sql`), mas `DEC-01` proibia tabelas nominais e `WEB-027` previa apenas migração de CSVs legados | Faltava modelar segregação física `web_patients`/`web_evaluators` vs. `assessments` e tabela `web_legacy_entity_links` para reconciliação humana assistida | `M4` (`WEB-045`), `M7` (`WEB-027`, `WEB-028`), `M8` (`WEB-032`) | Especificados `ADR-007`, `web_legacy_entity_links` em `MODELO_DE_DADOS.md`, proteção em `TRATAMENTO_DE_DADOS.md` e reconciliação assistida em `WEB-027` |
+| **8. Retirar importação CSV do produto (upload/painel), mantendo CSV exclusivamente para exportação do usuário** | `PARCIALMENTE IMPLEMENTADO` (em direção oposta no protótipo de importação) | `CsvImportPanel.tsx`, `POST /api/v1/projects/{project_id}/imports` (`web/backend/app.py`) e `REQ-CSV-001`/`WEB-025` previam upload CSV no dashboard | Necessidade de retirar `CsvImportPanel.tsx` e endpoints de upload de avaliações do produto, mantendo `stroop/ingestion/` apenas para CLI/testes internos (`WEB-026`) | `M7` (`WEB-025`, `WEB-026`), `M5` (`WEB-047`) | Criado `REQ-CSV-004`; redefinida `WEB-025` para remoção do upload CSV do produto e atualizado `CONTRATO_API_WEB.md` |
+| **9. Exportação CSV avançada multi-granularidade (`pacientes`, `avaliacoes`, `tentativas`, `metricas`, `stroop_21_colunas`), seleção de colunas, prévia e controle `deidentified` vs. `nominal`** | `PARCIALMENTE IMPLEMENTADO` / `PLANEJADO E NÃO IMPLEMENTADO` | `ExportToolbar.tsx` e `/api/v1/exports/{trials,summary}.csv` existiam no protótipo e estavam planejados para revalidação em `WEB-020` (`M5`), mas restritos a 2 formatos fixos por projeto | Faltavam 5 granularidades, seleção de colunas, endpoint `/api/v1/exports/preview`, escopo por avaliação/paciente/filtro, modo `deidentified` padrão vs. `nominal` restrito e sanitização CSV injection | `M5` (`WEB-017`, `WEB-020`), `M7` (`WEB-026`) | Criados `REQ-REL-004` e `REQ-CSV-005`; atualizadas fichas `WEB-017`, `WEB-020` e especificados `/api/v1/exports/preview` e `/api/v1/exports/download` em `CONTRATO_API_WEB.md` |
+| **10. Reformulação da interface administrativa em 8 módulos, KPIs documentados, gráficos interativos e design system acessível (preservando motor jsPsych)** | `PARCIALMENTE IMPLEMENTADO` / `PLANEJADO E NÃO IMPLEMENTADO` | `DashboardShell.tsx`, `AnalyticsFilterBar.tsx`, `AssessmentTable.tsx`, `MetricsCharts.tsx`, `AccountLinksAdminPanel.tsx` existiam e estavam planejados em `WEB-017`/`018`/`019` (`M5`); motor jsPsych já aceito em `WEB-007`..`010` e `WEB-042`..`044` | Faltavam arquitetura de navegação em 8 módulos (incluindo `Pacientes` e `Avaliadores`), catálogo explícito de KPIs sem normas clínicas e requisitos de acessibilidade/estados visuais | `M5` (`WEB-047`, `WEB-017`, `WEB-018`, `WEB-019`) | Criados `REQ-REL-005`, `REQ-UX-012` e `WEB-047`; atualizadas `WEB-017`/`018`/`019`, `UX_DECISIONS.md` e `ARQUITETURA_WEB.md`, preservando intactas `WEB-042`/`043`/`044` |
+
+#### Validação e aceite documental de CHG-005 — 2026-11-07
+
+Verificações locais executadas nesta missão documental (`Python 3.12.3`, sem instalação de pacotes):
+
+- `python3 scripts/verify_web_docs.py`: aprovado; **11 marcos, 48 tarefas, 59 requisitos/matriz, 13 riscos, cinco decisões, 26 aceitos, 87 documentos, 665 links locais e 78 âncoras**, dependências sem ciclos e IDs preservados.
+- `python3 -m unittest tests.test_verify_web_docs -v`: **7/7 aprovados**, sem skips.
+- `.venv/bin/python scripts/verify_web_ci.py sources`: aprovado (`OK [sources] Fronteiras de importação e ausência de artefatos sensíveis verificadas`).
+- `git diff --check`: aprovado sem erros de whitespace ou formatação.
+- Conferência de escopo (`git status --short`): exclusivamente arquivos Markdown sob `docs/` (`10` documentos: `ADR-007` novo e `9` documentos canônicos atualizados); nenhum arquivo de código-fonte, migration SQL, configuração ou teste funcional alterado.
+
 ## Retomada
 
-### Retomada vigente — conclusão de M4 (WEB-013 a WEB-016), 2026-11-06
+### Retomada vigente — replanejamento funcional e UX (CHG-005), 2026-11-07
+
+Replanejamento documental **CHG-005** concluído e validado em escopo estritamente documental. Foram integrados ao planejamento canônico: o novo fluxo profissional (`Login da equipe → Dashboard → Pacientes/Avaliadores → Preparar avaliação → Executar teste → Armazenar resultados → Consultar, analisar e exportar`), a revisão formal de `DEC-01` via [ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md), os cadastros centrais de pacientes (`web_patients`, `PAT-...`) e avaliadores (`web_evaluators`, `EVA-...`), o formulário completo de preparação da sessão alinhado ao PsychoPy Builder (`stroop_go_nogo_ptbr.psyexp`), a retirada de importação CSV do produto (`REQ-CSV-004`), a exportação CSV avançada em cinco granularidades (`REQ-CSV-005`) e a reformulação modular da interface administrativa (`REQ-REL-004/005`, `REQ-UX-012`).
+
+Progresso global recalculado com a inclusão de `WEB-045`, `WEB-046` (em `M4`) e `WEB-047` (em `M5`): **26/48 entregáveis aceitos (54,2%)**, preservando integralmente os 26 aceites históricos (`M0`, `M1`, `M2`, `M3`, `WEB-013`..`016` em `M4` e `M6`), e **22 entregáveis sem aceite**: `1` **PRONTA** (`WEB-045`), `20` **PENDENTES** e `1` **BLOQUEADA** (`WEB-031`, aguardando destino externo autorizado).
+
+Próxima ação exata: emitir instrução explícita (`continue o projeto`) para retomar o marco vigente **M4 — Fluxo completo de avaliações e cadastros centrais**, iniciando por `WEB-045` ("Implementar cadastros centrais de pacientes e avaliadores no backend e schema"), cuja dependência técnica (`WEB-016` e `WEB-024`) e revisão de `DEC-01` (`CHG-005` / `ADR-007`) já estão satisfeitas, seguida por `WEB-046` ("Reformular preparação da sessão com seleção cadastral, campos originais e resumo") para concluir `M4 (6/6)` antes de avançar para `M5` (`WEB-047`, `WEB-017`..`020`).
+
+### Retomada anterior — conclusão de M4 (WEB-013 a WEB-016), 2026-11-06
 
 Comando `continue o projeto` no marco vigente **M4** concluído até o limite do
 marco, sem avançar implicitamente para outro marco. `WEB-013`, `WEB-014`,
