@@ -2352,6 +2352,10 @@ Progresso global recalculado com a inclusão de `WEB-045`, `WEB-046` (em `M4`) e
 
 Próxima ação exata: emitir instrução explícita (`continue o projeto`) para retomar o marco vigente **M4 — Fluxo completo de avaliações e cadastros centrais**, iniciando por `WEB-045` ("Implementar cadastros centrais de pacientes e avaliadores no backend e schema"), cuja dependência técnica (`WEB-016` e `WEB-024`) e revisão de `DEC-01` (`CHG-005` / `ADR-007`) já estão satisfeitas, seguida por `WEB-046` ("Reformular preparação da sessão com seleção cadastral, campos originais e resumo") para concluir `M4 (6/6)` antes de avançar para `M5` (`WEB-047`, `WEB-017`..`020`).
 
+#### Fechamento Git de CHG-005 — 2026-11-07
+
+Entrega documental **`cdbd195a191fb4d042665c8bf3ba79ea693f1c3c`** (`docs: replaneja cadastros centrais, preparação, exportação e UX em CHG-005`), criada na branch `docs/chg-005-replanejamento-funcional-ux` (base `7a35a09fb32cecd1a408340ddfc1ac5f9cc3557c`) e enviada com upstream para `origin/docs/chg-005-replanejamento-funcional-ux`. `gh run list --branch docs/chg-005-replanejamento-funcional-ux --limit 5 --json headSha,status,conclusion,url` retornou `[]` (o workflow existente dispara em `push` para `main`, `pull_request` e `workflow_dispatch`, não para push em branch documental sem PR). Nenhum PR ou merge automático foi executado.
+
 ### Retomada anterior — conclusão de M4 (WEB-013 a WEB-016), 2026-11-06
 
 Comando `continue o projeto` no marco vigente **M4** concluído até o limite do
