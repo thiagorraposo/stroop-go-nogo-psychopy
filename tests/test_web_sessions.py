@@ -65,7 +65,7 @@ class WebSessionsPostgresTests(unittest.TestCase):
         self._set_member(self.admin, CONSULTA)
 
     def _config(self):
-        return APIConfig(
+        return APIConfig(auth_mode="oidc",
             database_url=self.database_url, public_origin=ORIGIN, app_env="test",
             oidc_client_id="synthetic-client-id",
             oidc_client_secret="synthetic-client-secret-never-use",
@@ -169,7 +169,9 @@ class WebSessionsPostgresTests(unittest.TestCase):
         self.assertEqual((receipt['platform'], receipt['state']), ('web', 'completed'))
         self.assertEqual(response.headers['cache-control'], 'no-store')
         self.assertEqual(self._counts(), (1, 16, 12, 1, 16))
-        self.assertEqual(participant.get('/api/v1/participant/session').json(), receipt)
+        bootstrap = participant.get('/api/v1/participant/session').json()
+        self.assertEqual(bootstrap.pop('checkpoint')['confirmed_through'], 16)
+        self.assertEqual(bootstrap, receipt)
         self.assertEqual(participant.post('/api/v1/participant/abort', json={'reason': 'user_cancelled'}).status_code, 409)
         self.assertEqual(participant.post('/api/v1/participant/start', json={'app_version': payload['app_version']}).status_code, 409)
         with psycopg.connect(self.database_url) as connection:
@@ -396,7 +398,7 @@ class WebSessionsPostgresTests(unittest.TestCase):
         aborted = participant.post("/api/v1/participant/abort",
                                    json={"reason": "focus_lost"}, headers=headers)
         self.assertEqual((aborted.status_code, aborted.json()["state"]), (200, "aborted"))
-        self.assertEqual(participant.get("/api/v1/participant/session").status_code, 409)
+        self.assertEqual(participant.get("/api/v1/participant/session").status_code, 200)
         with psycopg.connect(self.database_url) as connection:
             self.assertEqual(connection.execute("SELECT COUNT(*) FROM assessments").fetchone()[0], 0)
 
@@ -602,6 +604,91 @@ class WebSessionsPostgresTests(unittest.TestCase):
         self.assertEqual(sorted(response.status_code for response in responses), [200, 409])
         with psycopg.connect(self.database_url) as connection:
             self.assertEqual(connection.execute("SELECT COUNT(*) FROM app_users WHERE role='administracao' AND active").fetchone()[0], 1)
+
+    def test_prep_01_convite_cadastral_resumo_conferencia_e_rejeicoes(self):
+        patient_resp = self.importer.post(
+            "/api/v1/patients",
+            json={
+                "full_name": "Paciente Preparacao Sintetica",
+                "initials": "PPS",
+                "disambiguation_note": "Turma Experimental B",
+            },
+        )
+        self.assertEqual(patient_resp.status_code, 201, patient_resp.text)
+        patient = patient_resp.json()
+
+        evaluator_resp = self.importer.post(
+            "/api/v1/evaluators",
+            json={
+                "full_name": "Avaliadora Preparacao Sintetica",
+                "initials": "APS",
+            },
+        )
+        self.assertEqual(evaluator_resp.status_code, 201, evaluator_resp.text)
+        evaluator = evaluator_resp.json()
+
+        # Rejeita test_code invalido
+        bad_test = self.importer.post(
+            f"/api/v1/projects/{self.project_id}/invitations",
+            json={
+                "patient_id": patient["id"],
+                "evaluator_id": evaluator["id"],
+                "visit": "V_PREP_01",
+                "test_code": "instrumento_inexistente",
+            },
+        )
+        self.assertEqual(bad_test.status_code, 422, bad_test.text)
+
+        # Emite convite cadastral com resumo completo
+        issued_resp = self.importer.post(
+            f"/api/v1/projects/{self.project_id}/invitations",
+            json={
+                "patient_id": patient["id"],
+                "evaluator_id": evaluator["id"],
+                "visit": "V_PREP_01",
+                "test_code": "stroop_go_nogo_ptbr",
+                "initials": "P.P.S.",
+            },
+        )
+        self.assertEqual(issued_resp.status_code, 201, issued_resp.text)
+        issued = issued_resp.json()
+        self.assertIn("summary", issued)
+        self.assertEqual(
+            issued["summary"],
+            {
+                "project_id": self.project_id,
+                "project_code": "SYNTHETIC_WEB",
+                "project_name": "Projeto sintetico",
+                "patient_id": patient["id"],
+                "participant_code": patient["participant_code"],
+                "participant_name": "Paciente Preparacao Sintetica",
+                "initials": "P.P.S.",
+                "evaluator_id": evaluator["id"],
+                "evaluator_code": evaluator["evaluator_code"],
+                "evaluator_name": "Avaliadora Preparacao Sintetica",
+                "test_code": "stroop_go_nogo_ptbr",
+                "test_version": "0.2.2-web.1",
+                "protocol_id": "stroop_go_nogo_ptbr/0.2.2-web.1",
+                "visit": "V_PREP_01",
+            },
+        )
+
+        # Rejeita paciente ou avaliador inativo
+        inactivate_eval = self.importer.patch(
+            f"/api/v1/evaluators/{evaluator['id']}",
+            json={"active": False, "reason_code": "inactivate"},
+        )
+        self.assertEqual(inactivate_eval.status_code, 200, inactivate_eval.text)
+        blocked_eval = self.importer.post(
+            f"/api/v1/projects/{self.project_id}/invitations",
+            json={
+                "patient_id": patient["id"],
+                "evaluator_id": evaluator["id"],
+                "visit": "V_PREP_02",
+            },
+        )
+        self.assertEqual(blocked_eval.status_code, 409, blocked_eval.text)
+        self.assertEqual(blocked_eval.json()["error"]["code"], "state_conflict")
 
 
 if __name__ == "__main__":

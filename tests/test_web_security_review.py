@@ -237,3 +237,77 @@ class OIDCReviewTests(unittest.TestCase):
                 self.assertRaises(InvalidOIDCResponse):
             exchange_code(synthetic_config(), code='synthetic-code', code_verifier='synthetic-verifier',
                           expected_nonce='synthetic-nonce')
+
+
+class LocalAuthSecurityReviewTests(unittest.TestCase):
+    def setUp(self):
+        self.config = synthetic_config(auth_mode='local', oidc_client_id='', oidc_client_secret='',
+                                       oidc_callback_path='/oauth2callback')
+        self.app = create_app(self.config)
+        self.client = TestClient(self.app, base_url=ORIGIN)
+        self.addCleanup(self.client.close)
+
+    def test_corte_oidc_retorna_404_com_headers_seguros_sem_consultar_provedor(self):
+        for path in ('/api/v1/auth/login', '/api/v1/auth/callback', '/oauth2callback'):
+            with self.subTest(path=path), patch('api.auth.authorization_url') as auth_url, \
+                    patch('api.auth.exchange_code') as exchange:
+                response = self.client.get(path)
+            self.assertEqual(response.status_code, 404)
+            self.assertEqual(response.json()['error']['code'], 'not_found')
+            self.assertEqual(response.headers['Cache-Control'], 'no-store')
+            auth_url.assert_not_called()
+            exchange.assert_not_called()
+
+    def test_cookies_e_duplicatas_recusados_no_modo_local_sem_consultar_sessao(self):
+        for path, headers in (
+            ('/api/v1/auth/me', [('Cookie', f'{PARTICIPANT_COOKIE}={TOKEN}')]),
+            ('/api/v1/projects', [('Cookie', f'{PARTICIPANT_COOKIE}={TOKEN}')]),
+            ('/api/v1/participant/session', [('Cookie', f'{PROFESSIONAL_COOKIE}={TOKEN}')]),
+            ('/api/v1/auth/me', [('Cookie', f'{PROFESSIONAL_COOKIE}={TOKEN}; {PROFESSIONAL_COOKIE}={TOKEN}')]),
+            ('/api/v1/auth/me', [('Cookie', f'{PROFESSIONAL_COOKIE}={TOKEN}'), ('Cookie', f'{PROFESSIONAL_COOKIE}={TOKEN}')]),
+        ):
+            with self.subTest(path=path, headers=headers), \
+                    patch('api.auth.local_application.session_context') as local_context, \
+                    patch('api.sessions.persistence.participant_request_limit') as participant_limit:
+                response = self.client.get(path, headers=headers)
+            self.assertEqual(response.status_code, 401)
+            local_context.assert_not_called()
+            participant_limit.assert_not_called()
+
+    def test_login_senha_e_revogacao_exigem_origin_unico_e_limitam_corpo_4kib(self):
+        for path, body in (
+            ('/api/v1/auth/login', {'username': 'synthetic', 'password': 'x' * 20}),
+            ('/api/v1/auth/password', {'current_password': 'x' * 20, 'new_password': 'y' * 20}),
+        ):
+            for origin_headers in ([], [('Origin', 'null')], [('Origin', 'https://externo.invalid')],
+                                   [('Origin', ORIGIN), ('Origin', ORIGIN)]):
+                with self.subTest(path=path, origin_headers=origin_headers), \
+                        patch('api.local_auth.application.authenticate') as auth_call, \
+                        patch('api.local_auth.application.change_password_limited') as pwd_call:
+                    response = self.client.post(path, json=body, headers=origin_headers)
+                self.assertEqual(response.status_code, 403)
+                self.assertEqual(response.json()['error']['code'], 'csrf_failed')
+                auth_call.assert_not_called()
+                pwd_call.assert_not_called()
+            too_large = self.client.post(
+                path, content=b'{"password":"' + b'x' * 4096 + b'"}',
+                headers={'Origin': ORIGIN, 'Content-Type': 'application/json'},
+            )
+            self.assertEqual(too_large.status_code, 413)
+            self.assertEqual(too_large.json()['error']['code'], 'body_too_large')
+
+    def test_falha_interna_em_login_local_nao_loga_usuario_ou_senha(self):
+        secret_user = 'synthetic_user_secret'
+        secret_pass = 'Synthetic_Password_Secret_2026!'
+        with patch('api.local_auth.application.authenticate', side_effect=RuntimeError(secret_pass)), \
+                self.assertLogs('stroop.api', 'WARNING') as logs:
+            response = self.client.post(
+                '/api/v1/auth/login',
+                json={'username': secret_user, 'password': secret_pass},
+                headers={'Origin': ORIGIN},
+            )
+        self.assertEqual(response.status_code, 500)
+        self.assertNotIn(secret_user, response.text)
+        self.assertNotIn(secret_pass, response.text)
+        self.assertNotIn(secret_user, ' '.join(logs.output))
+        self.assertNotIn(secret_pass, ' '.join(logs.output))

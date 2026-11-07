@@ -1,3 +1,4 @@
+import { createExperimentHud } from './presentation'
 import { PROTOCOL } from './protocol'
 import type { Condition, InterruptionReason, PracticeSummary } from './protocol'
 
@@ -30,12 +31,6 @@ function keyId(key: string): string {
   return key === ' ' || key === 'Spacebar' || key === 'Space' ? 'Space' : key
 }
 
-/** Python round usado pela barra original: empates exatos arredondam para par. */
-function barCount(value: number): number {
-  const floor = Math.floor(value)
-  return value - floor === 0.5 ? floor + floor % 2 : Math.round(value)
-}
-
 /** Rodada imperativa: React e rede nunca participam da temporizacao. */
 export function createPracticeRuntime(container: HTMLElement, order: readonly Condition[],
   options: PracticeOptions, clock: PracticeClock = defaultClock): () => void {
@@ -54,42 +49,25 @@ export function createPracticeRuntime(container: HTMLElement, order: readonly Co
   const previousCursor = container.style.cursor
   const surface = document.createElement('section')
   surface.className = 'practice-runtime'
+  surface.dataset.visualVariant = PROTOCOL.visual.id
+  surface.dataset.visualVersion = PROTOCOL.visual.version
   surface.setAttribute('aria-label', 'Prática')
   Object.assign(surface.style, { background: '#0B1020', color: '#F8FAFC',
     minHeight: '100dvh', height: '100dvh', width: '100%', position: 'relative',
     display: 'grid', placeItems: 'center', fontFamily: 'system-ui, sans-serif' })
-  const hud = document.createElement('div')
-  hud.className = 'practice-hud'
-  Object.assign(hud.style, { display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '16px',
-    position: 'absolute', top: '24px', left: '24px', right: '24px', fontSize: 'min(2.8vh, 20px)' })
-  const accuracy = document.createElement('span')
-  accuracy.dataset.hud = 'accuracy'
-  const accuracyBar = document.createElement('span')
-  accuracyBar.dataset.hud = 'accuracy-bar'
-  accuracyBar.setAttribute('aria-hidden', 'true')
-  const progress = document.createElement('span')
-  progress.dataset.hud = 'progress'
-  const time = document.createElement('span')
-  time.textContent = 'Tempo: --:--'
-  hud.append(accuracy, accuracyBar, progress, time)
+  const presentation = createExperimentHud('practice', order.length)
+  const hud = presentation.element
   const reminder = document.createElement('p')
   reminder.textContent = 'ESPAÇO apenas quando combinar'
   Object.assign(reminder.style, { position: 'absolute', top: '70%', left: '12px', right: '12px',
     margin: '0', textAlign: 'center', fontSize: 'min(3vh, 22px)' })
   const card = document.createElement('div')
-  card.className = 'practice-stimulus-card'
+  card.className = 'practice-stimulus-card experiment-word'
   Object.assign(card.style, { display: 'flex', alignItems: 'center', justifyContent: 'center',
     fontWeight: '700', textAlign: 'center', lineHeight: '1.2', boxSizing: 'border-box' })
   surface.append(hud, reminder, card)
   container.replaceChildren(surface)
   container.style.cursor = 'none'
-
-  function updateHud() {
-    accuracy.textContent = completed === 0 ? 'Precisão: —' : `Precisão: ${Math.round(correct / completed * 100).toString().padStart(2, '0')}%`
-    const filled = completed === 0 ? 0 : barCount(correct / completed * 10)
-    accuracyBar.textContent = `[${'#'.repeat(filled)}${'-'.repeat(10 - filled)}]`
-    progress.textContent = `Prática — tentativa ${Math.min(index + 1, order.length)} de ${order.length}`
-  }
 
   function render() {
     container.dataset.phase = phase
@@ -102,7 +80,8 @@ export function createPracticeRuntime(container: HTMLElement, order: readonly Co
     hud.style.display = showHud ? 'flex' : 'none'
     reminder.hidden = phase !== 'stimulus'
     reminder.style.display = phase === 'stimulus' ? 'block' : 'none'
-    card.style.background = phase === 'stimulus' ? '#F8FAFC' : 'transparent'
+    card.style.background = 'transparent'
+    card.dataset.stimulus = String(phase === 'stimulus')
     card.style.color = '#F8FAFC'
     card.style.width = phase === 'stimulus' ? 'min(82vh, calc(100vw - 48px))' : 'min(90vw, 1100px)'
     card.style.height = phase === 'stimulus' ? '24vh' : 'auto'
@@ -129,7 +108,7 @@ export function createPracticeRuntime(container: HTMLElement, order: readonly Co
       card.textContent = feedback[outcome]
       container.dataset.outcome = outcome
     }
-    updateHud()
+    presentation.update(completed)
   }
 
   function cleanup() {

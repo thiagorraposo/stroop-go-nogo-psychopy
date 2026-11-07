@@ -1,7 +1,15 @@
 # Contrato HTTP da versao WEB
 
-Data: 2026-10-16. Especificacao implementavel de W02; nao representa rotas ja
-implementadas. Usa as decisoes aprovadas em
+Revisão alvo de 2026-11-06: [autenticação local CHG-004](#autenticação-local--contrato-alvo-chg-004)
+substitui apenas o mecanismo profissional OIDC para a versão alvo WEB,
+implementada e verificada em M6 (WEB-021/024). Seções OIDC abaixo preservam
+contrato legado/histórico; estado e aceite somente no backlog canônico.
+
+
+Base: 2026-10-16 (W02 histórico). Revisão documental: 2026-11-04.
+Há routers implementados em api/ para as operações descritas; esta é a fonte de
+contrato a confrontar com código em WEB-005/006, não evidência de teste aprovado.
+Estado e aceite atuais ficam somente no backlog canônico via a ponte ROADMAP_WEB. Usa as decisoes aprovadas em
 [PROTOCOLO_WEB.md](../experimento/PROTOCOLO_WEB.md), os perfis de
 [AUTENTICACAO_E_PERMISSOES.md](../seguranca/AUTENTICACAO_E_PERMISSOES.md) e os contratos de
 [CSV](../experimento/CSV_UNIFICADO.md) e [dados](../dados/MODELO_DE_DADOS.md). Formulas e metodo
@@ -654,3 +662,286 @@ W07 ciclo e migrations aditivas; W08 recebimento atomico; W09–W13 cliente,
 motor e integracao; W14 consulta/exportacao profissional; W16 coleta evidencia
 temporal real. A aprovacao do contrato nao substitui os testes, o banco real
 ou os navegadores exigidos por essas etapas.
+
+
+## Contrato alvo validado — persistência incremental (2026-11-05)
+
+Esta seção especifica o contrato aprovado em DEC-02. O receptor backend foi
+implementado em M2; resultados dos ensaios e SHA ficam em EV-M2 no
+[backlog](../Projeto%20Stroop%20Test.md#ev-m2--receptor-incremental-e-banco-sintético-2026-11-05).
+As seções anteriores preservam os corpos integrais de start/complete. O cliente
+experimental ainda envia somente ao final: worker/fila e gates de prontidão e
+timing pertencem a M3/M4. O responsável validou expressamente
+esta estratégia e a matriz metodológica em 2026-11-05, após apresentação de
+`270377b`, conforme [ADR-005](../arquitetura/ADR-005-persistencia-incremental.md).
+Contrato alvo aprovado não é evidência de implementação ou integração.
+O modelo de vínculos está no [modelo canônico](../dados/MODELO_DE_DADOS.md).
+Não alterar prazos, cookies, OIDC, CSRF, grants ou escopo por projeto.
+
+### Convites e vínculos
+
+Preservar UUID único de convite, código secreto aleatório de pelo menos 256 bits,
+hash no servidor, exibição única, expiração absoluta de 24 h e resgate atômico de
+uso único. UUID identifica; código autoriza resgate, pseudônimo nunca autoriza.
+Emissão exige perfil importação/administração e vínculo ativo com projeto ativo;
+revogação bloqueia convite/sessão e preserva registros recebidos. Sessão de 30 min
+não é renovada pelos checkpoints. Manter rate limit, código somente no corpo,
+HTTPS, no-store e ausência de segredo em logs/URL. IDs de participante/visita
+são resolvidos no servidor na preparação, sem confiar em associações do cliente.
+Compatibilidade do corpo atual por rótulos deve ser preservada com resolução
+unívoca; UUIDs internos não mudam as 21 colunas do CSV.
+
+### Recepção incremental
+
+- `POST /participant/session/checkpoints`: cookie participante + CSRF/Origin;
+  corpo fechado `{protocol_id,test_version,platform,app_version,frame_period_ms,
+  trials}`. `trials` contém de 1 a 16 registros completos com os mesmos campos,
+  tipos e unidades da conclusão atual; posições consecutivas em ordem crescente.
+  Não confiar em projeto/participante/sessão enviados no corpo. Limite 64 KiB.
+- Em running, o servidor aceita novo trecho somente se estende o prefixo
+  confirmado sem lacunas; sobreposição exige conteúdo canônico idêntico.
+  Conferir ordem/snapshot e continuidade temporal com o prefixo anterior.
+  Recebimento preservável não significa validade: falha temporal observável é
+  registrada e impede conclusão oficial. Corpo malformado/extra/inseguro: 422,
+  sem gravar o lote. Trecho fora da ordem: 409 `state_conflict`.
+- Transação bloqueia sessão, revalida acesso/prazo, grava lote e recibo, então
+  confirma commit. Resposta 200 fechada: `{session_id,confirmed_through,
+  prefix_hash,received_at}`; prefixo é contíguo, 0–16, hash SHA-256 calculado
+  pelo servidor pela canonização já definida, abrangendo proveniência e lista
+  ordenada de observações. `received_at` é UTC; não mede RT.
+- Idempotência por sessão/posição e hash canônico, com restrição única no banco.
+  Repetição idêntica não cria observação nova; retorna o prefixo confirmado
+  atual. Conteúdo diferente para posição já recebida: 409 `result_conflict`,
+  sem sobrescrever. Uma corrida divergente impede resultado válido até revisão;
+  não escolher silenciosamente a versão conveniente. Recibo só é sucesso após
+  commit durável conforme configuração PostgreSQL validada.
+- `GET /participant/session` acrescenta objeto fechado `checkpoint` com
+  `confirmed_through`, `prefix_hash`, `received_at` (hash/data nulos no prefixo 0).
+  Permite consultar recebimento após resposta perdida; não devolve tentativas
+  para reconstrução/retomada do principal. Credencial expirada/revogada não
+  consulta nem envia. Profissional autorizado pode conferir estado no projeto.
+  Em aborted, retorna 200 com metadados da sessão, `can_resume:false`, CSRF e
+  checkpoint, sem tentativas; start/complete continuam proibidos. Em completed,
+  mantém recibo e headers de CSRF/prazo, acrescentando checkpoint; se invalidada,
+  acrescenta `valid_for_result:false` e suprime o resumo com `summary:null`.
+- Checkpoint pode chegar após `abort`, antes do vencimento e sem revogação,
+  somente para preservar o prefixo já observado: nunca muda estado terminal,
+  nunca autoriza novo start/complete. Após completed, só replay idêntico de
+  observações existentes; qualquer acréscimo/divergência é 409. Expiração ou
+  revogação bloqueiam nova escrita; nada recebido é apagado por essa razão.
+
+### Conclusão, interrupção e concorrência
+
+`complete` conserva o corpo integral atual, suas validações e seu recibo oficial.
+Na mesma transação, confronta cada posição recebida, insere eventual sufixo
+faltante, valida integralidade/ordem/gates e materializa avaliação/métricas.
+Prefixo recebido pode sobreviver a rollback da conclusão; **nenhuma avaliação
+oficial parcial** sobrevive. Divergência não sobrescreve observações. Complete
+é permitido só em running válida, dentro do prazo, sem marca de interrupção,
+com confirmação local de encerramento de todas as tentativas. Retry de envio
+após término íntegro é transporte, não nova execução experimental.
+
+`abort`, checkpoint e complete serializam pelo mesmo bloqueio de sessão.
+Interrupção conhecida antes do encerramento principal proíbe o cliente de
+solicitar complete; abort vencedor impede complete. Complete já confirmado
+não é apagado por aviso tardio: evidência posterior de violação exige registro
+de invalidação auditável e exclusão dos resultados válidos, preservando linhas e
+recibo históricos. O contrato alvo validado prevê
+`POST /participant/session/invalidate`, corpo fechado `{reason,event_at_ms}`:
+razão enumerada D2/D5, tempo monotônico finito do evento (nulo quando não
+observável), mesma credencial/CSRF/Origin e prazo. É idempotente por sessão,
+retorna 200 `{session_id,valid_for_result:false}` após commit, inclusive se
+complete já venceu; preserva recibo e observações. Não reabre sessão nem aceita
+novo resultado. Evento posterior ao término íntegro não invalida o bloco.
+Após vencimento/revogação, canal participante permanece bloqueado; revisão
+profissional vinculada ao projeto registra invalidação auditável por operação
+`POST /projects/{project_id}/sessions/{session_id}/invalidate`, mesmo corpo,
+perfil importação/administração e CSRF. Consultas profissionais de resultado
+acrescentam `valid_for_result` e motivo, omitem inválidos por padrão de listas,
+resumos e exportações oficiais; acesso direto autorizado ao histórico mostra a
+marca sem resultado utilizável. Invalidação não é reversível pela API. Nenhum
+resultado pode continuar válido apenas porque a corrida favoreceu complete. Servidor não consegue provar que o
+cliente notificou todos os eventos. Falta de aviso não autoriza conclusão por
+quantidade de checkpoints ou tempo decorrido.
+
+Sessão sem conclusão válida ao fim do prazo é incompleta; expiração lógica deve
+ser respeitada imediatamente nas leituras e escritas, mesmo antes de uma rotina
+idempotente materializar o estado. Conservar motivo observado; sem aviso,
+registrar causa desconhecida. Não criar resultado automaticamente com prefixo 16.
+Nova execução exige novo convite/sessão e prática; mesma visita pode ser usada
+sem misturar observações de sessões diferentes.
+
+### Inspeção profissional de recebimento
+
+`GET /projects/{project_id}/sessions/{session_id}` exige profissional ativo,
+vínculo e projeto ativo; usa exclusivamente a credencial de leitura. Retorna
+objeto fechado com `session_id`, `state`, `expires_at`, `complete`,
+`valid_for_result`, `abort_reason`, `revoked`, `invalidation` e `checkpoint`.
+`invalidation` é nulo ou `{reason,source,event_at_ms,recorded_at}`; `checkpoint`
+tem os mesmos três campos da consulta participante. Sem conclusão, validade é
+sempre falsa; prazo vencido em preparing/running aparece como expired, sem
+fabricar motivo. Não devolve observações brutas, métricas ou credenciais.
+Rejeita corpo/query e usa os mesmos erros seguros e no-store. Este canal não
+concede retomada nem exportação parcial; a interface de inspeção pertence a M4/M5.
+
+### Identificação visual complementar de D3/D4 — 2026-11-05
+
+Variante visual `stroop-web-outline`, versão `1.0.0`, definida no protocolo.
+Snapshot compartilhado `condicoes/web_protocol.json` passa a incluir seção
+`visual` e `hud.live_accuracy=false`; tempos/cores/resposta permanecem.
+`test_version` e `protocol_id` continuam identificando o protocolo cognitivo;
+`app_version=web-<versão do pacote>+visual.1.0.0` distingue a apresentação usando
+os metadados já fixados em start/conclusão/recibo. Não acrescentar campos ao
+payload fechado, schema ou CSV de 21 colunas. Recibos/resultados antigos mantêm
+app_version original; não atribuir versão visual com base só em test_version.
+
+## Autenticação local — contrato alvo CHG-004
+
+Decisão de 2026-11-06, [ADR-006](../arquitetura/ADR-006-autenticacao-local.md),
+implementada e verificada em M6 (WEB-021/024); estado, evidências e aceite ficam
+somente no [backlog canônico](../Projeto%20Stroop%20Test.md).
+Para a versão alvo WEB, esta seção substitui o mecanismo OIDC profissional das
+seções anteriores, preservadas como contrato legado/histórico.
+Demais payloads experimentais, CSV, convites, recibos e prazos participantes ficam intactos.
+
+### Login, identidade e sessão
+
+- `POST /api/v1/auth/login`: JSON fechado `{username,password}`. `username`:
+  1–64 ASCII `[A-Za-z0-9_.-]`, aparado e convertido para minúsculas; unicidade
+  usa a mesma normalização. `password`: string de 15–128 caracteres Unicode,
+  sem aparar/normalizar/truncar (exceção explícita à convenção geral de strings).
+  Limite de corpo específico 4 KiB, UTF-8/JSON; sem query/formulário simples.
+  `Origin` único exatamente igual ao configurado obrigatório, inclusive antes
+  da sessão: proteção de login CSRF; sem origem, null ou divergente → 403
+  `csrf_failed`. Não reutilizar token CSRF de sessão anterior para login.
+- Sucesso 200 fechado `{user_id,role,expires_at,csrf_token}`, formato de `/me`;
+  emite cookie profissional novo aleatório de pelo menos 256 bits, guardado por
+  hash no servidor, nunca no corpo. Invalidar sessão profissional anterior do
+  mesmo navegador; impedir fixação. Destino frontend fixo/local: dashboard.
+- Usuário inexistente, senha incorreta, conta bloqueada: mesmo 401
+  `authentication_required`, mensagem genérica “Usuário ou senha inválidos.”,
+  sem `registration_request`, iss/sub ou dicas de cadastro; nenhum cookie novo.
+  Limitação: 429 `rate_limited` com `Retry-After`; indisponibilidade: 503
+  `service_unavailable`. Envelope fechado existente e no-store em todos os casos.
+  Corpo inválido mantém 400/413/415/422 das convenções; erros nunca refletem entrada.
+- `GET /api/v1/auth/me`: conserva campos `{user_id,role,expires_at,csrf_token}`;
+  `user_id` opaco/estável representa principal técnico local e não codificação
+  Google obrigatória. Cliente não interpreta nem escolhe identidade/perfil.
+  Sem sessão válida, expirada/revogada ou conta bloqueada → 401. APIs protegidas
+  mantêm 401/403/404 e autorização por objeto/projeto; nenhum redirect HTML em API.
+- Cookie `__Host-stroop_professional`: Secure, HttpOnly, SameSite=Lax, Path=/,
+  sem Domain; `Max-Age`/`Expires` não excedem limite servidor. Teto absoluto
+  **8 horas**, sem extensão por atividade, e inatividade **30 minutos** no
+  servidor desde login/última operação autenticada autorizada. `/me`/polling
+  automático não renova atividade; definir testes de fronteira e concorrência.
+  `expires_at` devolve o menor prazo efetivo; frontend revalida quando necessário,
+  limpa RAM em 401/logout e não decide validade. Horário do cliente não prorroga.
+- `POST /api/v1/auth/logout` mantém `{}`/204, Origin e CSRF e invalidação efetiva
+  no banco, inclusive replay em outra aba; repetição sem cookie continua 204
+  após validar Origin. Todas as escritas autenticadas conservam X-CSRF-Token
+  e Origin exatos. Sem localStorage/sessionStorage/IndexedDB ou senha persistida.
+
+### Alteração e revogação
+
+- `POST /api/v1/auth/password`: sessão ativa, Origin e CSRF, JSON fechado
+  `{current_password,new_password}`; strings com os limites acima, 4 KiB no total.
+  Senha atual inválida → 401 genérico e rate limit como login. Nova senha fora
+  da política → 422 genérico sem eco. Sucesso 204 **após commit** do novo hash/
+  versão e revogação de todas as sessões, inclusive corrente; apaga cookie e
+  frontend exige novo login. Sem criação de sessão automática pela troca.
+- `POST /api/v1/admin/users/{user_id}/sessions/revoke`: `{}`, 204 após revogar
+  todas as sessões do principal explicitamente indicado; administração ativa,
+  Origin/CSRF e rate limit de escrita. Alvo fora do contrato/inexistente → 404;
+  perfil insuficiente → 403. Revogar a própria conta encerra sessão corrente.
+  Idempotente quanto a sessões já revogadas; não altera vínculos ou dados.
+- Bootstrap e recuperação são procedimentos administrativos protegidos fora do
+  HTTP público, conforme [segurança](../seguranca/AUTENTICACAO_E_PERMISSOES.md#autenticação-local--especificação-alvo-chg-004).
+  API não expõe endpoint de recuperação pública nem cadastro. Bloqueio de conta
+  e rotação/recuperação impedem uso de sessão antiga em todas as operações.
+- Gestão mantém perfis/vínculos e proteção do último admin. `GET /admin/users`
+  alvo retorna identidade técnica opaca, role e active, sem hash/senha e sem
+  exigir issuer/subject Google; campos legados de exibição ficam documentados
+  como históricos. `PATCH /admin/users/{id}` preserva role/active e valida último
+  admin; negar criação de contas adicionais com 403 `permission_denied` no
+  `POST /admin/users` alvo. Não remover recursos históricos nem habilitar
+  ampliação multiusuário por esta decisão. Ajustar clientes/testes juntos.
+- No corte alvo, `GET /auth/login`, callback e alias `/oauth2callback` deixam de
+  emitir sessões OIDC e retornam 404; nenhuma configuração Google é obrigatória.
+  Código/DDL legado permanecem até retirada especificamente autorizada.
+
+Defaults de antiabuso e política de senha estão na especificação de segurança;
+rate limit de leituras/escritas continua distinto do login. Convites mantêm
+24 h, participante 30 min absolutos, CSRF e cookies separados. Rotação de senha
+revoga sessões profissionais; autorização do emissor bloqueado/perfil/vínculo
+revogado continua revalidada em convites/sessões participantes. Não declarar
+que trocar senha, por si, revoga convites: exposição de convites exige sua
+revogação explícita. Testar a distinção em AUTH-L04/L06/L07.
+
+## Cadastros de pacientes e avaliadores, preparação completa e exportação avançada — contrato alvo CHG-005
+
+Decisão arquitetural de 2026-11-07 ([ADR-007](../arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md)), planejada para implementação em `M4` (`WEB-045`, `WEB-046`), `M5` (`WEB-047`, `WEB-017`–`WEB-020`) e `M7` (`WEB-025`–`WEB-028`). Todas as rotas exigem sessão profissional ativa (`__Host-stroop_professional`), `Cache-Control: no-store`, e para escritas (`POST`, `PATCH`) cabeçalhos `X-CSRF-Token` e `Origin` exato.
+
+### 1. Cadastro central de pacientes (`/api/v1/patients`)
+
+| Método e caminho | Perfil exigido | Entrada / Query | Resposta e regras |
+|---|---|---|---|
+| `GET /api/v1/patients` | `leitura`, `importacao`, `administracao` (com vínculo ativo em pelo menos um projeto; listagem respeita escopo autorizado) | `search` (texto: nome, iniciais ou `participant_code`), `project_id`, `active` (`true`/`false`/`all`), `page`, `page_size` (1–100), `sort` (`name_asc`, `name_desc`, `created_desc`, `code_asc`) | `200 OK` com `{items, total, page, page_size}`. Cada item inclui `id` (UUID), `participant_code` (ex.: `PAT-20261107-000001`), `full_name`, `initials`, `disambiguation_note`, `active`, `project_codes`, `visit_count`, `assessment_count`, `last_visit_at`, `created_at`, `updated_at`. |
+| `GET /api/v1/patients/duplicates` | `importacao`, `administracao` | `full_name` (obrigatório, 2–120 chars), `initials` (opcional) | `200 OK` com `{candidates: [...]}` listando pacientes com `normalized_name` coincidente ou similar, exibindo `id`, `participant_code`, `full_name`, `initials`, `disambiguation_note`, `project_codes`, `last_visit_at` e `active` para confirmação humana antes do cadastro. |
+| `POST /api/v1/patients` | `importacao`, `administracao` | JSON fechado `{full_name, initials?, disambiguation_note?, confirm_homonym?}` | `201 Created` com objeto do paciente e `participant_code` gerado automaticamente pelo sistema. Se houver candidato com mesmo `normalized_name` e `confirm_homonym` não for `true`, retorna `409 Conflict` (`error.code = "duplicate_candidate_found"`) com lista resumida de candidatos para evitar duplicação acidental ou por concorrência. |
+| `GET /api/v1/patients/{patient_id}` | `leitura`, `importacao`, `administracao` | Sem corpo/query | `200 OK` com dados cadastrais, lista de participações em projetos autorizados (`projects`), visitas (`visits`), avaliações realizadas (`assessments`), sessões preparadas e histórico de alterações cadastrais (`audit_history`). |
+| `PATCH /api/v1/patients/{patient_id}` | `importacao`, `administracao` | JSON fechado `{full_name?, initials?, disambiguation_note?, active?, reason_code}` | `200 OK` com paciente atualizado; grava evento em `web_registry_audit_events`. Alterar `full_name`, `initials` ou `active=false` preserva integralmente o `id`, `participant_code` e todas as avaliações/sessões históricas. Não existe `DELETE` físico. |
+
+### 2. Cadastro central de avaliadores responsáveis (`/api/v1/evaluators`)
+
+| Método e caminho | Perfil exigido | Entrada / Query | Resposta e regras |
+|---|---|---|---|
+| `GET /api/v1/evaluators` | `leitura`, `importacao`, `administracao` | `search` (nome, iniciais ou `evaluator_code`), `active` (`true`/`false`/`all`), `page`, `page_size` | `200 OK` com `{items, total, page, page_size}`. Cada item inclui `id` (UUID), `evaluator_code` (ex.: `EVA-000001`), `full_name`, `initials`, `active`, `project_codes`, `assessment_count`, `last_assessment_at`, `created_at`, `updated_at`. |
+| `POST /api/v1/evaluators` | `importacao`, `administracao` | JSON fechado `{full_name, initials?, confirm_homonym?}` | `201 Created` com `id` e `evaluator_code` gerados automaticamente pelo sistema. Se existir homônimo em `normalized_name` sem `confirm_homonym=true`, retorna `409 Conflict` (`duplicate_candidate_found`). Não cria conta de login (`app_users`/`web_local_credentials`). |
+| `GET /api/v1/evaluators/{evaluator_id}` | `leitura`, `importacao`, `administracao` | Sem corpo/query | `200 OK` com cadastro do avaliador, projetos/instrumentos em que atuou, histórico de avaliações conduzidas e trilha de alterações cadastrais. |
+| `PATCH /api/v1/evaluators/{evaluator_id}` | `importacao`, `administracao` | JSON fechado `{full_name?, initials?, active?, reason_code}` | `200 OK`; inativação (`active=false`) impede seleção em novas preparações mantendo intacta a associação histórica das avaliações concluídas. |
+
+### 3. Formulário completo de preparação da sessão (`POST /api/v1/projects/{project_id}/invitations`)
+
+No contrato alvo `CHG-005` (`WEB-045` / `WEB-046`), a emissão de convite passa a receber os vínculos selecionados pelo profissional após a etapa de conferência:
+
+- **Entrada JSON fechada:**
+  - `patient_id`: UUID obrigatório de paciente ativo em `web_patients`.
+  - `evaluator_id`: UUID obrigatório de avaliador ativo em `web_evaluators`.
+  - `test_code`: código de instrumento registrado (padrão `"stroop_go_nogo_ptbr"`).
+  - `visit`: string obrigatória (`1..64` após `strip()`).
+  - `initials`: string opcional (`0..16` após `strip()`, pré-preenchida do cadastro do paciente e confirmada na preparação).
+- **Regras no servidor:**
+  - Revalida vínculo ativo da conta autenticada no projeto `project_id`, estado ativo do projeto, existência e estado `active=true` de `patient_id` e `evaluator_id`, e validade do `test_code`.
+  - O servidor resolve automaticamente `participant_id = patient.participant_code` e `evaluator = evaluator.evaluator_code` (sem solicitar digitação manual de IDs internos), vincula `(project_id, patient_id)` em `web_project_participants` e `(project_id, participant_uuid, visit)` em `web_participant_visits`, registra `issued_by` (conta autenticada) separadamente de `evaluator_uuid` (avaliador responsável) e emite o convite de uso único (24 h) e sessão reservada (`preparing`).
+- **Resposta `201 Created`:**
+  - `{invitation_id, session_id, code, expires_at, state, summary: {project_code, project_name, patient_id, participant_code, participant_name, initials, evaluator_id, evaluator_code, evaluator_name, test_code, test_version, visit}}`.
+- Os endpoints do participante (`/api/v1/participant/*`), bootstrap, checkpoints incrementais (`ADR-005`), invalidação e recibo permanecem inalterados e não expõem nome completo ou dados nominais no bootstrap do participante.
+
+### 4. Retirada da importação CSV do produto (`M7` / `WEB-025`)
+
+- A plataforma WEB deixa de oferecer importação manual de arquivos CSV pelo usuário:
+  - As rotas `POST /api/v1/projects/{project_id}/imports/{operation_id}` e `GET /api/v1/projects/{project_id}/imports/{operation_id}` são retiradas do contrato operacional do produto (retornam `404 Not Found` ou `410 Gone` fora de suites internas de compatibilidade legada).
+  - O componente `CsvImportPanel` e comandos de upload CSV são removidos da interface profissional.
+  - CSV permanece exclusivamente como formato de **exportação**.
+
+### 5. Catálogo expandido de filtros e consulta avançada (`GET /api/v1/assessments` e `GET /api/v1/assessments/facets`)
+
+A consulta combinada (`WEB-017` / `WEB-019`) suporta filtros combinados (AND entre dimensões diferentes, OR dentro de seleção múltipla na mesma dimensão) sobre o conjunto de projetos autorizados:
+
+- **Identificação e vínculos:** `project_id` (multisseleção até 20 projetos), `patient_id` (UUID), `participant_id` (`participant_code`), `patient_search` (busca textual por nome completo autorizado, iniciais ou código), `evaluator_id` (UUID ou `evaluator_code`, multisseleção), `visit` (multisseleção ou busca), `test_code` (multisseleção), `test_version`, `platform` (`web`, `psychopy_local`, `legacy`).
+- **Datas e status:** `date_from`, `date_to` (`YYYY-MM-DD` inclusivos), `status` (`valid` padrão oficial, `invalidated`, `aborted`, `expired`, `in_progress` — consultas de sessões parciais/inválidas permanecem estritamente segregadas dos totais e métricas oficiais).
+- **Condição experimental e tipo de resposta/erro:** `condition` (`congruent`, `incongruent`), `response_type` (`hit`, `omission`, `correct_rejection`, `commission`), `has_commission_errors` (`true`/`false`), `has_omission_errors` (`true`/`false`).
+- **Métricas de precisão e tempos de reação (faixas numéricas):** `accuracy_min`, `accuracy_max` (`0..100`), `go_accuracy_min`, `go_accuracy_max`, `no_go_accuracy_min`, `no_go_accuracy_max`, `rt_median_min_ms`, `rt_median_max_ms`, `rt_mean_min_ms`, `rt_mean_max_ms`, `include_null_rt` (`true`/`false`, explícito quando `hits = 0`).
+- **Ordenação e paginação:** `sort` (`started_at_desc`, `started_at_asc`, `participant_code_asc`, `visit_asc`, `accuracy_desc`, `accuracy_asc`, `rt_median_asc`, `rt_median_desc`), `page`, `page_size`.
+
+### 6. Exportação CSV avançada multi-granularidade (`/api/v1/exports/*`)
+
+Além da exportação individual oficial de 21 colunas (`GET /api/v1/projects/{project_id}/assessments/{assessment_id}/export.csv`), o módulo de exportação (`WEB-020`) expõe:
+
+- `POST /api/v1/exports/preview`: recebe o objeto de filtros ativos, `granularity` (`pacientes`, `avaliacoes`, `tentativas`, `metricas`, `stroop_21_colunas`), `columns` (lista de colunas selecionadas dentro do catálogo permitido para a granularidade) e `identification_mode` (`deidentified` padrão | `nominal`). Retorna `200 OK` com contagem total de registros (`total_rows`), lista de colunas validadas, resumo estruturado dos critérios aplicados (`applied_criteria`), amostra de pré-visualização (até 10 linhas) e `export_token` efêmero em RAM (15 min).
+- `POST /api/v1/exports/download`: recebe o mesmo filtro, `granularity`, `columns`, `identification_mode` e `export_token`, revalida integralmente as permissões da conta em todos os projetos filtrados e transmite `text/csv; charset=utf-8` com `Content-Disposition: attachment`.
+- **Regras de segurança e integridade científica na exportação:**
+  - `identification_mode = "nominal"` (incluindo `participant_name`, `initials` e `evaluator_name`) exige perfil autorizado (`administracao` ou permissão explícita do projeto) e habilitação institucional do projeto (`DEC-03`); caso contrário, retorna `403 Forbidden` (`nominal_export_not_authorized`). O modo padrão é sempre `deidentified` (`participant_code` e `evaluator_code`).
+  - Avaliação parcial, abortada, expirada ou invalidada (`valid_for_result = false`) nunca é incluída nas granularidades de resultados oficiais (`avaliacoes`, `tentativas`, `metricas`, `stroop_21_colunas`).
+  - Valores ausentes (ex.: RT quando `hits = 0`) são exportados como string vazia `""`, nunca como `0`. Métricas mantêm precisão numérica oficial sem arredondamento destrutivo.
+  - Células textuais iniciadas por `=`, `+`, `-`, `@`, `\t` ou `\r` recebem neutralização contra *CSV formula injection* e evento de auditoria de exportação é gravado em `auth_audit_events`.

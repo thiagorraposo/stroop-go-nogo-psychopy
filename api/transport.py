@@ -104,6 +104,14 @@ class RequestBoundary:
         async def safe_send(message: Message) -> None:
             nonlocal started
             if message["type"] == "http.response.start":
+                local_hash = scope.get("state", {}).get("local_session_token_hash")
+                if (local_hash and 200 <= message["status"] < 300
+                        and scope.get("path") not in {"/api/v1/auth/me", "/api/v1/auth/logout", "/api/v1/auth/password"}):
+                    from api.local_session import activity_cookie
+                    from starlette.concurrency import run_in_threadpool
+                    cookie_headers = await run_in_threadpool(activity_cookie,
+                        scope['app'].state.config, local_hash, scope['state']['local_session_token'])
+                    message = dict(message, headers=[*message.get('headers', []), *cookie_headers])
                 started = True
                 headers = [
                     (key, value) for key, value in message.get("headers", [])
@@ -134,7 +142,8 @@ class RequestBoundary:
             if transfers and (declared_lengths or len(transfers) != 1
                               or transfers[0].strip().lower() != b"chunked"):
                 raise APIError("invalid_json")
-            body_limit = MAX_CSV_UPLOAD_BYTES if is_csv_upload else MAX_BODY_BYTES
+            is_credential = scope["method"] == "POST" and path in {"/api/v1/auth/login", "/api/v1/auth/password"}
+            body_limit = MAX_CSV_UPLOAD_BYTES if is_csv_upload else 4096 if is_credential else MAX_BODY_BYTES
             if declared_lengths:
                 if len(declared_lengths) != 1 or not declared_lengths[0].isdigit():
                     raise APIError("invalid_json")

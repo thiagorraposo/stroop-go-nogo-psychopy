@@ -1,10 +1,291 @@
-# Registro de alteracoes
+# Registro de alterações
 
-Este arquivo preserva fatos datados; nao define estado ou aceite vigente.
-Consulte o [backlog canonico](legado/Projeto%20Stroop%20Test.md).
+Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20Stroop%20Test.md).
+Entradas antigas preservam política e evidências de suas datas; não constituem
+comandos atuais nem resultados reexecutados.
 
-O estado da nova versao web e mantido separadamente no
-[roadmap WEB](ROADMAP_WEB.md); os registros abaixo sao evidencias datadas.
+## 2026-11-06 — Fluxo ponta a ponta de avaliações e transporte incremental (M4)
+
+- Integrado o Dedicated Worker incremental (`checkpoint-worker.ts`) ao fluxo real
+  do participante (`ParticipantRun`, `PracticePreparation` e `ParticipantFlow`),
+  com sondagem de prontidão, drain assíncrono em interrupção, `worker-src 'self'`
+  em `web/security-headers.json` e invalidação tardia via
+  `POST /api/v1/participant/session/invalidate`.
+- Validados preparação profissional após login local (`CHG-004` / `AUTH-L07`),
+  múltiplas visitas/avaliações, isolamento de pseudônimo entre projetos,
+  ausência de campos nominais/demográficos e de precisão agregada durante a
+  execução, preservação de prefixo parcial em `web_session_observations` sem
+  criar resultado oficial, avaliação completa com 16 tentativas/12 métricas/
+  proveniência e logout participante limpando RAM/cookie.
+- Concluídas WEB-013, WEB-014, WEB-015 e WEB-016, encerrando M4 (4/4; 26/45
+  entregáveis aceitos). Evidências, falhas intermediárias preservadas, limites
+  e próxima ação (M5/WEB-017 e WEB-018) registrados somente no backlog canônico.
+
+## 2026-11-06 — Conclusão da autenticação local e revisão de segurança (M6)
+
+- Implementados e integrados login, troca de senha e revogação locais, gestão
+  por ID opaco, `Origin`/CSRF, limite de 4 KiB e cookie `__Host-stroop_professional`;
+  `API_AUTH_MODE=local` passa a ser o padrão fora de `APP_ENV=test`, recusando
+  endpoints OIDC com 404. Frontend limpa credenciais/RAM e não oferece cadastro
+  de contas adicionais.
+- Lista local ampliada para 10.898 hashes SHA-256 (SecLists), migration 0013
+  protege o último admin local ativo e revoga sessões locais ao bloquear/mudar
+  perfil; antiabuso combina origem/identificador persistentes, falhas
+  compartilhadas e teto de 10.000 buckets com limpeza >24 h.
+- Validados AUTH-L01–L09 sem skips: suíte Python/PG integral, Vitest/build,
+  Playwright `browser`/`integration`/`local-auth` em Chromium e Firefox,
+  scanner/self-test, auditorias, Compose HTTPS sem secrets Google e smoke de
+  backup/restore isolado exigindo `recover` antes da abertura.
+- Concluídas WEB-021 e WEB-024, encerrando M6 (4/4; 22/45 entregáveis aceitos).
+  Evidências, falhas intermediárias preservadas, limites e próxima ação (M4/WEB-013)
+  registrados somente no backlog canônico.
+
+## 2026-11-06 — Base transacional para credenciais locais
+
+- Iniciada implementação autorizada de M6: identidade local própria, migration
+  aditiva 0012, Argon2id, bootstrap/recuperação por terminal e transações de sessão,
+  revogação, rotação e limite por identificador, preservando legado e vínculos.
+- Acrescentadas regressões sintéticas de concorrência, rollback, expiração,
+  parâmetros, compatibilidade e privilégios; reader continua sem acesso a hash,
+  writer sem criar contas ou alterar app_users.
+- Unidade preparatória: API, formulário, Compose e corte OIDC ainda aguardam
+  integração e ensaios HTTPS. Evidência e continuidade somente no backlog.
+
+## 2026-11-06 — Aceite explícito do suporte local do motor
+
+- Registrada resposta “aceito” do proprietário aos resultados e limites de
+  EV-M3-012, com conferência dos critérios de WEB-012 e do gate M3 no backlog.
+- Preservados ambientes/versões medidos, falhas históricas, janela de perda,
+  limites de integração e validação física/metodológica. Matriz alinhada ao aceite.
+- Unidade exclusivamente documental; nenhuma campanha ou teste funcional
+  reexecutado, runtime alterado ou autorização de outro marco inferida.
+
+## 2026-11-06 — CHG-004: autenticação local e revisão de pendências
+
+- Decisão do proprietário integrada ao backlog e ADR-006: uma conta administrativa
+  local, sem cadastro público/Google obrigatório, mantendo projetos e convites.
+- Especificados hash/provisionamento/recuperação, antiabuso, sessões/revogação,
+  contrato HTTP e migração aditiva; matriz e plano AUTH-L01–L09 atualizados.
+- Revisadas todas as pendências e riscos, incluindo conta compartilhada sem
+  autoria individual e avaliação institucional ainda necessária. Aceites,
+  DEC-01–05, histórico, cálculo de progresso e workflow preservados.
+- Missão restrita à documentação; nenhum runtime, teste funcional, dependency,
+  migration ou ambiente externo alterado. Evidências/versionamento em EV-CHG-004
+  e Retomada do backlog, sem criar execução paralela.
+
+## 2026-11-06 — Réplica SSH e agenda sintéticas reais
+
+- Novo harness gera backup PG sintético, copia por SSH com forced-command,
+  confere bytes/checksum/idempotência e restaura cópia com recibo válido.
+- Timers transitórios comprovam cópia positiva e alerta negativo; ferramenta SSH
+  fica só em imagem descartável, sem instalar no host ou relaxar StrictModes.
+- Registradas falhas de ownership anteriores e limites do ensaio no mesmo host.
+  Gate de réplica externa preservado em WEB-031; nenhuma aprovação inventada.
+- Sessão excepcional encerrada após seleção global sem tarefas elegíveis;
+  workflow/AGENTS permanentes preservados. Evidências no backlog canônico.
+
+## 2026-11-06 — Pipeline integral local e Actions por SHA
+
+- Runner integral em checkout sparse/PG descartável e locks exatos aprovado:
+  scanner/self-test, Python, frontend, auditorias, browsers e HTTPS reais.
+- Workflow_dispatch existente validou a mesma SHA sem PR/merge/deploy; primeira
+  falha de scanner documental preservada, corrigida sem allowlist ou bypass.
+- Evidências e URLs em EV-M8-030 no backlog; nenhuma regra permanente de
+  continuidade alterada. Decisões/painel alinhados aos ensaios atuais.
+
+## 2026-11-06 — Infraestrutura sintética e integridade da restauração
+
+- Build/Compose HTTPS reais revalidados; smoke passou a exigir recusa de nove
+  caminhos de fontes/configuração no proxy.
+- Bancos de teste usam prefixo descartável e restaurações recebem projeto
+  exclusivo; verificação do recibo restaurado cobre vínculo e estado, com caso
+  negativo real e rollback de imagem ensaiado.
+- Documentado procedimento de validação formal por SHA via workflow_dispatch
+  existente, sem novos gatilhos, PR automático ou mudança de proteções.
+- Limites de réplica/agenda e evidências reais ficam em EV-M8-029/031 no backlog.
+
+## 2026-11-06 — Revalidação de permissões e sessões em HTTPS
+
+- Conferidos perfis/projetos/revogação em PostgreSQL sintético e navegadores;
+  novo E2E verifica CSRF cruzado, troca de credenciais, logout e replay real.
+- Preservadas proteções/runtime e separação entre ensaio com identidade sintética
+  e login Google interativo, que depende de ambiente e conta autorizados.
+- Evidências e limites em EV-M6-022/023 do backlog, sem alterar regras permanentes
+  de continuidade; autorização entre marcos vale apenas nesta sessão.
+
+## 2026-11-06 — Campanha temporal com transporte ativo e relatório de suporte
+
+- Executadas dez capturas completas por navegador no equipamento local aprovado,
+  com worker real, ACK lento/perdido e servidor simulado indisponível. Conferidas
+  transições/duração D5, igualdade dos registros recebidos e domínio Python.
+- Preservados 19 passes e uma falha original de preparação sem trilha recuperável;
+  suplemento Chromium explícito passou. Corrigida coleta de diagnóstico da fixture
+  para não mascarar erros; motor/worker idênticos entre série e suplemento.
+- Registrados custos observados, descontinuidade civil e limites em EV-M3-011;
+  relatório de viabilidade EV-M3-012 disponível para aceite do responsável.
+- Regressões frontend/Python/visual aprovadas, sem dependências, migrations,
+  dados reais, integração de produto M4 ou serviços externos alterados.
+
+## 2026-11-05 — Aprovação DEC-04 e preparação da campanha local
+
+- Proprietário aprovou expressamente o alcance local de engenharia DEC-04;
+  validação física/metodológica permanece gate M9. Matriz/evidência no backlog.
+- Preparados Dedicated Worker/fila em RAM e entrega de cópia imutável de tentativa
+  completa após início da próxima fixação, sem esperar HTTP/JSON no motor.
+- Campanha sintética isolada exercita motores reais com transporte ativo,
+  ACK lento/perdido e indisponibilidade; produto/fluxo integrado continua M4.
+- Sem alteração de tempos, estímulos, gates, métricas/CSV, schema ou dependências.
+
+## 2026-11-05 — Regressão consolidada da apresentação experimental
+
+- Conferidos os critérios de WEB-044 na apresentação aprovada: dez cores,
+  contorno/centro, HUD sem precisão, feedback, lifecycle, regras e métricas/CSV.
+- Executadas regressões frontend/Python e screenshots sintéticos; observação
+  temporal preparatória com navegador visível e trilhas preservadas.
+- Evidências, ambientes, resultados e limites em EV-M3-044 no backlog; campanha
+  DEC-04 com transporte ativo e aceite de suporte continuam gates próprios.
+- Runtime, protocolo, dependências, dados e serviços externos preservados.
+
+## 2026-11-05 — Aprovação visual de D3 pelo proprietário
+
+- Registrada aprovação explícita para contorno branco sem cartão, progresso e
+  cronômetro principal discretos, sem precisão agregada; feedback da prática mantido.
+- D3 visual revisada com histórico preservado; D4 complementada por identificação
+  stroop-web-outline/1.0.0 e proveniência via app_version, sem schema novo.
+- Gate visual de WEB-042/043 satisfeito pelo proprietário conforme responsabilidade
+  já documentada; nenhuma aprovação atribuída a terceiro. DEC-04 permanece pendente.
+- Dependências, rastreabilidade e workflow alinhados sem novos IDs/denominador.
+- Implementados contorno branco uniforme sem cartão e HUD imperativo com progresso
+  real/cronômetro estável; retirados nós de precisão nos dois motores, sem alterar
+  núcleo de métricas, janelas, agendamento ou transporte. Prática mantém feedback.
+- Criados testes de apresentação/ausência/relógio e screenshots sintéticos em
+  Chromium/Firefox; comandos, falhas e limites registrados no backlog.
+
+## 2026-11-05 — Integração de refinamento UX ao planejamento canônico
+
+- CHG-003 integra UX-01–08 ao backlog, requisitos REQ-UX-001…011, arquitetura,
+  protocolo/decisões, fonte UX e workflow; IDs e evidências anteriores preservados.
+- Acrescentadas entregas M3 WEB-042/043/044 e ampliados critérios de campanha,
+  fluxo M4, componentes/regressão M5 e validação M9, sem marco paralelo.
+- Especificada ausência da precisão agregada na prática/principal e preservação
+  dos cálculos, feedback individual, persistência, relatórios e CSV. Identificado
+  conflito com D3 aprovado e necessidade de identificação da variante frente a D4.
+- Validador documental reproduzível passou a calcular catálogo/progresso a partir
+  das fontes canônicas e conferir estabilidade de IDs contra HEAD.
+- Preferência de integração alinhada: Merge Commit tradicional com commits
+  preservados, sem Squash Merge; nenhuma configuração/proteção remota alterada.
+- Alterações experimentais permanecem condicionadas às decisões metodológicas;
+  documentação de alvo não é implementação, teste ou aceite funcional.
+
+## 2026-11-05 — Revalidação do motor experimental em M3
+
+- Iniciado M3 por `continue o projeto`; preservada base M2 sem integrar main.
+- Acrescentadas verificações de snapshot WEB versus tempos/paleta do Builder,
+  renderização das dez cores no principal e ciclo de vida dos plugins reais
+  jsPsych sob remontagem React StrictMode, sem mudar regras ou runtime.
+- Corrigida sincronização do teste E2E de teclado: aguarda foco inicial React
+  antes de enviar Espaço/Enter, preservando falhas anteriores no backlog.
+- Requisitos REQ-EXP-001/002 e evidências da revalidação vinculados ao backlog.
+  Resultados de navegador distinguem janela visível, automação e API double;
+  nenhuma evidência é promovida a latência física ou suporte universal.
+- Campanha temporal e aceite de suporte continuam condicionados à DEC-04;
+  nenhum trabalho de outro marco, deploy ou dado real por implicação.
+
+## 2026-11-05 — Comprovação de atomicidade e paridade de M2
+
+- Acrescentada prova de ACK após commit com constraint trigger adiado e leitura
+  independente, asserções de cardinalidade nas corridas e inspeção dos papéis PG.
+- Reforçada a referência independente das 12 métricas/unidades e a conferência
+  dos valores persistidos após exportação/reimportação CSV sintética.
+- Conferidos critérios WEB-007/008 e matriz ADR-005 aplicável ao backend;
+  evidências locais e vínculos REQ-INT-002/REQ-MET-001/002 no backlog único.
+  Runtime, migrations, fórmulas, dependências e protocolo preservados.
+- Nenhum trabalho de M3, pesquisa real, integração à main ou deploy nesta sessão.
+
+## 2026-11-05 — Receptor incremental e vínculos WEB
+
+- Implementada migration aditiva 0011 para participantes/visitas por projeto,
+  checkpoints e invalidação, com mapeamento restrito a convites WEB existentes.
+- Acrescentados receptor HTTP, recibos parciais, reconciliação de conclusão,
+  inspeção de estado e invalidação tardia sem resultado oficial utilizável.
+  Clientes existentes validam os novos campos, sem alterar o motor experimental.
+- Revalidada expiração durante escritas; grants mínimos incluem somente as
+  colunas necessárias à revisão do fim principal. Requisitos REQ-INT-001/002,
+  REQ-INF-001 e regressão REQ-MET-001/002 rastreados em EV-M2 no backlog único.
+- Decisões DEC-01/02 já aprovadas; testes exclusivamente sintéticos. Worker,
+  fila e impacto temporal do transporte continuam nas tarefas M3/M4. Sem
+  alteração metodológica, dependências novas ou operação em produção/dados reais.
+
+## 2026-11-05 — Painel visual de acompanhamento
+
+- Acrescentado painel ao backlog com resumo de aceites, barras por marco,
+  acesso às fichas concluídas e sequência do marco atual, por solicitação do responsável.
+- PROGRESS passou a oferecer navegação visual para o painel e suas evidências;
+  índice documental atualizado. Contabilidade permanece no backlog único.
+- Alteração de apresentação e navegação, sem novo aceite, mudança de escopo,
+  requisito, contrato, runtime ou autorização de execução.
+
+## 2026-11-05 — Validação da estratégia incremental pelo responsável
+
+- O responsável respondeu “valido” à proposta versionada em `270377b`, aprovando
+  ADR-005, contrato alvo, matriz de invalidação e limites residuais de perda.
+- Registrada a validação prévia à implementação e alinhadas as fontes canônicas;
+  contratos alvo continuam distintos do comportamento implementado. Evidência
+  de aceite e próxima ação permanecem exclusivamente no backlog.
+- Nenhuma alteração de runtime, schema ou regra experimental; ensaios de banco,
+  motor e transporte continuam exigidos antes do aceite funcional.
+
+## 2026-11-05 — Decisões de participação e proposta incremental
+
+- Registrada aprovação explícita do responsável para participantes por projeto,
+  múltiplas visitas/avaliações, convites únicos com controle de acesso/validade
+  e evolução longitudinal aditiva, sem cadastro central ou agenda separada.
+- Registrada rejeição de RAM final-only e exigência de persistência incremental,
+  recibos, idempotência e preservação de sessões incompletas/ inválidas; D2 mantém
+  nova sessão com prática e proíbe retomar bloco interrompido.
+- Elaborado ADR-005 com worker, riscos residuais e ensaios planejados; modelo,
+  contrato HTTP candidato e matriz metodológica alinhados. Validação definitiva
+  anterior ao código exigida pelo responsável; proposta não foi aprovada por
+  antecipação. Impactos rastreados em CHG-002, somente no backlog.
+- Nenhuma alteração de runtime, migration, métrica, CSV, dependência ou produção.
+
+## 2026-11-05 — Comparação dos contratos de participação e perda
+
+- Comparados contrato HTTP, modelo lógico e implementação de convite, sessão,
+  conclusão e envio em memória para preparar as decisões do responsável.
+- Documentada a distinção entre convite preparado, sessão criada no resgate e
+  avaliação oficial criada na conclusão. Registrados os limites do aviso de
+  perda exibido no envio pendente e da recuperação após resposta incerta.
+- Nenhum contrato científico, payload, schema ou runtime alterado. Achados,
+  dependências e próxima ação ficam exclusivamente no backlog canônico.
+
+## 2026-11-04 — Reprodução sintética da fundação WEB
+
+- Reproduzida implementação existente em worktree sparse isolada, com locks
+  preservados, PostgreSQL descartável em tmpfs e fixtures sintéticas.
+- Revalidados cálculos, unidades, ausência de hits, roundtrip CSV/SQLite,
+  reexports/CLIs e fronteiras entre domínio, ingestão, aplicação e persistência.
+  Nenhuma refatoração ou mudança experimental necessária para essa conferência.
+- Acrescentada receita local de reprodução/retomada, vinculada ao workflow;
+  resultados, ambiente, SHA e Git ficam em EV-M1/Retomada do backlog canônico.
+
+## 2026-11-04 — Replanejamento documental da plataforma Stroop Web
+
+- Auditados código/runtime, método, condições, métricas, migrations, OIDC, Docker,
+  proxy, CI e Git na HEAD 87f6a9c52043625a3474805dfc6680390ddfc151. React/FastAPI/
+  jsPsych/PG já existem; plano de consolidação/revalidação, sem reconstrução presumida.
+- Nova missão, inventário/classificação, requisitos A–L/matriz, arquitetura e ADR-004,
+  M0–M10/WEB com dependências, critérios, riscos/decisões e próximo trabalho canônicos.
+- Backlog único em Projeto Stroop Test.md; snapshots congelados de Wxx/retomada e
+  etapas 1–12 preservam histórico, sem transferir 87% nem aceites para novo escopo.
+- AGENTS/workflow/contribuição alinhados à última autorização: commit/push autônomos
+  em branch coesa, sem PR/merge automáticos; produção/dados reais separados. Conteúdo
+  preexistente de AGENTS sobre pesquisa/público/VPS preservado na revisão autorizada.
+- Corrigidas descrições documentais de arquitetura antiga, routers já implementados,
+  paleta CSV versus renderização e ausência de RT. Nenhuma regra científica, código,
+  schema, configuração operacional, dependência ou dado real alterado.
+- Validação desta sessão exclusivamente documental; comandos/resultados e Git final
+  em EV-M0/Retomada do backlog. Suites funcionais/CI/medição física não reexecutadas.
 
 ## 2026-11-04 — Correcao da auditoria de dependencias no PR1
 

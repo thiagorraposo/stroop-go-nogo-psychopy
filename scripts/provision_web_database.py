@@ -24,6 +24,10 @@ LOCK_ID = 849403019
 # DML operacional; nunca conceder UPDATE/INSERT de usuarios ou mapa legado.
 WRITER = {
     'schema_migrations': ('SELECT',),
+    'web_local_credentials': ('SELECT', 'UPDATE (password_hash,credential_version,updated_at)'),
+    'web_local_sessions': ('SELECT', 'INSERT', 'UPDATE (last_activity_at,revoked_at)', 'DELETE'),
+    'web_local_auth_limits': ('SELECT', 'INSERT', 'UPDATE', 'DELETE'),
+    'web_local_auth_events': ('INSERT (principal_id,action)',),
     'app_users': ('SELECT (issuer,subject,email,role,active)',),
     'auth_audit_events': ('SELECT (issuer,subject,outcome,occurred_at)',
                           'INSERT (issuer,subject,action,outcome,request_id)'),
@@ -36,12 +40,28 @@ WRITER = {
     'web_participant_sessions': ('SELECT', 'INSERT',
         'UPDATE (state,started_at,app_version,revoked_at,abort_reason,participant_token_sha256)'),
     'web_session_main_order': ('SELECT', 'INSERT'),
+    'web_project_participants': ('SELECT', 'INSERT', 'UPDATE (patient_id)'),
+    'web_participant_visits': ('SELECT', 'INSERT'),
+    'web_patients': (
+        'SELECT', 'INSERT',
+        'UPDATE (full_name,normalized_name,initials,disambiguation_note,is_homonym_confirmed,active,updated_at)',
+    ),
+    'web_evaluators': (
+        'SELECT', 'INSERT',
+        'UPDATE (full_name,normalized_name,initials,active,updated_at)',
+    ),
+    'web_registry_audit_events': ('SELECT', 'INSERT'),
+    'web_legacy_entity_links': ('SELECT',),
+    'web_session_observations': ('SELECT', 'INSERT'),
+    'web_session_checkpoints': ('SELECT', 'INSERT',
+        'UPDATE (confirmed_through,prefix_hash,received_at)'),
+    'web_session_invalidations': ('SELECT', 'INSERT'),
     'web_participant_redeem_limits': ('SELECT', 'INSERT', 'UPDATE', 'DELETE'),
     'web_professional_request_limits': ('SELECT', 'INSERT', 'UPDATE', 'DELETE'),
     'web_participant_request_limits': ('SELECT', 'INSERT', 'UPDATE', 'DELETE'),
     'assessments': ('SELECT (assessment_id)', 'INSERT'), 'trial_results': ('INSERT',),
     'assessment_metrics': ('INSERT',), 'web_assessments': ('SELECT', 'INSERT'),
-    'web_trial_observations': ('INSERT',),
+    'web_trial_observations': ('SELECT (assessment_id,trial_number,trial_end_ms)', 'INSERT'),
     'web_csv_imports': ('SELECT', 'INSERT', 'UPDATE'),
 }
 
@@ -171,7 +191,13 @@ def provision(environment: Mapping[str, str] | None = None):
             for table, columns in REQUIRED_COLUMNS.items():
                 connection.execute(sql.SQL('GRANT SELECT ({}) ON TABLE public.{} TO {}').format(
                     sql.SQL(',').join(map(sql.Identifier, sorted(columns))), sql.Identifier(table), sql.Identifier(reader_name)))
-            for sequence in ('auth_audit_events_audit_id_seq', 'trial_results_trial_result_id_seq', 'assessment_metrics_metric_id_seq'):
+            for sequence in (
+                'auth_audit_events_audit_id_seq',
+                'trial_results_trial_result_id_seq',
+                'assessment_metrics_metric_id_seq',
+                'web_patient_code_seq',
+                'web_evaluator_code_seq',
+            ):
                 connection.execute(sql.SQL('GRANT USAGE ON SEQUENCE public.{} TO {}').format(sql.Identifier(sequence), sql.Identifier(writer_name)))
             connection.execute(sql.SQL('GRANT EXECUTE ON FUNCTION public.web_lock_emitter(text,text) TO {}').format(sql.Identifier(writer_name)))
             connection.execute(sql.SQL('GRANT EXECUTE ON FUNCTION public.web_manage_user(text,text,text,text,text,text,text,boolean) TO {}').format(sql.Identifier(writer_name)))

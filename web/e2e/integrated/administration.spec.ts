@@ -13,32 +13,33 @@ function session(value: Record<string, unknown> = {}) {
     }
 }
 
-test('administra conta/projeto, prepara sessao e acesso depende do vinculo ativo', async ({ page, context }) => {
+test('administra perfil sintetico/projeto, prepara sessao e acesso depende do vinculo ativo', async ({ page, context }) => {
   const admin = session()
-  const issuer = 'https://accounts.google.com'
-  const subject = `synthetic-admin-flow-${randomUUID()}`
+  // Operador prepara perfil sintetico adicional somente para regressao; UI nao cadastra.
+  const seeded = JSON.parse(execFileSync(python, [management, 'fixture_user'], {
+    input: JSON.stringify({ role: 'importacao' }), encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'],
+  })) as { subject: string; user_id: string }
+  const subject = seeded.subject
+  const memberUserId = seeded.user_id
   await context.addCookies([{ name: admin.cookie_name, value: admin.token, domain: '127.0.0.1', path: '/',
     secure: true, httpOnly: true, sameSite: 'Lax' }])
   await page.goto('/equipe')
   await page.getByRole('button', { name: 'Administração', exact: true }).click()
-  await page.getByLabel('sub verificado').fill(subject)
-  await page.getByLabel('Perfil inicial').selectOption('importacao')
-  page.once('dialog', dialog => void dialog.accept())
-  await page.getByRole('button', { name: 'Cadastrar conta' }).click()
+  await expect(page.getByRole('button', { name: 'Cadastrar conta' })).toHaveCount(0)
   const accounts = page.getByRole('table', { name: 'Contas cadastradas' })
-  await expect(accounts.getByRole('row').filter({ hasText: subject })).toBeVisible()
+  await expect(accounts.getByRole('row').filter({ hasText: memberUserId })).toBeVisible()
 
   const projectCode = `SYNTHETIC_${randomUUID().replaceAll('-', '')}`
   await page.getByLabel('Código do projeto').fill(projectCode)
   await page.getByLabel('Nome do projeto').fill('Projeto sintetico W15D')
   await page.getByRole('button', { name: 'Criar projeto' }).click()
   await expect(page.getByLabel('Projeto para vínculos')).toContainText(projectCode)
-  await page.getByLabel('Conta para vincular').selectOption({ label: `${subject} — importacao` })
+  await page.getByLabel('Conta para vincular').selectOption({ label: `${memberUserId} — importacao` })
   page.once('dialog', dialog => void dialog.accept())
   await page.getByRole('button', { name: 'Ativar vínculo' }).click()
-  await expect(page.getByRole('table', { name: 'Vínculos do projeto selecionado' })).toContainText(subject)
+  await expect(page.getByRole('table', { name: 'Vínculos do projeto selecionado' })).toContainText(memberUserId)
 
-  const member = session({ issuer, subject })
+  const member = session({ subject })
   const projectId = await page.getByLabel('Projeto para vínculos').inputValue()
   const importerContext = await page.context().browser()!.newContext({ ignoreHTTPSErrors: true })
   const importerPage = await importerContext.newPage()
@@ -86,12 +87,12 @@ test('administra conta/projeto, prepara sessao e acesso depende do vinculo ativo
     expect(linked.status()).toBe(200)
     expect(JSON.stringify(await linked.json())).toContain(projectCode)
 
-    const row = accounts.getByRole('row').filter({ hasText: subject })
-    const revoke = page.getByRole('table', { name: 'Vínculos do projeto selecionado' }).getByRole('row').filter({ hasText: subject })
+    const row = accounts.getByRole('row').filter({ hasText: memberUserId })
+    const revoke = page.getByRole('table', { name: 'Vínculos do projeto selecionado' }).getByRole('row').filter({ hasText: memberUserId })
     page.once('dialog', dialog => void dialog.accept())
     await revoke.getByRole('button', { name: 'Revogar' }).click()
     await expect(revoke).toContainText('Revogado')
-    await expect(row).toContainText(subject)
+    await expect(row).toContainText(memberUserId)
     const revoked = await credentials.get('/api/v1/projects')
     expect(revoked.status()).toBe(200)
     expect(JSON.stringify(await revoked.json())).not.toContain(projectCode)
@@ -102,8 +103,8 @@ test('administra conta/projeto, prepara sessao e acesso depende do vinculo ativo
     await page.getByRole('button', { name: 'Confirmar alterações' }).click()
     await expect(row).toContainText('Bloqueada')
     const blocked = await credentials.get('/api/v1/auth/me')
-    expect(blocked.status()).toBe(403)
-    expect(await blocked.json()).toMatchObject({ error: { code: 'account_blocked', message: 'Conta bloqueada.' } })
+    expect(blocked.status()).toBe(401)
+    expect(await blocked.json()).toMatchObject({ error: { code: 'authentication_required' } })
   } finally {
     await participant.dispose()
     await importerContext.close()

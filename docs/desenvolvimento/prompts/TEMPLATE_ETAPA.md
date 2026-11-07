@@ -1,3 +1,9 @@
+# Template histórico — consulta, não seleção de trabalho
+
+O workflow atual dispensa prompts por etapa. Se este modelo for consultado,
+usar o [backlog vigente](../../Projeto%20Stroop%20Test.md); referências legadas
+abaixo descrevem o processo anterior e não autorizam retomar fases antigas.
+
 # Template de etapa — uso externo substituido
 
 O antigo template de prompts externos foi substituido pelo

@@ -19,6 +19,8 @@ def _base(item: dict) -> dict:
         **{key: item[key] for key in (
             'assessment_id', 'participant_id', 'visit', 'evaluator_id', 'platform',
             'test_code', 'test_version', 'protocol_id', 'app_version', 'summary')},
+        'valid_for_result': item.get('valid_for_result', True),
+        'invalidation_reason': item.get('invalidation_reason'),
         'created_at': persistence.iso_utc(item['created_at']),
         'started_at': persistence.iso_utc(item['started_at']),
     }
@@ -62,6 +64,11 @@ def _record(database_url: str, project_id: UUID, assessment_id: str, actor: AppU
 
 def assessment(database_url: str, project_id: UUID, assessment_id: str, actor: AppUser) -> dict:
     item = _record(database_url, project_id, assessment_id, actor)
+    if not item.get('valid_for_result', True):
+        return {**_base(item), 'project_id': str(project_id),
+                'session_id': str(item['session_id']), 'valid_for_result': False,
+                'invalidation_reason': item['invalidation_reason'],
+                'summary': None, 'metrics': [], 'trials': []}
     trials = []
     for source in item['trials']:
         trial = {key: source[key] for key in (
@@ -73,6 +80,8 @@ def assessment(database_url: str, project_id: UUID, assessment_id: str, actor: A
         trials.append(trial)
     return {
         **_base(item), 'project_id': str(project_id),
+        'valid_for_result': item.get('valid_for_result', True),
+        'invalidation_reason': item.get('invalidation_reason'),
         'session_id': str(item['session_id']) if item['session_id'] is not None else None,
         'completed_at': persistence.iso_utc(item['completed_at']),
         'metrics': item['metrics'], 'frame_period_ms': item['frame_period_ms'],
@@ -103,6 +112,8 @@ def export_assessment(database_url: str, project_id: UUID, assessment_id: str,
                       actor: AppUser) -> tuple[str, str]:
     # Reconsulta e reautoriza a cada download, mesmo apos visualizar o detalhe.
     item = _record(database_url, project_id, assessment_id, actor)
+    if not item.get('valid_for_result', True):
+        raise MissingError
     if item['test_code'] != 'stroop_go_nogo_ptbr':
         raise UnsupportedExportError
     metadata = {
@@ -122,3 +133,10 @@ def export_assessment(database_url: str, project_id: UUID, assessment_id: str,
 
 class UnsupportedExportError(ValueError):
     """Instrumento sem contrato de CSV oficial Stroop."""
+
+
+def session_status(database_url, project_id, session_id, actor):
+    item = persistence.session_status(database_url,project_id,session_id,actor.issuer,actor.subject)
+    if item is None:
+        raise MissingError
+    return item

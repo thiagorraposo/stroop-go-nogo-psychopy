@@ -1,5 +1,12 @@
 # Verificacoes reproduziveis WEB
 
+Nota de planejamento CHG-004, 2026-11-06 — **PLANEJADO**:
+Pipeline histórico com sessões/Google sintéticos não aceita senha local.
+WEB-021/032 devem adaptar fixtures/locks e integrar AUTH-L01–L09 mantendo
+scanners, gates e gatilhos/proteções; evidências anteriores valem só por SHA.
+Decisão: [ADR-006](../arquitetura/ADR-006-autenticacao-local.md). Execução/aceite somente no backlog canônico.
+
+
 O workflow [WEB validada](../../.github/workflows/web.yml) executa verificacoes em
 pull requests, pushes em `main` e disparos manuais. Push em branch de trabalho
 nao duplica a execucao do PR. Nao faz deploy, publica artefatos,
@@ -9,14 +16,41 @@ skip Python, vulnerabilidade conhecida ou deteccao de secrets; nao existe
 no repositorio remoto para bloquear merge; essa configuracao externa nao e
 criada pelo arquivo de workflow.
 
-Contribuicoes seguem [GitHub Flow](../../CONTRIBUTING.md). O agente aguarda CI
-e regras/revisoes exigidas antes de squash merge; nao usa bypass administrativo.
-O resultado integrado e verificado novamente por push em `main`.
-Em2026-11-04, protecao remota configurada: `verify` do app GitHub Actions,
+Contribuições seguem [GitHub Flow adaptado](../../CONTRIBUTING.md): commits/pushes
+autônomos em branch, sem PR/merge automático. Integração à main exige autorização
+específica e proteções/revisões vigentes; sem bypass. O pipeline verifica main
+quando houver integração autorizada. Não se exige CI remota para esta fase documental.
+Registro histórico anterior de 2026-11-04, não reconsultado nesta auditoria: proteção configurada com `verify` do app GitHub Actions,
 branch atualizada, PR obrigatorio, historico linear e conversas resolvidas,
 inclusive para administradores. Nao se adicionou aprovador externo obrigatorio;
 revisoes existentes continuam respeitadas. Force push/exclusao de main bloqueados;
 branches temporarias sao removidas automaticamente depois do merge permitido.
+
+## Validação formal de branch sem PR automático
+
+Quando a tarefa/sessão autorizar a execução remota, usar o `workflow_dispatch`
+existente em `web.yml`, após validar/enviar uma unidade coesa. A execução é de
+verificação; não publica imagens, não faz deploy nem integra branches. Não mudar
+os gatilhos ou proteções para obter aprovação. PR e merge continuam sujeitos ao
+[workflow canônico](../WORKFLOW_CODEX_CLI.md).
+
+1. Conferir worktree, branch de trabalho, HEAD/upstream e referência remota.
+   Guardar SHA completo do candidato no backlog; não disparar sobre `main` por
+   conveniência nem considerar uma aprovação de outro SHA suficiente.
+2. Executar `gh workflow run web.yml --ref NOME_DA_BRANCH` e localizar a execução
+   com `gh run list --workflow web.yml --branch NOME_DA_BRANCH --event
+   workflow_dispatch --json databaseId,headSha,status,conclusion,url`.
+3. Conferir que `headSha` corresponde ao candidato e acompanhar `gh run view ID
+   --json headSha,status,conclusion,url,jobs`. Registrar URL/SHA e resultado real
+   no backlog, distinguindo local, Actions, pendente, falha e não executado.
+4. Falha ou skip obrigatório mantém critério sem aceite; investigar no escopo
+   autorizado. Não publicar logs com dados/credenciais nem contornar o check.
+   Caso a branch avance, registrar quais commits são apenas documentais e qual
+   SHA executou os testes; aprovação não se transfere implicitamente.
+
+Se não houver autorização de disparo, recurso ou acesso, registrar a limitação
+e preservar os resultados locais. Não abrir PR automaticamente como alternativa.
+O registro da execução é evidência, sem mudar a governança de continuidade.
 
 ## Ambiente e isolamento
 

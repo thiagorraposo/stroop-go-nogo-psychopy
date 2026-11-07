@@ -18,9 +18,15 @@ export async function mockParticipant(page: Page, initial: 'preparing' | 'runnin
   let state: 'preparing' | 'running' | 'completed' | 'aborted' | 'none' = initial
   let startCalls = 0
   let completeCalls = 0
+  let confirmedThrough = initial === 'completed' ? 16 : 0
   const now = Date.now()
   const common = { session_id: '00000000-0000-4000-8000-000000000130',
     activated_at: new Date(now).toISOString(), expires_at: new Date(now + 1_800_000).toISOString(), csrf_token: 's'.repeat(43) }
+  const currentCheckpoint = () => ({
+    confirmed_through: confirmedThrough,
+    prefix_hash: confirmedThrough > 0 ? 'a'.repeat(64) : null,
+    received_at: confirmedThrough > 0 ? new Date(now).toISOString() : null,
+  })
   let receipt: Record<string, unknown> | undefined = initial === 'completed' ? {
     session_id: common.session_id, assessment_id: '00000000-0000-4000-8000-000000000131',
     state: 'completed', completed_at: new Date(now).toISOString(), platform: 'web',
@@ -40,23 +46,36 @@ export async function mockParticipant(page: Page, initial: 'preparing' | 'runnin
     if (path.endsWith('/session')) {
       if (state === 'none') return error('authentication_required', 401)
       if (state === 'aborted') return error('state_conflict', 409)
-      if (state === 'completed') return json(receipt, 200, {
+      if (state === 'completed') return json({ ...receipt, checkpoint: currentCheckpoint() }, 200, {
         'X-CSRF-Token': common.csrf_token, 'X-Session-Expires-At': common.expires_at,
       })
-      if (state === 'running') return json({ ...common, state, can_resume: false })
-      return json({ ...common, state, can_resume: false, protocol_id: 'stroop_go_nogo_ptbr/0.2.2-web.1',
+      if (state === 'running') return json({ ...common, state, can_resume: false, checkpoint: currentCheckpoint() })
+      return json({ ...common, state, can_resume: false, checkpoint: currentCheckpoint(),
+        protocol_id: 'stroop_go_nogo_ptbr/0.2.2-web.1',
         test_code: 'stroop_go_nogo_ptbr', test_version: '0.2.2-web.1', platform: 'web', protocol,
         practice_conditions: practice,
         main_conditions: order.map((id, index) => ({ ...main.find(row => row.condition_id === id)!, trial_number: index + 1 })) })
     }
-    if (path.endsWith('/redeem')) { state = 'preparing'; return json({ ...common, state }, 201) }
+    if (path.endsWith('/redeem')) { state = 'preparing'; confirmedThrough = 0; return json({ ...common, state }, 201) }
     if (request.headers()['x-csrf-token'] !== common.csrf_token) return error('csrf_failed', 403)
+    if (path.endsWith('/session/checkpoints')) {
+      if (state !== 'running' && state !== 'aborted' && state !== 'completed') return error('state_conflict', 409)
+      const body = request.postDataJSON() as { trials?: { trial_number: number }[] }
+      const last = body.trials?.at(-1)?.trial_number ?? confirmedThrough
+      confirmedThrough = Math.max(confirmedThrough, last)
+      return json({ session_id: common.session_id, ...currentCheckpoint() })
+    }
+    if (path.endsWith('/session/invalidate')) {
+      state = 'aborted'
+      return json({ session_id: common.session_id, valid_for_result: false })
+    }
     if (path.endsWith('/start')) {
       startCalls += 1; state = 'running'
       return json({ session_id: common.session_id, state, started_at: new Date().toISOString(), expires_at: common.expires_at })
     }
     if (path.endsWith('/complete')) {
       completeCalls += 1
+      confirmedThrough = 16
       const payload = request.postDataJSON()
       const outcomes = payload.trials.map((trial: { condition_id: number; key_pressed: string | null }) => {
         const go = main.find(row => row.condition_id === trial.condition_id)!.condition === 'congruent'
@@ -81,5 +100,5 @@ export async function mockParticipant(page: Page, initial: 'preparing' | 'runnin
     if (path.endsWith('/logout')) { state = 'none'; return route.fulfill({ status: 204 }) }
     return error('not_found', 404)
   })
-  return { counts: () => ({ start: startCalls, complete: completeCalls }) }
+  return { counts: () => ({ start: startCalls, complete: completeCalls, checkpoints: confirmedThrough }) }
 }

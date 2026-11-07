@@ -10,11 +10,11 @@ import time
 import urllib.request
 from urllib.parse import urlsplit
 
-from common import API_PORT, ISSUER, ORIGIN, ROOT, SUBJECT, database_url, environment, read_url, write_url
+from common import API_PORT, ORIGIN, ROOT, USERNAME, PASSWORD, database_url, environment, read_url, write_url
 import psycopg
 from scripts.migrations import apply_migrations
 from scripts.provision_web_database import provision
-from stroop.application import auth
+from stroop.application import local_auth
 
 
 def main():
@@ -27,7 +27,7 @@ def main():
         connection.execute('DROP SCHEMA public CASCADE')
         connection.execute('CREATE SCHEMA public')
     apply_migrations(database)
-    auth.bootstrap_admin(database, ISSUER, SUBJECT)
+    local_auth.provision(database, USERNAME, PASSWORD)
     provision({'API_MIGRATION_DATABASE_URL': database,
                'API_DATABASE_URL': write_url(), 'API_READ_DATABASE_URL': read_url()})
     with psycopg.connect(write_url()) as connection:

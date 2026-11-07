@@ -1,21 +1,27 @@
 /** W13A: emissao pela interface e coleta HTTPS/PostgreSQL reais, sem mocks. */
 import { execFileSync } from 'node:child_process'
+import { randomUUID } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { expect, test } from '@playwright/test'
 import type { BrowserContext, Page } from '@playwright/test'
-import { finishPractice, manage, redeem } from './fixtures'
+import { finishPractice, manage, manageLinks, redeem } from './fixtures'
 
 const python = fileURLToPath(new URL('../../../.venv/bin/python', import.meta.url))
 const script = fileURLToPath(new URL('./dashboard-manage.py', import.meta.url))
-type Prepared = { cookie_name: string; token: string; project_id: string; evaluator_id: string }
-async function professional(page: Page, context: BrowserContext, role: string): Promise<Prepared> {
+type Prepared = {
+  cookie_name: string; token: string; project_id: string; evaluator_id: string;
+  username: string; password: string;
+}
+async function professional(page: Page, _context: BrowserContext, role: string): Promise<Prepared> {
   const prepared: Prepared = JSON.parse(execFileSync(python, [script], {
     input: JSON.stringify({ role }), encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'],
   }))
-  await context.addCookies([{ name: prepared.cookie_name, value: prepared.token, domain: '127.0.0.1',
-    path: '/', secure: true, httpOnly: true, sameSite: 'Lax' }])
   await page.goto('/equipe')
+  await page.getByLabel('Usuário', { exact: true }).fill(prepared.username)
+  await page.getByLabel('Senha', { exact: true }).fill(prepared.password)
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click()
+  await expect(page.getByText('Sua sessão está ativa.')).toBeVisible()
   await page.getByRole('combobox', { name: 'Projeto', exact: true }).selectOption(prepared.project_id)
   return prepared
 }
@@ -48,7 +54,8 @@ test('cadastro pela equipe conserva metadados ate recibo, consulta e CSV reais',
     await expect(participantPage.getByRole('heading', { name: 'Resumo da execução' })).toBeVisible({ timeout: 70_000 })
     await expect(participantPage.getByRole('status')).toContainText('Resultado recebido pela equipe.', { timeout: 15_000 })
     const stored = manage('state', { session_id: issued.session_id })
-    expect([stored.state, stored.assessments, stored.trials, stored.metrics]).toEqual(['completed', 1, 16, 12])
+    expect([stored.state, stored.assessments, stored.trials, stored.metrics, stored.observations, stored.confirmed_through])
+      .toEqual(['completed', 1, 16, 12, 16, 16])
     await page.reload()
     await page.getByRole('combobox', { name: 'Projeto', exact: true }).selectOption(prepared.project_id)
     await page.getByRole('button', { name: `Ver avaliação ${participant}, visita ${visit}` }).click()
@@ -58,7 +65,8 @@ test('cadastro pela equipe conserva metadados ate recibo, consulta e CSV reais',
     expect(response.status()).toBe(200)
     const assessment = await response.json()
     expect(assessment).toMatchObject({ participant_id: participant, visit, evaluator_id: prepared.evaluator_id,
-      project_id: prepared.project_id, session_id: issued.session_id, platform: 'web' })
+      project_id: prepared.project_id, session_id: issued.session_id, platform: 'web',
+      app_version: 'web-0.1.0+visual.1.0.0', valid_for_result: true })
     const downloading = page.waitForEvent('download')
     await detail.getByRole('button', { name: 'Exportar CSV oficial' }).click()
     const download = await downloading
@@ -106,4 +114,139 @@ test('consulta vinculada nao recebe controles de cadastro ou revogacao', async (
   await expect(page.getByRole('button', { name: 'Gerar convite', exact: true })).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Revogar convite', exact: true })).toHaveCount(0)
   await expect(page.getByLabel('Código do participante', { exact: true })).toHaveCount(0)
+})
+
+test('login local precede multiplas visitas, avaliacoes na mesma visita, isolamento entre projetos e credencial participante independente', async ({ page, context, browser }) => {
+  const preparedA = await professional(page, context, 'importacao')
+  const issuedA1 = await issue(page, preparedA.project_id, 'P_VINCULO_M4', 'VISITA_1')
+  await page.getByRole('button', { name: 'Preparar outra sessão', exact: true }).click()
+  const issuedA2 = await issue(page, preparedA.project_id, 'P_VINCULO_M4', 'VISITA_1')
+  await page.getByRole('button', { name: 'Preparar outra sessão', exact: true }).click()
+  const issuedA3 = await issue(page, preparedA.project_id, 'P_VINCULO_M4', 'VISITA_2')
+
+  const linksA1 = manageLinks(issuedA1.session_id)
+  const linksA2 = manageLinks(issuedA2.session_id)
+  const linksA3 = manageLinks(issuedA3.session_id)
+  expect(linksA1.participant_uuid).toBe(linksA2.participant_uuid)
+  expect(linksA1.participant_uuid).toBe(linksA3.participant_uuid)
+  expect(linksA1.visit_uuid).toBe(linksA2.visit_uuid)
+  expect(linksA3.visit_uuid).not.toBe(linksA1.visit_uuid)
+  expect(issuedA1.session_id).not.toBe(issuedA2.session_id)
+  expect(issuedA1.code).not.toBe(issuedA2.code)
+
+  const secondContext = await browser.newContext({ ignoreHTTPSErrors: true })
+  const secondPage = await secondContext.newPage()
+  const participantContext = await browser.newContext({ ignoreHTTPSErrors: true })
+  const participantPage = await participantContext.newPage()
+  try {
+    const preparedB = await professional(secondPage, secondContext, 'importacao')
+    const issuedB1 = await issue(secondPage, preparedB.project_id, 'P_VINCULO_M4', 'VISITA_1')
+    const linksB1 = manageLinks(issuedB1.session_id)
+    expect(linksB1.participant_uuid).not.toBe(linksA1.participant_uuid)
+    expect(linksB1.visit_uuid).not.toBe(linksA1.visit_uuid)
+
+    await redeem(participantPage, issuedA1.code)
+    // Uso unico: tentar resgatar o mesmo codigo novamente falha com 409 sem derrubar a sessao ativa.
+    expect((await secondPage.request.post('/api/v1/participant/redeem', {
+      headers: { Origin: new URL(secondPage.url()).origin }, data: { code: issuedA1.code },
+    })).status()).toBe(409)
+
+    // Logout profissional nao invalida credencial participante ativa; participante nao acessa /auth/me.
+    await page.getByRole('button', { name: 'Encerrar sessão', exact: true }).click()
+    await expect(page.getByRole('button', { name: 'Entrar', exact: true })).toBeVisible()
+    expect((await participantPage.request.get('/api/v1/auth/me')).status()).toBe(401)
+    const activeParticipant = await participantPage.request.get('/api/v1/participant/session')
+    expect(activeParticipant.status()).toBe(200)
+    expect((await activeParticipant.json()).session_id).toBe(issuedA1.session_id)
+  } finally {
+    await secondContext.close()
+    await participantContext.close()
+  }
+})
+
+test('PREP-01 e E2E-FLOW-01: cadastro inline de paciente e avaliador, resumo para conferencia, execucao completa sem expor nomes ao participante e consulta/CSV', async ({ page, context }) => {
+  const prepared = await professional(page, context, 'importacao')
+  const suffix = Array.from(randomUUID().replaceAll('-', '').slice(0, 6))
+    .map(ch => String.fromCharCode(65 + (parseInt(ch, 16) % 26)))
+    .join('')
+
+  await page.getByRole('button', { name: 'Cadastrar novo paciente', exact: true }).click()
+  const patientGroup = page.getByRole('group', { name: 'Novo cadastro de paciente' })
+  const patientFullName = `Helena Sintetica ${suffix}`
+  await patientGroup.getByLabel('Nome completo do paciente').fill(patientFullName)
+  const expectedPatientInitials = `HS${suffix[0]}`
+  await expect(patientGroup.getByLabel('Iniciais do paciente')).toHaveValue(expectedPatientInitials)
+  await patientGroup.getByLabel('Nota de desambiguação (opcional)').fill('Turma Sintetica M4')
+  const creatingPatient = page.waitForResponse(res => res.url().endsWith('/api/v1/patients') && res.request().method() === 'POST')
+  await patientGroup.getByRole('button', { name: 'Salvar paciente', exact: true }).click()
+  const patientResp = await creatingPatient
+  expect(patientResp.status()).toBe(201)
+  const createdPatient = await patientResp.json() as { id: string; participant_code: string }
+  expect(createdPatient.participant_code).toMatch(/^PAT-\d{8}-\d{6}$/)
+
+  await expect(page.getByLabel('Código do participante', { exact: true })).toHaveValue(createdPatient.participant_code)
+  await expect(page.getByLabel('Iniciais na sessão', { exact: true })).toHaveValue(expectedPatientInitials)
+
+  await page.getByRole('button', { name: 'Cadastrar novo avaliador', exact: true }).click()
+  const evaluatorGroup = page.getByRole('group', { name: 'Novo cadastro de avaliador' })
+  const evaluatorFullName = `Dr. Marcos Sintetico ${suffix}`
+  await evaluatorGroup.getByLabel('Nome completo do avaliador').fill(evaluatorFullName)
+  const expectedEvaluatorInitials = `DMS${suffix[0]}`
+  await expect(evaluatorGroup.getByLabel('Iniciais do avaliador')).toHaveValue(expectedEvaluatorInitials)
+  const creatingEvaluator = page.waitForResponse(res => res.url().endsWith('/api/v1/evaluators') && res.request().method() === 'POST')
+  await evaluatorGroup.getByRole('button', { name: 'Salvar avaliador', exact: true }).click()
+  const evaluatorResp = await creatingEvaluator
+  expect(evaluatorResp.status()).toBe(201)
+  const createdEvaluator = await evaluatorResp.json() as { id: string; evaluator_code: string }
+  expect(createdEvaluator.evaluator_code).toMatch(/^EVA-\d{6}$/)
+
+  const visit = 'VISITA_PREP01'
+  await page.getByLabel('Visita da sessão', { exact: true }).fill(visit)
+  await page.getByRole('button', { name: 'Revisar preparação', exact: true }).click()
+
+  const review = page.getByRole('region', { name: 'Resumo para conferência' })
+  await expect(review).toContainText(`${patientFullName} (${createdPatient.participant_code})`)
+  await expect(review).toContainText(`${evaluatorFullName} (${createdEvaluator.evaluator_code})`)
+  await expect(review).toContainText('stroop_go_nogo_ptbr · 0.2.2-web.1')
+
+  const issuing = page.waitForResponse(res => res.url().endsWith(`/projects/${prepared.project_id}/invitations`) && res.request().method() === 'POST')
+  await review.getByRole('button', { name: 'Confirmar e emitir convite', exact: true }).click()
+  const issuedResp = await issuing
+  expect(issuedResp.status()).toBe(201)
+  const issued = await issuedResp.json() as { session_id: string; invitation_id: string; code: string }
+  await expect(page.getByLabel('Código do convite', { exact: true })).toHaveText(issued.code)
+
+  const participantPage = await context.newPage()
+  try {
+    await redeem(participantPage, issued.code)
+    const bootstrapRes = await participantPage.request.get('/api/v1/participant/session')
+    expect(bootstrapRes.status()).toBe(200)
+    const bootstrapBody = await bootstrapRes.json() as Record<string, unknown>
+    expect(bootstrapBody).not.toHaveProperty('participant_name')
+    expect(bootstrapBody).not.toHaveProperty('full_name')
+    expect(bootstrapBody).not.toHaveProperty('initials')
+
+    await finishPractice(participantPage)
+    await participantPage.getByRole('button', { name: 'Começar tarefa' }).click()
+    await expect(participantPage.getByRole('heading', { name: 'Resumo da execução' })).toBeVisible({ timeout: 70_000 })
+    await expect(participantPage.getByRole('status')).toContainText('Resultado recebido pela equipe.', { timeout: 15_000 })
+
+    const stored = manage('state', { session_id: issued.session_id })
+    expect([stored.state, stored.assessments, stored.trials, stored.metrics, stored.observations, stored.confirmed_through])
+      .toEqual(['completed', 1, 16, 12, 16, 16])
+
+    const detailResp = await page.request.get(`/api/v1/projects/${prepared.project_id}/assessments/${stored.assessment_id}`)
+    expect(detailResp.status()).toBe(200)
+    const assessment = await detailResp.json()
+    expect(assessment).toMatchObject({
+      participant_id: createdPatient.participant_code,
+      visit,
+      evaluator_id: createdEvaluator.evaluator_code,
+      project_id: prepared.project_id,
+      session_id: issued.session_id,
+      valid_for_result: true,
+    })
+  } finally {
+    await participantPage.close()
+  }
 })

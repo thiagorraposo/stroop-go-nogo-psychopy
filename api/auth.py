@@ -8,6 +8,8 @@ import hmac
 import re
 import secrets
 from datetime import datetime, timezone
+from dataclasses import dataclass
+from uuid import UUID
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, RedirectResponse, Response
 from pydantic import BaseModel, ConfigDict
@@ -22,6 +24,9 @@ from api.google_oidc import (
     exchange_code,
 )
 from stroop.application import auth as auth_application
+from stroop.application import local_auth as local_application
+from stroop.domain.local_auth import LOCAL_ISSUER
+from stroop.domain.auth import AppUser
 from stroop.domain.auth import (
     opaque_user_id,
     AuthDatabaseError,
@@ -138,6 +143,18 @@ def _professional_context(request: Request, action: str):
     token = _cookie(request, PROFESSIONAL_COOKIE)
     if token is None or TOKEN_PATTERN.fullmatch(token) is None:
         raise APIError("authentication_required")
+    if config.auth_mode == "local":
+        try:
+            status, details = local_application.session_context(
+                config.database_url, hashlib.sha256(token.encode("ascii")).hexdigest(), action)
+        except PersistenceError:
+            raise APIError("service_unavailable") from None
+        if status != "success":
+            raise APIError("permission_denied" if status == "forbidden" else "authentication_required")
+        principal, role, expires = details
+        request.state.local_session_token_hash = hashlib.sha256(token.encode("ascii")).hexdigest()
+        request.state.local_session_token = token
+        return AppUser(LOCAL_ISSUER, str(principal), None, role, True), LocalSessionView(expires), token
     try:
         session = web_auth.find_professional_session(
             config.database_url, hashlib.sha256(token.encode("ascii")).hexdigest()
@@ -160,6 +177,11 @@ def _professional_context(request: Request, action: str):
     return user, session, token
 
 
+@dataclass(frozen=True)
+class LocalSessionView:
+    expires_at: datetime
+
+
 def parse_opaque_user_id(value: str) -> tuple[str, str] | None:
     if not 1 <= len(value) <= 512 or re.fullmatch(r"[A-Za-z0-9_-]+", value) is None:
         return None
@@ -168,6 +190,13 @@ def parse_opaque_user_id(value: str) -> tuple[str, str] | None:
         issuer, subject = raw.decode("ascii").split("\0", 1)
     except (ValueError, UnicodeError):
         return None
+    if issuer == LOCAL_ISSUER:
+        try:
+            if str(UUID(subject)) != subject:
+                return None
+        except ValueError:
+            return None
+        return issuer, subject
     if issuer not in {"https://accounts.google.com", "accounts.google.com"}:
         return None
     if not 1 <= len(subject) <= 255 or any(c.isspace() for c in subject):
@@ -214,6 +243,8 @@ def _oidc_error(request: Request, code: str = "invalid_oidc_state") -> JSONRespo
 
 @router.get("/login")
 async def login(request: Request):
+    if request.app.state.config.auth_mode == "local":
+        raise APIError("not_found")
     _reject_query(request)
     await _reject_body(request)
     config: APIConfig = request.app.state.config
@@ -272,6 +303,8 @@ async def login(request: Request):
 
 @router.get("/callback")
 async def callback(request: Request):
+    if request.app.state.config.auth_mode == "local":
+        raise APIError("not_found")
     await _reject_body(request)
     config: APIConfig = request.app.state.config
     parameters = request.query_params.multi_items()
@@ -400,9 +433,13 @@ async def logout(request: Request, body: LogoutRequest):
         raise APIError("csrf_failed")
     _professional_rate_limit(request, token, "write")
     try:
-        web_auth.revoke_professional_session(
-            config.database_url, hashlib.sha256(token.encode("ascii")).hexdigest()
-        )
+        if config.auth_mode == "local":
+            from stroop.persistence.local_auth import revoke
+            revoke(config.database_url, hashlib.sha256(token.encode("ascii")).hexdigest())
+        else:
+            web_auth.revoke_professional_session(
+                config.database_url, hashlib.sha256(token.encode("ascii")).hexdigest()
+            )
     except PersistenceError:
         return error_response("service_unavailable", request.state.request_id)
     response = Response(status_code=204)

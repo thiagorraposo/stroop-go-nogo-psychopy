@@ -69,7 +69,7 @@ class WebAdministrationProvisionedTests(unittest.TestCase):
                 VALUES(%s,%s,%s,CURRENT_TIMESTAMP+INTERVAL '1 hour',
                        CURRENT_TIMESTAMP+INTERVAL '1 hour')""",
                        (sha256(token.encode('ascii')).hexdigest(), actor.issuer, actor.subject))
-        config = APIConfig(database_url=self.writer_dsn, read_database_url=self.reader_dsn,
+        config = APIConfig(auth_mode="oidc", database_url=self.writer_dsn, read_database_url=self.reader_dsn,
                            public_origin=ORIGIN, app_env='test',
                            oidc_client_id='synthetic-client-id',
                            oidc_client_secret='synthetic-client-secret-never-use',

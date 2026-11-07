@@ -10,6 +10,7 @@
 !scripts/
 !scripts/migrations.py
 !scripts/provision_web_database.py
+!scripts/gerenciar_conta_local.py
 !scripts/migrations/
 !scripts/migrations/*.sql
 !condicoes/

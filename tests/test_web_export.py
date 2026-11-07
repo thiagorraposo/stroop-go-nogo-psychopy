@@ -47,6 +47,11 @@ class WebExportTests(unittest.TestCase):
                 self.assertTrue(all(row['participant_name'] == 'NAO_COLETADO'
                                     and row['initials'] == '' and row['block'] == 'main' for row in rows))
                 metrics = {metric['metric_code']: metric['metric_value'] for metric in calculate_metrics(rows)}
+                expected_units = {metric['metric_code']: metric['unit'] for metric in result['metrics']}
+                self.assertEqual(set(metrics), set(expected_units))
+                self.assertAlmostEqual(metrics['omission_errors_percentage'],
+                                       fixture['expected_summary']['omission_errors'] /
+                                       fixture['expected_summary']['total_go_trials'] * 100)
                 for key, expected in fixture['expected_summary'].items():
                     self.assertAlmostEqual(metrics[key], 0 if expected is None else expected, places=12)
                 imported = import_csv(path, Path(directory) / 'synthetic.sqlite3')
@@ -54,6 +59,11 @@ class WebExportTests(unittest.TestCase):
                 with sqlite3.connect(Path(directory) / 'synthetic.sqlite3') as connection:
                     self.assertEqual(connection.execute('SELECT COUNT(*) FROM assessments').fetchone(), (1,))
                     self.assertEqual(connection.execute('SELECT COUNT(*) FROM assessment_metrics').fetchone(), (12,))
+                    imported_metrics = connection.execute(
+                        'SELECT metric_code,metric_value,unit FROM assessment_metrics').fetchall()
+                for code, value, unit in imported_metrics:
+                    self.assertAlmostEqual(value, metrics[code], places=12)
+                    self.assertEqual(unit, expected_units[code])
                 self.assertEqual(rows[0]['started_at'], '2026-10-17T02:30:45Z')
                 self.assertEqual(rows[0]['assessment_date'], '2026-10-17')
 

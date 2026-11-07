@@ -161,3 +161,51 @@ test('429 impede reenvio imediato; erro fatal nunca confirma nem reenvia', async
   await run.send()
   expect(port.completeParticipant).toHaveBeenCalledTimes(2)
 })
+
+test('worker incremental bloqueia inicio quando indisponivel, encaminha tentativas e preserva parcial na interrupcao', async () => {
+  const port = { ...ports(), invalidateParticipant: vi.fn().mockResolvedValue(false) }
+  const enqueue = vi.fn()
+  const dispose = vi.fn()
+  const prepareTransport = vi.fn()
+    .mockRejectedValueOnce(new ApiError('service_unavailable', 503))
+    .mockImplementation(async (_context, onStatus) => {
+      onStatus?.({ state: 'ready', confirmed: 0, queued: 0, attempts: 0 })
+      return { enqueue, dispose }
+    })
+  const run = new ParticipantRun(port, prepareTransport)
+  runs.push(run)
+  await run.activate()
+  await expect(run.start()).rejects.toMatchObject({ code: 'service_unavailable' })
+  // Tentativa nao deve ser encaminhada se o worker nao ficou pronto.
+  run.recordTrial(result().trials[0]!, 16.666667)
+  expect(enqueue).not.toHaveBeenCalled()
+  await run.start()
+  expect(prepareTransport).toHaveBeenCalledTimes(2)
+  run.recordTrial(result().trials[0]!, 16.666667)
+  expect(enqueue).toHaveBeenCalledExactlyOnceWith(result().trials[0], 16.666667)
+  run.interrupt('escape')
+  expect(dispose).toHaveBeenCalledWith(true)
+  expect(run.getSnapshot()).toMatchObject({
+    phase: 'invite',
+    message: expect.stringContaining('observação parcial, sem gerar resultado oficial'),
+  })
+})
+
+test('invalidacao tardia apos conclusao distingue evento antes e depois do fim do bloco', async () => {
+  const port = { ...ports(), invalidateParticipant: vi.fn().mockResolvedValueOnce(true).mockResolvedValueOnce(false) }
+  const run = new ParticipantRun(port)
+  runs.push(run)
+  await run.activate(); await run.start()
+  run.complete(result()); await settle()
+  expect(run.getSnapshot()).toMatchObject({ phase: 'result', delivery: 'saved' })
+  // Evento apos o encerramento integro (valid_for_result: true) preserva o resultado salvo.
+  await run.invalidate('focus_lost', 60001)
+  expect(run.getSnapshot()).toMatchObject({ phase: 'result', delivery: 'saved' })
+  // Violacao tardia anterior ao fim (valid_for_result: false) invalida o resultado e exige novo convite/pratica.
+  await run.invalidate('visibility_hidden', 59000)
+  expect(port.invalidateParticipant).toHaveBeenCalledTimes(2)
+  expect(run.getSnapshot()).toMatchObject({
+    phase: 'invite',
+    message: expect.stringContaining('invalidada e não possui resultado oficial'),
+  })
+})

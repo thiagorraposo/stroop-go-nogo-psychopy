@@ -2,7 +2,8 @@ import { mockParticipant } from './support/participant'
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 
-test.beforeEach(async ({ page }) => { await mockParticipant(page) })
+let participantMock: Awaited<ReturnType<typeof mockParticipant>>
+test.beforeEach(async ({ page }) => { participantMock = await mockParticipant(page) })
 
 async function finishPractice(page: Page) {
   await page.goto('/pratica')
@@ -34,6 +35,8 @@ test('principal executa 16 condicoes reais sem feedback nem encurtar resposta', 
     ids.push(condition!.id)
     kinds.push(condition!.kind!)
     await expect(page.locator('[data-phase="feedback"]')).toHaveCount(0)
+    await expect(page.locator('[data-testid*="accuracy"]')).toHaveCount(0)
+    await expect(page.getByText(/precisão|taxa de acerto|classificação|ranking/i)).toHaveCount(0)
     await expect(page.getByText('ESPAÇO apenas quando combinar', { exact: true })).toHaveCount(0)
     if (trial === 1) await page.keyboard.up('Space')
     else if (trial <= 3) {
@@ -42,6 +45,7 @@ test('principal executa 16 condicoes reais sem feedback nem encurtar resposta', 
     }
   }
   await expect(page.getByRole('heading', { name: 'Resumo da execução' })).toBeVisible({ timeout: 5_000 })
+  await expect.poll(() => participantMock.counts().checkpoints).toBe(16)
   expect(ids.sort((a, b) => a - b)).toEqual(Array.from({ length: 16 }, (_, i) => i + 1))
   expect(kinds.filter(kind => kind === 'congruent')).toHaveLength(8)
   expect(kinds.filter(kind => kind === 'incongruent')).toHaveLength(8)

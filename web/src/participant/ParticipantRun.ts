@@ -2,12 +2,23 @@
 import * as api from '../api/participant'
 import type { AbortReason, CompletePayload, ParticipantSession, PreparingSession, Receipt } from '../api/participant'
 import { ApiError } from '../api/client'
-import type { MainResult } from '../experiment/main-engine'
+import type { MainResult, MainTrial } from '../experiment/main-engine'
 import { summarizeMain } from '../experiment/summary'
 import type { DisplaySummary } from '../experiment/summary'
+import type { TransportContext, TransportStatus } from '../transport/checkpoint-queue'
+import { prepareCheckpointWorker } from '../transport/checkpoint-worker'
 
 type API = Pick<typeof api, 'getParticipantSession' | 'redeemInvitation' | 'startParticipant' |
-  'completeParticipant' | 'abortParticipant' | 'logoutParticipant'>
+  'completeParticipant' | 'abortParticipant' | 'logoutParticipant'> &
+  Partial<Pick<typeof api, 'invalidateParticipant'>>
+export type CheckpointTransport = {
+  enqueue(trial: Readonly<MainTrial>, framePeriod: number): void
+  dispose(graceful?: boolean): void
+}
+export type PrepareTransport = (
+  context: TransportContext,
+  onStatus?: (status: TransportStatus) => void,
+) => Promise<CheckpointTransport>
 export type ParticipantView =
   | { phase: 'loading' }
   | { phase: 'blocked'; message: string }
@@ -37,6 +48,9 @@ export class ParticipantRun {
   private io: AbortController | undefined
   private context: ParticipantSession | undefined
   private payload: CompletePayload | undefined
+  private transport: CheckpointTransport | undefined
+  private observedTrials = 0
+  private confirmedTrials = 0
   private engineStarted = false
   private startAttempted = false
   private startPending = false
@@ -44,22 +58,37 @@ export class ParticipantRun {
   private sending = false
   private expiry: ReturnType<typeof setTimeout> | undefined
   private retryTimer: ReturnType<typeof setTimeout> | undefined
+  private readonly prepareTransport: PrepareTransport
 
-  constructor(private readonly port: API = api) {}
+  constructor(private readonly port: API = api, prepareTransport?: PrepareTransport) {
+    this.prepareTransport = prepareTransport ?? (port === api
+      ? prepareCheckpointWorker
+      : async (_context, onStatus) => {
+        onStatus?.({ state: 'ready', confirmed: 0, queued: 0, attempts: 0 })
+        return { enqueue() {}, dispose() {} }
+      })
+  }
   getSnapshot = (): ParticipantView => this.view
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener) } }
   private set(view: ParticipantView) { this.view = view; this.listeners.forEach(listener => listener()) }
   private current(version: number) { return this.active && version === this.version }
   private cancelIO() { this.version += 1; this.io?.abort(); this.io = undefined }
   private beginIO() { this.cancelIO(); this.io = new AbortController(); return { version: this.version, signal: this.io.signal } }
-  private clear() {
+  private disposeTransport(graceful = false) {
+    const current = this.transport
+    this.transport = undefined
+    current?.dispose(graceful)
+  }
+  private clear(gracefulTransport = false) {
     clearTimeout(this.expiry); clearTimeout(this.retryTimer)
     this.expiry = undefined; this.retryTimer = undefined
+    this.disposeTransport(gracefulTransport)
+    this.observedTrials = 0; this.confirmedTrials = 0
     this.context = undefined; this.payload = undefined
     this.engineStarted = false; this.startAttempted = false; this.startPending = false; this.sending = false
   }
-  private invite(message: string | null) {
-    this.cancelIO(); this.clear()
+  private invite(message: string | null, gracefulTransport = false) {
+    this.cancelIO(); this.clear(gracefulTransport)
     this.set({ phase: 'invite', message, busy: false })
   }
   private deadline(expiresAt: string) {
@@ -73,15 +102,25 @@ export class ParticipantRun {
       this.invite('Seu acesso expirou. Solicite um novo convite à equipe.')
     }, delay)
   }
-  private bestEffortAbort(reason: AbortReason) {
+  private bestEffortAbort(reason: AbortReason, eventAtMs: number | null = null) {
     const context = this.context
-    if (!context || context.state === 'completed') return
-    void this.port.abortParticipant(context.csrf_token, context.session_id, reason).catch(() => undefined)
+    if (!context) return
+    if (context.state === 'completed') {
+      if (reason !== 'user_cancelled') {
+        void this.port.invalidateParticipant?.(context.csrf_token, context.session_id, reason, eventAtMs).catch(() => undefined)
+      }
+      return
+    }
+    void this.port.abortParticipant(context.csrf_token, context.session_id, reason).catch(error => {
+      if (reason !== 'user_cancelled' && error instanceof ApiError && error.status === 409) {
+        void this.port.invalidateParticipant?.(context.csrf_token, context.session_id, reason, eventAtMs).catch(() => undefined)
+      }
+    })
   }
   activate() { this.active = true; return this.load() }
   dispose(reason: AbortReason = 'user_cancelled', notify = false) {
     if (this.engineStarted || this.startAttempted || this.startPending) this.bestEffortAbort(reason)
-    this.active = false; this.cancelIO(); this.clear(); this.view = { phase: 'loading' }
+    this.active = false; this.cancelIO(); this.clear(reason !== 'user_cancelled'); this.view = { phase: 'loading' }
     if (notify) this.listeners.forEach(listener => listener())
   }
   blocked(message: string) { this.set({ phase: 'blocked', message }) }
@@ -92,7 +131,7 @@ export class ParticipantRun {
     if (session.state === 'running') {
       // Pagina recarregada nao sabe quais estimulos ja foram apresentados.
       this.bestEffortAbort('reload')
-      this.invite('A execução anterior foi interrompida. Solicite um novo convite e faça a prática novamente.')
+      this.invite('A execução anterior foi interrompida e não gerou resultado oficial; observações parciais eventualmente recebidas não permitem retomar a sessão. Solicite um novo convite e faça a prática novamente.')
     } else if (session.state === 'completed') {
       this.payload = undefined; this.engineStarted = false
       this.deadline(session.expires_at)
@@ -145,8 +184,28 @@ export class ParticipantRun {
     }
     const { version, signal } = this.beginIO()
     this.startPending = true; this.startAttempted = true
-    const operation = this.port.startParticipant(context, signal).then(() => {
+    const operation = this.port.startParticipant(context, signal).then(async () => {
       if (!this.current(version)) throw new ApiError('request_cancelled', 0)
+      this.disposeTransport(false)
+      this.observedTrials = 0; this.confirmedTrials = 0
+      const transport = await this.prepareTransport({
+        session_id: context.session_id,
+        csrf_token: context.csrf_token,
+        expires_at: context.expires_at,
+        protocol_id: context.protocol_id,
+        test_version: context.test_version,
+        platform: 'web',
+        app_version: api.APP_VERSION,
+      }, status => {
+        if (this.active && this.context?.session_id === context.session_id) {
+          this.confirmedTrials = status.confirmed
+        }
+      })
+      if (!this.current(version)) {
+        transport.dispose(false)
+        throw new ApiError('request_cancelled', 0)
+      }
+      this.transport = transport
       this.engineStarted = true
     }).catch(error => {
       if (this.current(version) && terminal(error)) this.invite(api.participantErrorMessage(error))
@@ -155,11 +214,42 @@ export class ParticipantRun {
     this.startPromise = operation
     try { await operation } finally { if (this.startPromise === operation) this.startPromise = undefined }
   }
-  interrupt(reason: AbortReason) {
+  recordTrial(trial: Readonly<MainTrial>, framePeriod: number) {
+    if (!this.active || !this.engineStarted) return
+    this.observedTrials = Math.max(this.observedTrials, trial.trial_number)
+    this.transport?.enqueue(trial, framePeriod)
+  }
+  interrupt(reason: AbortReason, eventAtMs: number | null = null) {
     if (!this.active) return
-    this.bestEffortAbort(reason)
-    this.invite((reason === 'timing_invalid' ? 'Não foi possível manter os tempos de apresentação nesta execução.'
-      : 'A execução foi interrompida e não gerou resultado.') + ' Solicite um novo convite e faça a prática novamente.')
+    const hadObservations = this.observedTrials > 0 || this.confirmedTrials > 0
+    this.bestEffortAbort(reason, eventAtMs)
+    const detail = hadObservations
+      ? ' Tentativas já concluídas podem ter sido registradas apenas como observação parcial, sem gerar resultado oficial.'
+      : ''
+    this.invite(
+      (reason === 'timing_invalid'
+        ? 'Não foi possível manter os tempos de apresentação nesta execução.'
+        : 'A execução foi interrompida e não gerou resultado.') +
+      detail +
+      ' Solicite um novo convite e faça a prática novamente.',
+      true,
+    )
+  }
+  async invalidate(reason: AbortReason, eventAtMs: number | null = null): Promise<void> {
+    if (!this.active || !this.context) return
+    const { csrf_token, session_id } = this.context
+    try {
+      const stillValid = await this.port.invalidateParticipant?.(csrf_token, session_id, reason, eventAtMs)
+      if (stillValid === true) return
+    } catch {
+      // Prosseguir para encerramento local conservador quando aplicavel.
+    }
+    if (this.active) {
+      this.invite(
+        'Esta sessão foi invalidada e não possui resultado oficial. Observações registradas permanecem apenas para auditoria técnica. Solicite um novo convite e faça a prática novamente.',
+        true,
+      )
+    }
   }
   complete(result: MainResult) {
     const context = this.context
@@ -176,6 +266,7 @@ export class ParticipantRun {
     } catch { this.interrupt('timing_invalid') }
   }
   private saved(receipt: Receipt, context: PreparingSession) {
+    this.disposeTransport(false)
     this.payload = undefined
     this.context = { ...receipt, csrf_token: context.csrf_token, expires_at: context.expires_at }
     this.set({ phase: 'result', summary: display(receipt), delivery: 'saved',

@@ -1,5 +1,13 @@
 # Implantacao WEB na VPS existente
 
+Nota de planejamento CHG-004, 2026-11-06 — **PLANEJADO**:
+Registros de configuração/login Google abaixo são históricos datados; alvo
+WEB-037/038 usa conta local provisionada por procedimento protegido e smoke
+HTTPS/login/logout/negações. Exigir autorização específica de deploy; esta
+revisão não modifica ambiente remoto.
+Decisão: [ADR-006](../arquitetura/ADR-006-autenticacao-local.md). Execução/aceite somente no backlog canônico.
+
+
 Substituicao explicitamente autorizada pelo responsavel em 2026-10-16,
 executada sem alterar dominio. Publicacao destinada exclusivamente a testes
 sinteticos; nao concede homologacao temporal W16, capacidade W21 ou autorizacao

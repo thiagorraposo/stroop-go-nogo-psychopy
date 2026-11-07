@@ -57,7 +57,11 @@ async def list_users(request: Request):
     except AuthError as exc:
         raise _database_error(exc) from None
     more = len(users) > limit
-    return {"items": [_user_row(user) for user in users[:limit]],
+    def row(user):
+        if config.auth_mode == "local":
+            return {key: value for key, value in _user_row(user).items() if key in {"user_id", "role", "active"}}
+        return _user_row(user)
+    return {"items": [row(user) for user in users[:limit]],
             "next_cursor": _next_cursor(config, scope, offset + limit) if more else None}
 
 
@@ -65,6 +69,8 @@ async def list_users(request: Request):
 async def create_user(request: Request, body: CreateUser):
     _reject_query(request)
     actor = _professional_write(request, "manage_users")
+    if request.app.state.config.auth_mode == "local":
+        raise APIError("permission_denied")
     try:
         management.create_user(request.app.state.config.database_url, body.issuer, body.subject,
                                 body.role, body.email, actor)
@@ -82,6 +88,8 @@ async def create_user(request: Request, body: CreateUser):
 async def update_user(user_id: str, request: Request, body: UpdateUser):
     _reject_query(request)
     actor = _professional_write(request, "manage_users")
+    if request.app.state.config.auth_mode == "local":
+        raise APIError("not_found")
     identity = parse_opaque_user_id(user_id)
     if identity is None:
         raise APIError("invalid_request")
@@ -98,3 +106,65 @@ async def update_user(user_id: str, request: Request, body: UpdateUser):
 
 
 __all__ = ["router"]
+
+
+class LocalUserUpdate(RequestModel):
+    role: str
+    active: bool
+
+
+class RevokeSessionsRequest(RequestModel):
+    pass
+
+
+@router.patch('/users/{user_id}')
+async def update_local_user(user_id: str, request: Request, body: LocalUserUpdate):
+    _reject_query(request)
+    actor = _professional_write(request, 'manage_users')
+    config = request.app.state.config
+    from stroop.domain.local_auth import LOCAL_ISSUER
+    identity = parse_opaque_user_id(user_id)
+    if config.auth_mode != 'local' or identity is None:
+        raise APIError('not_found')
+    # Recursos historicos continuam no catalogo; nenhuma reescrita de identidade/email.
+    from stroop.persistence.local_management import user_email
+    from stroop.persistence.auth import PersistenceError
+    try:
+        email = user_email(config.database_url, *identity)
+    except PersistenceError:
+        raise APIError('service_unavailable') from None
+    if email is None:
+        raise APIError('not_found')
+    try:
+        management.update_user(config.database_url, *identity, role=body.role,
+                               active=body.active, email=email[0], actor=actor)
+    except AuthError as exc:
+        raise _database_error(exc) from None
+    return {'user_id': user_id, 'role': body.role, 'active': body.active}
+
+
+@router.post('/users/{user_id}/sessions/revoke', status_code=204)
+async def revoke_local_sessions(user_id: str, request: Request, body: RevokeSessionsRequest):
+    _reject_query(request)
+    actor = _professional_write(request, 'manage_users')
+    config = request.app.state.config
+    from stroop.domain.local_auth import LOCAL_ISSUER
+    from stroop.persistence.local_management import revoke_sessions
+    from stroop.persistence.auth import PersistenceError
+    from fastapi.responses import Response
+    from api.auth import PROFESSIONAL_COOKIE
+    identity = parse_opaque_user_id(user_id)
+    if config.auth_mode != 'local' or identity is None or identity[0] != LOCAL_ISSUER:
+        raise APIError('not_found')
+    try:
+        status = revoke_sessions(config.database_url, actor, identity[1])
+    except PersistenceError:
+        raise APIError('service_unavailable') from None
+    if status != 'success':
+        raise APIError('permission_denied' if status == 'forbidden' else 'not_found')
+    response = Response(status_code=204)
+    if identity == (actor.issuer, actor.subject):
+        # Revogacao propria nao pode renovar atividade nem cookie.
+        request.state.local_session_token_hash = None
+        response.delete_cookie(PROFESSIONAL_COOKIE, path='/', secure=True, httponly=True, samesite='lax')
+    return response

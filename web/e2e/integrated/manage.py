@@ -1,34 +1,39 @@
 """Operacoes sinteticas de teste por stdin/stdout, sem rotas extras na API."""
-from datetime import datetime, timedelta, timezone
-from hashlib import sha256
 import json
-import secrets
 import sys
 from uuid import UUID
 
-from common import ISSUER, SUBJECT, database_url, environment
+from common import ISSUER, database_url, environment, fixture_session, fixture_user, primary_subject
 import psycopg
 from api.auth import PROFESSIONAL_COOKIE, _csrf_token
 from api.config import APIConfig
-from stroop.application import auth
 from stroop.domain.auth import opaque_user_id
-from stroop.persistence import web_auth, web_sessions
+from stroop.persistence import web_sessions
 
 
 def execute(action, value):
     database = database_url()
+    if action == 'fixture_user':
+        subject = fixture_user(value['role'])
+        return {'subject': subject, 'user_id': opaque_user_id(ISSUER, subject)}
     if action == 'professional':
-        issuer = value.get('issuer', ISSUER)
-        subject = value.get('subject', SUBJECT)
-        expires = int((datetime.now(timezone.utc) + timedelta(hours=1)).timestamp())
-        user = auth.authorize(database, {'iss': issuer, 'sub': subject, 'exp': expires}, 'view_dashboard')
-        token = secrets.token_urlsafe(32)
-        web_auth.create_professional_session(database, sha256(token.encode()).hexdigest(), issuer, subject, expires)
+        subject = value.get('subject') or primary_subject()
+        token, user_id = fixture_session(subject)
         return {'cookie_name': PROFESSIONAL_COOKIE, 'token': token,
-                'csrf': _csrf_token(APIConfig.from_env(environment()), token),
-                'user_id': opaque_user_id(user.issuer, user.subject)}
+                'csrf': _csrf_token(APIConfig.from_env(environment()), token), 'user_id': user_id}
     session_id = UUID(value['session_id'])
     with psycopg.connect(database) as connection:
+        if action == 'links':
+            row = connection.execute('''
+                SELECT i.session_id::text, i.project_id::text, i.participant_uuid::text, p.pseudonym,
+                       i.visit_uuid::text, v.label
+                FROM web_invitations i
+                JOIN web_project_participants p ON p.participant_uuid = i.participant_uuid
+                JOIN web_participant_visits v ON v.visit_uuid = i.visit_uuid
+                WHERE i.session_id = %s
+            ''', (session_id,)).fetchone()
+            return {'session_id': row[0], 'project_id': row[1], 'participant_uuid': row[2],
+                    'pseudonym': row[3], 'visit_uuid': row[4], 'visit': row[5]}
         if action == 'expire':
             connection.execute("""UPDATE web_participant_sessions
                 SET activated_at=CURRENT_TIMESTAMP-INTERVAL '31 minutes',
@@ -42,12 +47,16 @@ def execute(action, value):
         row = connection.execute('''SELECT s.state,s.abort_reason,w.assessment_id,w.receipt FROM web_participant_sessions s
             LEFT JOIN web_assessments w USING(session_id) WHERE s.session_id=%s''', (session_id,)).fetchone()
         if row is None:
-            return {'state': None, 'assessments': 0}
+            return {'state': None, 'assessments': 0, 'observations': 0, 'confirmed_through': 0, 'valid_for_result': False}
         assessment_id = row[2]
         trials = connection.execute('SELECT COUNT(*) FROM trial_results WHERE assessment_id=%s', (assessment_id,)).fetchone()[0]
         metrics = connection.execute('SELECT COUNT(*) FROM assessment_metrics WHERE assessment_id=%s', (assessment_id,)).fetchone()[0]
+        observations = connection.execute('SELECT COUNT(*) FROM web_session_observations WHERE session_id=%s', (session_id,)).fetchone()[0]
+        confirmed = connection.execute('SELECT COALESCE((SELECT confirmed_through FROM web_session_checkpoints WHERE session_id=%s), 0)', (session_id,)).fetchone()[0]
+        valid = connection.execute('SELECT NOT EXISTS(SELECT 1 FROM web_session_invalidations WHERE session_id=%s)', (session_id,)).fetchone()[0]
         return {'state': row[0], 'reason': row[1], 'assessment_id': assessment_id,
-                'receipt': row[3], 'assessments': int(assessment_id is not None), 'trials': trials, 'metrics': metrics}
+                'receipt': row[3], 'assessments': int(assessment_id is not None), 'trials': trials, 'metrics': metrics,
+                'observations': observations, 'confirmed_through': confirmed, 'valid_for_result': bool(valid)}
 
 
 if __name__ == '__main__':

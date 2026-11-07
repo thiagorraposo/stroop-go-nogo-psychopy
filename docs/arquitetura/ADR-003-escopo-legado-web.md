@@ -1,5 +1,9 @@
 # ADR-003 — Vinculo explicito para consulta de dados legados pela WEB
 
+Nota de 2026-11-04: decisão histórica preservada. [ADR-004](ADR-004-replanejamento-plataforma.md)
+consolida direção atual e substitui orientações antigas de backlog/comandos/Git;
+não revoga regras metodológicas ou mapa explícito de legado.
+
 Data: 2026-10-16. Decisao tecnica de autorizacao para W14; implementacao e
 aceite permanecem no [roadmap](../ROADMAP_WEB.md).
 

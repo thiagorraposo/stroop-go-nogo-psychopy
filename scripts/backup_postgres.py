@@ -11,6 +11,7 @@ import hmac
 import os
 from pathlib import Path
 import re
+import secrets
 import subprocess
 import sys
 import tempfile
@@ -255,7 +256,7 @@ def restore_isolated(backup: Path, key_file: Path, *, verify_web: bool = False) 
     key = load_key(key_file)
     # A pilha isolada usa apenas constantes; nao descobrir .env operacional.
     empty_environment = tempfile.NamedTemporaryFile(prefix='stroop-restore-env-')
-    compose = _compose_base(RESTORE_COMPOSE, "stroop-restore-validation",
+    compose = _compose_base(RESTORE_COMPOSE, "stroop-restore-validation-" + secrets.token_hex(5),
                             Path(empty_environment.name))
     try:
         subprocess.run(
@@ -278,7 +279,7 @@ def restore_isolated(backup: Path, key_file: Path, *, verify_web: bool = False) 
                 "--username",
                 "stroop_restore",
                 "--dbname",
-                "stroop_restore_test",
+                "stroop_etapa4_test_restore",
             ],
             stdin=subprocess.PIPE,
             stdout=subprocess.DEVNULL,
@@ -305,7 +306,11 @@ def restore_isolated(backup: Path, key_file: Path, *, verify_web: bool = False) 
               (SELECT COUNT(*) FROM trial_results t WHERE t.assessment_id=w.assessment_id)<>16
               OR (SELECT COUNT(*) FROM assessment_metrics m WHERE m.assessment_id=w.assessment_id)<>12;
             SELECT COUNT(*) FROM web_assessments w JOIN web_participant_sessions s USING(session_id)
-              WHERE s.state<>'completed';
+              WHERE s.state<>'completed'
+                OR w.receipt->>'session_id' IS DISTINCT FROM w.session_id::text
+                OR w.receipt->>'assessment_id' IS DISTINCT FROM w.assessment_id::text
+                OR w.receipt->>'state' IS DISTINCT FROM 'completed'
+                OR w.receipt->>'platform' IS DISTINCT FROM 'web';
             """
         result = subprocess.run(
             compose
@@ -317,7 +322,7 @@ def restore_isolated(backup: Path, key_file: Path, *, verify_web: bool = False) 
                 "--username",
                 "stroop_restore",
                 "--dbname",
-                "stroop_restore_test",
+                "stroop_etapa4_test_restore",
                 "--tuples-only",
                 "--no-align",
                 "--command",
