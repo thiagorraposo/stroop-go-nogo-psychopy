@@ -25,6 +25,8 @@ class SessionRecord:
     app_version: str | None
     order: tuple[int, ...]
     receipt: dict | None = None
+    checkpoint: dict | None = None
+    valid_for_result: bool = True
 
 
 class ConflictError(Exception):
@@ -183,13 +185,31 @@ def create_invitation(database_url: str, invitation_id: UUID, session_id: UUID,
                     or not user[0] or user[1] not in {'importacao','administracao'}):
                 return False
             connection.execute(
+                """INSERT INTO web_project_participants(participant_uuid,project_id,pseudonym)
+                   VALUES (%s,%s,%s) ON CONFLICT (project_id,pseudonym) DO NOTHING""",
+                (uuid4(),project_id,participant_id),
+            )
+            participant_uuid = connection.execute(
+                "SELECT participant_uuid FROM web_project_participants WHERE project_id=%s AND pseudonym=%s",
+                (project_id,participant_id),
+            ).fetchone()[0]
+            connection.execute(
+                """INSERT INTO web_participant_visits(visit_uuid,project_id,participant_uuid,label)
+                   VALUES (%s,%s,%s,%s) ON CONFLICT (project_id,participant_uuid,label) DO NOTHING""",
+                (uuid4(),project_id,participant_uuid,visit),
+            )
+            visit_uuid = connection.execute(
+                "SELECT visit_uuid FROM web_participant_visits WHERE project_id=%s AND participant_uuid=%s AND label=%s",
+                (project_id,participant_uuid,visit),
+            ).fetchone()[0]
+            connection.execute(
                 """INSERT INTO web_invitations
                    (invitation_id,session_id,project_id,code_sha256,participant_id,visit,
-                    evaluator_issuer,evaluator_subject,expires_at)
-                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,
+                    evaluator_issuer,evaluator_subject,participant_uuid,visit_uuid,expires_at)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
                            CURRENT_TIMESTAMP + INTERVAL '24 hours')""",
                 (invitation_id, session_id, project_id, code_hash, participant_id,
-                 visit, issuer, subject),
+                 visit, issuer, subject, participant_uuid, visit_uuid),
             )
             _audit(connection, issuer, subject, "create_invitation")
             return connection.execute(
@@ -197,6 +217,161 @@ def create_invitation(database_url: str, invitation_id: UUID, session_id: UUID,
                 (invitation_id,),
             ).fetchone()[0]
     return _run(operation)
+
+
+def create_cadastral_invitation(
+    database_url: str,
+    invitation_id: UUID,
+    session_id: UUID,
+    project_id: UUID,
+    code_hash: str,
+    *,
+    patient_id: UUID,
+    evaluator_id: UUID,
+    visit: str,
+    test_code: str,
+    test_version: str,
+    protocol_id: str,
+    initials: str | None,
+    issuer: str,
+    subject: str,
+):
+    def operation():
+        with psycopg.connect(database_url) as connection:
+            project = connection.execute(
+                "SELECT active,collection_mode,code,name FROM web_projects WHERE project_id=%s FOR SHARE",
+                (project_id,),
+            ).fetchone()
+            member = connection.execute(
+                "SELECT active FROM web_project_members WHERE project_id=%s AND issuer=%s AND subject=%s FOR SHARE",
+                (project_id, issuer, subject),
+            ).fetchone()
+            user = connection.execute(
+                "SELECT active,role FROM public.web_lock_emitter(%s,%s)",
+                (issuer, subject),
+            ).fetchone()
+            if (
+                project is None
+                or not project[0]
+                or project[1] != "synthetic"
+                or member is None
+                or not member[0]
+                or user is None
+                or not user[0]
+                or user[1] not in {"importacao", "administracao"}
+            ):
+                return None
+
+            patient = connection.execute(
+                """SELECT id,participant_code,full_name,initials,active
+                   FROM web_patients WHERE id=%s FOR SHARE""",
+                (patient_id,),
+            ).fetchone()
+            if patient is None:
+                raise MissingError
+            if not patient[4]:
+                raise ConflictError
+
+            evaluator = connection.execute(
+                """SELECT id,evaluator_code,full_name,initials,active
+                   FROM web_evaluators WHERE id=%s FOR SHARE""",
+                (evaluator_id,),
+            ).fetchone()
+            if evaluator is None:
+                raise MissingError
+            if not evaluator[4]:
+                raise ConflictError
+
+            participant_code = patient[1]
+            evaluator_code = evaluator[1]
+            effective_initials = initials if initials is not None else patient[3]
+
+            connection.execute(
+                """INSERT INTO web_project_participants(participant_uuid,project_id,pseudonym,patient_id)
+                   VALUES (%s,%s,%s,%s)
+                   ON CONFLICT (project_id,pseudonym) DO UPDATE
+                   SET patient_id = COALESCE(web_project_participants.patient_id, EXCLUDED.patient_id)""",
+                (uuid4(), project_id, participant_code, patient_id),
+            )
+            participant_row = connection.execute(
+                """SELECT participant_uuid,patient_id
+                   FROM web_project_participants
+                   WHERE project_id=%s AND pseudonym=%s""",
+                (project_id, participant_code),
+            ).fetchone()
+            if participant_row[1] != patient_id:
+                raise ConflictError
+            participant_uuid = participant_row[0]
+
+            connection.execute(
+                """INSERT INTO web_participant_visits(visit_uuid,project_id,participant_uuid,label)
+                   VALUES (%s,%s,%s,%s) ON CONFLICT (project_id,participant_uuid,label) DO NOTHING""",
+                (uuid4(), project_id, participant_uuid, visit),
+            )
+            visit_uuid = connection.execute(
+                """SELECT visit_uuid FROM web_participant_visits
+                   WHERE project_id=%s AND participant_uuid=%s AND label=%s""",
+                (project_id, participant_uuid, visit),
+            ).fetchone()[0]
+
+            expires_at = connection.execute(
+                """INSERT INTO web_invitations (
+                       invitation_id,session_id,project_id,code_sha256,
+                       participant_id,visit,evaluator_issuer,evaluator_subject,
+                       participant_uuid,visit_uuid,patient_id,evaluator_uuid,
+                       evaluator_id,participant_initials,test_code,test_version,
+                       protocol_id,expires_at
+                   )
+                   VALUES (
+                       %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+                       CURRENT_TIMESTAMP + INTERVAL '24 hours'
+                   )
+                   RETURNING expires_at""",
+                (
+                    invitation_id,
+                    session_id,
+                    project_id,
+                    code_hash,
+                    participant_code,
+                    visit,
+                    issuer,
+                    subject,
+                    participant_uuid,
+                    visit_uuid,
+                    patient_id,
+                    evaluator_id,
+                    evaluator_code,
+                    effective_initials,
+                    test_code,
+                    test_version,
+                    protocol_id,
+                ),
+            ).fetchone()[0]
+            _audit(connection, issuer, subject, "create_invitation")
+            summary = {
+                "project_id": str(project_id),
+                "project_code": project[2],
+                "project_name": project[3],
+                "patient_id": str(patient[0]),
+                "participant_code": participant_code,
+                "participant_name": patient[2],
+                "initials": effective_initials,
+                "evaluator_id": str(evaluator[0]),
+                "evaluator_code": evaluator_code,
+                "evaluator_name": evaluator[2],
+                "test_code": test_code,
+                "test_version": test_version,
+                "protocol_id": protocol_id,
+                "visit": visit,
+            }
+            return expires_at, summary
+
+    try:
+        return operation()
+    except (MissingError, ConflictError):
+        raise
+    except (psycopg.Error, ValueError) as exc:
+        raise PersistenceError from exc
 
 
 def revoke_invitation(database_url: str, project_id: UUID, invitation_id: UUID,
@@ -447,7 +622,9 @@ def get_participant_session(database_url: str, token_hash: str) -> SessionRecord
                 receipt = connection.execute(
                     "SELECT receipt FROM web_assessments WHERE session_id=%s", (row[0],)
                 ).fetchone()[0]
-            return SessionRecord(row[0],row[1],row[2],row[3],row[4],row[5],order,receipt)
+            from stroop.persistence.web_checkpoints import checkpoint_receipt, invalidated
+            return SessionRecord(row[0],row[1],row[2],row[3],row[4],row[5],order,receipt,
+                                 checkpoint_receipt(connection, row[0]), not invalidated(connection, row[0]))
     try:
         return operation()
     except (MissingError, ExpiredError):
@@ -531,6 +708,17 @@ def complete_participant_session(database_url: str, token_hash: str, payload: di
                 "SELECT condition_id FROM web_session_main_order WHERE session_id=%s ORDER BY trial_number",
                 (row[0],),
             ).fetchall())
+            from stroop.persistence.web_checkpoints import reconcile_complete, invalidated, _unexpired
+            # Schema/domain preparation precedes writes. Existing ACKs survive rollback.
+            prepare_result(order, row[5], observations_only=True)
+            # Conclusao mantem cardinalidade integral antes de tocar o prefixo.
+            if len(payload['trials']) != 16:
+                from stroop.domain.web_results import InvalidResultError
+                raise InvalidResultError
+            reconcile_complete(connection, row[0], payload, completed=row[1] == 'completed')
+            if invalidated(connection, row[0]):
+                connection.commit()
+                raise ConflictError
             result = prepare_result(order, row[5])
             if row[1] == 'completed':
                 saved = connection.execute(
@@ -538,20 +726,20 @@ def complete_participant_session(database_url: str, token_hash: str, payload: di
                     (row[0],),
                 ).fetchone()
                 if saved[0] != result['payload_sha256']:
-                    raise ResultConflictError
+                    from stroop.persistence.web_checkpoints import _conflict
+                    _conflict(connection, row[0])
                 return saved[1], False
 
             metadata = connection.execute(
-                """SELECT p.code,i.participant_id,i.visit,i.protocol_id
+                """SELECT p.code,i.participant_id,i.visit,i.protocol_id,
+                          i.patient_id,i.evaluator_uuid,i.evaluator_id
                    FROM web_invitations i JOIN web_projects p USING(project_id)
                    WHERE i.session_id=%s""", (row[0],),
             ).fetchone()
             completed_at = connection.execute("SELECT clock_timestamp()").fetchone()[0]
             if completed_at >= row[3]:
-                connection.execute(
-                    "UPDATE web_participant_sessions SET state='expired' WHERE session_id=%s", (row[0],)
-                )
-                connection.commit()
+                # O contexto desfaz o sufixo sem liberar e readquirir o lock.
+                # A expiracao logica vale mesmo sem materializar state=expired.
                 raise ExpiredError
             assessment_id = str(uuid4())
             timestamp = completed_at.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z')
@@ -563,13 +751,14 @@ def complete_participant_session(database_url: str, token_hash: str, payload: di
                 'test_version': payload['test_version'], 'protocol_id': metadata[3],
                 'app_version': row[5], 'summary': result['summary'],
             }
+            evaluator_label = metadata[6] if metadata[6] is not None else opaque_user_id(row[7], row[8])
             connection.execute(
                 """INSERT INTO assessments
                    (assessment_id,test_code,test_version,project,participant_id,participant_name,
                     initials,visit,evaluator,assessment_date,started_at,source_file,imported_at,import_status)
                    VALUES (%s,'stroop_go_nogo_ptbr',%s,%s,%s,'NAO_COLETADO',NULL,%s,%s,%s,%s,%s,%s,'valid')""",
                 (assessment_id, payload['test_version'], metadata[0], metadata[1], metadata[2],
-                 opaque_user_id(row[7],row[8]), started.date().isoformat(),
+                 evaluator_label, started.date().isoformat(),
                  started.isoformat().replace('+00:00','Z'), f'web:{row[0]}', timestamp),
             )
             connection.cursor().executemany(
@@ -592,10 +781,10 @@ def complete_participant_session(database_url: str, token_hash: str, payload: di
             connection.execute(
                 """INSERT INTO web_assessments
                    (assessment_id,session_id,project_id,protocol_id,app_version,frame_period_ms,
-                    payload_sha256,completed_at,receipt)
-                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                    payload_sha256,completed_at,receipt,patient_id,evaluator_uuid)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                 (assessment_id,row[0],row[6],metadata[3],row[5],payload['frame_period_ms'],
-                 result['payload_sha256'],completed_at,Jsonb(receipt)),
+                 result['payload_sha256'],completed_at,Jsonb(receipt),metadata[4],metadata[5]),
             )
             connection.cursor().executemany(
                 """INSERT INTO web_trial_observations
@@ -609,6 +798,8 @@ def complete_participant_session(database_url: str, token_hash: str, payload: di
             connection.execute(
                 "UPDATE web_participant_sessions SET state='completed' WHERE session_id=%s", (row[0],)
             )
+            # Incluir o tempo gasto nas escritas, antes do commit e do recibo.
+            _unexpired(connection, row, rollback=True)
             return receipt, True
     except psycopg.Error as exc:
         raise PersistenceError from exc

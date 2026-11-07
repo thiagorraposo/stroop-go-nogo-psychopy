@@ -2,7 +2,7 @@ import { afterEach, expect, test, vi } from 'vitest'
 import shared from '../../../tests/fixtures/web_results_summary.json'
 import { ApiError } from './client'
 import { abortParticipant, APP_VERSION, completeParticipant, completionPayload, getParticipantSession,
-  participantErrorMessage, PROTOCOL_ID, redeemInvitation, startParticipant, TEST_VERSION, logoutParticipant } from './participant'
+  invalidateParticipant, participantErrorMessage, PROTOCOL_ID, redeemInvitation, startParticipant, TEST_VERSION, logoutParticipant } from './participant'
 import type { PreparingSession } from './participant'
 import { MAIN_CONDITIONS, PRACTICE_CONDITIONS, PROTOCOL } from '../experiment/protocol'
 import type { MainResult, MainTrial } from '../experiment/main-engine'
@@ -140,4 +140,31 @@ test('logout limpa acesso com CSRF e exige confirmacao 204', async () => {
     headers: { 'X-CSRF-Token': common.csrf_token } })
   mock({}, 200)
   await expect(logoutParticipant(common.csrf_token)).rejects.toMatchObject({ code: 'invalid_response' })
+})
+
+test('aceita recibo de checkpoint fechado sem expor tentativas nem permitir retomada', async () => {
+  const checkpoint = { confirmed_through: 0, prefix_hash: null, received_at: null }
+  mock({ ...preparing, checkpoint })
+  await expect(getParticipantSession()).resolves.toEqual(model)
+  mock({ ...preparing, checkpoint: { ...checkpoint, confirmed_through: 17 } })
+  await expect(getParticipantSession()).rejects.toMatchObject({ code: 'invalid_response' })
+  mock({ ...preparing, checkpoint: { ...checkpoint, extra: 'SINTETICO' } })
+  await expect(getParticipantSession()).rejects.toMatchObject({ code: 'invalid_response' })
+  mock({ ...preparing, state: 'aborted', checkpoint })
+  await expect(getParticipantSession()).rejects.toMatchObject({ code: 'state_conflict' })
+  mock({ ...receipt, valid_for_result: false, summary: null, checkpoint })
+  await expect(getParticipantSession()).rejects.toMatchObject({ code: 'state_conflict' })
+  expect(participantErrorMessage(new ApiError('state_conflict', 409))).toContain('não gerou resultado oficial')
+})
+
+test('invalidacao tardia envia keepalive com CSRF e valida corpo fechado', async () => {
+  const fetchMock = mock({ session_id: sessionId, valid_for_result: false })
+  await expect(invalidateParticipant(common.csrf_token, sessionId, 'visibility_hidden', 59000)).resolves.toBe(false)
+  expect(fetchMock.mock.calls[0]![0]).toBe('/api/v1/participant/session/invalidate')
+  expect(transport(fetchMock.mock.calls[0]!)).toMatchObject({
+    method: 'POST', keepalive: true, body: '{"reason":"visibility_hidden","event_at_ms":59000}',
+    headers: { 'X-CSRF-Token': common.csrf_token },
+  })
+  mock({ session_id: assessmentId, valid_for_result: false })
+  await expect(invalidateParticipant(common.csrf_token, sessionId, 'reload')).rejects.toMatchObject({ code: 'invalid_response' })
 })

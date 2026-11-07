@@ -102,6 +102,57 @@ function syntheticResult(): MainResult {
 }
 
 describe('bloco principal imperativo', () => {
+  it('entrega somente tentativas completas e imutaveis depois da proxima fixacao, sem esperar transporte', () => {
+    const delivered: unknown[] = []
+    start({ onTrialComplete: (trial, period) => {
+      expect(Object.isFrozen(trial)).toBe(true)
+      expect(trial.trial_end_ms).toBeGreaterThan(trial.stimulus_offset_ms)
+      expect(period).toBe(10)
+      if (trial.trial_number < 16) {
+        expect(container.dataset.phase).toBe('fixation')
+        expect(container.querySelector('.main-stimulus-card')?.textContent).toBe('+')
+      }
+      delivered.push(trial)
+    } })
+    const origin = mainStart()
+    expect(delivered).toHaveLength(0)
+    const result = finish(origin)
+    expect(delivered).toEqual(result.trials)
+    expect(delivered[0]).not.toBe(result.trials[0])
+    expect(result.trials[15]!.trial_end_ms).toBe(60000)
+  })
+  it('interrupcao preserva somente tentativas ja encerradas para transporte', () => {
+    const onTrialComplete = vi.fn()
+    start({ onTrialComplete })
+    mainStart()
+    clock.advance(4000)
+    keyboard('keydown', clock.time, { key: 'Escape', code: 'Escape' })
+    expect(onTrialComplete).toHaveBeenCalledTimes(1)
+    expect(onTrialComplete.mock.calls[0]![0].trial_number).toBe(1)
+    expect(onComplete).not.toHaveBeenCalled()
+  })
+  it('renderiza as dez cores efetivas e todas as palavras na ordem canonica', () => {
+    start()
+    const origin = mainStart()
+    const colors = new Set<string>()
+    for (const [index, condition] of MAIN_CONDITIONS.entries()) {
+      clock.advance(origin + index * 3750 + 300 - clock.time)
+      expect(container.dataset.phase).toBe('stimulus')
+      expect(container.dataset.conditionId).toBe(String(condition.condition_id))
+      const card = container.querySelector<HTMLElement>('.main-stimulus-card')!
+      const expectedColor = document.createElement('span')
+      expectedColor.style.color = condition.ink_color_display
+      expect(card.textContent).toBe(condition.word)
+      expect(card.style.color).toBe(expectedColor.style.color)
+      expect(card.style.background).toBe('transparent')
+      expect(card.dataset.stimulus).toBe('true')
+      expect(card.classList.contains('experiment-word')).toBe(true)
+      colors.add(card.style.color)
+    }
+    expect(colors.size).toBe(10)
+    expect(finish(origin).trials).toHaveLength(16)
+  })
+
   it('captura tempos sinteticos completos e tentativas interrompidas somente quando habilitado', () => {
     const onTimingTrace = vi.fn<NonNullable<MainOptions['onTimingTrace']>>()
     start({ onTimingTrace })
@@ -153,7 +204,7 @@ describe('bloco principal imperativo', () => {
     }
     expect(container.dataset.phase).toBe('fixation')
     expect(container.querySelector('[data-hud="time"]')?.textContent).toBe('Tempo: 00:00')
-    expect(container.querySelector('[data-hud="accuracy"]')?.textContent).toBe('Precisão: —')
+    expect(container.querySelector('[data-hud="accuracy"]')).toBeNull()
     expect(container.querySelector<HTMLElement>('.main-hud')!.hidden).toBe(false)
     const result = finish(clock.time)
     expect(result.frame_period_ms).toBe(10)
@@ -183,19 +234,19 @@ describe('bloco principal imperativo', () => {
     clock.time += 100
     keyboard('keydown')
     expect(container.dataset.phase).toBe('stimulus')
-    expect(container.textContent).toContain('Precisão: —')
+    expect(container.textContent).not.toMatch(/Precisão|%/)
     clock.advance(2394) // Antes do quadro mais proximo do offset.
     expect(container.dataset.phase).toBe('stimulus')
     clock.tickAt(origin + 2800)
     expect(container.dataset.phase).toBe('blank')
     expect(container.querySelector<HTMLElement>('.main-stimulus-card')!.style.background).toBe('transparent')
-    expect(container.textContent).toContain('Precisão: —')
+    expect(container.textContent).not.toMatch(/Precisão|%/)
     clock.advance(944) // Antes do quadro mais proximo do fim.
     expect(container.dataset.phase).toBe('blank')
     clock.tickAt(origin + 3750)
     expect(container.dataset.phase).toBe('fixation')
-    expect(container.querySelector('[data-hud="accuracy"]')?.textContent).toBe('Precisão: 100%')
-    expect(container.querySelector('[data-hud="progress"]')?.textContent).toContain('tentativa 2 de 16')
+    expect(container.querySelector('[data-hud="accuracy"]')).toBeNull()
+    expect(container.querySelector('[data-hud="progress"]')?.textContent).toBe('Bloco principal · 1 / 16')
     expect(container.querySelector('[data-hud="time"]')?.textContent).toBe('Tempo: 00:03')
     const result = finish(origin)
     expect(result.trials[0]!.reaction_time_ms).toBe(100)

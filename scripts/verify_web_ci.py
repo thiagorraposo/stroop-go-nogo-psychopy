@@ -195,6 +195,7 @@ def main(argv: list[str] | None = None) -> int:
             elif stage == 'integration':
                 database_guard(os.environ.get('TEST_DATABASE_URL', ''))
                 run(['npm', 'run', 'test:integration'], cwd=ROOT / 'web')
+                run(['npx', 'playwright', 'test', '--config', 'playwright.local-auth.config.ts'], cwd=ROOT / 'web')
             elif stage == 'audit':
                 audit_dependencies()
         return 0

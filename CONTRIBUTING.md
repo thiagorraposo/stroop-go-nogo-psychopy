@@ -1,70 +1,36 @@
-# Contribuir
+# Contribuição e GitHub Flow adaptado
 
-Use GitHub Flow: `main` estavel e branches curtas `feat/`, `fix/`, `refactor/`,
-`docs/` ou `chore/`. Leia os `AGENTS.md` aplicaveis, preserve alteracoes locais
-alheias e consulte o [roadmap WEB](docs/ROADMAP_WEB.md) para dependencias e aceite.
-Nao inclua coletas, bancos, exports, chaves ou configuracoes privadas.
+Leia [AGENTS](AGENTS.md), [workflow](docs/WORKFLOW_CODEX_CLI.md) e a tarefa do
+[backlog único](docs/Projeto%20Stroop%20Test.md). A missão documental original M0 não
+autorizava implementação funcional; o marco e a autorização vigentes devem ser
+consultados no backlog. Produção sempre exige autorização específica.
 
-## Fluxo essencial
+Use main estável e branch coesa docs/feat/fix/refactor/test/chore por entrega ou
+marco. Antes, confira status/branch/remotos/HEAD/upstream, preserve alterações
+locais e faça fetch se acessível. Sincronize com ff-only só quando seguro; não
+perca commits não integrados para trocar base. Reutilize branch apropriada.
 
-Com worktree conferida, parta de `main` atualizada:
+Após unidade coerente e validada, revise diff/status e git diff --check; adicione
+somente arquivos/hunks da tarefa. Use [Conventional Commits em português](docs/desenvolvimento/PADRAO_DE_COMMITS.md).
+Commit e push são autônomos; no primeiro envio, git push -u origin BRANCH.
+Registrar evidências/SHA/push no backlog. Se falhar, preservar trabalho e registrar
+impedimento. Não versionar secrets, dados reais, SQLite, exports, logs ou backups.
 
-```bash
-git switch main
-git pull --ff-only
-git switch -c feat/nome-curto
-```
+**Não criar PR automaticamente, não fazer merge automático e não enviar direto
+à main.** Integração depende de autorização específica e proteções/revisões
+existentes. Se main exigir PR, não contornar nem reduzir proteção; o proprietário
+definirá procedimento de integração. Sem force push, exclusão remota ou bypass.
+Deploy, tags, alterações destrutivas e dados reais exigem autorização específica.
+Quando autorizada a integração por PR, usar **Merge Commit tradicional**,
+preservando os commits originais; sem Squash Merge em novas integrações. A
+preferência não autoriza criar PR/merge automaticamente ou alterar proteções.
+Configuração remota conferida em 2026-11-05: Merge Commit habilitado, Squash Merge
+desabilitado; Rebase Merge habilitado não substitui a preferência do proprietário.
 
-Implemente e valide a unidade. Use Conventional Commits em portugues conforme
-o [padrao](docs/desenvolvimento/PADRAO_DE_COMMITS.md), adicionando apenas os
-arquivos ou hunks da tarefa. Exemplo:
-
-```bash
-git diff --check
-git add CAMINHOS-DA-TAREFA
-git commit -m "feat(web): descreve o comportamento entregue"
-git push -u origin feat/nome-curto
-gh pr create --base main --title "feat(web): descreve o comportamento entregue" --body-file /tmp/pr.md
-gh pr checks --watch --fail-fast
-```
-
-A descricao deve explicar o problema, o comportamento entregue, a validacao
-executada e limites relevantes. Para textos multilinha, use arquivo com
-`--body-file`; nao interpole secrets ou dados em comandos/comentarios.
-
-Integre somente com CI aprovada, revisoes exigidas e regras satisfeitas.
-Prefira squash e confira o SHA revisado antes do merge:
-
-```bash
-gh pr view --json headRefOid
-gh pr merge --squash --delete-branch --match-head-commit SHA-REVISADO
-git switch main
-git pull --ff-only
-```
-
-Se a worktree tiver alteracoes alheias, preserve-as antes da troca; nunca use
-reset destrutivo ou force push. Nao use `--admin` para contornar protecoes.
-Exclua somente branches temporarias integradas. Nao existe branch de
-integracao permanente adicional. Deploy, tags e operacoes destrutivas exigem
-autorizacao especifica; merge nao faz deploy.
-
-## Validacao e CI
-
-O workflow [WEB validada](.github/workflows/web.yml) tem um job `verify`:
-scanner de secrets com prova negativa, suite Python sem skips com PostgreSQL
-descartavel, testes frontend, tipos/build, Chromium/Firefox, integracao HTTPS
-com API/banco reais e auditorias de dependencias. Usa somente dados sinteticos,
-acoes fixadas por SHA, permissoes de leitura e nenhum secret operacional.
-
-PRs executam a verificacao; pushes em branches de trabalho nao duplicam esse
-job. Push em `main` verifica o resultado integrado; disparo manual permanece
-disponivel. A concorrencia cancela execucoes antigas da mesma referencia.
-
-Execute localmente os checks proporcionais a mudanca e sempre `git diff --check`.
-Para reproduzir o pipeline completo, inclusive preparar banco isolado e
-dependencias, siga [CI_WEB](docs/desenvolvimento/CI_WEB.md). Nunca use `.env`
-operacional ou um banco de coleta para testes. Falhas, skips e ferramentas
-obrigatorias indisponiveis impedem o aceite; mocks nao substituem integracao real.
-
-Ao concluir, registre fatos no [registro](docs/REGISTRO_DE_ALTERACOES.md) e
-retomada em [PROGRESS](docs/PROGRESS.md), sem duplicar estado do roadmap.
+CI existente em [.github/workflows/web.yml](.github/workflows/web.yml) executa
+verify em PR, push main e disparo manual; push de branch normalmente não dispara.
+Não alterar/desabilitar gatilhos para evitar checks. Pipeline inclui scanner,
+Python/PG sem skips, frontend/build, auditorias, Chromium/Firefox e HTTPS real.
+[CI_WEB](docs/desenvolvimento/CI_WEB.md) descreve reprodução. Distinguir testes
+locais de Actions por SHA; nunca declarar CI aprovada sem evidência. M8 prevê
+revisar formalização desse pipeline no fluxo sem PR; pipeline não faz deploy.

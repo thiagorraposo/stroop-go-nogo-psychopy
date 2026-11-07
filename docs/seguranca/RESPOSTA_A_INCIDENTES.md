@@ -1,5 +1,14 @@
 # Resposta a incidentes
 
+Alvo CHG-004 (2026-11-06): além do procedimento histórico abaixo, exposição de
+senha local exige redefinição protegida e revogação global das sessões, revisão
+de vínculos/convites expostos e preservação de eventos técnicos sem credenciais.
+Saída de integrante da conta compartilhada exige troca global, sem atribuir
+autoria individual. Recuperação/restauração não pode ressuscitar sessão ou senha
+revogada; ver [segurança local](AUTENTICACAO_E_PERMISSOES.md#autenticação-local--especificação-alvo-chg-004).
+Esta revisão não altera obrigações legais ou autoriza intervenção operacional.
+
+
 Este procedimento e provisório ate a instituicao designar controlador,
 encarregado, pesquisador responsável, equipe tecnica e canais de contato. Nao
 usar dados reais antes dessas definicoes.

@@ -11,6 +11,10 @@ from stroop.persistence.auth import DuplicateUserError, PersistenceError
 def _manage(database_url: str, operation: str, issuer: str, subject: str, *,
             role: str, active: bool, email: str | None, actor: AppUser) -> None:
     identity = _validate_user_fields(issuer, subject, role, email)
+    from stroop.domain.local_auth import LOCAL_ISSUER
+    if issuer == LOCAL_ISSUER:
+        if operation == 'create':
+            raise ForbiddenOperationError('Provisionamento exclusivo do operador.')
     try:
         status = persistence.manage_user(database_url, operation, identity, role=role,
                                          active=active, email=email, actor=actor)

@@ -11,10 +11,45 @@ import time
 if __package__ in {None, ''}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.backup_postgres import create_backup, generate_key, restore_isolated
+from scripts.backup_postgres import BackupError, create_backup, generate_key, restore_isolated
 from scripts.monitor_web import check
 from scripts.migrations import discover_migrations
-from scripts.smoke_web_compose import API_IMAGE, PROXY_IMAGE, WebComposeSmoke, _run
+from scripts.smoke_web_compose import API_IMAGE, PROXY_IMAGE, SYNTHETIC_DATABASE, WebComposeSmoke, _run
+
+
+def verify_receipt_rejection(stack, root, key):
+    """Uma copia da fixture com recibo desvinculado deve falhar na restauracao."""
+    helper = '''import os
+import psycopg
+from api.config import secret_value
+with psycopg.connect(secret_value(os.environ, 'API_MIGRATION_DATABASE_URL')) as db:
+    db.execute(SQL)
+'''
+
+    def update_receipt(value):
+        sql = ("UPDATE web_assessments SET receipt=jsonb_set(receipt, "
+               "'{assessment_id}', to_jsonb(" + value + "))")
+        stack.compose('run', '--rm', '--no-deps', '--interactive', '--entrypoint',
+                      'python', 'web-provision', '-',
+                      input_text=helper.replace('SQL', repr(sql)))
+
+    update_receipt("'00000000-0000-0000-0000-000000000000'::text")
+    try:
+        backup = create_backup(
+            compose_file=Path(__file__).resolve().parents[1] / 'compose.web.yaml',
+            key_file=key, output_directory=root / 'invalid-receipt-backups',
+            database=SYNTHETIC_DATABASE, user='stroop_owner', service='web-postgres',
+            project_name=stack.project, env_file=stack.environment_file,
+        )
+        try:
+            restore_isolated(backup, key, verify_web=True)
+        except BackupError as error:
+            if str(error) != 'Restauracao isolada sem verificacao estrutural.':
+                raise
+        else:
+            raise RuntimeError('Recibo desvinculado aceito indevidamente')
+    finally:
+        update_receipt('assessment_id::text')
 
 
 def main(argv=None):
@@ -41,13 +76,15 @@ def main(argv=None):
                 started = time.monotonic()
                 stage = 'backup'
                 backup = create_backup(compose_file=Path(__file__).resolve().parents[1] / 'compose.web.yaml',
-                    key_file=key, output_directory=root / 'backups', database='stroop_w19',
+                    key_file=key, output_directory=root / 'backups', database=SYNTHETIC_DATABASE,
                     user='stroop_owner', service='web-postgres', project_name=stack.project,
                     env_file=stack.environment_file)
                 stage = 'restore'
                 migrations, assessments = restore_isolated(backup, key, verify_web=True)
                 stack._assert(migrations == len(discover_migrations()) and assessments == 1)
                 restoration_seconds = round(time.monotonic() - started, 3)
+                stage = 'invalid-receipt'
+                verify_receipt_rejection(stack, root, key)
                 stage = 'outage'
                 stack.compose('stop', 'web-postgres')
                 outage = check(stack.environment_file, stack.project)
@@ -74,6 +111,7 @@ def main(argv=None):
                 stack._assert(after['status'] == 'ready' and after['counts'] == before['counts'])
                 print(json.dumps({'status':'passed','restoration_seconds':restoration_seconds,
                     'restored_assessments':assessments,'restored_migrations':migrations,'database_outage_detected':True,
+                    'invalid_receipt_rejected':True,
                     'failed_candidate_rollback':True,'counts_preserved':True}))
             finally:
                 stack.cleanup()

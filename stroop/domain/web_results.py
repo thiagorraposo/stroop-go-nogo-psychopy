@@ -26,6 +26,10 @@ class InvalidResultError(ValueError):
     """Corpo de conclusao inconsistente com o protocolo ou snapshot da sessao."""
 
 
+class OrderConflictError(InvalidResultError):
+    """Trecho nao corresponde as posicoes/condicoes fixadas na sessao."""
+
+
 def canonical_payload(payload: dict) -> bytes:
     """JSON UTF-8 ordenado, sem espacos e com numeros decimais normalizados.
 
@@ -73,8 +77,8 @@ def _closed_object(value, fields: frozenset, name: str) -> None:
         raise InvalidResultError(f"Campos de {name} invalidos.")
 
 
-def validate_result(payload: dict, order: tuple[int, ...], app_version: str,
-                    conditions: list[dict]) -> dict:
+def _validate(payload: dict, order: tuple[int, ...], app_version: str,
+              conditions: list[dict], *, full: bool, previous_end=0) -> dict:
     """Valida o registro original e deriva linhas/metricas sem confiar no cliente.
 
     ``conditions`` recebe as 16 linhas do snapshot principal, identificadas por
@@ -96,29 +100,35 @@ def validate_result(payload: dict, order: tuple[int, ...], app_version: str,
     if len(conditions) != 16 or set(sources) != set(order):
         raise InvalidResultError("Snapshot de condicoes invalido.")
     trials = payload["trials"]
-    if type(trials) is not list or len(trials) != 16:
+    if type(trials) is not list or not 1 <= len(trials) <= 16 or (full and len(trials) != 16):
         raise InvalidResultError("A conclusao exige 16 tentativas principais.")
 
     rows = []
-    previous_end = Decimal(0)
-    for index, trial in enumerate(trials, 1):
+    previous_end = Decimal(str(previous_end))
+    first = 1 if full else trials[0].get("trial_number") if type(trials[0]) is dict else None
+    if type(first) is not int or not 1 <= first <= 17 - len(trials):
+        raise InvalidResultError("Posicao inicial invalida.")
+    timing_valid = True
+    for index, trial in enumerate(trials, first):
         _closed_object(trial, TRIAL_FIELDS, "tentativa")
         if type(trial["trial_number"]) is not int or trial["trial_number"] != index:
-            raise InvalidResultError("Numeracao das tentativas invalida.")
+            raise OrderConflictError("Numeracao das tentativas invalida.")
         if (type(trial["condition_id"]) is not int
                 or trial["condition_id"] != order[index - 1]):
-            raise InvalidResultError("Condicao incompativel com a ordem da sessao.")
+            raise OrderConflictError("Condicao incompativel com a ordem da sessao.")
         start, onset, offset, end = (
             _number(trial[field], field) for field in (
                 "trial_start_ms", "stimulus_onset_ms", "stimulus_offset_ms", "trial_end_ms")
         )
+        if any(value < 0 for value in (start, onset, offset, end)):
+            raise InvalidResultError("Instantes negativos.")
         if not 0 <= start < onset < offset < end <= 60100 or start != previous_end:
-            raise InvalidResultError("Tempos descontinuos ou fora dos limites.")
+            timing_valid = False
         if any(abs(actual - nominal) > frame for actual, nominal in (
             (start, Decimal((index - 1) * 3750)), (onset, start + 300),
             (offset, start + 2800), (end, start + 3750), (offset - onset, Decimal(2500)),
         )):
-            raise InvalidResultError("Transicao excede a tolerancia de um quadro.")
+            timing_valid = False
         previous_end = end
         key = trial["key_pressed"]
         rt_value = trial["reaction_time_ms"]
@@ -133,10 +143,13 @@ def validate_result(payload: dict, order: tuple[int, ...], app_version: str,
             rt = _number(rt_value, "reaction_time_ms")
             key_at = _number(key_at_value, "key_at_ms")
             if not 0 < rt < 2500 or not onset < key_at < offset:
-                raise InvalidResultError("Resposta fora da janela exclusiva.")
+                timing_valid = False
             if abs(key_at - onset - rt) > Decimal("0.001"):
-                raise InvalidResultError("RT diverge do instante da resposta.")
-            seconds = rt_value / 1000
+                timing_valid = False
+            try:
+                seconds = rt_value / 1000
+            except OverflowError:
+                raise InvalidResultError("RT nao representavel em segundos.") from None
             # O contrato interno usa DOUBLE; nunca substituir RT positivo por
             # zero por underflow nem fabricar um valor minimo metodologico.
             if not math.isfinite(seconds) or seconds <= 0:
@@ -153,8 +166,12 @@ def validate_result(payload: dict, order: tuple[int, ...], app_version: str,
             raise InvalidResultError("Condicao principal invalida.")
         row["correct_response"], row["correct"], row["error_type"] = outcome
         rows.append(row)
-    if not Decimal(59900) <= previous_end <= Decimal(60100):
-        raise InvalidResultError("Duracao principal excede a tolerancia de 100 ms.")
+    if first + len(trials) - 1 == 16 and not Decimal(59900) <= previous_end <= Decimal(60100):
+        timing_valid = False
+    if not full:
+        return {"timing_valid": timing_valid}
+    if not timing_valid:
+        raise InvalidResultError("Registro viola os gates temporais.")
 
     metrics = calculate_metrics(rows)
     values = {metric["metric_code"]: metric["metric_value"] for metric in metrics}
@@ -166,3 +183,16 @@ def validate_result(payload: dict, order: tuple[int, ...], app_version: str,
     }
     return {"rows": rows, "metrics": metrics, "summary": summary,
             "payload_sha256": hashlib.sha256(canonical_payload(payload)).hexdigest()}
+
+
+def validate_result(payload: dict, order: tuple[int, ...], app_version: str,
+                    conditions: list[dict]) -> dict:
+    """Conclusao integral: mesmas formulas e gates aprovados."""
+    return _validate(payload, order, app_version, conditions, full=True)
+
+
+def validate_checkpoint(payload: dict, order: tuple[int, ...], app_version: str,
+                        conditions: list[dict], previous_end=0) -> dict:
+    """Trecho seguro e fechado; falha de timing preservada sem produzir metricas."""
+    return _validate(payload, order, app_version, conditions, full=False,
+                     previous_end=previous_end)

@@ -31,7 +31,7 @@ export function ResultSummaryPanel({ summary, onFinish, delivery = 'local', mess
     <p role="status" className={`delivery-status delivery-${delivery}`}>
       {delivery === 'saved' ? 'Resultado recebido pela equipe.' : delivery === 'sending'
         ? 'Enviando o resultado. Aguarde a confirmação de recebimento.' : delivery === 'pending'
-          ? 'O recebimento ainda não foi confirmado. Você pode reenviar o mesmo resultado sem repetir a tarefa.'
+          ? 'O recebimento ainda não foi confirmado. Observações parciais não substituem o recibo oficial; você pode reenviar o mesmo resultado sem repetir a tarefa.'
           : 'Esta execução local ainda não possui confirmação de recebimento pela equipe.'}
     </p>
     {message && <p role="alert" className="notice">{message}</p>}

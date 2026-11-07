@@ -1,5 +1,11 @@
 # Threat model
 
+Revisão alvo CHG-004, 2026-11-06: referências OIDC abaixo preservam o código
+atual/histórico. Para a versão alvo WEB, aplicar
+[autenticação local](AUTENTICACAO_E_PERMISSOES.md#autenticação-local--especificação-alvo-chg-004)
+e [ADR-006](../arquitetura/ADR-006-autenticacao-local.md). Estado/riscos no backlog.
+
+
 Escopo: preparacao para exposicao futura do dashboard autenticado. Este modelo
 nao transforma o experimento em instrumento clinico e nao autoriza dados reais
 ou deploy. Deve ser revisto na Etapa 11 diante do host, DNS, certificado,
@@ -135,3 +141,22 @@ e uma permissao geral de HTML inline, conforme a
 [documentacao de style-src](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/style-src).
 Os testes de CSP precisam passar no bundle real; a previa Vite de desenvolvimento
 na porta4173 nao constitui hospedagem com essa politica de producao.
+
+## Ameaças da autenticação local — CHG-004
+
+Revisão consolidada em 2026-11-06 (M6/WEB-021/WEB-024):
+
+| Ameaça | Controle observado / implementado em M6 | Risco residual / verificação |
+|---|---|---|
+| Banco/hash exposto ou senha reutilizada | Argon2id (64 MiB/t=3/p=1, salt aleatório), senha 15–128 Unicode íntegra, lista local de 10.898 hashes SHA-256 (SecLists), grants restritos (reader sem SELECT em hash; writer sem INSERT/DELETE em credenciais) e backups criptografados | Hash não elimina quebra offline; testado em AUTH-L01/L08 (`test_local_auth.py`, `test_web_database_provision.py`, `smoke_local_auth_restore.py`), rotação por incidente |
+| Enumeração/força bruta/DoS | Respostas 401/corpos genéricos, verificação de hash fictício para conta ausente, semáforo por processo, hash novo só após senha atual/limites, buckets HMAC persistentes (20/min por origem, 5 falhas/15 min compartilhado por identificador, teto 10.000 buckets e limpeza >24 h), `Retry-After` em 429 e logs sanitizados | Conta única pode sofrer negação temporária por janela; testado em AUTH-L03/L09 (`test_local_auth.py`, `test_local_auth_http.py`, `test_web_security_review.py`); capacidade de produção pertence a M9/M10 |
+| Login CSRF/fixação/replay ou sessão antiga | `Origin` único exato e corpo até 4 KiB em `/api/v1/auth/login` e `/api/v1/auth/password`, cookie `__Host-stroop_professional` novo com substituição da sessão anterior, CSRF em RAM, inatividade 30 min (sem extensão em `/me`/falhas) e teto 8 h, revogação efetiva e separação participante/profissional | Comprometimento de host/browser permanece externo; testado em AUTH-L04/L05 (`test_local_auth_http.py`, `test_web_security_review.py`, `web/e2e/local-auth/auth.spec.ts`, `web/e2e/integrated/sessions-security.spec.ts`) |
+| Recuperação/rotação concorrente ou abuso de admin | CLI `scripts/gerenciar_conta_local.py` em TTY sem eco com DSN de operador e confirmação `RECUPERAR`; rotação/recuperação incrementa `credential_version` e revoga todas as sessões na mesma transação; migration 0013 protege último admin local ativo, recusa criação de conta pelo runtime e revoga sessões locais ao bloquear/mudar perfil; projetos exigem vínculo explícito | Credencial administrativa comprometida amplia alcance; testado em AUTH-L02/L06 (`test_local_auth.py`, `test_local_auth_http.py`, `test_web_administration_provisioned.py`, `web/e2e/local-auth/auth.spec.ts`) |
+| Compartilhamento e saída de profissional | Custódia operacional, troca de senha/revogação global (`POST /api/v1/auth/password` e `POST /api/v1/admin/users/{id}/sessions/revoke`) e identificação técnica por conta (`evaluator_id`), sem prometer autoria individual | Sem atribuição ou revogação individual por pessoa; R07 e R12 permanecem abertos e exigem avaliação institucional DEC-03 em WEB-033 e procedimentos finais em WEB-039 |
+| Corte/rollback/restore ressuscita acesso | Schema aditivo 0012/0013 testado, `API_AUTH_MODE=local` por padrão com corte 404 das rotas OIDC fora de `APP_ENV=test`, imagens/Compose sem secrets Google obrigatórios e ensaio de restore isolado (`scripts/smoke_local_auth_restore.py`) exigindo `recover` antes da abertura | Produção e release candidata seguem gates próprios (WEB-031/032/038/039); testado em AUTH-L08/L09 (`test_postgres_migrations.py`, `smoke_web_compose.py`, `smoke_local_auth_restore.py`) |
+
+Controles técnicos locais implementados e verificados em ambiente sintético em M6
+(evidências e aceite em EV-M6-021/024 no [backlog](../Projeto%20Stroop%20Test.md)).
+Acesso por projeto e separação do participante não mudam. R05, R07 e R12 permanecem
+abertos para seus gates subsequentes (M4/M5/M8/M9/M10). Nenhum scanner/ataque
+contra produção foi autorizado.

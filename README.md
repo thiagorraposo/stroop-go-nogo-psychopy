@@ -1,56 +1,48 @@
-# Stroop Go/No-Go PsychoPy
+# Plataforma Stroop Web
 
-Contribuicoes seguem [GitHub Flow](CONTRIBUTING.md), com PRs, CI e squash merge.
+Desenvolver uma plataforma Web modular para aplicação, gerenciamento e análise
+de avaliações cognitivas, iniciando pelo Stroop Go/No-Go, com integridade de dados,
+rastreabilidade metodológica, segurança e capacidade de expansão.
 
-## Evolucao para WEB
+O repositório já contém React + TypeScript + Vite, motor jsPsych e API própria
+Python/FastAPI com PostgreSQL, além da operação histórica PsychoPy/Streamlit.
+O plano atual consolida e revalida essa implementação; não representa migração
+concluída. A tarefa executa no navegador e envia resultados à API para cálculo
+oficial/persistência. CSV é intercâmbio complementar. Docker/Nginx/HTTPS já têm
+configuração versionada; sua existência não comprova disponibilidade publicada.
 
-A versao WEB esta publicada para testes sinteticos em
-[strooptest.thiagorraposo.dev](https://strooptest.thiagorraposo.dev).
-Participantes precisam de convite; a equipe usa Google com cadastro previo.
-Homologacao temporal e liberacao para coleta real continuam pendentes.
-Implantacao, manutencao e recuperacao: [runbook da VPS](docs/operacao/DEPLOY_WEB_VPS.md).
+Fluxo alvo: avaliador autenticado → preparação de avaliação/convite → identificação
+pseudonimizada → instruções → prática → tarefa no navegador → tentativas/API →
+PostgreSQL → métricas → dashboard React → exportações autorizadas.
 
-O repositorio desenvolve a versao web no mesmo projeto, com arquitetura de
-monolito modular. O nucleo Python em `stroop/` concentra contratos, validacao,
-metricas e adaptadores CSV reutilizados pelo fluxo atual. `api/` concentra a
-autenticacao, sessoes e resultados HTTP; `web/` contem a base React/TypeScript,
-navegacao e cliente HTTP. Comandos e fronteiras da interface ficam no
-[README WEB](web/README.md).
-O estado de entrega e validacao permanece no roadmap.
+PsychoPy é referência histórica e metodológica; Streamlit será substituído como
+interface operacional final, permanecendo preservado na transição. Uso educacional
+e pesquisa exploratória, sem diagnóstico, norma, percentil clínico ou equivalência
+psicométrica presumida. Fórmulas preservadas não certificam temporização física.
+O código atual restringe projetos a ensaios sintéticos; uso real exige decisão e
+validação próprias. Publicação para testes foi registrada historicamente, sem
+verificação remota nesta auditoria.
 
-- [Estrutura e mapa de compatibilidade](docs/ESTRUTURA_DO_PROJETO.md).
-- [Decisao arquitetural e stack alvo](docs/arquitetura/ADR-001-evolucao-web.md).
-- [Roadmap WEB e ponto de retomada](docs/ROADMAP_WEB.md).
+Comece por:
 
-No Codex CLI, `continue web` executa o roadmap continuamente, validando e
-registrando cada etapa antes de avancar; `execute Wxx` seleciona a etapa inicial
-com dependencias atendidas, salvo limite explicito de escopo. Contexto de
-retomada: [PROGRESS.md](docs/PROGRESS.md). A operacao PsychoPy/Streamlit
-e os comandos abaixo continuam disponiveis.
+- [Backlog canônico: marcos, tarefas, aceite e próxima ação](docs/Projeto%20Stroop%20Test.md).
+- [Arquitetura atual/alvo e transição](docs/ARQUITETURA_WEB.md).
+- [Requisitos e rastreabilidade](docs/REQUISITOS_E_RASTREABILIDADE.md).
+- [Auditoria de código e limitações](docs/AUDITORIA_REPLANEJAMENTO.md).
+- [Workflow Codex CLI](docs/WORKFLOW_CODEX_CLI.md), [AGENTS](AGENTS.md) e [contribuição](CONTRIBUTING.md).
+- [Índice documental](docs/README.md), [API](api/README.md) e [Web](web/README.md).
 
-## Workflow de evolucao
+`mostrar status` é somente leitura; `continue o projeto` executa o marco autorizado;
+`validar marco atual` verifica sem novas funções; `replanejar` revisa o plano.
+Branches/commits/pushes validados são autônomos; não criar PR/merge automaticamente.
+Produção, main e dados reais exigem autorização específica. Esta entrega é
+exclusivamente documental e para antes de qualquer implementação futura.
 
-O [backlog legado](docs/legado/Projeto%20Stroop%20Test.md) e a unica fonte de escopo,
-aceite, dependencias, estado e progresso do fluxo existente. O [protocolo](docs/desenvolvimento/WORKFLOW_CODEX_CLI.md)
-orienta o trabalho do Codex CLI neste repositorio. As Etapas 11 e 12 serao
-executadas e validadas diretamente pelo usuario.
+## Operação histórica preservada
 
-- `continue o projeto`: nao inicia as Etapas 11 e 12, reservadas ao usuario.
-- `mostrar status`: inspeciona progresso, bloqueios e proxima etapa sem escrever.
-- `validar etapa atual`: para etapas sob responsabilidade do Codex, reexecuta o
-  aceite sem antecipar outra; nas Etapas 11 e 12, revisa apenas evidencias
-  disponibilizadas pelo usuario.
-
-Nao e necessario gerar prompts externos. Validacoes do projeto usam somente dados
-sinteticos. O uso cotidiano do experimento e do dashboard continua descrito
-abaixo.
-
-
-Experimento PsychoPy Builder de Stroop Go/No-Go em portugues brasileiro.
-
-Regra da tarefa: pressionar `Espaco` apenas quando a palavra e a cor da tinta forem congruentes. Nao responder quando forem incongruentes.
-
-Este projeto e mantido para fins educacionais e de pesquisa exploratoria. Ele nao e instrumento clinico validado, nao produz diagnostico e nao deve ser usado para classificacao clinica ou normativa.
+As instruções abaixo mantêm os comandos públicos existentes. Não significam que
+PsychoPy/Streamlit sejam a interface final da plataforma nem autorizam coleta real,
+instalação de produção ou alteração de infraestrutura durante replanejamento.
 
 ## Uso em qualquer sistema
 
@@ -259,7 +251,7 @@ A arquitetura operacional é: PsychoPy -> CSV bruto unificado -> importador Post
 Os contratos tecnicos estao em `docs/dados/DADOS_E_DASHBOARD.md`,
 `docs/dados/MODELO_DE_DADOS.md`, `docs/experimento/CSV_UNIFICADO.md` e `docs/dados/IMPORTACAO_SQLITE.md`.
 As antigas fases sao historicas; nao exigem dados reais para aceite do workflow.
-Planejamento e progresso ficam somente no [backlog canonico](docs/legado/Projeto%20Stroop%20Test.md).
+Planejamento e progresso atuais ficam somente no [backlog canônico](docs/Projeto%20Stroop%20Test.md); o arquivo em legado/ é histórico congelado.
 
 Para rodar o dashboard:
 
@@ -310,7 +302,8 @@ stroop-cognifit/
 │   ├── operacao/
 │   ├── desenvolvimento/
 │   ├── legado/
-│   ├── ROADMAP_WEB.md
+│   ├── Projeto Stroop Test.md # backlog canônico
+│   ├── ROADMAP_WEB.md         # ponte de navegação
 │   ├── PROGRESS.md
 │   └── ESTRUTURA_DO_PROJETO.md
 ├── nginx/

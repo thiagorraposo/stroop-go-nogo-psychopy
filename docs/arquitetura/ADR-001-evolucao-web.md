@@ -1,5 +1,9 @@
 # ADR-001 — Evolucao web em monolito modular
 
+Nota de 2026-11-04: decisão histórica preservada. [ADR-004](ADR-004-replanejamento-plataforma.md)
+consolida direção atual e substitui orientações antigas de backlog/comandos/Git;
+não revoga regras metodológicas ou mapa explícito de legado.
+
 Data: 2026-10-16. Decisao arquitetural adotada para orientar a implementacao.
 Estado de execucao e aceite ficam somente no [roadmap WEB](../ROADMAP_WEB.md).
 

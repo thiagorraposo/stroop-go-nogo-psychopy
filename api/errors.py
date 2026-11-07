@@ -21,6 +21,10 @@ ERRORS = {
     "invitation_used": (409, "Convite ja utilizado."),
     "result_conflict": (409, "Resultado diferente do ja recebido."),
     "duplicate_project": (409, "Projeto ja cadastrado."),
+    "duplicate_candidate_found": (
+        409,
+        "Cadastro com nome semelhante ja existente; confirme homonimo ou selecione o registro existente.",
+    ),
     "invitation_expired": (410, "Convite expirado."),
     "session_expired": (410, "Sessao expirada."),
     "body_too_large": (413, "Corpo da requisicao excede o limite."),
@@ -44,19 +48,36 @@ STATUS_CODES = {
 class APIError(HTTPException):
     """Erro de negocio com codigo pertencente ao catalogo estatico."""
 
-    def __init__(self, code: str, headers: dict[str, str] | None = None) -> None:
+    def __init__(
+        self,
+        code: str,
+        headers: dict[str, str] | None = None,
+        extra: dict[str, object] | None = None,
+    ) -> None:
         status, message = ERRORS[code]
         self.code = code
+        self.extra = extra
         super().__init__(status_code=status, detail=message, headers=headers)
 
 
-def error_response(code: str, request_id: str) -> JSONResponse:
+def error_response(
+    code: str,
+    request_id: str,
+    *,
+    extra: dict[str, object] | None = None,
+) -> JSONResponse:
     status, message = ERRORS[code]
     headers = {"X-Request-ID": request_id, "Cache-Control": "no-store"}
     if code == "rate_limited":
         headers["Retry-After"] = "900"
+    payload: dict[str, object] = {
+        "error": {"code": code, "message": message},
+        "request_id": request_id,
+    }
+    if extra:
+        payload.update(extra)
     return JSONResponse(
-        {"error": {"code": code, "message": message}, "request_id": request_id},
+        payload,
         status_code=status,
         headers=headers,
     )
@@ -64,7 +85,8 @@ def error_response(code: str, request_id: str) -> JSONResponse:
 
 async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
     code = exc.code if isinstance(exc, APIError) else STATUS_CODES.get(exc.status_code, "internal_error")
-    response = error_response(code, request.state.request_id)
+    extra = exc.extra if isinstance(exc, APIError) else None
+    response = error_response(code, request.state.request_id, extra=extra)
     if exc.headers:
         for name, value in exc.headers.items():
             if name.lower() == "retry-after" and value.isdigit():

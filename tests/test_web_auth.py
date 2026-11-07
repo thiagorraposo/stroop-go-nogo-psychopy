@@ -29,7 +29,7 @@ SUBJECT = "synthetic-professional-subject"
 
 
 def config() -> APIConfig:
-    return APIConfig(
+    return APIConfig(auth_mode="oidc",
         database_url=DATABASE,
         public_origin=ORIGIN,
         app_env="test",
@@ -326,7 +326,7 @@ class WebAuthPostgresTests(unittest.TestCase):
 
 
 def configured_database(database_url: str, **settings) -> APIConfig:
-    return APIConfig(
+    return APIConfig(auth_mode="oidc",
         database_url=database_url,
         public_origin=ORIGIN,
         app_env="test",

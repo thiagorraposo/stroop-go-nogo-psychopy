@@ -88,6 +88,29 @@ class WebResultValidationTests(unittest.TestCase):
         self.assertAlmostEqual(result["summary"]["response_time_seconds"],
                                (512.123456789 / 1000 + 731.123456789 / 1000) / 2)
         self.assertEqual(result["summary"]["hits"], 2)
+        # Referencia calculada a partir das 16 condicoes: 2 hits, 6 omissoes,
+        # 1 comissao e 7 rejeicoes. Conferir todos os codigos e suas unidades,
+        # inclusive percentual de omissoes que nao aparece no resumo HTTP.
+        expected = {
+            "accuracy": (56.25, "percent"),
+            "accuracy_go_trials": (25, "percent"),
+            "accuracy_no_go_trials": (87.5, "percent"),
+            "omission_errors": (6, "count"),
+            "omission_errors_percentage": (75, "percent"),
+            "commission_errors": (1, "count"),
+            "response_time": (0.621623456789, "seconds"),
+            "total_trials": (16, "count"),
+            "total_go_trials": (8, "count"),
+            "total_no_go_trials": (8, "count"),
+            "hits": (2, "count"),
+            "correct_rejections": (7, "count"),
+        }
+        metrics = {m["metric_code"]: m for m in result["metrics"]}
+        self.assertEqual(set(metrics), set(expected))
+        for code, (value, unit) in expected.items():
+            with self.subTest(metric=code):
+                self.assertAlmostEqual(metrics[code]["metric_value"], value, places=12)
+                self.assertEqual(metrics[code]["unit"], unit)
 
     def test_closed_top_level_schema(self):
         for field in self.payload:

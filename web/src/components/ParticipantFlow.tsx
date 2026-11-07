@@ -96,6 +96,7 @@ export function ParticipantFlow({ onBack }: { onBack: () => void }) {
 
   if (view.phase === 'preparing') return <><PracticePreparation key={view.session.session_id}
     onBack={onBack} mainOrder={view.session.main_conditions} onMainStart={() => run.start()}
+    onMainTrialComplete={(trial, framePeriod) => run.recordTrial(trial, framePeriod)}
     onMainComplete={result => run.complete(result)} onMainInterrupted={reason => run.interrupt(reason)}
     captureTiming={captureTiming} onMainTimingTrace={trace => setTimingTraces(rows => [...rows, trace])} />{capturePanel}</>
   if (view.phase === 'result') return <><ResultSummaryPanel summary={view.summary}

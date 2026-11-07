@@ -1,3 +1,9 @@
+# ARQUIVO HISTÓRICO CONGELADO — etapas 1–12
+
+Preservado em 2026-11-04. Percentuais, comandos e destinos abaixo descrevem
+o planejamento histórico; não constituem backlog executável nem progresso do novo produto.
+Fonte única vigente: [Projeto Stroop Test](../Projeto%20Stroop%20Test.md).
+
 # Backlog completo — evolução do Stroop
 
 Este documento governa o escopo legado PsychoPy/Streamlit. A evolucao para a

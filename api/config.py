@@ -78,9 +78,9 @@ class APIConfig:
     database_url: str = field(repr=False)
     public_origin: str
     app_env: str
-    oidc_client_id: str = field(repr=False)
-    oidc_client_secret: str = field(repr=False)
     session_secret: str = field(repr=False)
+    oidc_client_id: str = field(default="", repr=False)
+    oidc_client_secret: str = field(default="", repr=False)
     login_rate_limit: int = 20
     login_rate_window_seconds: int = 60
     redeem_rate_limit: int = 10
@@ -93,8 +93,11 @@ class APIConfig:
     participant_rate_window_seconds: int = 60
     read_database_url: str = field(default="", repr=False)
     oidc_callback_path: str = "/api/v1/auth/callback"
+    auth_mode: str = "local"
 
     def __post_init__(self) -> None:
+        if self.auth_mode not in {"local", "oidc"} or (self.auth_mode == "oidc" and self.app_env != "test"):
+            _invalid()
         for value, upper_bound in (
             (self.participant_read_rate_limit, 10000),
             (self.participant_write_rate_limit, 10000),
@@ -130,11 +133,10 @@ class APIConfig:
             or not 1 <= self.professional_rate_window_seconds <= 86400
         ):
             _invalid()
-        for value, minimum, maximum in (
-            (self.oidc_client_id, 8, 256),
-            (self.oidc_client_secret, 16, 512),
-            (self.session_secret, 32, 512),
-        ):
+        secrets_to_validate = [(self.session_secret, 32, 512)]
+        if self.auth_mode == "oidc":
+            secrets_to_validate.extend([(self.oidc_client_id, 8, 256), (self.oidc_client_secret, 16, 512)])
+        for value, minimum, maximum in secrets_to_validate:
             if (
                 not isinstance(value, str) or not minimum <= len(value) <= maximum
                 or any(character.isspace() or ord(character) < 32 for character in value)
@@ -199,13 +201,14 @@ class APIConfig:
         except (TypeError, ValueError):
             _invalid()
         return cls(
+            auth_mode=values.get("API_AUTH_MODE", "local"),
             database_url=secret_value(values, "API_DATABASE_URL"),
             read_database_url=secret_value(values, "API_READ_DATABASE_URL"),
             oidc_callback_path=values.get("OIDC_CALLBACK_PATH", "/api/v1/auth/callback"),
             public_origin=values.get("API_PUBLIC_ORIGIN", ""),
             app_env=values.get("APP_ENV", ""),
-            oidc_client_id=secret_value(values, "OIDC_CLIENT_ID"),
-            oidc_client_secret=secret_value(values, "OIDC_CLIENT_SECRET"),
+            oidc_client_id=secret_value(values, "OIDC_CLIENT_ID") if values.get("API_AUTH_MODE", "local") == "oidc" else "",
+            oidc_client_secret=secret_value(values, "OIDC_CLIENT_SECRET") if values.get("API_AUTH_MODE", "local") == "oidc" else "",
             session_secret=secret_value(values, "API_SESSION_SECRET"),
             login_rate_limit=login_rate_limit,
             login_rate_window_seconds=login_rate_window_seconds,

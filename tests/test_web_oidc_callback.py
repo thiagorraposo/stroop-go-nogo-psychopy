@@ -32,7 +32,7 @@ class CallbackCompatibilityTests(unittest.TestCase):
                 replace(config(), oidc_callback_path=value)
 
     def test_config_from_env_preserva_padrao_e_opcao(self):
-        environment = dict(API_DATABASE_URL=config().database_url, APP_ENV='test',
+        environment = dict(API_AUTH_MODE='oidc', API_DATABASE_URL=config().database_url, APP_ENV='test',
                            API_PUBLIC_ORIGIN=ORIGIN, OIDC_CLIENT_ID=config().oidc_client_id,
                            OIDC_CLIENT_SECRET=config().oidc_client_secret,
                            API_SESSION_SECRET=config().session_secret)

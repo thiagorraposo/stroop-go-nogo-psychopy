@@ -38,6 +38,10 @@ REQUIRED_COLUMNS = {
         "assessment_id", "session_id", "project_id", "platform", "protocol_id",
         "app_version", "frame_period_ms", "completed_at",
     },
+    "web_session_invalidations": {"session_id", "reason", "recorded_at", "source", "event_at_ms"},
+    "web_session_checkpoints": {"session_id", "confirmed_through", "prefix_hash", "received_at"},
+    "web_participant_sessions": {"session_id", "state", "expires_at", "abort_reason", "revoked_at"},
+    "web_invitations": {"session_id", "project_id", "revoked_at"},
     "web_trial_observations": {
         "assessment_id", "trial_number", "condition_id", "trial_start_ms",
         "stimulus_onset_ms", "stimulus_offset_ms", "trial_end_ms", "key_at_ms",
@@ -98,15 +102,18 @@ def _authorized_project(connection, project_id: UUID, issuer: str, subject: str)
     return row is not None
 
 
-def _base_query(where_clause: str) -> str:
+def _base_query(where_clause: str, *, history=False) -> str:
     # where_clause is selected only from the fixed call sites below.
+    valid_clause = "" if history else "AND NOT EXISTS (SELECT 1 FROM web_session_invalidations inv WHERE inv.session_id=wa.session_id)"
     return f"""SELECT a.assessment_id, a.participant_id, a.visit, p.code AS project_code,
                       CASE WHEN wa.assessment_id IS NULL THEN NULL ELSE a.evaluator END AS evaluator_id,
                       COALESCE(wa.completed_at, a.imported_at::timestamptz) AS created_at,
                       a.started_at, COALESCE(wa.platform, 'psychopy') AS platform,
                       a.test_code, a.test_version, wa.protocol_id, wa.app_version,
                       wa.session_id, wa.completed_at, wa.frame_period_ms,
-                      a.assessment_date, a.import_status
+                      a.assessment_date, a.import_status,
+                      NOT EXISTS (SELECT 1 FROM web_session_invalidations inv WHERE inv.session_id=wa.session_id) AS valid_for_result,
+                      (SELECT inv.reason FROM web_session_invalidations inv WHERE inv.session_id=wa.session_id) AS invalidation_reason
                FROM assessments a
                LEFT JOIN web_assessments wa ON wa.assessment_id=a.assessment_id
                LEFT JOIN web_csv_imports wi ON wi.assessment_id=a.assessment_id AND wi.status='importado'
@@ -121,7 +128,7 @@ def _base_query(where_clause: str) -> str:
                  AND m.issuer=%s AND m.subject=%s AND m.active
                JOIN app_users u ON (u.issuer,u.subject)=(m.issuer,m.subject)
                  AND u.active AND u.role IN ('consulta','importacao','administracao')
-               WHERE p.active AND a.import_status='valid' {where_clause}"""
+               WHERE p.active AND a.import_status='valid' {valid_clause} {where_clause}"""
 
 
 class SnapshotConflict(Exception):
@@ -352,7 +359,7 @@ def get_assessment(database_url: str, project_id: UUID, assessment_id: str,
             if not _authorized_project(connection, project_id, issuer, subject):
                 return None
             rows = connection.execute(
-                _base_query("AND a.assessment_id=%s"),
+                _base_query("AND a.assessment_id=%s", history=True),
                 (project_id, issuer, subject, assessment_id),
             ).fetchone()
             if rows is None:
@@ -435,3 +442,42 @@ def iso_utc(value: Any) -> str | None:
 
 __all__ = ["PersistenceError", "SchemaError", "SnapshotConflict", "FacetLimitError",
            "list_assessments", "assessment_options", "aggregate_assessments", "get_assessment", "iso_utc"]
+
+
+def session_status(database_url, project_id, session_id, issuer, subject):
+    """Estado de recepcao separado das consultas oficiais; sem observacoes brutas."""
+    try:
+        with _connect(database_url) as connection:
+            _validate_schema(connection)
+            if not _authorized_project(connection,project_id,issuer,subject):
+                return None
+            row = connection.execute(
+                """SELECT s.session_id,s.state,s.expires_at,s.abort_reason,s.revoked_at,
+                          i.revoked_at AS invitation_revoked_at,c.confirmed_through,c.prefix_hash,c.received_at,
+                          inv.reason AS invalidation_reason,inv.source AS invalidation_source,
+                          inv.recorded_at AS invalidated_at,inv.event_at_ms,
+                          (s.expires_at <= clock_timestamp()) AS deadline_passed
+                   FROM web_participant_sessions s JOIN web_invitations i USING(session_id)
+                   LEFT JOIN web_session_checkpoints c USING(session_id)
+                   LEFT JOIN web_session_invalidations inv USING(session_id)
+                   WHERE i.project_id=%s AND s.session_id=%s""", (project_id,session_id),
+            ).fetchone()
+            if row is None:
+                return None
+            expired = row['deadline_passed'] and row['state'] in {'preparing','running'}
+            return {
+                'session_id':str(row['session_id']), 'state':'expired' if expired else row['state'],
+                'expires_at':iso_utc(row['expires_at']),
+                'complete':row['state']=='completed',
+                'valid_for_result':row['state']=='completed' and row['invalidation_reason'] is None,
+                'abort_reason':row['abort_reason'],
+                'revoked':row['revoked_at'] is not None or row['invitation_revoked_at'] is not None,
+                'invalidation':None if row['invalidation_reason'] is None else {
+                    'reason':row['invalidation_reason'],'source':row['invalidation_source'],
+                    'event_at_ms':row['event_at_ms'],'recorded_at':iso_utc(row['invalidated_at']),
+                },
+                'checkpoint':{'confirmed_through':row['confirmed_through'] or 0,
+                              'prefix_hash':row['prefix_hash'],'received_at':iso_utc(row['received_at'])},
+            }
+    except psycopg.Error as exc:
+        raise PersistenceError from exc

@@ -4,7 +4,7 @@ services:
   restore-postgres:
     image: postgres:17.6-bookworm@sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3
     environment:
-      POSTGRES_DB: stroop_restore_test
+      POSTGRES_DB: stroop_etapa4_test_restore
       POSTGRES_USER: stroop_restore
       POSTGRES_PASSWORD: synthetic-restore-only
       PGDATA: /var/lib/postgresql/data/pgdata
@@ -22,7 +22,7 @@ services:
     cpus: 0.50
     mem_limit: 768m
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U stroop_restore -d stroop_restore_test"]
+      test: ["CMD-SHELL", "pg_isready -U stroop_restore -d stroop_etapa4_test_restore"]
       interval: 2s
       timeout: 2s
       retries: 30

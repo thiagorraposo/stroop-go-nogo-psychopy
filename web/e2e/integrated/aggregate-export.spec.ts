@@ -19,14 +19,16 @@ async function open(page: Page, context: BrowserContext, prepared: Prepared) {
 }
 async function download(page: Page) {
   const response = page.waitForResponse(value => value.url().endsWith('/api/v1/assessments/export'))
-  const event = page.waitForEvent('download')
+  const event = page.waitForEvent('download').catch(() => null)
   await page.getByRole('button', { name: 'Exportar visão filtrada', exact: true }).click()
-  const [result, file] = await Promise.all([response, event])
+  const result = await response
   expect(result.status()).toBe(200)
+  const file = await event
+  expect(file).not.toBeNull()
   expect(result.headers()['cache-control']).toContain('no-store')
   expect(result.headers()['content-type']).toContain('text/csv')
-  expect(file.suggestedFilename()).not.toContain('P_SINTETICO')
-  const path = await file.path(); expect(path).not.toBeNull()
+  expect(file!.suggestedFilename()).not.toContain('P_SINTETICO')
+  const path = await file!.path(); expect(path).not.toBeNull()
   const contents = await readFile(path!, 'utf8')
   expect(contents).not.toContain('NOME_SINTETICO_RESTRITO')
   const lines = contents.replace(/^\uFEFF/, '').trim().split(/\r?\n/)

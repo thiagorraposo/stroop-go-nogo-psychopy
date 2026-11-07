@@ -44,7 +44,7 @@ test('percurso preparatorio e exemplos permanecem legiveis sem rolagem horizonta
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })
 
-test('mostra carregamento e direciona o acesso profissional ao Google', async ({ page }) => {
+test('mostra carregamento e formulario profissional local', async ({ page }) => {
   let release!: () => void
   const gate = new Promise<void>(resolve => { release = resolve })
   await page.route('**/api/v1/auth/me', async route => {
@@ -54,9 +54,9 @@ test('mostra carregamento e direciona o acesso profissional ao Google', async ({
   await page.goto('/equipe')
   await expect(page.getByRole('status')).toHaveText('Verificando seu acesso…')
   release()
-  const login = page.getByRole('link', { name: 'Entrar com Google' })
-  await expect(login).toBeVisible()
-  await expect(login).toHaveAttribute('href', '/api/v1/auth/login')
+  await expect(page.getByLabel('Usuário', { exact: true })).toBeVisible()
+  await expect(page.getByLabel('Senha', { exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Entrar', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Área da equipe' })).toBeVisible()
 })
 
@@ -82,7 +82,7 @@ test('recupera erro seguro, revalida perfil e encerra com CSRF em RAM', async ({
   await expect(page.getByRole('main')).not.toContainText(profile.csrf_token)
   await expect(page.getByRole('main')).not.toContainText(profile.user_id)
   await page.getByRole('button', { name: 'Encerrar sessão' }).click()
-  await expect(page.getByRole('link', { name: 'Entrar com Google' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Entrar', exact: true })).toBeVisible()
   expect(await page.evaluate(() => ({ local: localStorage.length, session: sessionStorage.length })))
     .toEqual({ local: 0, session: 0 })
 })
@@ -120,12 +120,16 @@ test('perda de foco cancela avancar por tecla iniciada antes da interrupcao', as
 
 test('expiracao profissional limpa painel e exige novo login sem persistir dados', async ({ page }) => {
   await page.clock.install()
-  await page.route('**/api/v1/auth/me', route => route.fulfill({ status: 200, json: profile }))
+  let expired = false
+  await page.route('**/api/v1/auth/me', route => route.fulfill(!expired
+    ? { status: 200, json: profile }
+    : { status: 401, json: { error: { code: 'authentication_required' } } }))
   await page.route('**/api/v1/projects?*', route => route.fulfill({ status: 200, json: { items: [], next_cursor: null } }))
   await page.goto('/equipe')
   await expect(page.getByRole('heading', { name: 'Resultados da pesquisa' })).toBeVisible()
+  expired = true
   await page.clock.fastForward(1_800_001)
-  await expect(page.getByRole('link', { name: 'Entrar com Google' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Entrar', exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Resultados da pesquisa' })).toHaveCount(0)
   expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0)
 })

@@ -95,3 +95,51 @@ test('cancelamento antes e durante escrita nao declara sucesso nem repete', asyn
   resolve(new Response(null, { status: 204 }));
   expect(fetchMock).toHaveBeenCalledTimes(1);
 });
+
+test('cria convite cadastral com patient_id, evaluator_id, test_code, iniciais e resumo para conferencia', async () => {
+  const patientId = '00000000-0000-4000-8000-000000000101';
+  const evaluatorId = '00000000-0000-4000-8000-000000000202';
+  const summary = {
+    project_id: projectId,
+    project_code: 'PROJETO_SINTETICO',
+    project_name: 'Projeto sintetico',
+    patient_id: patientId,
+    participant_code: 'PAT-0001',
+    participant_name: 'Paciente Sintetico',
+    initials: 'P.S.',
+    evaluator_id: evaluatorId,
+    evaluator_code: 'EVA-0001',
+    evaluator_name: 'Avaliador Sintetico',
+    test_code: 'stroop_go_nogo_ptbr',
+    test_version: '0.2.2-web.1',
+    protocol_id: 'stroop_go_nogo_ptbr/0.2.2-web.1',
+    visit: 'T1',
+  };
+  fetchMock.mockResolvedValue(json({ ...invitation, summary }));
+  await expect(
+    createInvitation(
+      projectId,
+      {
+        patient_id: patientId,
+        evaluator_id: evaluatorId,
+        visit: ' T1 ',
+        test_code: 'stroop_go_nogo_ptbr',
+        initials: ' p.s. ',
+      },
+      csrf,
+    ),
+  ).resolves.toEqual({ ...invitation, summary });
+  expect(fetchMock).toHaveBeenCalledExactlyOnceWith(
+    `/api/v1/projects/${projectId}/invitations`,
+    expect.objectContaining({
+      method: 'POST',
+      body: JSON.stringify({
+        patient_id: patientId,
+        evaluator_id: evaluatorId,
+        visit: 'T1',
+        test_code: 'stroop_go_nogo_ptbr',
+        initials: 'P.S.',
+      }),
+    }),
+  );
+});

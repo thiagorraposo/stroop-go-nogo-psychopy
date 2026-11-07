@@ -14,11 +14,20 @@ o metodo fica no [protocolo](../experimento/PROTOCOLO_WEB.md).
 
 ## Profissionais e autorizacao
 
-Google OIDC autentica; cadastro previo ativo e autorizacao no servidor
-determinam acesso. Preservar identidade permanente `iss` + `sub` e os perfis
-existentes `consulta`, `importacao` e `administracao`. E-mail e auxiliar,
-nao identifica participante nem concede privilegio. Sem autocadastro,
-senhas proprias ou acesso por claims que o navegador declarar.
+Alvo WEB CHG-004: login local por usuário/senha, conta administrativa única,
+sem cadastro público ou autenticação externa obrigatória, conforme
+[ADR-006](../arquitetura/ADR-006-autenticacao-local.md) e
+[especificação de segurança](AUTENTICACAO_E_PERMISSOES.md#autenticação-local--especificação-alvo-chg-004).
+O runtime WEB opera com `API_AUTH_MODE=local` por padrão e recusa endpoints OIDC
+em desenvolvimento/produção; o suporte OIDC e identidade `iss/sub` permanecem
+preservados apenas para compatibilidade histórica e regressões em `APP_ENV=test`.
+Estado e evidências ficam no [backlog canônico](../Projeto%20Stroop%20Test.md).
+Preservar perfis `consulta`,
+`importacao` e `administracao`, cadastro/estado e autorização no servidor.
+A conta inicial tem perfil `administracao`, mas bootstrap não concede projetos.
+Compartilhamento não identifica cada profissional; `evaluator_id` identifica
+somente a conta emissora. DEC-03 deve avaliar adequação para dados reais e R12;
+revogar acesso de uma pessoa exige troca global e invalidação de sessões.
 
 Vinculo ativo a projeto e obrigatorio para consultar dados, exportar e emitir
 convites, **inclusive para administradores**. Administracao global permite
@@ -29,7 +38,7 @@ verificacao. O servidor deve consultar o projeto real do objeto solicitado.
 
 | Operacao | consulta | importacao | administracao | Participante |
 |---|---|---|---|---|
-| Login e propria identidade | Cadastro ativo | Cadastro ativo | Cadastro ativo | Nao usa Google |
+| Login e propria identidade | Conta ativa | Conta ativa | Conta ativa | Convite, não login profissional |
 | Listar projetos | Somente vinculados | Somente vinculados | Todos para gestao | Nao |
 | Criar projetos/gerenciar vinculos | Nao | Nao | Sim, gestao global | Nao |
 | Criar/revogar convite | Nao | Vinculo e projeto ativo | Vinculo e projeto ativo | Nao |
@@ -97,8 +106,8 @@ responsavel. Nao inferir anonimato por usar pseudonimo.
 | `visit` | Profissional; distinguir momento da coleta | Membros do projeto; fixado no convite |
 | `evaluator_id` | Servidor; conta criadora responsavel pela emissao | Membros do projeto; sem e-mail ou nome no resultado |
 | `session_id`, `invitation_id`, estados e prazos | Servidor; uso unico, revogacao, expiracao e rastreabilidade operacional | Somente atores autorizados; IDs nao concedem acesso |
-| Hash de codigo/cookie, transacao OIDC e CSRF | Servidor; autenticar e impedir replay/CSRF | Somente backend; segredo nunca vira dado de pesquisa/export |
-| `iss`, `sub`, perfil, bloqueio e vinculos | Identidade validada/cadastro; autorizacao e auditoria profissional | Autorizacao/administracao; nao enviados ao participante |
+| Hash de codigo/cookie, credencial local e CSRF (transacao OIDC no histórico) | Servidor; autenticar e impedir replay/CSRF | Somente backend; segredo nunca vira dado de pesquisa/export |
+| `iss`, `sub`, perfil, bloqueio e vinculos | Identidade validada/cadastro atual OIDC; alvo local usa principal técnico estável e autorização/auditoria sem autoria individual | Autorizacao/administracao; nao enviados ao participante |
 | Protocolo, versao do teste/app e plataforma | Servidor e app; distinguir variante, proveniencia e interpretacao | Motor e membros; nao alterar CSV de 21 colunas |
 | Ordem, respostas, tempos monotones e periodo de quadro | Motor; classificacao, metricas e consistencia temporal | Resultado proprio resumido; detalhe somente membros |
 | Timestamps civis e hash canonico/recibo | Servidor; identificar execucao e evitar duplicacao no reenvio | Backend/membros; recibo proprio ao participante |
@@ -139,7 +148,7 @@ substitui procedimento institucional. Nao prometer comprovacao de consentimento
 que o software nao registrou.
 
 VPS ja adquirida e dominio existente seguem
-[ADR-002](../arquitetura/ADR-002-hospedagem-vps.md). Hostname, credenciais OIDC,
+[ADR-002](../arquitetura/ADR-002-hospedagem-vps.md). Hostname, provisionamento local protegido,
 DNS/TLS, destino externo de backup e textos reais sao configuracoes de
 homologacao/operacao. Sua ausencia nao bloqueia desenvolvimento e testes
 sinteticos locais; acesso/deploy de producao continuam sob autorizacao propria.
@@ -166,3 +175,14 @@ Prazos e objetivos de recuperacao estao no
 Esta revisao de cenarios fecha a especificacao; evidencias executaveis de
 autenticacao, concorrencia, autorizacao e navegador pertencem as etapas
 W06–W14. Nao confundir revisao documental com aprovacao de uso real.
+
+## Cadastros centrais, avaliador responsável e exportação em CHG-005 (2026-11-07)
+
+Com a revisão formal de `DEC-01` e aprovação de [ADR-007](../arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md):
+
+1. **Conta local compartilhada vs. avaliador responsável:** a autenticação na aplicação permanece realizada pela conta local única da equipe (`ADR-006`, concluída em `M6`), que identifica o operador técnico (`issued_by_issuer`/`issued_by_subject`). O avaliador responsável pela condução do teste (`web_evaluators.id` / `evaluator_code` / `full_name`) é uma entidade cadastral separada, selecionada obrigatoriamente na preparação da sessão (`WEB-046`), sem criação de conta de login individual para cada avaliador.
+2. **Cadastro central de pacientes (`web_patients`):** o sistema armazena `full_name` (`participant_name` do formulário original do PsychoPy) e `initials` opcional em tabela cadastral segregada da tabela de resultados científicos (`assessments`), gerando automaticamente `id UUID` e `participant_code` estável (`participant_id`). Nenhum dado nominal é exposto no bootstrap/sessão do participante (`/api/v1/participant/*`).
+3. **Controle de acesso cruzado e exportação:**
+   - A consulta e seleção de pacientes e avaliadores exige sessão profissional autenticada e vínculo ativo com projeto autorizado; tentativas de acesso a projetos sem vínculo continuam respondendo `404 Not Found`.
+   - A exportação CSV opera por padrão no modo **desidentificado** (`identification_mode = "deidentified"`), exportando `participant_code` e `evaluator_code` e preservando `participant_name = NAO_COLETADO`. A exportação nominal (`identification_mode = "nominal"`) exige perfil autorizado e habilitação institucional explícita do projeto (`DEC-03` / `WEB-033` / `WEB-041`).
+4. **Retirada do upload CSV:** a importação manual de CSV pelo navegador é removida do produto em `M7` (`WEB-025`); dados operacionais entram exclusivamente pelo fluxo autenticado de cadastro, preparação e execução da plataforma.
