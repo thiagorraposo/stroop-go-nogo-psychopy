@@ -1,9 +1,11 @@
+<!-- Revisão 2026-11-04: mapa de caminhos, sem estado de execução. -->
+
 # Estrutura do projeto
 
 Mapa vigente da evolucao web. Decisao:
 [ADR-001](arquitetura/ADR-001-evolucao-web.md). Estado e tarefas web:
-[roadmap](ROADMAP_WEB.md). O [backlog legado](legado/Projeto%20Stroop%20Test.md)
-continua governando a operacao PsychoPy/Streamlit existente.
+[roadmap](ROADMAP_WEB.md). O [backlog canônico](Projeto%20Stroop%20Test.md) governa a consolidação da plataforma;
+o plano legado foi congelado como referência histórica da operação preservada.
 
 ## Arvore funcional
 
@@ -88,8 +90,8 @@ stroop-cognifit/
 │   ├── operacao/              # instalacao, uso, Docker e hardening
 │   ├── desenvolvimento/       # workflow, contrato HTTP, commits e prompts
 │   ├── legado/                # backlog legado, baselines e propostas antigas
-│   ├── ROADMAP_WEB.md         # unico estado da evolucao web
-│   ├── PROGRESS.md            # memoria concisa de trabalho e retomada
+│   ├── ROADMAP_WEB.md         # ponte para Projeto Stroop Test.md
+│   ├── PROGRESS.md            # ponte para retomada no backlog
 │   ├── REGISTRO_DE_ALTERACOES.md
 │   └── ESTRUTURA_DO_PROJETO.md # este mapa
 ├── nginx/                      # proxy existente
@@ -105,6 +107,10 @@ stroop-cognifit/
 ├── data/                       # saidas locais ignoradas
 └── database/                   # bancos locais ignorados
 ```
+
+Planejamento/estado vigentes: [Projeto Stroop Test](Projeto%20Stroop%20Test.md).
+Arquitetura consolidada: [ARQUITETURA_WEB](ARQUITETURA_WEB.md). As pontes
+ROADMAP_WEB/PROGRESS não mantêm outro estado; planos em legado são históricos.
 
 ## Direcao das dependencias
 

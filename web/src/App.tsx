@@ -6,6 +6,7 @@ import type { ProfessionalProfile } from './api/client'
 import { ParticipantFlow } from './components/ParticipantFlow'
 import { ProfessionalDashboard } from './components/ProfessionalDashboard'
 import { AdministrationPanel } from './components/AdministrationPanel'
+import { ProfessionalLogin, ProfessionalPassword } from './components/ProfessionalCredentials'
 import { JourneyIndicator } from './components/JourneyIndicator'
 
 type Navigate = (path: string) => void
@@ -88,7 +89,7 @@ function ProfessionalAccess() {
   useEffect(() => {
     if (state.phase !== 'ready') return
     const remaining = Math.max(0, Date.parse(state.profile.expires_at) - Date.now())
-    const timer = setTimeout(() => setState({ phase: 'login' }), remaining)
+    const timer = setTimeout(() => setRevision(value => value + 1), remaining)
     return () => clearTimeout(timer)
   }, [state])
   useEffect(() => {
@@ -98,8 +99,9 @@ function ProfessionalAccess() {
     const clear = () => flushSync(() => setState({ phase: 'login' }))
     const restore = (event: PageTransitionEvent) => { if (event.persisted) window.location.reload() }
     window.addEventListener('pagehide', clear)
+    window.addEventListener('stroop-professional-session-ended', clear)
     window.addEventListener('pageshow', restore)
-    return () => { window.removeEventListener('pagehide', clear); window.removeEventListener('pageshow', restore) }
+    return () => { window.removeEventListener('pagehide', clear); window.removeEventListener('stroop-professional-session-ended', clear); window.removeEventListener('pageshow', restore) }
   }, [])
 
   async function endSession(profile: ProfessionalProfile) {
@@ -119,11 +121,7 @@ function ProfessionalAccess() {
     <p className="eyebrow">Acesso profissional</p>
     <h1>Área da equipe</h1>
     {state.phase === 'loading' && <p role="status" className="status-line"><span className="spinner" aria-hidden="true" />Verificando seu acesso…</p>}
-    {state.phase === 'login' && <>
-      <p className="lead">Entre com a conta cadastrada pela equipe responsável pela pesquisa.</p>
-      <a className="button primary" href="/api/v1/auth/login">Entrar com Google <span aria-hidden="true">→</span></a>
-      <p className="quiet">O acesso é reservado a profissionais previamente autorizados.</p>
-    </>}
+    {state.phase === 'login' && <ProfessionalLogin onAuthenticated={profile => setState({ phase: 'ready', profile })} />}
     {state.phase === 'error' && <>
       <p role="alert" className="notice">{apiErrorMessage(state.error)}</p>
       <button className="button secondary" onClick={() => setRevision(value => value + 1)}>Tentar novamente</button>
@@ -134,6 +132,7 @@ function ProfessionalAccess() {
       {logoutError && <p role="alert" className="notice">Não foi possível confirmar o encerramento. Tente novamente.</p>}
       <button className="button secondary" disabled={ending} onClick={() => void endSession(state.profile)}>{ending ? 'Encerrando…' : 'Encerrar sessão'}</button>
       {!ending && <>
+        <ProfessionalPassword profile={state.profile} onEnded={() => setState({ phase: 'login' })} />
         {state.profile.role === 'administracao' && <nav aria-label="Áreas profissionais" className="professional-areas">
           <button className="button secondary" aria-pressed={area === 'resultados'} onClick={() => setArea('resultados')}>Resultados</button>{' '}
           <button className="button secondary" aria-pressed={area === 'administracao'} onClick={() => setArea('administracao')}>Administração</button>

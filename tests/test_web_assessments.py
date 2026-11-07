@@ -296,6 +296,7 @@ class WebAssessmentsTests(unittest.TestCase):
         for key in ('accuracy_go_trials', 'accuracy_no_go_trials', 'total_go_trials', 'total_no_go_trials'):
             self.assertEqual(listed[key], metrics[key])
         recovered = participant.get('/api/v1/participant/session').json()
+        self.assertEqual(recovered.pop('checkpoint')['confirmed_through'],16)
         self.assertEqual(recovered, receipt)
         self.assertEqual(set(recovered['summary']), original_keys)
 

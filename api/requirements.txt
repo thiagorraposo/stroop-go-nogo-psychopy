@@ -7,3 +7,6 @@ psycopg[binary]==3.3.5
 requests==2.34.2
 uvicorn==0.52.4
 urllib3==2.8.0
+
+# Autenticacao local M6; API PasswordHasher/Argon2id.
+argon2-cffi==25.1.0

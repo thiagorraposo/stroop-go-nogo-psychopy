@@ -1,5 +1,12 @@
 # Verificacoes reproduziveis WEB
 
+Nota de planejamento CHG-004, 2026-11-06 — **PLANEJADO**:
+Pipeline histórico com sessões/Google sintéticos não aceita senha local.
+WEB-021/032 devem adaptar fixtures/locks e integrar AUTH-L01–L09 mantendo
+scanners, gates e gatilhos/proteções; evidências anteriores valem só por SHA.
+Decisão: [ADR-006](../arquitetura/ADR-006-autenticacao-local.md). Execução/aceite somente no backlog canônico.
+
+
 O workflow [WEB validada](../../.github/workflows/web.yml) executa verificacoes em
 pull requests, pushes em `main` e disparos manuais. Push em branch de trabalho
 nao duplica a execucao do PR. Nao faz deploy, publica artefatos,
@@ -9,50 +16,29 @@ skip Python, vulnerabilidade conhecida ou deteccao de secrets; nao existe
 no repositorio remoto para bloquear merge; essa configuracao externa nao e
 criada pelo arquivo de workflow.
 
-Contribuicoes seguem [GitHub Flow](../../CONTRIBUTING.md). O agente aguarda CI
-e regras/revisoes exigidas antes de Merge Commit tradicional por PR; nao usa
-bypass administrativo, Squash Merge, Rebase Merge ou push direto em main.
-O resultado integrado e verificado novamente por push em `main`.
-Registro historico de 2026-11-04 (historico linear substituido abaixo): `verify` do app GitHub Actions,
+Contribuições seguem [GitHub Flow com PR](../../CONTRIBUTING.md). Commits e
+pushes autônomos em branch são seguidos de abertura de Pull Request (`gh pr create`).
+O job `verify` do GitHub Actions é disparado pelo PR; a integração à main ocorre
+exclusivamente via **Merge Commit tradicional** (`gh pr merge --merge`), sem Squash
+Merge, sem Rebase Merge e sem push direto em main. O resultado integrado é verificado
+novamente por push em `main`.
+
 branch atualizada, PR obrigatorio, historico linear e conversas resolvidas,
 inclusive para administradores. Nao se adicionou aprovador externo obrigatorio;
 revisoes existentes continuam respeitadas. Force push/exclusao de main bloqueados;
 branches temporarias sao removidas automaticamente depois do merge permitido.
 
-## Metodo de merge e protecoes — 2026-11-05
+## Método de merge e proteções
 
-Auditoria via API autenticada com permissao administrativa: Merge Commit ja
-habilitado, Squash e Rebase habilitados, historico linear obrigatorio. Alterados
-somente `allow_squash_merge` para false e `required_linear_history` para false;
-Merge Commit permanece habilitado. Rebase permanece habilitado na configuracao
-do repositorio, mas o workflow do Codex usa exclusivamente Merge Commit.
+Configuração remota: Merge Commit habilitado, Squash Merge desativado e histórico
+linear desativado. PR obrigatório, `verify` estrito do GitHub Actions, descarte de
+revisões obsoletas e conversas resolvidas. Auto-merge do GitHub permanece desabilitado;
+nunca usar `--auto`. Aguardar os checks e validação de critérios antes do merge
+tradicional (`gh pr merge --merge`).
 
-A reconsulta confirmou PR obrigatorio, `verify` do GitHub Actions (app 15368),
-branch atualizada (`strict`), descarte de revisoes obsoletas, conversas resolvidas
-e aplicacao das regras a administradores. Quantidade de aprovacoes exigidas
-continua zero; code owners e ultima aprovacao por outro autor continuam como
-antes. Force push e exclusao de main continuam bloqueados; assinaturas continuam
-sem exigencia. Nenhum ruleset de repositorio ou herdado foi encontrado, nem regra
-adicional efetiva; proprietario e conta pessoal. Auto-merge continua desabilitado:
-aguardar checks e autorizacao explicita do responsavel antes de usar
-`gh pr merge --merge`. Por instrucao posterior nesta sessao, nao automatizar
-merges nem usar `--auto`; PRs podem ser criados/atualizados automaticamente.
-Workflows, permissoes de usuarios e demais configuracoes foram preservados.
-
-Exportacao original, alvo, resultado verificado e rollback estao no diretorio
-local `/home/raposo/.local/state/stroop-merge-commit/20261105T172953Z`, fora do Git.
-Regra afetada: protecao classica de `main`, endpoint
-`repos/thiagorraposo/stroop-go-nogo-psychopy/branches/main/protection`; sem ruleset
-para alterar. Para rollback, reconsultar a API e comparar alteracoes concorrentes;
-restaurar os dois valores originais conforme `ROLLBACK.txt`, usando os payloads
-`rollback-repository.json` (PATCH do repositorio) e `rollback-protection.json`
-(PUT da protecao). Nao restaurar cegamente sobre mudancas posteriores. Nenhum
-historico de commit e alterado pelo rollback de configuracao.
-
-Validacao da configuracao feita por API e comparacao integral da protecao:
-a unica diferenca foi historico linear. Metodos de merge e configuracoes nao
-relacionadas conferidos separadamente. Isso nao equivale a CI aprovada nem a
-ensaio de merge: resultados de Actions devem ser consultados por SHA no PR.
+A verificação remota também pode ser disparada manualmente via `workflow_dispatch`
+existente em `web.yml` (`gh workflow run web.yml --ref NOME_DA_BRANCH`), sem dispensar
+os gates locais nem o fluxo com PR canônico.
 
 ## Ambiente e isolamento
 

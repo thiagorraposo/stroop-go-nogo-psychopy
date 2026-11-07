@@ -92,6 +92,10 @@ class PostgresMigrationsTests(unittest.TestCase):
                 "0008_web_user_lock.sql",
                 "0009_web_csv_imports.sql",
                 "0010_web_user_management.sql",
+                "0011_web_incremental_sessions.sql",
+                "0012_local_authentication.sql",
+                "0013_local_user_management.sql",
+                "0014_central_patients_evaluators.sql",
             ],
         )
         with psycopg.connect(TEST_DATABASE_URL) as connection:
@@ -124,6 +128,10 @@ class PostgresMigrationsTests(unittest.TestCase):
                     "web_trial_observations",
                     "web_participant_request_limits",
                     "web_csv_imports",
+                    "web_patients",
+                    "web_evaluators",
+                    "web_registry_audit_events",
+                    "web_legacy_entity_links",
                 }
                 .issubset(tables)
             )
@@ -136,13 +144,17 @@ class PostgresMigrationsTests(unittest.TestCase):
             self.assertIn("idx_assessment_metrics_assessment_metric", indices)
             self.assertIn("idx_trial_results_assessment_block", indices)
             self.assertIn("idx_web_csv_imports_project_updated", indices)
+            self.assertIn("idx_web_patients_normalized_name", indices)
+            self.assertIn("idx_web_patients_participant_code", indices)
+            self.assertIn("idx_web_evaluators_normalized_name", indices)
+            self.assertIn("idx_web_evaluators_evaluator_code", indices)
             foreign_keys = connection.execute(
                 """
                 SELECT COUNT(*) FROM information_schema.table_constraints
                 WHERE constraint_schema = 'public' AND constraint_type = 'FOREIGN KEY'
                 """
             ).fetchone()[0]
-            self.assertEqual(foreign_keys, 18)
+            self.assertEqual(foreign_keys, 42)
             self.assertIn("web_legacy_project_links", tables)
             self.assertEqual(connection.execute(
                 "SELECT COUNT(*) FROM web_legacy_project_links").fetchone()[0], 0)
@@ -168,6 +180,10 @@ class PostgresMigrationsTests(unittest.TestCase):
             "0008_web_user_lock.sql",
             "0009_web_csv_imports.sql",
             "0010_web_user_management.sql",
+                "0011_web_incremental_sessions.sql",
+                "0012_local_authentication.sql",
+                "0013_local_user_management.sql",
+                "0014_central_patients_evaluators.sql",
         ])
         with psycopg.connect(TEST_DATABASE_URL) as connection:
             self.assertEqual(connection.execute("SELECT COUNT(*) FROM assessments").fetchone()[0], 1)
@@ -204,7 +220,9 @@ class PostgresMigrationsTests(unittest.TestCase):
         project_id, invitation_id, session_id = uuid4(), uuid4(), uuid4()
         session_query = 'SELECT * FROM web_participant_sessions WHERE session_id=%s'
         order_query = 'SELECT trial_number,condition_id FROM web_session_main_order WHERE session_id=%s ORDER BY trial_number'
-        invitation_query = 'SELECT * FROM web_invitations WHERE session_id=%s'
+        invitation_query = '''SELECT invitation_id,session_id,project_id,code_sha256,participant_id,visit,
+            evaluator_issuer,evaluator_subject,protocol_id,state,created_at,expires_at,redeemed_at,revoked_at
+            FROM web_invitations WHERE session_id=%s'''
         with psycopg.connect(TEST_DATABASE_URL) as connection:
             connection.execute("INSERT INTO app_users(issuer,subject,role) VALUES(%s,%s,'administracao')", (issuer, subject))
             connection.execute("""INSERT INTO web_projects(project_id,code,name,created_by_issuer,created_by_subject)
@@ -225,12 +243,19 @@ class PostgresMigrationsTests(unittest.TestCase):
                       connection.execute(invitation_query, (session_id,)).fetchall())
         self.assertEqual(apply_migrations(TEST_DATABASE_URL), [
             '0006_web_completed_results.sql', '0007_web_legacy_project_links.sql', '0008_web_user_lock.sql',
-            '0009_web_csv_imports.sql', '0010_web_user_management.sql'])
+            '0009_web_csv_imports.sql', '0010_web_user_management.sql', '0011_web_incremental_sessions.sql', '0012_local_authentication.sql', '0013_local_user_management.sql', '0014_central_patients_evaluators.sql'])
         with psycopg.connect(TEST_DATABASE_URL) as connection:
             after = (connection.execute(session_query, (session_id,)).fetchall(),
                      connection.execute(order_query, (session_id,)).fetchall(),
                      connection.execute(invitation_query, (session_id,)).fetchall())
         self.assertEqual(after, before)
+        with psycopg.connect(TEST_DATABASE_URL) as connection:
+            self.assertEqual(connection.execute("""SELECT p.pseudonym,v.label FROM web_invitations i
+                JOIN web_project_participants p USING(participant_uuid)
+                JOIN web_participant_visits v USING(visit_uuid)
+                WHERE i.session_id=%s""",(session_id,)).fetchone(),('P_SINTETICO','V1'))
+            self.assertEqual(connection.execute('SELECT count(*) FROM web_session_observations').fetchone()[0],0)
+            self.assertEqual(connection.execute('SELECT count(*) FROM web_session_checkpoints').fetchone()[0],0)
         session = web_sessions.participant_session(TEST_DATABASE_URL, 'b' * 64)
         self.assertEqual(session.state, 'running')
         self.assertEqual(session.session_id, session_id)
@@ -308,6 +333,10 @@ class PostgresMigrationStaticTests(unittest.TestCase):
                 "0008_web_user_lock.sql",
                 "0009_web_csv_imports.sql",
                 "0010_web_user_management.sql",
+                "0011_web_incremental_sessions.sql",
+                "0012_local_authentication.sql",
+                "0013_local_user_management.sql",
+                "0014_central_patients_evaluators.sql",
             ],
         )
 

@@ -14,6 +14,8 @@ async function access(page: Page, role = 'importacao', active = true) {
   await page.route('**/api/v1/projects?*', route => route.fulfill({ json: { items: [project,
     { ...project, id: other, code: 'OUTRO_SINTETICO', active: true }], next_cursor: null } }))
   await page.route('**/api/v1/projects/*/assessments?*', route => route.fulfill({ json: { items: [], next_cursor: null } }))
+  await page.route('**/api/v1/patients*', route => route.fulfill({ json: { items: [], total: 0, page: 1, page_size: 50 } }))
+  await page.route('**/api/v1/evaluators*', route => route.fulfill({ json: { items: [], total: 0, page: 1, page_size: 50 } }))
   await page.goto('/equipe'); await expect(page.getByLabel('Projeto', { exact: true })).toBeVisible()
 }
 async function fill(page: Page) {
@@ -101,4 +103,48 @@ test('logout apaga codigo confirmado', async ({ page }) => {
   await expect(code(page)).toHaveText(invitation.code)
   await page.getByRole('button', { name: 'Encerrar sessão', exact: true }).click()
   await expect(panel(page)).toHaveCount(0); await expect(page.locator('body')).not.toContainText(invitation.code)
+})
+test('PREP-01: seleciona paciente e avaliador, revisa resumo para conferencia e emite convite cadastral', async ({ page }) => {
+  const patient = { id: '55555555-5555-4555-8555-555555555555', participant_code: 'PAT-0001',
+    full_name: 'Paciente Sintetico Prep', normalized_name: 'PACIENTE SINTETICO PREP', initials: 'PSP',
+    disambiguation_note: 'Coorte 1', active: true, created_at: '2026-11-07T10:00:00Z',
+    updated_at: '2026-11-07T10:00:00Z', project_count: 1, assessment_count: 0, last_assessment_at: null }
+  const evaluator = { id: '66666666-6666-4666-8666-666666666666', evaluator_code: 'EVA-0001',
+    full_name: 'Avaliadora Sintetica Prep', normalized_name: 'AVALIADORA SINTETICA PREP', initials: 'ASP',
+    active: true, created_at: '2026-11-07T10:00:00Z', updated_at: '2026-11-07T10:00:00Z',
+    assessment_count: 0, last_assessment_at: null }
+  const summary = { project_id: id, project_code: 'PROJETO_SINTETICO', project_name: 'Pesquisa sintetica',
+    patient_id: patient.id, participant_code: 'PAT-0001', participant_name: patient.full_name,
+    initials: 'PSP', evaluator_id: evaluator.id, evaluator_code: 'EVA-0001', evaluator_name: evaluator.full_name,
+    test_code: 'stroop_go_nogo_ptbr', test_version: '0.2.2-web.1', protocol_id: 'stroop_go_nogo_ptbr/0.2.2-web.1',
+    visit: 'T1' }
+  await access(page)
+  await page.unroute('**/api/v1/patients*')
+  await page.unroute('**/api/v1/evaluators*')
+  await page.route('**/api/v1/patients*', route => route.fulfill({ json: { items: [patient], total: 1, page: 1, page_size: 50 } }))
+  await page.route('**/api/v1/evaluators*', route => route.fulfill({ json: { items: [evaluator], total: 1, page: 1, page_size: 50 } }))
+  await page.route(endpoint, route => {
+    expect(route.request().postDataJSON()).toEqual({
+      patient_id: patient.id, evaluator_id: evaluator.id, visit: 'T1',
+      test_code: 'stroop_go_nogo_ptbr', initials: 'PSP',
+    })
+    return route.fulfill({ status: 201, json: { ...invitation, summary } })
+  })
+  await page.getByLabel('Buscar paciente cadastrado', { exact: true }).fill('Paciente')
+  await page.getByLabel('Paciente cadastrado', { exact: true }).selectOption(patient.id)
+  await expect(page.getByLabel('Código do participante', { exact: true })).toHaveValue('PAT-0001')
+  await expect(page.getByLabel('Iniciais na sessão')).toHaveValue('PSP')
+  await page.getByLabel('Buscar avaliador responsável', { exact: true }).fill('Avaliadora')
+  await page.getByLabel('Avaliador responsável', { exact: true }).selectOption(evaluator.id)
+  await page.getByLabel('Visita da sessão').fill('T1')
+  await page.getByRole('button', { name: 'Revisar preparação', exact: true }).click()
+  const review = page.getByRole('region', { name: 'Resumo para conferência' })
+  await expect(review).toContainText('Paciente Sintetico Prep (PAT-0001)')
+  await expect(review).toContainText('Avaliadora Sintetica Prep (EVA-0001)')
+  await expect(review).toContainText('stroop_go_nogo_ptbr · 0.2.2-web.1')
+  await review.getByRole('button', { name: 'Confirmar e emitir convite', exact: true }).click()
+  await expect(code(page)).toHaveText(invitation.code)
+  await expect(panel(page)).toContainText('Participante: PAT-0001 · Visita: T1')
+  await expect(panel(page)).toContainText('Paciente: Paciente Sintetico Prep (PAT-0001)')
+  await expect(panel(page)).toContainText('Avaliador: Avaliadora Sintetica Prep (EVA-0001)')
 })

@@ -35,7 +35,7 @@
   },
   "practice_repeat_allowed": true,
   "hud": {
-    "live_accuracy": true,
+    "live_accuracy": false,
     "main_timer": true,
     "progress": true
   },
@@ -50,5 +50,9 @@
     "purple": "#9A24FF",
     "blue": "#0062FF",
     "gray": "#808080"
+  },
+  "visual": {
+    "id": "stroop-web-outline",
+    "version": "1.0.0"
   }
 }

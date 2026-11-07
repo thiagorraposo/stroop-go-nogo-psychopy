@@ -2,7 +2,7 @@
 """Mede HTTPS/API/DB em pilha local sintetica exclusiva, sem aceitar alvo remoto.
 
 Um GET/segundo por sessao, quatro consultas autenticadas, limites padrao ativos.
-Nao mede motor experimental, Google real, coorte grande ou capacidade da VPS.
+Nao mede motor experimental, operadores individuais, coorte grande ou capacidade da VPS.
 """
 from __future__ import annotations
 
@@ -58,7 +58,7 @@ import psycopg
 from api.config import secret_value
 with psycopg.connect(secret_value(os.environ,'API_MIGRATION_DATABASE_URL')) as db:
     for token in {tokens!r}:
-        db.execute("INSERT INTO web_professional_sessions(token_sha256,issuer,subject,oidc_expires_at,expires_at) VALUES (%s,'https://accounts.google.com','synthetic-w19-admin',CURRENT_TIMESTAMP+INTERVAL '1 hour',CURRENT_TIMESTAMP+INTERVAL '1 hour')", (hashlib.sha256(token.encode('ascii')).hexdigest(),))
+        db.execute("INSERT INTO web_local_sessions(token_sha256,principal_id,credential_version) SELECT %s,principal_id,credential_version FROM web_local_credentials WHERE username='synthetic-smoke-admin'", (hashlib.sha256(token.encode('ascii')).hexdigest(),))
 print('seeded')
 '''
     stack._assert(stack.compose('run', '--rm', '--no-deps', '--interactive', '--entrypoint',
@@ -142,7 +142,7 @@ def main(argv=None) -> int:
     report = {'schema': 'stroop-w21-local-capacity-v1',
               'created_at': datetime.now(timezone.utc).isoformat(), 'status': 'failed',
               'scope': 'isolated-local-compose', 'dataset_assessments': 1,
-              'synthetic_oidc_session_fixture': True, 'physical_timing_measured': False,
+              'synthetic_local_session_fixture': True, 'physical_timing_measured': False,
               'defaults_changed': False, 'stages': [], 'samples': []}
     stage, stack = 'stack', None
     try:

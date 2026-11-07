@@ -9,10 +9,19 @@ const origin = 'https://127.0.0.1:4373'
 const python = fileURLToPath(new URL('../../../.venv/bin/python', import.meta.url))
 const management = fileURLToPath(new URL('./manage.py', import.meta.url))
 export type StoredState = { state: string; reason: string | null; assessment_id: string | null;
-  assessments: number; trials: number; metrics: number; receipt: { summary: Record<string, number | null> } | null }
+  assessments: number; trials: number; metrics: number; observations: number;
+  confirmed_through: number; valid_for_result: boolean;
+  receipt: { summary: Record<string, number | null> } | null }
+export type StoredLinks = { session_id: string; project_id: string; participant_uuid: string;
+  pseudonym: string; visit_uuid: string; visit: string }
 export function manage(action: string, input: Record<string, unknown> = {}): StoredState {
   const output = execFileSync(python, [management, action], { input: JSON.stringify(input), encoding: 'utf8',
     stdio: ['pipe', 'pipe', 'pipe'] })
+  return JSON.parse(output)
+}
+export function manageLinks(sessionId: string): StoredLinks {
+  const output = execFileSync(python, [management, 'links'], { input: JSON.stringify({ session_id: sessionId }),
+    encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] })
   return JSON.parse(output)
 }
 export type Invitation = { code: string; session_id: string; invitation_id: string; project_id: string;

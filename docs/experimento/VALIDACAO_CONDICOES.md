@@ -20,7 +20,7 @@ Nenhum arquivo em `data/` foi alterado ou usado como fonte de validacao. Esta co
 
 ## Cores oficiais
 
-| Palavra | `ink_color` | Cor visual |
+| Palavra | `ink_color` | Display histórico no CSV |
 |---|---|---|
 | `VERDE` | `green` | `#16A34A` |
 | `AMARELO` | `yellow` | `#B77900` |
@@ -33,7 +33,7 @@ Nenhum arquivo em `data/` foi alterado ou usado como fonte de validacao. Esta co
 | `AZUL` | `blue` | `#2563EB` |
 | `CINZA` | `gray` | `#64748B` |
 
-`ink_color` permanece como valor logico no CSV unificado oficial. O campo `ink_color_display` existe apenas nos CSVs de condicoes para renderizar o texto no PsychoPy com hexadecimal. O exportador unificado continua gravando somente `ink_color`.
+`ink_color` permanece como valor logico no CSV unificado oficial. O campo `ink_color_display` preserva a paleta histórica nos CSVs de condições. A inspeção de 2026-11-04 confirmou que a renderização atual do Builder usa `INK_COLOR_DISPLAY_MAP` e a WEB usa `condicoes/web_protocol.json`, conforme `tests/test_fase3_condicoes_tempos.py`; a tabela acima não representa a paleta efetivamente renderizada. O exportador unificado continua gravando somente `ink_color`.
 
 ## Arquivos de condicoes
 

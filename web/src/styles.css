@@ -180,3 +180,30 @@ kbd { font: inherit; font-size: .9em; border: 1px solid #b7bfca; border-radius: 
 .table-scroll .stroop-results { min-width: 1800px; }
 .results-table .button { white-space: nowrap; }
 .assessment-detail .assessment-metadata { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+
+/* D3 visual 1.0.0: tokens uniformes, independentes da tinta experimental. */
+:root { --experiment-outline-width: .02em; --experiment-hud-color: #CBD5E1; }
+.experiment-word[data-stimulus="true"] {
+  -webkit-text-stroke: var(--experiment-outline-width) #fff;
+  paint-order: stroke fill;
+}
+.experiment-hud {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;
+  position: absolute; top: 24px; left: 24px; right: 24px;
+  color: var(--experiment-hud-color); font-size: min(2.2vh, 16px); line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+.experiment-progress { width: min(32vw, 280px); }
+.experiment-progress-track {
+  height: 3px; margin-top: 6px; border-radius: 2px; overflow: hidden; background: #30394e;
+}
+.experiment-progress-track > span { display: block; height: 100%; background: #CBD5E1; }
+.experiment-timer { white-space: nowrap; min-width: 12ch; text-align: right; }
+
+.professional-credentials { display: grid; gap: .75rem; max-width: 34rem; margin: 1.5rem 0; }
+.professional-credentials label { font-weight: 700; }
+.professional-credentials input { width: 100%; padding: .8rem 1rem; border: 1px solid #8793a6; border-radius: 5px; background: white; color: #172139; }
+.professional-credentials input:focus-visible, .password-settings summary:focus-visible { outline: 3px solid #7350c7; outline-offset: 2px; }
+.professional-credentials button { justify-self: start; }
+.password-settings { margin: 1.25rem 0; }
+.password-settings summary { cursor: pointer; font-weight: 700; }

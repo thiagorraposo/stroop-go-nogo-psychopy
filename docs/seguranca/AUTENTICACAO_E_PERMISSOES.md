@@ -1,5 +1,11 @@
 # Autenticacao e permissoes
 
+Nota de 2026-11-06: o alvo WEB muda para login local conforme
+[especificação CHG-004](#autenticação-local--especificação-alvo-chg-004).
+As seções OIDC/Streamlit anteriores a essa especificação descrevem o código
+atual e histórico preservado, sem autorizar sua execução ou retirada.
+
+
 A aplicacao usa o OIDC nativo do Streamlit com Google Identity. O Google
 autentica a conta; o PostgreSQL decide se a identidade pode acessar o sistema e
 qual perfil possui. Estado e aceite da etapa permanecem somente no
@@ -180,3 +186,95 @@ iniciado por `stroop_etapa4_test`:
 docker compose --env-file .env.example config --quiet
 git diff --check
 ```
+
+## Autenticação local — especificação alvo CHG-004
+
+Decisão de 2026-11-06: [ADR-006](../arquitetura/ADR-006-autenticacao-local.md).
+As seções OIDC acima descrevem o código/legado e seu histórico; a versão alvo
+WEB passa a usar conta administrativa local única, implementada e verificada em
+M6 (WEB-021/024), com evidências e aceite somente no
+[backlog canônico](../Projeto%20Stroop%20Test.md). Permissões por projeto em
+[ACESSO_WEB](ACESSO_WEB.md) continuam válidas.
+
+### Credenciais e procedimento administrativo futuro
+
+- Usuário único técnico, não civil, normalizado conforme contrato; senha nunca
+  é aparada, convertida de caixa ou truncada. Exigir 15–128 caracteres,
+  permitir espaços/Unicode e colagem/gerenciadores; recusar senhas comuns ou
+  comprometidas por lista local, sem enviar senha a serviço externo. Sem
+  composição arbitrária nem troca periódica sem motivo; trocar por exposição,
+  recuperação ou alteração da equipe.
+- Persistir exclusivamente hash Argon2id com salt aleatório por senha e
+  parâmetros/versionamento codificados. Piso de engenharia: 19 MiB, duas
+  iterações, paralelismo 1; medir custo/concorrência no ambiente autorizado e
+  aumentar se suportado, sem afrouxar piso para passar testes. Biblioteca e
+  lock serão selecionados/revisados na implementação; sem criptografia própria.
+  Hash nunca retorna por API, log, exportação ou auditoria. Rehash só após
+  verificação bem sucedida, com escrita transacional e sem perder revogação.
+- Nenhuma senha padrão, em texto puro no banco, hardcoded, versionada ou em
+  argumentos de processo/histórico shell. Bootstrap via comando administrativo
+  futuro com entrada oculta em terminal protegido e confirmação, usando acesso
+  de operador separado do runtime; só cria a primeira conta quando inexistente,
+  sob trava transacional para impedir dois admins iniciais. Sem endpoint público
+  de bootstrap nem recriação silenciosa por reinício do container.
+- Alteração normal exige sessão válida, CSRF/Origin e senha atual; recuperação
+  break-glass usa operador autorizado no host/terminal e acesso administrativo
+  protegido, confirmação explícita e evento fechado auditado. Não depender de
+  e-mail Google, perguntas pessoais ou credenciais universais. Erros não exibem
+  DSN/hash/usuário. O procedimento exato da CLI é entrega WEB-021, sem modificar
+  o comando legado por inferência nesta missão.
+- Troca/recuperação atualiza hash e versão da credencial e revoga **todas** as
+  sessões na mesma transação. Concorrência com login não pode emitir sessão da
+  versão anterior após o commit. Recuperação não concede novos vínculos nem
+  altera resultados; testar recuperação sem destruir proteção do último admin.
+
+### Antiabuso, erros e observabilidade
+
+Combinar limite por origem confiável e por identificador normalizado em bucket
+HMAC, inclusive inexistente, persistente entre processos/reinícios. Defaults
+alvo: 20 tentativas/min por origem e cinco falhas/15 min por identificador;
+bloqueio temporário da janela, nunca bloqueio permanente acionável anonimamente.
+Testar concorrência, expiração e resistência a distribuição por IP sem facilitar
+DoS da conta única; limitar também volume/conexões no proxy e concorrência/custo
+da verificação. Não confiar em X-Forwarded-For arbitrário. Falha no contador ou
+banco nega login com erro sanitizado, sem bypass.
+
+Senha incorreta, usuário inexistente e conta bloqueada retornam o mesmo 401,
+corpo e mensagem genérica. Verificar hash fictício de custo equivalente para
+usuário inexistente; medir diferenças grosseiras de tempo/status/tamanho e
+eliminar atalhos de enumeração. 429 genérico com Retry-After, sem dizer se a
+conta existe. Falha operacional 503 sanitizada. Não registrar usuário tentado,
+senha, hash, token, cookie, corpo, query ou IP bruto; eventos fechados de sucesso,
+falha, limitação, rotação e recuperação usam ID aleatório/principal técnico
+quando autenticado, sem atribuição individual. Retenção depende da política
+existente e DEC-03, sem prazo novo inventado.
+
+### Sessões e conta compartilhada
+
+Prazos e formato HTTP no [contrato](../desenvolvimento/CONTRATO_API_WEB.md#autenticação-local--contrato-alvo-chg-004).
+Revogar sessão corrente no logout e todas por procedimento administrativo,
+bloqueio, alteração/recuperação de senha. Validar versão da credencial/estado
+em cada acesso; não basta apagar cookie. Nenhum token/senha/resultados em
+localStorage, sessionStorage, IndexedDB ou URL. CSRF somente em RAM; senha
+limpa após envio/falha/saída, sem telemetria. Não renovar participante por
+atividade do profissional nem usar cookie participante em área administrativa.
+
+Conta `administracao` pode gerir projetos/vínculos; resultados e emissão de
+convites exigem vínculo explícito. Por padrão inicial, **nenhum projeto** é
+concedido pelo bootstrap. Criar vínculo é operação explícita auditada. Modelo
+preserva perfis consulta/importacao/administracao para autorização/regressão,
+sem implementar múltiplas contas nesta entrega. UI não oferece criar contas
+adicionais; backend também recusa essa ampliação na versão alvo.
+
+Credenciais compartilhadas não identificam quem operou. Não há revogação de uma
+pessoa isolada: trocar senha e invalidar todas as sessões quando equipe mudar,
+usar canal protegido e custodiante definido. Identificador `evaluator_id`
+representa a conta emissora, não prova pessoa física. Uso real requer decisão
+institucional DEC-03; hash e HTTPS não eliminam R12 nem tornam auditoria
+individual. Se inadequado, planejar contas individuais em mudança posterior
+antes do uso real. Testes futuros AUTH-L01–L09 em [validação](../VALIDACAO_WEB.md#autenticação-local--plano-de-verificação-chg-004).
+
+Referências técnicas consultadas em 2026-11-06: [OWASP Password Storage](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)
+para Argon2id e [OWASP Authentication](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
+para respostas genéricas e limitação. Defaults locais são especificação de
+engenharia a ensaiar, não evidência de proteção implantada.

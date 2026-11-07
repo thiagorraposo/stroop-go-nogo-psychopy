@@ -1,5 +1,11 @@
 # Decisoes do experimento
 
+Revisão documental em 2026-11-04: regras científicas preservadas. A direção de
+produto/infraestrutura está em [ARQUITETURA_WEB](../ARQUITETURA_WEB.md) e
+[ADR-004](../arquitetura/ADR-004-replanejamento-plataforma.md), sem decidir
+validade científica. Estado e validação atuais somente no [backlog](../Projeto%20Stroop%20Test.md).
+A aprovação histórica D1–D6 permanece; não é evidência de equivalência ou coleta real.
+
 ## Decisoes estabelecidas
 
 - O paradigma e Stroop Go/No-Go.
@@ -7,7 +13,7 @@
 - Tentativas incongruentes devem ser inibidas, sem resposta.
 - A pratica e separada do bloco principal.
 - As cores previstas para o experimento sao verde, amarelo, rosa, preto, vermelho, laranja, marrom, roxo, azul e cinza.
-- A lista oficial de palavras futuras e `VERDE`, `AMARELO`, `ROSA`, `PRETO`, `VERMELHO`, `LARANJA`, `MARROM`, `ROXO`, `AZUL` e `CINZA`.
+- A lista oficial de palavras e `VERDE`, `AMARELO`, `ROSA`, `PRETO`, `VERMELHO`, `LARANJA`, `MARROM`, `ROXO`, `AZUL` e `CINZA`.
 - O bloco principal deve permanecer sem feedback por tentativa.
 - No Builder local, a pratica tem uma unica rodada. A variante WEB aprovada
   permite repetir rodadas completas antes do principal conforme o protocolo abaixo.
@@ -27,8 +33,8 @@
 - As telas de navegacao pre-pratica aceitam clique, `Espaco` e `Enter`; cliques nao contam como respostas experimentais.
 - Resultados exibidos ao participante devem ser apenas descritivos.
 - Idade e sexo nao devem ser usados para pontuacao, classificacao ou comparacao normativa.
-- A arquitetura de dados futura adotara SQLite local como armazenamento inicial.
-- O dashboard futuro sera local, em Streamlit, lendo apenas SQLite.
+- Decisão histórica de 2026-07-06: SQLite como armazenamento inicial local; preservado no legado, superado como alvo operacional pelo ADR-004.
+- Decisão histórica de 2026-07-06: dashboard local Streamlit; preservado na transição, substituído como interface final por React conforme ADR-004.
 - `participant_id` sera o identificador principal da pessoa.
 - `initials` serao opcionais e tratadas como dado potencialmente identificavel.
 - `assessment_date` sera gerada automaticamente pelo sistema.
@@ -62,6 +68,9 @@
 - Incongruente + Espaco = `commission`.
 
 ## Variante WEB aprovada em 2026-10-16
+
+Registro original preservado. A apresentação vigente segue a revisão visual D3
+do proprietário de 2026-11-05 e identificação complementar de D4 no protocolo.
 
 O usuario aprovou explicitamente os itens 1–19 apresentados na sessao, incluindo
 as decisoes D1–D6 detalhadas no [protocolo WEB](PROTOCOLO_WEB.md). A finalidade e
@@ -126,3 +135,95 @@ respectivas etapas; o formulario e os dados locais existentes sao preservados.
 - 2026-07-06: formulario local de sessao definido como fonte canonica de metadados da execucao.
 - 2026-07-06: especificacao visual futura definida como documentacao, sem alterar o experimento atual.
 - 2026-07-05: estrutura inicial de governanca e versionamento criada sem alterar a logica experimental.
+
+## Contratos e limites identificados na auditoria de 2026-11-04
+
+- A paleta lógica e o balanceamento são preservados. Valores ink_color_display
+  antigos nos CSVs não governam renderização atual: Builder usa INK_COLOR_DISPLAY_MAP;
+  WEB usa o snapshot condicoes/web_protocol.json. Não mudar cores nesta revisão.
+- Persistência histórica usa response_time=0.0 quando nenhum hit existe; resumo
+  WEB usa null e tela usa traço. Essa diferença de representação não significa
+  medida igual a zero. Convenção detalhada no [modelo](../dados/MODELO_DE_DADOS.md).
+- Identificação WEB usa pseudônimo/visita do convite, sem nome/iniciais; cadastro
+  longitudinal não está definido. Envio atual é final e em RAM; principal
+  interrompido é inválido conforme D2. DEC-01/02 do backlog distinguem lacunas de
+  produto/dados de decisões científicas já aprovadas.
+- Validação física/matriz e eventual estudo de equivalência dependem de DEC-04;
+  não inventar limiar ou equivalência. Política institucional e liberação de
+  coleta real dependem de DEC-03/05, sem supor consentimento ou autorização ética.
+
+
+## Decisão do responsável em 2026-11-05 — participação e preservação
+
+Aprovados pseudônimos por projeto, múltiplas visitas/avaliações com vínculos
+consistentes e preparação por convite único, com acesso/validade controlados;
+sem cadastro longitudinal central nem módulo de agendamento nesta versão.
+Preservar evolução longitudinal aditiva. Entidades no
+[modelo canônico](../dados/MODELO_DE_DADOS.md).
+
+Rejeitado armazenamento exclusivamente em RAM até envio final. Requerida
+persistência incremental segura, confirmação de recebimento, idempotência e
+preservação de sessões incompletas/ inválidas. Reafirmada D2: interrupção que
+comprometa protocolo exige nova sessão com prática, sem retomar principal.
+A estratégia definitiva e critérios metodológicos devem ser documentados e
+validados **antes da implementação**, por exigência expressa do responsável.
+A estratégia é [ADR-005](../arquitetura/ADR-005-persistencia-incremental.md), com
+matriz no [protocolo](PROTOCOLO_WEB.md). A observação de RAM final-only na auditoria
+acima descreve código histórico, não aprovação atual desse comportamento.
+
+Após a proposta versionada em `270377b`, o responsável respondeu “valido” em
+2026-11-05, validando a estratégia definitiva, a janela residual de perda e a
+matriz de invalidação antes da implementação. D1–D6, métricas, prática e CSV
+continuam preservados. Ensaios técnicos e temporais continuam exigidos;
+a validação documental não autoriza migração operacional, deploy ou coleta real.
+
+## CHG-003 — proposta inicial (histórico anterior à aprovação visual)
+
+Solicitação de 2026-11-05: palavras sem retângulo branco e com contorno branco,
+HUD discreto de progresso/tempo e retirada completa de precisão agregada durante
+prática/principal, mantendo feedback individual da prática e cálculos oficiais.
+Direção detalhada em [UX_DECISIONS](UX_DECISIONS.md); execução e aprovação no
+[backlog único](../Projeto%20Stroop%20Test.md).
+
+Registro histórico, superado pela revisão visual de D3.
+
+**Divergência explícita à época:** D3 aprovado exige HUD atual com precisão ao vivo.
+A solicitação autoriza direção UX, mas não alteração silenciosa de D3. Antes do
+runtime, o responsável metodológico deve aprovar a apresentação revisada,
+visibilidade de progresso/cronômetro, escopo do feedback e identificação/versionamento
+da variante frente a D4, sem misturar evidências anteriores e posteriores.
+Até isso ocorrer, os contratos e o código anteriores continuam vigentes.
+DEC-04 segue pendente para matriz/equipamento/campanha; não é aprovada por CHG-003.
+
+Tempos, condições, dez cores, resposta, métricas/CSV e D1/D2/D5/D6 permanecem.
+A campanha WEB-011 deve usar o layout final aprovado e transporte incremental
+ativo (DEC-02/ADR-005), com falhas/retries e limites D5 intactos; medição apenas
+na apresentação antiga não comprova esta alteração. WEB-034 avalia percepção,
+saliência, atenção e protocolo visual, sem presumir equivalência com PsychoPy.
+
+## D3 visual revisada pelo proprietário — 2026-11-05
+
+Aprovação explícita do proprietário substitui somente a apresentação incompatível
+na D3 histórica acima. A decisão vigente, identificação `stroop-web-outline/1.0.0`,
+complemento de D4 e política de visibilidade estão no
+[protocolo](PROTOCOLO_WEB.md#revisão-visual-d3--aprovação-explícita-do-proprietário-2026-11-05).
+Sem retângulo branco; contorno branco fino/tinta original; progresso periférico e
+cronômetro principal estáveis; nenhuma precisão agregada na prática/principal;
+feedback individual da prática preservado. Protocolo cognitivo, métricas,
+persistência e limites D5 intactos. Não se atribui aprovação a terceiro:
+o proprietário já se declarou responsável pela pesquisa/validação/operação.
+DEC-04 e validação final M9 continuam independentes e pendentes.
+
+
+## DEC-04 — alcance local de engenharia aprovado em 2026-11-05
+
+O proprietário/responsável respondeu “eu aprovo esse alcance para DEC-04” à
+proposta de campanha no equipamento local com Chromium e Firefox visíveis,
+dez sessões sintéticas por ambiente, layout stroop-web-outline/1.0.0 aprovado,
+transporte incremental ativo e falhas de rede. D1/D5, durações, tolerâncias,
+interrupções e preservação de falhas permanecem. A aprovação não altera a
+exceção histórica W16 nem a transfere para M3; não concede aceite por antecipação.
+Validação física/metodológica permanece pendente em M9. Equipamento, versões,
+recursos, execução, resultados e limites ficam somente em DEC-04/EV-M3-011 no
+[backlog canônico](../Projeto%20Stroop%20Test.md#ev-m3-011--aprovação-do-alcance-e-campanha-local-2026-11-05).
+Não autoriza equivalência, coleta real, suporte universal ou deploy.

@@ -78,7 +78,15 @@ function stroopSummary(x: unknown): x is StroopSummary {
     && Math.abs(x.accuracy - 100 * (Number(x.hits) + Number(x.correct_rejections)) / Number(x.total_trials)) < 1e-8;
 }
 const baseKeys = 'assessment_id participant_id visit evaluator_id created_at started_at platform test_code test_version protocol_id app_version summary';
+function validity(x: unknown): unknown {
+  if (!record(x) || !Object.hasOwn(x, 'valid_for_result')) return x;
+  if (x.valid_for_result === false) throw new ApiError('state_conflict', 409);
+  if (x.valid_for_result !== true || x.invalidation_reason !== null) return invalid();
+  const { valid_for_result: _validity, invalidation_reason: _reason, ...body } = x;
+  return body;
+}
 function assessment(x: unknown, detail = false): Assessment {
+  x = validity(x);
   const keys = detail ? `${baseKeys} project_id session_id completed_at metrics frame_period_ms trials` : baseKeys;
   if (!closed(x, keys) || typeof x.assessment_id !== 'string' || !idPattern.test(x.assessment_id)
     || !nonempty(x.participant_id) || !nonempty(x.visit) || !nullableText(x.evaluator_id)
@@ -106,6 +114,7 @@ function trial(x: unknown): Trial {
   return x as Trial;
 }
 function detail(x: unknown, projectId: string, assessmentId: string): AssessmentDetail {
+  x = validity(x);
   assessment(x, true);
   if (!record(x) || x.project_id !== projectId || x.assessment_id !== assessmentId
     || !(x.session_id === null || typeof x.session_id === 'string' && uuidPattern.test(x.session_id))

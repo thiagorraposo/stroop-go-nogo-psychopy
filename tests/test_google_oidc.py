@@ -44,7 +44,7 @@ class GoogleOIDCCryptographicTests(unittest.TestCase):
             .public_bytes(serialization.Encoding.PEM)
             .decode("ascii")
         )
-        cls.config = APIConfig(
+        cls.config = APIConfig(auth_mode="oidc",
             database_url="postgresql://synthetic:synthetic@127.0.0.1/stroop_etapa4_test_oidc",
             public_origin="https://synthetic.example.test",
             app_env="test",

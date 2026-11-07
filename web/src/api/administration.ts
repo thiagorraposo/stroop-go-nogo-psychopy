@@ -1,9 +1,9 @@
-/** Operacoes administrativas autenticadas; e-mail e claims ficam restritos ao admin. */
+/** Operacoes administrativas por identidade tecnica opaca. */
 import { ApiError, record, request } from './client'
 import type { ApiPath } from './client'
 import type { Project } from './assessments'
 
-export type AdminUser = { user_id: string; issuer: string; subject: string; email: string | null;
+export type AdminUser = { user_id: string;
   role: 'consulta' | 'importacao' | 'administracao'; active: boolean }
 export type AdminPage<T> = { items: T[]; next_cursor: string | null }
 export type ProjectMember = { user_id: string; active: boolean }
@@ -21,11 +21,8 @@ function page<T>(value: unknown, decode: (item: unknown) => T): AdminPage<T> {
   return { items: value.items.map(decode), next_cursor: value.next_cursor }
 }
 function user(value: unknown): AdminUser {
-  if (!closed(value, ['user_id', 'issuer', 'subject', 'email', 'role', 'active'])
+  if (!closed(value, ['user_id', 'role', 'active'])
     || typeof value.user_id !== 'string' || !token.test(value.user_id)
-    || !['https://accounts.google.com', 'accounts.google.com'].includes(String(value.issuer))
-    || typeof value.subject !== 'string' || !/^[\x21-\x7e]{1,255}$/.test(value.subject)
-    || !(value.email === null || typeof value.email === 'string' && value.email.length >= 3 && value.email.length <= 320)
     || !['consulta', 'importacao', 'administracao'].includes(String(value.role)) || typeof value.active !== 'boolean') return fail()
   return value as AdminUser
 }
@@ -63,20 +60,20 @@ export function listAdminUsers(options: AdminPageOptions = {}): Promise<AdminPag
   return json(`/api/v1/admin/users${params.size ? `?${params}` : ''}` as ApiPath, 'GET', undefined, options.signal,
     value => page(value, user), 200)
 }
-export function createAdminUser(value: { issuer: string; subject: string; role: AdminUser['role']; email: string | null }, csrf: string): Promise<AdminUser> {
-  input(['https://accounts.google.com', 'accounts.google.com'].includes(value.issuer)
-    && /^[\x21-\x7e]{1,255}$/.test(value.subject) && ['consulta', 'importacao', 'administracao'].includes(value.role)
-    && (value.email === null || value.email.length >= 3 && value.email.length <= 320))
-  return json('/api/v1/admin/users', 'POST', requestData(value, csrf), undefined, user, 201)
-}
-export function updateAdminUser(userId: string, value: { role: AdminUser['role']; active: boolean; email: string | null }, csrf: string): Promise<Pick<AdminUser, 'user_id' | 'role' | 'active' | 'email'>> {
+export function updateAdminUser(userId: string, value: { role: AdminUser['role']; active: boolean }, csrf: string): Promise<AdminUser> {
   input(token.test(userId) && ['consulta', 'importacao', 'administracao'].includes(value.role)
-    && typeof value.active === 'boolean' && (value.email === null || value.email.length >= 3 && value.email.length <= 320))
-  return json(`/api/v1/admin/users/${userId}` as ApiPath, 'PUT', requestData(value, csrf), undefined, responseValue => {
-    if (!closed(responseValue, ['user_id', 'role', 'active', 'email']) || responseValue.user_id !== userId || responseValue.role !== value.role
-      || responseValue.active !== value.active || responseValue.email !== value.email) return fail()
-    return responseValue as Pick<AdminUser, 'user_id' | 'role' | 'active' | 'email'>
+    && typeof value.active === 'boolean')
+  return json(`/api/v1/admin/users/${userId}` as ApiPath, 'PATCH', requestData(value, csrf), undefined, responseValue => {
+    const decoded = user(responseValue)
+    if (decoded.user_id !== userId || decoded.role !== value.role || decoded.active !== value.active) return fail()
+    return decoded
   }, 200)
+}
+export function revokeAdminSessions(userId: string, csrf: string): Promise<void> {
+  input(token.test(userId) && /^[A-Za-z0-9_-]{43}$/.test(csrf))
+  return request(`/api/v1/admin/users/${userId}/sessions/revoke` as ApiPath, {
+    method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-CSRF-Token': csrf }, body: '{}',
+  }, async response => { if (response.status !== 204) throw new ApiError('invalid_response', response.status) })
 }
 export function createProject(value: { code: string; name: string }, csrf: string): Promise<Project> {
   input(/^[A-Za-z0-9_.-]{1,64}$/.test(value.code) && value.name.trim().length >= 1 && value.name.trim().length <= 120)

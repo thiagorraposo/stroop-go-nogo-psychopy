@@ -48,7 +48,11 @@ class SetMember(RequestModel):
 
 
 class CreateInvitation(RequestModel):
-    participant_id: str
+    participant_id: str | None = None
+    patient_id: str | None = None
+    evaluator_id: str | None = None
+    test_code: str | None = None
+    initials: str | None = None
     visit: str
 
 
@@ -286,6 +290,26 @@ async def set_member(project_id: UUID, user_id: str, request: Request, body: Set
 async def create_invitation(project_id: UUID, request: Request, body: CreateInvitation):
     _reject_query(request)
     actor = _professional_write(request, "view_dashboard")
+    is_cadastral = body.patient_id is not None or body.evaluator_id is not None
+    if is_cadastral:
+        if (
+            body.participant_id is not None
+            or body.patient_id is None
+            or body.evaluator_id is None
+        ):
+            raise APIError("invalid_request")
+        try:
+            patient_uuid = UUID(body.patient_id)
+            evaluator_uuid = UUID(body.evaluator_id)
+        except ValueError:
+            raise APIError("invalid_request") from None
+    else:
+        if (
+            body.participant_id is None
+            or body.test_code is not None
+            or body.initials is not None
+        ):
+            raise APIError("invalid_request")
     try:
         access = application.project_invitation_access(
             request.app.state.config.database_url, project_id, actor
@@ -297,11 +321,46 @@ async def create_invitation(project_id: UUID, request: Request, body: CreateInvi
     if access == "forbidden":
         raise APIError("permission_denied")
     code = secrets.token_urlsafe(32)
+    code_hash = hashlib.sha256(code.encode("ascii")).hexdigest()
     invitation_id, session_id = uuid4(), uuid4()
+    if is_cadastral:
+        try:
+            result = application.create_cadastral_invitation(
+                request.app.state.config.database_url,
+                invitation_id,
+                session_id,
+                project_id,
+                code_hash,
+                patient_id=patient_uuid,
+                evaluator_id=evaluator_uuid,
+                visit=body.visit,
+                test_code=body.test_code,
+                initials=body.initials,
+                actor=actor,
+            )
+        except application.InvalidDataError:
+            raise APIError("invalid_request") from None
+        except persistence.MissingError:
+            raise APIError("not_found") from None
+        except persistence.ConflictError:
+            raise APIError("state_conflict") from None
+        except PersistenceError:
+            raise _persistence_error() from None
+        if result is None:
+            raise APIError("not_found")
+        expires_at, summary = result
+        return {
+            "invitation_id": invitation_id,
+            "session_id": session_id,
+            "code": code,
+            "expires_at": _serialize_time(expires_at),
+            "state": "issued",
+            "summary": summary,
+        }
     try:
         created = application.create_invitation(
             request.app.state.config.database_url, invitation_id, session_id,
-            project_id, hashlib.sha256(code.encode("ascii")).hexdigest(),
+            project_id, code_hash,
             body.participant_id, body.visit, actor,
         )
     except application.InvalidDataError:
@@ -402,9 +461,11 @@ async def participant_session(request: Request):
         raise _persistence_error() from None
     result = {"session_id": session.session_id, "state": session.state,
               "activated_at": _serialize_time(session.activated_at),
-              "expires_at": _serialize_time(session.expires_at), "can_resume": False}
+              "expires_at": _serialize_time(session.expires_at), "can_resume": False,
+              "checkpoint": session.checkpoint or {"confirmed_through":0,"prefix_hash":None,"received_at":None}}
     if session.state == 'completed':
-        return JSONResponse(session.receipt, headers={
+        return JSONResponse({**session.receipt, "checkpoint": result["checkpoint"],
+                             **({"valid_for_result":False,"summary":None} if not session.valid_for_result else {})}, headers={
             'X-CSRF-Token': _participant_csrf(request.app.state.config, token),
             'X-Session-Expires-At': _serialize_time(session.expires_at),
         })
@@ -427,7 +488,8 @@ async def participant_session(request: Request):
         result["csrf_token"] = _participant_csrf(request.app.state.config,
                                                   _cookie(request, PARTICIPANT_COOKIE))
     elif session.state == "aborted":
-        raise APIError("state_conflict")
+        # Recibo parcial consultavel; nunca permite retomada nem novo start.
+        result["csrf_token"] = _participant_csrf(request.app.state.config, token)
     return result
 
 

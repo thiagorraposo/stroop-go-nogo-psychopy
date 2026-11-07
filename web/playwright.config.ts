@@ -8,7 +8,7 @@ const origin = `http://127.0.0.1:${portText}`
 
 export default defineConfig({
   testDir: './e2e',
-  testIgnore: ['**/integrated/**'],
+  testIgnore: ['**/integrated/**', '**/local-auth/**'],
   fullyParallel: true,
   forbidOnly: true,
   retries: 0,

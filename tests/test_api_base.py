@@ -34,6 +34,7 @@ class SyntheticRequest(RequestModel):
 
 def synthetic_config(**changes):
     return APIConfig(**{
+        "auth_mode": "oidc",
         "database_url": DATABASE, "public_origin": ORIGIN, "app_env": "test",
         "oidc_client_id": "synthetic-client-id",
         "oidc_client_secret": "synthetic-client-secret-never-use",
@@ -50,12 +51,13 @@ class APIConfigurationTests(unittest.TestCase):
 
     def test_ambiente_obrigatorio_e_invalido_nao_reflete_valores(self):
         valid = {
+            "API_AUTH_MODE": "oidc",
             "API_DATABASE_URL": DATABASE, "API_PUBLIC_ORIGIN": ORIGIN, "APP_ENV": "test",
             "OIDC_CLIENT_ID": "synthetic-client-id",
             "OIDC_CLIENT_SECRET": "synthetic-client-secret-never-use",
             "API_SESSION_SECRET": "synthetic-session-secret-never-use-0000000000",
         }
-        for missing in valid:
+        for missing in valid.keys() - {"API_AUTH_MODE"}:
             environment = {key: value for key, value in valid.items() if key != missing}
             with self.subTest(missing=missing), self.assertRaises(ConfigurationError):
                 APIConfig.from_env(environment)

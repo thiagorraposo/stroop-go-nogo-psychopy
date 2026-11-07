@@ -15,6 +15,7 @@ async function feedbackOutcome(page: Page): Promise<string> {
 
 async function prepare(page: Page) {
   await page.goto('/pratica')
+  await expect(page.locator('input[type="text"], input[type="email"], input[type="number"], input[type="date"], select')).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Começar prática', exact: true })).toBeDisabled()
   await page.getByLabel('Estou usando um computador ou notebook com teclado físico.').check()
   await page.getByRole('main').focus()
@@ -25,8 +26,12 @@ async function prepare(page: Page) {
 
 test('navegacao por teclado nao inicia treino sem confirmar e testar o teclado', async ({ page }) => {
   await page.goto('/')
+  // O foco inicial e aplicado pelo effect que sucede a instalacao dos listeners.
+  // goto aguarda load, mas nao garante que o React ja montou a navegacao.
+  await expect(page.getByRole('main')).toBeFocused()
   await page.keyboard.press('Space')
   await expect(page).toHaveURL('/instrucoes')
+  await expect(page.getByRole('main')).toBeFocused()
   await page.keyboard.press('Enter')
   await expect(page).toHaveURL('/pratica')
   await page.getByLabel('Estou usando um computador ou notebook com teclado físico.').check()
@@ -48,6 +53,8 @@ test('rodada real mostra quatro feedbacks sem encurtar estimulo e pode repetir',
     const stimulus = page.locator('[data-phase="stimulus"]')
     await expect(stimulus).toBeVisible({ timeout: 12_000 })
     await expect(stimulus).toHaveAttribute('data-trial-number', String(trial))
+    await expect(page.locator('[data-testid*="accuracy"], [data-testid="hud-timer"]')).toHaveCount(0)
+    await expect(page.getByText(/precisão|taxa de acerto|classificação|ranking/i)).toHaveCount(0)
     ids.add((await stimulus.getAttribute('data-condition-id'))!)
     const condition = (await stimulus.getAttribute('data-condition'))!
     if (!responded.has(condition)) {

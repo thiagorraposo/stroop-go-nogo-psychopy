@@ -22,6 +22,8 @@ PERMISSIONS = {
     "manage_project_members": frozenset({"administracao"}),
     "create_invitation": frozenset({"importacao", "administracao"}),
     "revoke_invitation": frozenset({"importacao", "administracao"}),
+    "manage_patients": frozenset({"importacao", "administracao"}),
+    "manage_evaluators": frozenset({"importacao", "administracao"}),
 }
 DENIAL_LIMIT = 5
 DENIAL_WINDOW_MINUTES = 15

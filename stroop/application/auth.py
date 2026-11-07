@@ -123,6 +123,15 @@ def list_users_page(database_url: str, limit: int, offset: int) -> list[AppUser]
 
 
 def _management_identity(issuer: str, subject: str) -> Identity:
+    from uuid import UUID
+    from stroop.domain.local_auth import LOCAL_ISSUER
+    if issuer == LOCAL_ISSUER:
+        try:
+            if not isinstance(subject, str) or str(UUID(subject)) != subject:
+                raise ValueError
+        except (ValueError, TypeError, AttributeError):
+            raise InvalidIdentityError("Identidade local invalida.") from None
+        return Identity(issuer, subject, 2**62)
     return parse_identity({"iss": issuer, "sub": subject, "exp": 2**62})
 
 

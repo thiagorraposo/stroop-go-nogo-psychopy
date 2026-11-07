@@ -5,7 +5,7 @@ import type { MainResult, MainTrial } from '../experiment/main-engine'
 import { validMainResult } from '../experiment/main-engine'
 import packageInfo from '../../package.json'
 
-export const APP_VERSION = `web-${packageInfo.version}`
+export const APP_VERSION = `web-${packageInfo.version}+visual.${PROTOCOL.visual.version}`
 export const PROTOCOL_ID = 'stroop_go_nogo_ptbr/0.2.2-web.1'
 export const TEST_VERSION = '0.2.2-web.1'
 type CommonSession = { session_id: string; activated_at: string; expires_at: string; csrf_token: string }
@@ -92,6 +92,18 @@ function receipt(value: unknown): Receipt {
 }
 function session(value: unknown): PreparingSession | RunningSession | Receipt {
   if (!record(value)) invalid()
+  if (value.valid_for_result === false || value.state === 'aborted') throw new ApiError('state_conflict', 409)
+  if (Object.hasOwn(value, 'checkpoint')) {
+    const checkpoint = value.checkpoint
+    if (!closed(checkpoint, ['confirmed_through', 'prefix_hash', 'received_at'])
+      || !Number.isInteger(checkpoint.confirmed_through) || Number(checkpoint.confirmed_through) < 0
+      || Number(checkpoint.confirmed_through) > 16
+      || (checkpoint.confirmed_through === 0 ? checkpoint.prefix_hash !== null || checkpoint.received_at !== null
+        : typeof checkpoint.prefix_hash !== 'string' || !/^[a-f0-9]{64}$/.test(checkpoint.prefix_hash) || !utc(checkpoint.received_at))) invalid()
+    const { checkpoint: _checkpoint, ...body } = value
+    value = body
+  }
+  if (!record(value)) invalid()
   if (value.state === 'completed') return receipt(value)
   const keys = ['session_id', 'state', 'activated_at', 'expires_at', 'csrf_token', 'can_resume']
   if (value.state === 'running') {
@@ -172,10 +184,23 @@ export function abortParticipant(csrf: string, sessionId: string, reason: AbortR
     if (!closed(value, ['session_id', 'state']) || value.session_id !== sessionId || value.state !== 'aborted') invalid()
   })
 }
+export function invalidateParticipant(csrf: string, sessionId: string, reason: AbortReason,
+  eventAtMs: number | null = null): Promise<boolean> {
+  return request('/api/v1/participant/session/invalidate',
+    { ...post({ reason, event_at_ms: eventAtMs }, csrf), keepalive: true }, async response => {
+      if (response.status !== 200) invalid(response.status)
+      const value = await json(response)
+      if (!closed(value, ['session_id', 'valid_for_result']) || value.session_id !== sessionId
+        || typeof value.valid_for_result !== 'boolean') invalid()
+      return value.valid_for_result
+    })
+}
 export function participantErrorMessage(error: unknown): string {
   if (error instanceof ApiError && error.status === 401) return 'Este acesso não está disponível. Utilize um convite válido.'
   if (error instanceof ApiError && error.code === 'csrf_failed') return 'Não foi possível verificar este acesso. Entre em contato com a equipe.'
-  if (error instanceof ApiError && error.code === 'state_conflict') return 'Esta sessão não pode continuar. Solicite um novo convite à equipe.'
+  if (error instanceof ApiError && error.code === 'state_conflict') {
+    return 'Esta sessão não pode continuar e não gerou resultado oficial. Observações parciais não permitem retomada; solicite um novo convite à equipe.'
+  }
   return apiErrorMessage(error)
 }
 

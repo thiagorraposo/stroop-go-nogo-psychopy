@@ -236,3 +236,158 @@ confirmacao de encerramento oferece retorno as orientacoes e deixa outro convite
 como opcao secundaria. O foco programatico permanece visivel. Essas telas nao
 alteram motor, estimulos, condicoes, tempos, feedback cronometrado, teclas,
 tratamento de foco/Escape ou CSV.
+
+## WEB — direção UX de CHG-003 (2026-11-05)
+
+Especificação visual aprovada explicitamente pelo proprietário na revisão D3 de
+2026-11-05; implementação e aceite por tarefa no backlog. As seções
+locais e Wxx acima preservam seu contexto histórico; não governam esta mudança.
+Execução, riscos, decisões e evidências somente no
+[backlog canônico](../Projeto%20Stroop%20Test.md); vínculos na
+[matriz](../REQUISITOS_E_RASTREABILIDADE.md), REQ-UX-001 a REQ-UX-011.
+
+**Durante o teste, a interface do participante deverá apresentar os estímulos
+sem a barra de precisão dos acertos ou indicadores agregados de desempenho.
+A barra de progresso e o cronômetro poderão permanecer, conforme o protocolo
+aprovado.** A apresentação foi aprovada explicitamente pelo proprietário; D3/D4 revisadas
+e identificação `stroop-web-outline/1.0.0` no [protocolo](PROTOCOLO_WEB.md).
+D1/D2/D5/D6 e protocolo cognitivo preservados. DEC-04 continua pendente.
+
+### Estímulos e hierarquia (UX-01/05)
+
+Retirar o retângulo branco, sem substituir por caixa/cartão. Aplicar contorno
+branco diretamente aos caracteres para delimitar a forma das letras sobre o
+fundo experimental escuro; essa é uma hipótese de legibilidade, não prova de
+percepção equivalente das cores. Preservar o preenchimento das dez cores do
+snapshot, fundo geral, família/peso/tamanho experimental e centro geométrico.
+Não usar sombra pesada, gradiente ou volume; não ajustar cores automaticamente
+nem criar tratamentos por cor. Qualquer ajuste tipográfico exige justificativa.
+
+Avaliar `-webkit-text-stroke` e alternativa de contorno compatível nos navegadores
+de D1. Definir token único de espessura após revisão sintética das dez cores,
+sem fixar valor experimental por conveniência; comprovar que o contorno não
+encobre a tinta. Registrar alternativa, limites de renderização, screenshots
+sintéticos e dimensões em Chromium/Firefox. Nenhum suporte inferido de CSS.
+Estímulo permanece no centro experimental; HUD periférico não desloca seu centro.
+Remover espaços reservados à precisão. Sem menus, sidebar ou controles flutuantes.
+Não alterar escala por responsividade, duração, ordem, composição ou intervalos.
+
+### Progresso e cronômetro (UX-02/03)
+
+Progresso minimalista: traço fino, geometria consistente, cantos discretos,
+contraste controlado, rótulo legível e alinhado. Derivar etapa e total do contrato
+vigente e contar tentativas **concluídas**, sem número fixo ou avanço no início
+da tentativa. Exemplo ilustrativo: `Bloco principal · 8 / 16`. Distinguir prática e
+principal; sem animação durante estímulos. Visibilidade aprovada na D3 revisada: progresso em prática/principal, cronômetro
+somente no principal; HUD oculto em contagens/lembrete/feedback individual.
+Conferir localização e impacto na campanha DEC-04.
+
+Cronômetro mantém tempo **decorrido** do principal, iniciado na primeira tentativa
+até o fim da última, formato `MM:SS`, algarismos tabulares e largura numérica
+estável, alinhamento discreto e sem decoração. O placeholder da prática será retirado, conforme política D3 aprovada, sem criar
+relógio de prática. Usar origem monotônica do motor; atualizar DOM somente quando necessário,
+sem novo intervalo React, relógio científico paralelo, ticks acumulativos ou
+re-render por quadro. RT e registros científicos permanecem independentes.
+
+### Ausência de desempenho agregado (UX-04)
+
+Retirar nós, rótulos, percentuais, barras, tooltips e conteúdo acessível de
+precisão, taxa de acertos/erros, classificação, ranking ou equivalentes na prática
+e no principal. Não basta ocultar com CSS/aria-hidden; não substituir por outro
+indicador de qualidade nem deixar espaço vazio. Feedback **individual** da
+prática e repetição sem limiar permanecem conforme protocolo; sem classificação.
+Accuracy total/Go/No-Go, omissões, comissões e RT continuam calculados, persistidos
+e disponíveis nos relatórios/CSV/dashboard aos profissionais autorizados.
+
+### Instruções e transições (UX-06/07)
+
+Hierarquia clara da regra Go/No-Go, tecla de resposta destacada e confirmação de
+início, distinguindo prática e principal. Preservar semântica aprovada, sem dicas
+novas de estratégia cognitiva. Reutilizar textos de COPY_DAS_TELAS como fonte de
+copy; revisão aprovada antes de mudança semântica. Organizar instruções, prática,
+feedback, preparação, execução e encerramento sem tempos adicionais implícitos.
+
+Distinguir execução concluída, dados aguardando envio, envio em andamento,
+confirmação do servidor, falha de envio e sessão interrompida/inválida. Somente
+recibo válido autoriza afirmar recebimento/sucesso. Preservar ADR-005, idempotência,
+ACKs incrementais, observações parciais separadas de resultado oficial e D2:
+nenhuma retomada do principal. Resultado individual ao participante somente se
+autorizado no protocolo; revisar o resumo agregado existente em WEB-015 sem
+supor que removê-lo durante execução autorize mudar a tela final.
+
+### Acessibilidade e regressão (UX-08)
+
+Reutilizar tokens/componentes existentes de styles.css; sem biblioteca nova.
+Teclado, foco visível, legibilidade, contraste não experimental, erros/loading,
+resoluções permitidas, ausência de scroll e perda de foco devem ser verificados.
+Não recolorir estímulos para satisfazer contrastes de UI, não alterar modalidade
+de resposta nem restrições de ambiente/fullscreen vigentes em D1 (fullscreen
+não obrigatório). Não prometer acessibilidade experimental por ajuste automático.
+
+Regressão planejada em WEB-044: DOM e árvore acessível sem desempenho agregado;
+feedback individual preservado; dez cores/centralização/tipografia/contorno sem
+caixa em Chromium e Firefox nas resoluções aprovadas; screenshots sintéticos;
+progresso real e sem animação; relógio monotônico sem duplicação/deriva; Go/No-Go,
+congruência, quatro resultados, janelas, sequência, lifecycle e interrupções
+inalterados. WEB-016/019/020 verificam persistência, dashboard e exportações.
+WEB-011 mede D5 com o layout final e transporte ativo; WEB-034 avalia saliência,
+atenção, protocolo visual e limitações de equivalência com PsychoPy. Testes
+CSS/automatizados não comprovam validade psicométrica nem latência física.
+
+### Concretização de D3 visual 1.0.0
+
+O token `--experiment-outline-width: .02em` aplica contorno branco uniforme
+com `-webkit-text-stroke`; `paint-order: stroke fill` desenha o preenchimento
+sobre o contorno, preservando a tinta e a fonte existentes. Referência técnica:
+[WHATWG Compatibility — text stroking](https://compat.spec.whatwg.org/#text-stroke).
+A avaliação de alternativa com sombras deslocadas foi descartada por gerar
+aproximação direcional do contorno; não há fallback que altere silenciosamente
+cores/tipografia. A capacidade stroke/paint-order é verificada nos navegadores
+ensaiados, sem prometer compatibilidade com versões não medidas.
+
+HUD imperativo compartilhado entre motores por `presentation.ts`, fora do React;
+progresso de 3 px, sem animação, e contador MM:SS com números tabulares e largura
+estável. O cronômetro mantém a origem monotônica principal; não há relógio novo
+na prática. Nenhum elemento de desempenho agregado é criado. Tokens e centro
+experimental independem da quantidade de itens no HUD. Evidências e ambientes
+reais dos ensaios, incluindo falhas, ficam apenas no backlog canônico.
+
+## WEB — reformulação funcional e UX da interface administrativa (CHG-005 — 2026-11-07)
+
+Especificação da experiência profissional planejada em `CHG-005` ([ADR-007](../arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md)), integrada às tarefas `WEB-045` e `WEB-046` (`M4`), `WEB-047` e `WEB-017`–`WEB-020` (`M5`) e `WEB-025` (`M7`). As seções históricas `W13A`, `W15A`–`W15E` permanecem acima como registro do baseline anterior. **Esta reformulação aplica-se exclusivamente à área profissional autenticada; o motor experimental jsPsych, estímulos, contorno branco `stroop-web-outline/1.0.0`, HUD, dez cores e temporização D5 permanecem inalterados.**
+
+### 1. Arquitetura de informação e fluxo de trabalho profissional
+
+O percurso principal da equipe segue a sequência integrada:
+
+**Login da equipe → Dashboard (Visão geral) → Pacientes / Avaliadores → Preparar avaliação → Executar teste → Armazenar resultados → Consultar, analisar e exportar.**
+
+A navegação administrativa organiza-se em oito áreas com hierarquia visual clara, estados ativos e atalhos contextuais:
+
+1. **Visão geral (Dashboard):** indicadores sintéticos (KPIs), atividade recente, evolução temporal de coletas e atalhos rápidos para `Preparar avaliação`, `Cadastrar paciente` e `Exportar dados`.
+2. **Pacientes:** listagem pesquisável e paginada, cadastro de novo paciente com verificação de duplicidade/homônimos, edição cadastral auditada, inativação lógica e ficha detalhada com histórico longitudinal de projetos, visitas, sessões e avaliações.
+3. **Avaliadores:** listagem pesquisável e paginada de avaliadores responsáveis, cadastro com verificação de duplicidade, edição e inativação lógica, e ficha detalhada com histórico de avaliações conduzidas (sem criar conta de login individual).
+4. **Preparar avaliação:** assistente/formulário estruturado que seleciona (ou cadastra inline) o paciente e o avaliador responsável, seleciona projeto e instrumento, preenche visita e iniciais (pré-preenchidas do cadastro do paciente), valida vínculos, apresenta **resumo para conferência** e emite o convite de uso único sem digitação manual de IDs internos.
+5. **Avaliações e histórico:** acompanhamento operacional de convites emitidos, sessões em andamento/concluídas/interrompidas/expiradas, inspeção de checkpoints incrementais (`ADR-005`) e invalidação auditável quando aplicável.
+6. **Resultados e análises:** consulta combinada com catálogo completo de filtros, tabelas analíticas de avaliações, tentativas e métricas oficiais, e visualizações interativas descritivas.
+7. **Exportações:** configuração de exportação CSV do conjunto filtrado por nível de granularidade (`pacientes`, `avaliacoes`, `tentativas`, `metricas`, `stroop_21_colunas`), seleção de colunas, modo de identificação (`deidentified` padrão vs. `nominal` autorizado), pré-visualização com contagem de linhas e resumo dos critérios aplicados antes do download.
+8. **Administração / configurações:** gestão de projetos, membros/vínculos por projeto, sessão/senha da conta local compartilhada (`ADR-006`) e associação auditada de registros legados (`WEB-027`). A área de importação manual de CSV (`CsvImportPanel`) é **retirada** do produto (`WEB-025`).
+
+### 2. Dashboard principal e indicadores descritivos
+
+O painel `Visão geral` apresenta cartões KPI e gráficos descritivos calculados sobre os projetos autorizados:
+
+- **Total de pacientes cadastrados** (ativos e com participação nos projetos autorizados).
+- **Avaliações válidas realizadas** por período (hoje, últimos 7/30 dias, total), por instrumento (`test_code`), por projeto, por status de sessão (`completed`, `preparing`/`running`, `aborted`/`invalidated`/`expired`) e por avaliador responsável.
+- **Evolução temporal de coletas:** série temporal de avaliações concluídas por dia/semana/mês.
+- **Resumos descritivos das métricas oficiais (Stroop Go/No-Go):** precisão total (%), precisão Go (%), precisão No-Go (%), contagens de `hits`, `omission_errors`, `correct_rejections`, `commission_errors` e tempos de reação (`mean`, `sd`, `median`, `iqr` em segundos/ms sobre `hits`).
+- **Rigor metodológico na apresentação:** todo indicador exibe explicitamente sua **origem**, **definição**, **unidade de medida** e **tratamento de valores nulos** (ex.: RT exibido como `Ausente` quando `hits = 0`, nunca convertido em zero). É estritamente proibido exibir diagnóstico clínico, escore normativo, percentil populacional ou classificação "acima/abaixo da média".
+
+### 3. Visualizações interativas, tabelas e estados de interface
+
+- **Visualizações interativas (`Resultados e análises`):**
+  - Evolução longitudinal do paciente através de visitas e avaliações (precisão total/Go/No-Go e RT mediano/IIQ ao longo do tempo).
+  - Distribuição de tempos de reação e comparação descritiva por condição experimental (`congruent` vs. `incongruent`) e por tipo de resposta/erro (`hit`, `omission`, `correct_rejection`, `commission`).
+  - Distribuição de avaliações e erros por projeto, visita e avaliador responsável, sempre acompanhada de tabela acessível equivalente.
+- **Tabelas e listagens:** busca textual com debounce, filtros visíveis como *chips* removíveis, ordenação por coluna, paginação com tamanho configurável, ações contextuais por linha (abrir ficha do paciente, inspecionar detalhe da avaliação, exportar CSV individual de 21 colunas) e estados claros de carregamento (*skeleton*/progresso), lista vazia (*empty state* orientativo) e erro recuperável.
+- **Critérios de sistema visual e acessibilidade (`REQ-UX-012`):** tipografia legível com algarismos tabulares (`font-variant-numeric: tabular-nums`) em códigos, métricas e timestamps; contraste compatível com WCAG AA nas telas administrativas; navegação completa por teclado com `:focus-visible` nítido; modais/etapas de confirmação antes de inativar cadastro, emitir convite ou revogar sessão; responsividade para desktops e notebooks de pesquisa.

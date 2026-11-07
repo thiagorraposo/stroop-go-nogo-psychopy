@@ -1,31 +1,17 @@
-# Documentacao
+# Documentação
 
-Escopo: `docs/`. Herda todas as regras da raiz.
+Herda [AGENTS raiz](../AGENTS.md). Índice: [README](README.md).
 
-- Use o [indice](README.md) e agrupe documentos em `experimento/`, `dados/`,
-  `seguranca/`, `operacao/`, `desenvolvimento/`, `arquitetura/` ou `legado/`.
-  Roadmap WEB, progresso, registro e mapa estrutural permanecem nesta raiz.
-- Escreva em portugues, de forma objetiva, e use links relativos para fontes
-  canonicas em vez de duplicar contratos ou estados.
-- Registre metodo em `experimento/DECISOES_DO_EXPERIMENTO.md`, interface em
-  `experimento/UX_DECISIONS.md`, arquitetura em `arquitetura/ADR-*.md` e fatos datados em
-  `REGISTRO_DE_ALTERACOES.md`. Altere documentacao arquitetural somente diante
-  de decisao relevante, justificando motivo e impacto; preserve os ADRs anteriores.
-- Estado legado fica em [Projeto Stroop Test.md](legado/Projeto%20Stroop%20Test.md);
-  estado da evolucao web fica somente em [ROADMAP_WEB.md](ROADMAP_WEB.md).
-  Nao misture IDs Wxx, etapas legadas 1–12 e fases historicas de implementacao.
-- Leia e aplique o [protocolo Codex CLI](desenvolvimento/WORKFLOW_CODEX_CLI.md). Documentos
-  auxiliares referenciam as fontes canonicas, sem copiar fichas, tabelas de
-  estado, pesos, dependencias ou criterios de aceite.
-- [PROGRESS.md](PROGRESS.md) e a memoria concisa de retomada: registre marcos,
-  decisoes, problemas/bloqueios com evidencia, arquivos alterados, comandos e
-  resultados de validacao e a proxima acao. Atualize a cada marco ou impedimento,
-  mantendo contexto suficiente para compactacao, interrupcao ou fim de cota.
-  Referencie IDs do roadmap sem criar outra contabilidade de progresso.
-- Use `ROADMAP_WEB.md` e `arquitetura/ADR-*.md` nos papeis dos nomes genericos
-  `ROADMAP.md` e `ARCHITECTURE.md`; nao crie documentos paralelos. Ajuste o
-  roadmap somente com evidencia, preservando decisoes e aceite ainda pendente.
-- Ao mudar regras operacionais, alinhe instrucoes, protocolo e trechos de
-  retomada do roadmap/README, sem alterar o estado das etapas por presuncao.
-- Exemplos devem ser sinteticos e nao podem conter nomes, IDs ou metadados reais.
-- Ao criar ou renomear documentos, valide todos os links relativos afetados.
+- Fonte única de execução/estado/progresso/riscos: [Projeto Stroop Test](Projeto%20Stroop%20Test.md).
+  ROADMAP_WEB/PROGRESS são pontes; docs/legado são arquivos históricos congelados.
+- Workflow vigente na raiz docs/WORKFLOW_CODEX_CLI.md. Especificação na matriz,
+  visão arquitetural em ARQUITETURA_WEB e decisões em arquitetura/ADR-*.md.
+  Método e fórmulas permanecem nas fontes experimento/ e dados/, sem duplicação.
+- Escrever em português, com IDs estáveis, links relativos e evidências reais;
+  PLANEJADO quando não houver implementação/ensaio. Não promover histórico a teste atual.
+- Atualizar fatos datados no REGISTRO_DE_ALTERACOES, sem copiar estado do backlog.
+  Mudança relevante tem motivo/impacto/requisitos/testes e aprovação quando exigida.
+- Preservar histórico e contratos; marcar informação antiga como superada em vez
+  de apagá-la. Ao mover, reparar links e deixar ponte quando útil.
+- Validar links/âncoras, consistência de IDs/dependências/matriz e git diff --check.
+  Não duplicar tabelas de progresso em README ou memória paralela.
