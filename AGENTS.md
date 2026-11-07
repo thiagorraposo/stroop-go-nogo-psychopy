@@ -66,7 +66,7 @@ principal integra e confere aceite. Não paralelizar edições conflitantes.
 - Não reduzir OIDC, CSRF, cookies seguros, grants ou acesso por projeto. Migrations
   existentes imutáveis; novas alterações de schema só na tarefa autorizada.
 - Decisões metodológicas, operações destrutivas, migrações/dados reais, credenciais
-  sensíveis, produção/deploy, merge main, tags e reescrita de histórico exigem
+  sensíveis, produção/deploy, tags e reescrita de histórico exigem
   autorização específica. VPS/domínio existentes não a concedem.
 
 ## Validação e continuidade
@@ -80,7 +80,7 @@ PG descartável com prefixo stroop_etapa4_test; frontend Vitest/tipos/build e
 navegadores/HTTPS quando exigidos. Sempre git diff --check; documentos também
 exigem links e consistência. Não instalar/atualizar dependência incidentalmente.
 
-## GitHub Flow adaptado
+## GitHub Flow com Pull Request, Push e Merge Commit tradicional
 
 main estável; branch coesa docs/feat/fix/refactor/test/chore por marco ou entrega.
 Antes: status/branch/remotos, preservar alterações locais, fetch quando acessível,
@@ -89,14 +89,17 @@ Reutilizar branch adequada. Não descartar trabalho para obter árvore limpa.
 
 Commits e pushes autônomos autorizados após unidade coerente validada, Conventional
 Commits em português, staging só de arquivos/hunks da tarefa. Primeiro push com
-upstream; sem push direto em main, force push, bypass ou exclusão remota.
-**Não criar PR automaticamente e não executar merge automático.** Quando a
-integração for autorizada, usar Merge Commit tradicional preservando commits;
-sem Squash Merge em novas integrações, conforme preferência do proprietário. Integração à
-main exige autorização específica e proteções/revisões vigentes; não alterá-las.
-Se houver bloqueio de envio, preservar commits, registrar causa e pendência.
+upstream (`git push -u origin BRANCH`); sem push direto em main, force push, bypass
+ou exclusão remota. Abertura e atualização de Pull Request (`gh pr create` / `gh pr edit`)
+para main integram o fluxo do projeto; manter auto-merge do GitHub desabilitado.
+Aguardar CI/checks obrigatórios (`verify`) e validação de critérios. Integração à main
+autorizada exclusivamente via **Merge Commit tradicional** (`gh pr merge --merge`),
+preservando todos os commits originais; nunca usar Squash Merge, Rebase Merge ou push
+direto em main. Após merge concluído, atualizar main local por fast-forward
+(`git switch main && git pull --ff-only`). Se houver bloqueio de envio ou CI pendente,
+preservar commits, registrar causa e pendência.
 
-CI existente permanece ativa; push pode disparar workflows conforme gatilhos.
+CI existente permanece ativa em PRs e push na main; push de branch isolada não a duplica.
 Distinguir teste local e Actions por SHA, falhou/não executado/não verificado.
-No fechamento registrar branch, commits reais, resultado do push, CI, limitações
-e próxima tarefa. [Contribuição](CONTRIBUTING.md) e workflow detalham operações.
+No fechamento registrar branch, commits reais, resultado do push, PR, merge, CI,
+limitações e próxima tarefa. [Contribuição](CONTRIBUTING.md) e workflow detalham operações.

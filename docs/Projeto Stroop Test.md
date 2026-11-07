@@ -20,7 +20,7 @@ O comando de 2026-11-05 autorizou M2, já concluído. Novo `continue o projeto`
 autoriza M3, condicionado às decisões de suas tarefas. Em 2026-11-05, o proprietário
 aprovou DEC-04 no alcance local de engenharia descrito em EV-M3-011; validação
 física/metodológica permanece pendente para M9. Após o aceite de M3, novo `continue o projeto` em 2026-11-06 autorizou M6, já
-concluído. Novo `continue o projeto` em 2026-11-06 concluiu o escopo inicial de M4 (`WEB-013` a `WEB-016`). Em 2026-11-07, a missão documental `CHG-005` ([ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md)) revisou formalmente `DEC-01` e expandiu `M4` (`WEB-045`, `WEB-046`) e `M5` (`WEB-047`), além de atualizar `M5`, `M7`, `M8`, `M9` e `M10`.
+concluído. Novo `continue o projeto` em 2026-11-06 concluiu o escopo inicial de M4 (`WEB-013` a `WEB-016`). Em 2026-11-07, a missão documental `CHG-005` ([ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md)) revisou formalmente `DEC-01` e expandiu `M4` (`WEB-045`, `WEB-046`) e `M5` (`WEB-047`), além de atualizar `M5`, `M7`, `M8`, `M9` e `M10`. Em 2026-11-07, instrução explícita do responsável formalizou no workflow do projeto a adoção de Pull Request, Push e Merge Commit tradicional, e autorizou a execução do marco **M5** (`WEB-017` e `WEB-018`).
 
 Uma tarefa CONCLUIDA tem todos critérios, comandos/resultados/data, componente,
 referências de teste e Git. Documento é evidência suficiente apenas para entrega
@@ -50,7 +50,7 @@ Atualizado em **2026-11-07**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **28 de 48 · 58,3%** | **20** | **M5 aguardando autorização (M4 6/6 concluído)** | Autorizar M5 (`WEB-017` e `WEB-018`) com novo `continue o projeto`; `WEB-031` aguarda destino externo |
+| **28 de 48 · 58,3%** | **20** | **M5 autorizado (M4 6/6 concluído)** | Implementar WEB-017 e WEB-018 em M5; WEB-031 aguarda destino externo |
 
 ```text
 Aceites   ████████████░░░░░░░░   58,3%
@@ -119,7 +119,7 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 
 ### Foco do marco atual
 
-`M4` está **6/6 concluído** (`WEB-013` a `WEB-016` em `EV-M4-013/016` e `WEB-045` a `WEB-046` em `EV-M4-045/046`). O próximo marco na sequência crítica é **M5 — Interface administrativa e analítica React** (`WEB-017` e `WEB-018` **PRONTAS**, seguidas de `WEB-047`, `WEB-019` e `WEB-020`), aguardando nova instrução explícita `continue o projeto`.
+`M4` está **6/6 concluído** (`WEB-013` a `WEB-016` em `EV-M4-013/016` e `WEB-045` a `WEB-046` em `EV-M4-045/046`). O marco autorizado pelo comando `continue o projeto` de 2026-11-07 é **M5 — Interface administrativa e analítica React** (`WEB-017` e `WEB-018` **PRONTAS** para execução, seguidas de `WEB-047`, `WEB-019` e `WEB-020`).
 
 | ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito |
 |---|---|---|---|---|---|
@@ -2444,7 +2444,29 @@ Verificações locais executadas nesta missão documental (`Python 3.12.3`, sem 
 
 ## Retomada
 
-### Retomada vigente — conclusão de M4 expandido (WEB-045 e WEB-046), 2026-11-07
+### Retomada vigente — adoção de Pull Request, Push e Merge tradicional e autorização de M5, 2026-11-07
+
+Por instrução explícita do responsável em 2026-11-07 ("continue o projeto e adicione
+pullresquest merge e push ao workflow do projeto"), foram formalizados no workflow
+canônico os comandos e ciclo de GitHub Flow com commits e pushes autônomos
+(`git push -u origin BRANCH`), abertura/atualização de Pull Request para `main`
+(`gh pr create`) e integração exclusivamente via Merge Commit tradicional
+(`gh pr merge --merge`), preservando commits originais (sem Squash Merge, sem Rebase
+Merge e sem push direto em `main`).
+
+Comando `continue o projeto` autoriza o marco **M5 — Interface administrativa e analítica React**,
+com `WEB-017` ("Revalidar filtros, lista e agregações autorizadas") e `WEB-018` ("Revalidar
+administração React de contas e vínculos") prontas para execução em branch dedicada
+de M5 (`feat/m5-interface-administrativa-react`). Progresso global mantido em
+**28/48 entregáveis aceitos (58,3%)**, 20 sem aceite: `WEB-017` e `WEB-018` **PRONTAS**,
+17 **PENDENTES** e `WEB-031` **BLOQUEADA** por destino externo autorizado indisponível.
+
+Próxima ação exata: integrar esta atualização de governança documental via PR #2
+(`docs(git): adota Merge Commit tradicional com PR obrigatório`) em `main` com
+Merge Commit tradicional após CI aprovada, e iniciar o desenvolvimento de M5
+(`WEB-017` e `WEB-018`) a partir de `main` na branch de feature dedicada.
+
+### Retomada anterior — conclusão de M4 expandido (WEB-045 e WEB-046), 2026-11-07
 
 Comando `continue o projeto` no marco vigente **M4** concluído até o limite do
 marco, sem avançar implicitamente para outro marco. `WEB-045` e `WEB-046`

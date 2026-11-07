@@ -4,6 +4,20 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-07 — Incorporação de Pull Request, Push e Merge Commit tradicional ao workflow
+
+- Por instrução do responsável, o workflow do projeto adota formalmente o ciclo
+  com commits e pushes autônomos (`git push -u origin BRANCH`), abertura e
+  atualização de Pull Requests (`gh pr create`) para `main` e integração
+  exclusivamente por Merge Commit tradicional (`gh pr merge --merge`),
+  preservando o histórico integral dos commits (sem Squash Merge, sem Rebase
+  Merge e sem push direto em `main`).
+- Auto-merge do GitHub permanece desabilitado; aguardar a conclusão dos checks
+  obrigatórios da CI (`verify`) antes do merge.
+- Documentos de governança e fluxo alinhados: `AGENTS.md`, `CONTRIBUTING.md`,
+  `docs/WORKFLOW_CODEX_CLI.md`, `docs/desenvolvimento/CI_WEB.md` e
+  `docs/desenvolvimento/WORKFLOW_CODEX_CLI.md`.
+
 ## 2026-11-06 — Fluxo ponta a ponta de avaliações e transporte incremental (M4)
 
 - Integrado o Dedicated Worker incremental (`checkpoint-worker.ts`) ao fluxo real
@@ -286,6 +300,22 @@ comandos atuais nem resultados reexecutados.
   schema, configuração operacional, dependência ou dado real alterado.
 - Validação desta sessão exclusivamente documental; comandos/resultados e Git final
   em EV-M0/Retomada do backlog. Suites funcionais/CI/medição física não reexecutadas.
+
+## 2026-11-05 — Merge Commit tradicional com Pull Requests
+
+- Por instrucao do responsavel, Squash Merge desabilitado e exigencia de
+  historico linear retirada da protecao classica de main; Merge Commit ja
+  estava habilitado. Reconsulta da API confirmou PR, verify, regras de revisao,
+  administradores e bloqueios de force push/exclusao preservados. Sem rulesets
+  adicionais; Rebase e auto-merge mantidos como estavam.
+- Orientacao posterior do responsavel: sem automerge. GitHub auto-merge
+  permanece desabilitado; Codex pode abrir/atualizar PRs, mas so integra apos
+  autorizacao explicita, mesmo com CI aprovada. PR desta entrega fica aberto.
+- AGENTS, contribuicao, workflow Codex e CI_WEB alinhados ao merge tradicional
+  por PR. Exportacao/rollback e validacao remota descritos em CI_WEB.
+- Alteracao exclusivamente de governanca Git; sem codigo, workflows Actions,
+  arquitetura, requisitos, roadmap, dados ou deploy. Entregas anteriores de
+  outras branches permanecem fora deste PR.
 
 ## 2026-11-04 — Correcao da auditoria de dependencias no PR1
 

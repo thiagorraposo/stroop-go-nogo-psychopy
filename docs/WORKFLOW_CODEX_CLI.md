@@ -3,8 +3,8 @@
 Mensagens abaixo são comandos de trabalho do usuário, não scripts. Fontes:
 [AGENTS](../AGENTS.md), [backlog único](Projeto%20Stroop%20Test.md),
 [requisitos](REQUISITOS_E_RASTREABILIDADE.md), [arquitetura](ARQUITETURA_WEB.md).
-Históricos Wxx/etapas 1–12 não selecionam execução. Esta versão substitui o
-protocolo anterior de avanço contínuo entre marcos e PR/merge automático.
+Históricos Wxx/etapas 1–12 não selecionam execução. Esta versão adota o
+fluxo estruturado por marcos com Pull Request, Push e Merge Commit tradicional.
 
 ## Inicialização mínima
 
@@ -85,33 +85,43 @@ Replanejamento não autoriza implementação por implicação.
 
 ## Git e encerramento
 
-GitHub Flow adaptado sem PR/merge automático, conforme [CONTRIBUTING](../CONTRIBUTING.md).
+GitHub Flow com Pull Request, Push e Merge Commit tradicional, conforme [CONTRIBUTING](../CONTRIBUTING.md).
 Status/branch/remotos → preservar worktree → fetch quando acessível em sessão de
 escrita → conferir base → sincronização ff-only se segura → branch coesa.
 Não criar outra branch se a atual for adequada. Base com trabalho não integrado
 pode ser preservada com justificativa, sem descartar commits para partir de main.
 
-Depois de validar unidade coerente: diff --check, revisar diff/status, adicionar
-somente tarefa, commit Conventional Commits em português e push com upstream.
-Push falhou: investigar sem sobrescrever histórico, registrar causa/pendência;
-não força, não altera proteção. PR e merge não são automáticos. Quando autorizada a integração, usar Merge Commit
-tradicional, preservando commits originais, sem Squash Merge; não alterar
-proteções/configurações remotas. main não recebe
-push direto. Deploy, integração, tags, dados reais e operações destrutivas têm
-aprovação específica e não decorrem de commit/push.
+Ciclo de entrega e integração:
+1. Validar unidade coerente: `git diff --check`, testes do marco/tarefa, validação documental.
+2. Commit atômico com Conventional Commits em português e push autônomo com upstream: `git push -u origin BRANCH`.
+3. Abertura/atualização de Pull Request para `main`:
+   ```bash
+   gh pr create --base main --head BRANCH --title "tipo(escopo): descrição" --body-file /caminho/resumo.md
+   ```
+4. Verificação de CI remota: aguardar a conclusão dos checks obrigatórios (`verify`).
+5. Merge autorizado via Merge Commit tradicional:
+   ```bash
+   gh pr merge --merge --match-head-commit SHA_VALIDADO
+   git switch main
+   git pull --ff-only
+   ```
+   Nunca usar Squash Merge, Rebase Merge ou push direto em `main`. Manter o auto-merge
+   do GitHub desabilitado.
+
+Push falhou: investigar sem sobrescrever histórico, registrar causa/pendência; não
+força, não altera proteção. Se houver bloqueio de CI ou pendência de revisão, manter
+o PR aberto e registrar o motivo. Deploy, tags, dados reais e operações destrutivas
+têm aprovação específica e não decorrem de commit/push/merge.
 
 No backlog: ID, estado/aceite, branch, SHA real, testes/evidências/data, limitações,
-push e CI. Evitar autorreferência de SHA: registrar hash da entrega no fechamento
+push, PR e CI. Evitar autorreferência de SHA: registrar hash da entrega no fechamento
 posterior ou consulta Git inequívoca para o próprio fechamento. Não criar commits
-artificiais só para atualizar hash. CI existente dispara PR/main/manual; push de
-branch não implica execução. Actions não executado/não verificado é um estado
+artificiais só para atualizar hash. Actions não executado/não verificado é um estado
 válido de registro, não equivalente a aprovado. Nunca desabilitar checks para
-adaptar fluxo. M8 planeja formalização de CI sem alterar política/proteções agora.
+adaptar fluxo.
 
-Final: resultado, arquivos, validações, riscos/pendências, branch/commits/push/CI
-e próxima tarefa. Na missão documental: parar após M0 validado/versionado/enviado,
-sem iniciar React/API/migrations/produção. A autorização final de versionamento
-substituiu as proibições iniciais de add/commit/push da missão.
+Final: resultado, arquivos, validações, riscos/pendências, branch/commits/push/PR/CI/merge
+e próxima tarefa.
 
 ## Compatibilidade de comandos antigos
 

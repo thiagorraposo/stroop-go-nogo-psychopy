@@ -16,41 +16,29 @@ skip Python, vulnerabilidade conhecida ou deteccao de secrets; nao existe
 no repositorio remoto para bloquear merge; essa configuracao externa nao e
 criada pelo arquivo de workflow.
 
-Contribuições seguem [GitHub Flow adaptado](../../CONTRIBUTING.md): commits/pushes
-autônomos em branch, sem PR/merge automático. Integração à main exige autorização
-específica e proteções/revisões vigentes; sem bypass. O pipeline verifica main
-quando houver integração autorizada. Não se exige CI remota para esta fase documental.
-Registro histórico anterior de 2026-11-04, não reconsultado nesta auditoria: proteção configurada com `verify` do app GitHub Actions,
+Contribuições seguem [GitHub Flow com PR](../../CONTRIBUTING.md). Commits e
+pushes autônomos em branch são seguidos de abertura de Pull Request (`gh pr create`).
+O job `verify` do GitHub Actions é disparado pelo PR; a integração à main ocorre
+exclusivamente via **Merge Commit tradicional** (`gh pr merge --merge`), sem Squash
+Merge, sem Rebase Merge e sem push direto em main. O resultado integrado é verificado
+novamente por push em `main`.
+
 branch atualizada, PR obrigatorio, historico linear e conversas resolvidas,
 inclusive para administradores. Nao se adicionou aprovador externo obrigatorio;
 revisoes existentes continuam respeitadas. Force push/exclusao de main bloqueados;
 branches temporarias sao removidas automaticamente depois do merge permitido.
 
-## Validação formal de branch sem PR automático
+## Método de merge e proteções
 
-Quando a tarefa/sessão autorizar a execução remota, usar o `workflow_dispatch`
-existente em `web.yml`, após validar/enviar uma unidade coesa. A execução é de
-verificação; não publica imagens, não faz deploy nem integra branches. Não mudar
-os gatilhos ou proteções para obter aprovação. PR e merge continuam sujeitos ao
-[workflow canônico](../WORKFLOW_CODEX_CLI.md).
+Configuração remota: Merge Commit habilitado, Squash Merge desativado e histórico
+linear desativado. PR obrigatório, `verify` estrito do GitHub Actions, descarte de
+revisões obsoletas e conversas resolvidas. Auto-merge do GitHub permanece desabilitado;
+nunca usar `--auto`. Aguardar os checks e validação de critérios antes do merge
+tradicional (`gh pr merge --merge`).
 
-1. Conferir worktree, branch de trabalho, HEAD/upstream e referência remota.
-   Guardar SHA completo do candidato no backlog; não disparar sobre `main` por
-   conveniência nem considerar uma aprovação de outro SHA suficiente.
-2. Executar `gh workflow run web.yml --ref NOME_DA_BRANCH` e localizar a execução
-   com `gh run list --workflow web.yml --branch NOME_DA_BRANCH --event
-   workflow_dispatch --json databaseId,headSha,status,conclusion,url`.
-3. Conferir que `headSha` corresponde ao candidato e acompanhar `gh run view ID
-   --json headSha,status,conclusion,url,jobs`. Registrar URL/SHA e resultado real
-   no backlog, distinguindo local, Actions, pendente, falha e não executado.
-4. Falha ou skip obrigatório mantém critério sem aceite; investigar no escopo
-   autorizado. Não publicar logs com dados/credenciais nem contornar o check.
-   Caso a branch avance, registrar quais commits são apenas documentais e qual
-   SHA executou os testes; aprovação não se transfere implicitamente.
-
-Se não houver autorização de disparo, recurso ou acesso, registrar a limitação
-e preservar os resultados locais. Não abrir PR automaticamente como alternativa.
-O registro da execução é evidência, sem mudar a governança de continuidade.
+A verificação remota também pode ser disparada manualmente via `workflow_dispatch`
+existente em `web.yml` (`gh workflow run web.yml --ref NOME_DA_BRANCH`), sem dispensar
+os gates locais nem o fluxo com PR canônico.
 
 ## Ambiente e isolamento
 
