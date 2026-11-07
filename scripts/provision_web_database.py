@@ -40,8 +40,18 @@ WRITER = {
     'web_participant_sessions': ('SELECT', 'INSERT',
         'UPDATE (state,started_at,app_version,revoked_at,abort_reason,participant_token_sha256)'),
     'web_session_main_order': ('SELECT', 'INSERT'),
-    'web_project_participants': ('SELECT', 'INSERT'),
+    'web_project_participants': ('SELECT', 'INSERT', 'UPDATE (patient_id)'),
     'web_participant_visits': ('SELECT', 'INSERT'),
+    'web_patients': (
+        'SELECT', 'INSERT',
+        'UPDATE (full_name,normalized_name,initials,disambiguation_note,is_homonym_confirmed,active,updated_at)',
+    ),
+    'web_evaluators': (
+        'SELECT', 'INSERT',
+        'UPDATE (full_name,normalized_name,initials,active,updated_at)',
+    ),
+    'web_registry_audit_events': ('SELECT', 'INSERT'),
+    'web_legacy_entity_links': ('SELECT',),
     'web_session_observations': ('SELECT', 'INSERT'),
     'web_session_checkpoints': ('SELECT', 'INSERT',
         'UPDATE (confirmed_through,prefix_hash,received_at)'),
@@ -181,7 +191,13 @@ def provision(environment: Mapping[str, str] | None = None):
             for table, columns in REQUIRED_COLUMNS.items():
                 connection.execute(sql.SQL('GRANT SELECT ({}) ON TABLE public.{} TO {}').format(
                     sql.SQL(',').join(map(sql.Identifier, sorted(columns))), sql.Identifier(table), sql.Identifier(reader_name)))
-            for sequence in ('auth_audit_events_audit_id_seq', 'trial_results_trial_result_id_seq', 'assessment_metrics_metric_id_seq'):
+            for sequence in (
+                'auth_audit_events_audit_id_seq',
+                'trial_results_trial_result_id_seq',
+                'assessment_metrics_metric_id_seq',
+                'web_patient_code_seq',
+                'web_evaluator_code_seq',
+            ):
                 connection.execute(sql.SQL('GRANT USAGE ON SEQUENCE public.{} TO {}').format(sql.Identifier(sequence), sql.Identifier(writer_name)))
             connection.execute(sql.SQL('GRANT EXECUTE ON FUNCTION public.web_lock_emitter(text,text) TO {}').format(sql.Identifier(writer_name)))
             connection.execute(sql.SQL('GRANT EXECUTE ON FUNCTION public.web_manage_user(text,text,text,text,text,text,text,boolean) TO {}').format(sql.Identifier(writer_name)))

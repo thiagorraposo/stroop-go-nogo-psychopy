@@ -8,6 +8,11 @@ import secrets
 from uuid import UUID
 
 from stroop.domain.auth import AppUser
+from stroop.domain.registry import (
+    InvalidRegistryDataError,
+    validate_initials,
+    validate_test_code,
+)
 from stroop.persistence import web_sessions as persistence
 from stroop.persistence.auth import PersistenceError
 
@@ -76,6 +81,45 @@ def create_invitation(database_url: str, invitation_id: UUID, session_id: UUID,
     )
 
 
+def create_cadastral_invitation(
+    database_url: str,
+    invitation_id: UUID,
+    session_id: UUID,
+    project_id: UUID,
+    code_hash: str,
+    *,
+    patient_id: UUID,
+    evaluator_id: UUID,
+    visit: str,
+    test_code: str | None = None,
+    initials: str | None = None,
+    actor: AppUser,
+):
+    try:
+        instrument = validate_test_code(test_code)
+        cleaned_initials = (
+            validate_initials(initials) if initials is not None else None
+        )
+    except InvalidRegistryDataError as exc:
+        raise InvalidDataError from exc
+    return persistence.create_cadastral_invitation(
+        database_url,
+        invitation_id,
+        session_id,
+        project_id,
+        code_hash,
+        patient_id=patient_id,
+        evaluator_id=evaluator_id,
+        visit=_label(visit),
+        test_code=instrument["test_code"],
+        test_version=instrument["test_version"],
+        protocol_id=instrument["protocol_id"],
+        initials=cleaned_initials,
+        issuer=actor.issuer,
+        subject=actor.subject,
+    )
+
+
 def revoke_invitation(database_url: str, project_id: UUID, invitation_id: UUID,
                       actor: AppUser) -> bool:
     return persistence.revoke_invitation(
@@ -118,8 +162,8 @@ def redeem_limit(database_url: str, remote_hash: str, limit: int, window_seconds
 
 __all__ = ["InvalidDataError", "ConflictError", "ExpiredError", "MissingError",
            "PersistenceError", "projects", "create_project", "members", "set_member",
-           "create_invitation", "revoke_invitation", "redeem", "participant_session",
-           "start", "abort", "redeem_limit", "logout"]
+           "create_invitation", "create_cadastral_invitation", "revoke_invitation",
+           "redeem", "participant_session", "start", "abort", "redeem_limit", "logout"]
 
 
 ConflictError = persistence.ConflictError

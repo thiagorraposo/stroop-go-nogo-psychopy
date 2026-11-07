@@ -16,7 +16,9 @@ from api.sessions import router as sessions_router
 from api.results import router as results_router
 from api.assessments import router as assessments_router, export_router as assessment_export_router
 from api.administration import router as administration_router
+from api.evaluators import router as evaluators_router
 from api.imports import router as imports_router
+from api.patients import router as patients_router
 
 
 def create_app(config: APIConfig | None = None) -> FastAPI:
@@ -32,6 +34,8 @@ def create_app(config: APIConfig | None = None) -> FastAPI:
     if config.oidc_callback_path == "/oauth2callback":
         app.add_api_route("/oauth2callback", auth_callback, methods=["GET"], include_in_schema=False)
     app.include_router(sessions_router)
+    app.include_router(patients_router)
+    app.include_router(evaluators_router)
     app.include_router(results_router)
     app.include_router(assessments_router)
     app.include_router(assessment_export_router)

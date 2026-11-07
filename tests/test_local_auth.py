@@ -111,7 +111,14 @@ class LocalPostgresTests(unittest.TestCase):
             c.execute("INSERT INTO app_users(issuer,subject,role) VALUES ('https://accounts.google.com','synthetic-old','administracao')")
             c.execute("INSERT INTO web_projects(project_id,code,name,created_by_issuer,created_by_subject) VALUES (%s,'OLD','Synthetic old','https://accounts.google.com','synthetic-old')", (project,))
             c.execute("INSERT INTO web_project_members(project_id,issuer,subject) VALUES (%s,'https://accounts.google.com','synthetic-old')", (project,))
-        self.assertEqual(apply_migrations(DSN), ['0012_local_authentication.sql', '0013_local_user_management.sql'])
+        self.assertEqual(
+            apply_migrations(DSN),
+            [
+                '0012_local_authentication.sql',
+                '0013_local_user_management.sql',
+                '0014_central_patients_evaluators.sql',
+            ],
+        )
         self.bootstrap()
         self.assertEqual(self.rows('SELECT issuer,subject FROM web_project_members'), [('https://accounts.google.com','synthetic-old')])
         self.assertEqual(self.rows('SELECT created_by_issuer,created_by_subject FROM web_projects'), [('https://accounts.google.com','synthetic-old')])

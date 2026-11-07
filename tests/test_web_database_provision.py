@@ -101,7 +101,13 @@ class ProvisionPostgresTests(unittest.TestCase):
                           "UPDATE app_users SET role='administracao'", 'DELETE FROM app_users',
                           "INSERT INTO web_legacy_project_links(legacy_project,project_id) VALUES ('SINTETICO',gen_random_uuid())",
                           'UPDATE assessments SET participant_id=participant_id',
-                          'DELETE FROM web_csv_imports'):
+                          'DELETE FROM web_csv_imports',
+                          'DELETE FROM web_patients',
+                          'DELETE FROM web_evaluators',
+                          'DELETE FROM web_registry_audit_events',
+                          'DELETE FROM web_legacy_entity_links',
+                          'UPDATE web_patients SET participant_code=participant_code',
+                          'UPDATE web_evaluators SET evaluator_code=evaluator_code'):
             self.denied(self.writer_dsn, statement)
         with psycopg.connect(self.owner_dsn) as connection:
             self.assertEqual(connection.execute("SELECT count(*) FROM pg_auth_members WHERE member=(SELECT oid FROM pg_roles WHERE rolname=%s)", (self.writer,)).fetchone()[0], 0)

@@ -20,6 +20,7 @@ const backendErrors = {
   invitation_used: [409, 'Este convite já foi utilizado.'],
   result_conflict: [409, 'Esta sessão já possui um resultado diferente.'],
   duplicate_project: [409, 'Este projeto já está cadastrado.'],
+  duplicate_candidate_found: [409, 'Já existe um cadastro com nome semelhante. Confirme se trata-se de homônimo ou selecione o registro existente.'],
   invitation_expired: [410, 'Este convite expirou. Solicite um novo convite.'],
   session_expired: [410, 'Sua sessão expirou. Inicie uma nova sessão.'],
   body_too_large: [413, 'A solicitação excede o tamanho permitido.'],
@@ -64,8 +65,10 @@ export class ApiError extends Error {
   readonly code: string;
   readonly status: number;
   readonly retryAfter: number | null;
+  readonly candidates: ReadonlyArray<Record<string, unknown>> | null;
 
-  constructor(code: string, status: number, retryAfter: number | null = null) {
+  constructor(code: string, status: number, retryAfter: number | null = null,
+    candidates: ReadonlyArray<Record<string, unknown>> | null = null) {
     const publicCode = safeCode(code);
     super(messageFor(publicCode));
     this.name = 'ApiError';
@@ -73,6 +76,7 @@ export class ApiError extends Error {
     this.status = Number.isInteger(status) && status >= 0 && status <= 599 ? status : 0;
     this.retryAfter = retryAfter !== null && Number.isSafeInteger(retryAfter) && retryAfter >= 0
       ? retryAfter : null;
+    this.candidates = candidates;
   }
 }
 
@@ -95,19 +99,25 @@ function retryAfter(response: Response): number | null {
 
 async function responseError(response: Response): Promise<ApiError> {
   let code = fallbackByStatus[response.status] ?? 'invalid_response';
+  let candidates: ReadonlyArray<Record<string, unknown>> | null = null;
   try {
     const body: unknown = await response.json();
     if (record(body) && record(body.error) && typeof body.error.code === 'string'
       && isBackendCode(body.error.code) && backendErrors[body.error.code][0] === response.status) {
       code = body.error.code;
+      if (code === 'duplicate_candidate_found' && Array.isArray(body.candidates)) {
+        candidates = body.candidates.filter(record);
+      }
     }
   } catch {
     // Respostas de proxy ou JSON malformado usam somente o status publico.
   }
-  return new ApiError(code, response.status, retryAfter(response));
+  return new ApiError(code, response.status, retryAfter(response), candidates);
 }
 
 export type ApiPath = '/api/v1/assessments/export' | '/api/v1/admin/users' | `/api/v1/admin/users?${string}` | `/api/v1/admin/users/${string}` |
+  '/api/v1/patients' | `/api/v1/patients?${string}` | `/api/v1/patients/${string}` |
+  '/api/v1/evaluators' | `/api/v1/evaluators?${string}` | `/api/v1/evaluators/${string}` |
   `/api/v1/projects/${string}/imports/${string}` |
   `/api/v1/projects/${string}/members${string}` | `/api/v1/projects/${string}/members/${string}` |
   `/api/v1/projects/${string}/invitations${string}` | '/api/v1/projects' | `/api/v1/projects?${string}` |
