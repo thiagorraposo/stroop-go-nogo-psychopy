@@ -462,7 +462,7 @@ export function ProfessionalDashboard({
 
       {/* MÓDULO 1: VISÃO GERAL (DASHBOARD) */}
       {activeModule === 'dashboard' && (
-        <section aria-label="Visão geral da pesquisa">
+        <>
           <h2>Resultados da pesquisa</h2>
           <p className="notice">
             Resultados descritivos. Este painel não representa avaliação clínica ou diagnóstico.
@@ -719,7 +719,7 @@ export function ProfessionalDashboard({
               {renderAssessmentDetail()}
             </>
           )}
-        </section>
+        </>
       )}
 
       {/* MÓDULO 2: PACIENTES (WEB-047) */}
