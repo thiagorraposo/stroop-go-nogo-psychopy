@@ -15,7 +15,18 @@ import { listProjects, listAssessments, getAssessment, exportAssessment } from '
 import type { AssessmentDetail, AssessmentOptions, Project } from '../api/assessments'
 import { exportAssessmentView } from '../api/aggregate'
 import type { ExportContext } from '../api/aggregate'
-import { accuracyByVisit, countByDate, formatMetric as number, responseDistribution, summarize } from '../dashboard/analysis'
+import {
+  accuracyByVisit,
+  computeOverviewKPIs,
+  countByDate,
+  filterAssessments,
+  formatMetric as number,
+  OFFICIAL_METRICS_DICTIONARY,
+  responseDistribution,
+  sortAssessments,
+  summarize,
+} from '../dashboard/analysis'
+import { listPatients } from '../api/patients'
 
 export type AdministrativeModule =
   | 'dashboard'
@@ -66,10 +77,28 @@ export function ProfessionalDashboard({
   const [aggregateContext, setAggregateContext] = useState<ExportContext | null>(null)
   const [aggregateBusy, setAggregateBusy] = useState(false)
   const [aggregateMessage, setAggregateMessage] = useState<string | null>(null)
+  const [registeredPatientsCount, setRegisteredPatientsCount] = useState<number | null>(null)
 
   const detailPanel = useRef<HTMLElement>(null)
   const downloadIO = useRef<AbortController | null>(null)
   const aggregateIO = useRef<AbortController | null>(null)
+
+  // Carrega contagem de pacientes cadastrados no projeto atual para os KPIs
+  useEffect(() => {
+    if (!project) {
+      setRegisteredPatientsCount(null)
+      return
+    }
+    const io = new AbortController()
+    void listPatients({ page_size: 1 }, io.signal)
+      .then(res => {
+        if (!io.signal.aborted) setRegisteredPatientsCount(res.total)
+      })
+      .catch(() => {
+        if (!io.signal.aborted) setRegisteredPatientsCount(null)
+      })
+    return () => io.abort()
+  }, [project, revision])
 
   // Carrega lista de projetos autorizados
   useEffect(() => {
@@ -243,12 +272,24 @@ export function ProfessionalDashboard({
   }
 
   const currentProject = projects.find(item => item.id === project) ?? null
-  const instruments = [...new Set(rows.map(row => row.test_code))].sort()
+
+  // Aplicação do catálogo avançado de filtros e ordenação determinística (REQ-REL-004)
+  const filteredRows = filterAssessments(rows, query?.advanced)
+  const sortedRows = sortAssessments(
+    filteredRows,
+    query?.advanced?.sortBy ?? 'date',
+    query?.advanced?.sortOrder ?? 'desc',
+  )
+
+  const instruments = [...new Set(sortedRows.map(row => row.test_code))].sort()
   const selectedInstrument = instrument || instruments[0] || ''
-  const visible = rows.filter(row => row.test_code === selectedInstrument && (!platform || row.platform === platform))
+  const visible = sortedRows.filter(
+    row => row.test_code === selectedInstrument && (!platform || row.platform === platform),
+  )
   const totals = summarize(visible)
   const dates = countByDate(visible)
   const peak = Math.max(1, ...dates.map(([, count]) => count))
+  const overviewKpis = computeOverviewKPIs(sortedRows, registeredPatientsCount)
 
   // Renderizador do seletor de projeto compartilhado
   const renderProjectSelector = () => (
@@ -527,6 +568,10 @@ export function ProfessionalDashboard({
                         `${filterLabels[key] ?? key}: ${Array.isArray(value) ? value.join(', ') : value}`,
                     )
                     .join(' · ') || 'sem restrições adicionais'}
+                  {query.advanced?.searchText ? ` · busca: "${query.advanced.searchText}"` : ''}
+                  {query.advanced?.status && query.advanced.status !== 'valid' ? ` · status: ${query.advanced.status}` : ''}
+                  {query.advanced?.accuracyRange && query.advanced.accuracyRange !== 'all' ? ` · precisão: ${query.advanced.accuracyRange}` : ''}
+                  {query.advanced?.rtRange && query.advanced.rtRange !== 'all' ? ` · RT: ${query.advanced.rtRange}` : ''}
                   .
                 </p>
               )}
@@ -539,6 +584,32 @@ export function ProfessionalDashboard({
                     <p role="status">Nenhuma avaliação corresponde aos filtros.</p>
                   ) : (
                     <>
+                      {/* KPIs da Visão Geral (CHG-005 / REQ-REL-004) */}
+                      <section className="overview-summary-kpis" aria-label="KPIs da Visão Geral">
+                        <div className="kpi-grid">
+                          <div className="kpi-box">
+                            <span className="kpi-label">Pacientes cadastrados no projeto</span>
+                            <strong className="kpi-value tabular-nums">
+                              {registeredPatientsCount !== null ? registeredPatientsCount : '—'}
+                            </strong>
+                          </div>
+                          <div className="kpi-box">
+                            <span className="kpi-label">Avaliações válidas</span>
+                            <strong className="kpi-value tabular-nums">{overviewKpis.byStatus.valid}</strong>
+                          </div>
+                          <div className="kpi-box">
+                            <span className="kpi-label">Avaliações interrompidas / inválidas</span>
+                            <strong className="kpi-value tabular-nums">{overviewKpis.byStatus.invalid}</strong>
+                          </div>
+                          <div className="kpi-box">
+                            <span className="kpi-label">Avaliadores no recorte</span>
+                            <strong className="kpi-value tabular-nums">
+                              {Object.keys(overviewKpis.byEvaluator).length}
+                            </strong>
+                          </div>
+                        </div>
+                      </section>
+
                       <div className="dashboard-filters">
                         <label>
                           Instrumento
@@ -709,6 +780,43 @@ export function ProfessionalDashboard({
                           setDetailId(row.assessment_id)
                         }}
                       />
+
+                      {/* Resumo e Dicionário Descritivo das Métricas Oficiais (CHG-005) */}
+                      <section className="metrics-dictionary" aria-labelledby="metrics-dictionary-title">
+                        <h3 id="metrics-dictionary-title">Resumo Descritivo das Métricas Oficiais</h3>
+                        <p className="quiet">
+                          Definições conceituais, origens de cálculo e convenção de tratamento de valores nulos
+                          das métricas oficiais Stroop Go/No-Go.
+                        </p>
+                        <div className="table-scroll">
+                          <table aria-label="Definições conceituais e tratamento de nulos">
+                            <thead>
+                              <tr>
+                                <th>Métrica oficial</th>
+                                <th>Origem da fórmula</th>
+                                <th>Definição conceitual</th>
+                                <th>Unidade</th>
+                                <th>Tratamento de nulos</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {OFFICIAL_METRICS_DICTIONARY.map(m => (
+                                <tr key={m.code}>
+                                  <td>
+                                    <strong>{m.label}</strong> (<code>{m.code}</code>)
+                                  </td>
+                                  <td>{m.origin}</td>
+                                  <td>{m.definition}</td>
+                                  <td>
+                                    <span className="badge">{m.unit}</span>
+                                  </td>
+                                  <td>{m.nullTreatment}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </section>
                     </>
                   )}
                 </>
@@ -964,7 +1072,10 @@ export function ProfessionalDashboard({
 
       {/* MÓDULO 8: ADMINISTRAÇÃO (AdministrationPanel.tsx) */}
       {activeModule === 'administracao' && profile.role === 'administracao' && (
-        <AdministrationPanel profile={profile} />
+        <AdministrationPanel
+          profile={profile}
+          onNavigateToEvaluators={() => setActiveModule('avaliadores')}
+        />
       )}
     </div>
   )

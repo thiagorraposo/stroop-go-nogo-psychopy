@@ -232,3 +232,15 @@ kbd { font: inherit; font-size: .9em; border: 1px solid #b7bfca; border-radius: 
 .export-hub-panel .export-info-card { margin-top: 1.25rem; }
 .export-hub-panel ul { padding-left: 1.25rem; line-height: 1.6; }
 .project-selector-wrapper { margin: 1rem 0; }
+
+/* KPIs da Visão Geral e Dicionário de Métricas (REQ-REL-004 / CHG-005) */
+.overview-summary-kpis { margin: 1.5rem 0; }
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+.kpi-box { padding: 1rem; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; display: flex; flex-direction: column; gap: 0.5rem; }
+.kpi-label { font-size: 0.9rem; color: #475569; font-weight: 600; }
+.kpi-value { font-size: 1.5rem; color: #0f172a; }
+.notice-card { background: #f1f5f9; border-left: 4px solid #3b82f6; padding: 1rem 1.25rem; border-radius: 0 6px 6px 0; margin: 1.25rem 0; }
+.notice-card h4 { margin: 0 0 0.5rem; color: #1e3a8a; }
+.notice-card p { margin: 0.25rem 0; font-size: 0.95rem; line-height: 1.5; color: #334155; }
+.metrics-dictionary { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0; }
+.badge { display: inline-block; padding: 2px 6px; background: #e2e8f0; border-radius: 4px; font-size: 0.85em; font-weight: 600; }

@@ -7,7 +7,13 @@ import type { Project } from '../api/assessments'
 import { revokeAdminSessions, createProject, listAdminUsers, listProjectMembers, setProjectMember, updateAdminUser } from '../api/administration'
 import type { AdminUser, ProjectMember } from '../api/administration'
 
-export function AdministrationPanel({ profile }: { profile: ProfessionalProfile }) {
+export function AdministrationPanel({
+  profile,
+  onNavigateToEvaluators,
+}: {
+  profile: ProfessionalProfile
+  onNavigateToEvaluators?: () => void
+}) {
   const [users, setUsers] = useState<AdminUser[]>([])
   const [userCursor, setUserCursor] = useState<string | null>(null)
   const [usersBusy, setUsersBusy] = useState(false)
@@ -132,6 +138,28 @@ export function AdministrationPanel({ profile }: { profile: ProfessionalProfile 
   return <section className="administration-panel" aria-labelledby="admin-title">
     <h2 id="admin-title">Administração</h2>
     <p className="quiet">Somente a administração pode gerir contas, projetos e vínculos. Bloqueios e revogações são revalidados pelo servidor.</p>
+    <div className="notice-card" role="region" aria-label="Aviso de distinção arquitetural">
+      <h4>Distinção arquitetural importante (ADR-006 / ADR-007)</h4>
+      <p>
+        As contas gerenciadas abaixo referem-se à <strong>conta técnica local compartilhada</strong> de autenticação da equipe no ambiente (perfis: <em>consulta</em>, <em>importação</em> ou <em>administração</em>), mantendo a proteção intransigente do último administrador ativo.
+      </p>
+      <p>
+        O cadastro central de <strong>avaliadores responsáveis</strong> (com código <code>EVA-NNNNNN</code>, iniciais e vinculação científica em cada avaliação) é nominal e independente desta conta técnica, sendo gerenciado exclusivamente no módulo{' '}
+        {onNavigateToEvaluators ? (
+          <button
+            type="button"
+            className="button secondary"
+            style={{ display: 'inline', padding: '2px 8px', fontSize: '0.9em', marginLeft: '4px' }}
+            onClick={onNavigateToEvaluators}
+          >
+            Ir para Avaliadores
+          </button>
+        ) : (
+          <strong>Avaliadores</strong>
+        )}
+        .
+      </p>
+    </div>
     {error && <p role="alert">{error}</p>}{message && <p role="status">{message}</p>}
     <section aria-labelledby="accounts-title">
       <h3 id="accounts-title">Contas e permissões</h3>

@@ -20,7 +20,7 @@ O comando de 2026-11-05 autorizou M2, já concluído. Novo `continue o projeto`
 autoriza M3, condicionado às decisões de suas tarefas. Em 2026-11-05, o proprietário
 aprovou DEC-04 no alcance local de engenharia descrito em EV-M3-011; validação
 física/metodológica permanece pendente para M9. Após o aceite de M3, novo `continue o projeto` em 2026-11-06 autorizou M6, já
-concluído. Novo `continue o projeto` em 2026-11-06 concluiu o escopo inicial de M4 (`WEB-013` a `WEB-016`). Em 2026-11-07, a missão documental `CHG-005` ([ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md)) revisou formalmente `DEC-01` e expandiu `M4` (`WEB-045`, `WEB-046`) e `M5` (`WEB-047`), além de atualizar `M5`, `M7`, `M8`, `M9` e `M10`. Em 2026-11-07, instrução explícita do responsável formalizou no workflow do projeto a adoção de Pull Request, Push e Merge Commit tradicional, e autorizou a execução do marco **M5** (`WEB-017` e `WEB-018`).
+concluído. Novo `continue o projeto` em 2026-11-06 concluiu o escopo inicial de M4 (`WEB-013` a `WEB-016`). Em 2026-11-07, a missão documental `CHG-005` ([ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md)) revisou formalmente `DEC-01` e expandiu `M4` (`WEB-045`, `WEB-046`) e `M5` (`WEB-047`), além de atualizar `M5`, `M7`, `M8`, `M9` e `M10`. Em 2026-11-07, instrução explícita do responsável formalizou no workflow do projeto a adoção de Pull Request, Push e Merge Commit tradicional, e autorizou a execução do marco **M5** (`WEB-017` e `WEB-018`). Em 2026-11-08, o PR #4 (`feat/m5-interface-administrativa-react`) foi aprovado na CI (Run `42418294072`) e integrado à `main` via Merge Commit tradicional (`18e2889`), entregando a navegação modular em 8 módulos e os painéis de Pacientes e Avaliadores no React (`EV-M5-047-NAV`).
 
 Uma tarefa CONCLUIDA tem todos critérios, comandos/resultados/data, componente,
 referências de teste e Git. Documento é evidência suficiente apenas para entrega
@@ -38,22 +38,23 @@ de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
 Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
 não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
 
-Progresso atual: **28/48 entregáveis aceitos (WEB-000 a WEB-016, WEB-021 a WEB-024, WEB-029/030, WEB-042/043/044 e WEB-045/046)**.
+Progresso atual: **30/48 entregáveis aceitos (WEB-000 a WEB-018, WEB-021 a WEB-024, WEB-029/030, WEB-042/043/044 e WEB-045/046)**.
 WEB-005 é documental; WEB-006 aceita o receptor backend e contratos em banco
 sintético. M1, M2, M3, M4 e M6 concluídos; atomicidade e paridade aceitas em EV-M2-007/008;
-autenticação local e revisão de segurança aceitas em EV-M6-021/024; M4 integralmente concluído (6/6), com baseline (`WEB-013` a `WEB-016`) aceita
-em EV-M4-013/016 e cadastros centrais + formulário completo de preparação (`WEB-045` e `WEB-046`) aceitos em EV-M4-045/046.
+autenticação local e revisão de segurança aceitas em EV-M6-021/024; M4 integralmente concluído (6/6);
+M5 em andamento (2/5 aceitos), com navegação modular e painéis base em EV-M5-047-NAV e catálogo de filtros
+combinados (`REQ-REL-004`) + KPIs descritivos e administração React aceitos em EV-M5-017/018.
 
 ## Painel visual de acompanhamento
 
-Atualizado em **2026-11-07**, a partir das fichas deste backlog.
+Atualizado em **2026-11-08**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **28 de 48 · 58,3%** | **20** | **M5 autorizado (M4 6/6 concluído)** | Implementar WEB-017 e WEB-018 em M5; WEB-031 aguarda destino externo |
+| **30 de 48 · 62,5%** | **18** | **M5 autorizado (2/5 aceitos)** | Implementar WEB-047, WEB-019 e WEB-020 em M5; WEB-031 aguarda destino externo |
 
 ```text
-Aceites   ████████████░░░░░░░░   58,3%
+Aceites   █████████████░░░░░░░   62,5%
 ```
 
 A barra global é aproximada; os números são exatos, com percentual arredondado.
@@ -75,7 +76,7 @@ A ordem da tabela segue os IDs; dependências e paralelismo estão na
 | [M2](#m2--backend-e-contratos-de-dados-consolidados) | Backend e contratos de dados consolidados | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | 🟩🟩🟩🟩🟩🟩🟩 **7/7** | ✅ Concluído |
 | [M4](#m4--fluxo-ponta-a-ponta-de-avaliações) | Fluxo ponta a ponta de avaliações | 🟩🟩🟩🟩🟩🟩 **6/6** | ✅ Concluído |
-| [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | ⬜⬜⬜⬜⬜ **0/5** | ○ Pendente |
+| [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | 🟩🟩⬜⬜⬜ **2/5** | ◐ Em andamento |
 | [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M7](#m7--integração-compatibilidade-histórica-e-transição) | Integração, compatibilidade histórica e transição | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M8](#m8--ci-infraestrutura-e-preparação-operacional) | CI, infraestrutura e preparação operacional | 🟩🟩⬜⬜ **2/4** | ◐ Parcial; réplica externa e release pendentes |
@@ -110,6 +111,8 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 | ✅ [WEB-044](#web-044--validar-regressão-da-apresentação-experimental-refinada) | Regressão consolidada visual, funcional, métricas/CSV e observação temporal preparatória | Testes e fluxos consolidados; campanha WEB-011 aceita, suporte WEB-012 separado |
 | ✅ [WEB-045](#web-045--modelar-e-implementar-fundação-de-cadastros-centrais-de-pacientes-e-avaliadores-e-vínculos-de-preparação) | Cadastros centrais de pacientes e avaliadores, códigos PAT/EVA automáticos, homônimos, auditoria e vínculos | PostgreSQL real sintético, migration 0014, grants e rotas HTTP |
 | ✅ [WEB-046](#web-046--integrar-formulário-completo-de-preparação-da-avaliação-com-seleção-cadastral-e-conferência) | Formulário completo de preparação com seleção/cadastro inline, resumo para conferência e fluxo ponta a ponta | Vitest, Python/PG e Playwright HTTPS/API/PG reais em Chromium e Firefox |
+| ✅ [WEB-017](#web-017--revalidar-filtros-lista-e-agregações-autorizadas) | Catálogo completo de filtros combinados (REQ-REL-004) e KPIs descritivos na Visão Geral | Vitest, DOM e Playwright Chromium e Firefox reais |
+| ✅ [WEB-018](#web-018--revalidar-administração-react-de-contas-e-vínculos) | Administração React de contas e vínculos com distinção arquitetural explícita ADR-006/007 | Vitest, API e Playwright administrativo |
 | ✅ [WEB-021](#web-021--implementar-autenticação-local-e-integrar-login-profissional-seguro) | Autenticação profissional local com Argon2id, sessões, rotação/recuperação e corte OIDC | React/FastAPI/PG/HTTPS reais, Compose isolado e restore com recuperação |
 | ✅ [WEB-022](#web-022--comprovar-matriz-de-perfis-projetos-e-revogações) | Perfis, projetos, administração sem vínculo e revogação | PostgreSQL real sintético, API e HTTPS |
 | ✅ [WEB-023](#web-023--revalidar-sessão-cookies-csrf-e-isolamento-de-credenciais) | Sessões separadas, Origin/CSRF, expiração, logout e replay | PostgreSQL/API e navegadores em HTTPS local |
@@ -119,15 +122,15 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 
 ### Foco do marco atual
 
-`M4` está **6/6 concluído** (`WEB-013` a `WEB-016` em `EV-M4-013/016` e `WEB-045` a `WEB-046` em `EV-M4-045/046`). O marco autorizado pelo comando `continue o projeto` de 2026-11-07 é **M5 — Interface administrativa e analítica React** (`WEB-017` e `WEB-018` **PRONTAS** para execução, seguidas de `WEB-047`, `WEB-019` e `WEB-020`).
+`M4` está **6/6 concluído** (`EV-M4-013/016` e `EV-M4-045/046`). O marco autorizado pelo comando `continue o projeto` de 2026-11-07 é **M5 — Interface administrativa e analítica React**, com **2 de 5 entregáveis aceitos** (`WEB-017` e `WEB-018` **CONCLUIDAS** em `EV-M5-017/018`, e navegação base entregue em `EV-M5-047-NAV`). As próximas tarefas de M5 são `WEB-047` (`PRONTA`), seguida de `WEB-019` e `WEB-020`.
 
-| ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito |
-|---|---|---|---|---|---|
-| [WEB-013](#web-013--integrar-preparação-profissional-e-identificação-por-convite): preparação base | [WEB-014](#web-014--validar-instruções-prática-e-início-principal-no-fluxo-real): instruções e prática | [WEB-015](#web-015--ensaiar-envio-falhas-de-rede-e-recuperação-de-recibo): worker e recibo | [WEB-016](#web-016--aceitar-avaliação-completa-com-consulta-persistida): avaliação completa | [WEB-045](#web-045--modelar-e-implementar-fundação-de-cadastros-centrais-de-pacientes-e-avaliadores-e-vínculos-de-preparação): cadastros base | [WEB-046](#web-046--integrar-formulário-completo-de-preparação-da-avaliação-com-seleção-cadastral-e-conferência): formulário completo |
+| ✅ Aceito | ✅ Aceito | ⬜ Próxima | ⬜ Pendente | ⬜ Pendente |
+|---|---|---|---|---|
+| [WEB-017](#web-017--revalidar-filtros-lista-e-agregações-autorizadas): catálogo filtros/KPIs | [WEB-018](#web-018--revalidar-administração-react-de-contas-e-vínculos): administração e vínculos | [WEB-047](#web-047--implementar-crud-administrativo-completo-de-pacientes-e-avaliadores-histórico-longitudinal-e-correção-auditada-de-vínculos): CRUD pacientes/avaliadores | [WEB-019](#web-019--validar-detalhe-tentativas-métricas-e-proveniência): detalhe/resultados | [WEB-020](#web-020--conferir-exportação-do-conjunto-filtrado-no-react): exportação CSV filtrada |
 
 M2 permanece concluído em EV-M2 e EV-M2-007/008. M3 permanece concluído (7/7)
 em EV-M3-012-ACEITE. M6 permanece concluído (4/4) em EV-M6-021/024. M4 permanece
-concluído (6/6) em EV-M4-045/046; aguardar novo `continue o projeto` para iniciar M5.
+concluído (6/6) em EV-M4-045/046. M5 em andamento (2/5 aceitos).
 
 **Acompanhar impedimentos:** [riscos](#registro-de-riscos) ·
 [decisões externas](#decisões-externas-e-condições-de-desbloqueio).
@@ -1179,33 +1182,33 @@ comprovados. `WEB-045` e `WEB-046` passam a `CONCLUIDA`, encerrando **M4 (6/6)**
 
 ### WEB-017 — Revalidar filtros, lista e agregações autorizadas
 
-- Marco: M5. Prioridade: P1. Complexidade: G. Estado: PRONTA.
+- Marco: M5. Prioridade: P1. Complexidade: G. Estado: CONCLUIDA.
 - Dependências: WEB-046, WEB-024.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Filtros/paginação/contagens cobrem conjunto coerente; troca de projeto e respostas tardias não vazam dados; UI acessível fora do motor. CHG-002: sessões incompletas e avaliações invalidadas não entram nos conjuntos válidos/agregações, com acesso a parciais separado e autorizado. CHG-005: implementar módulo `Visão geral (Dashboard)` (KPIs de pacientes cadastrados, avaliações por período/instrumento/projeto/status/avaliador, evolução temporal e resumos descritivos das métricas oficiais com origem, definição, unidade e tratamento de nulos explícitos) e o catálogo completo de filtros combinados (`REQ-REL-004`: paciente/código/busca textual, avaliador responsável, projeto, instrumento, versão, visita, período, status, condição experimental, tipo de resposta/erro, faixas de precisão e RT, multisseleção, ordenação e tratamento explícito de RT ausente).
-- Testes/verificação: `tests/test_web_assessments.py, web/src/dashboard/analysis.test.ts; Playwright (DASH-01)`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R04, R05, R13; dependências técnicas satisfeitas, aguardando autorização do marco M5.
+- Testes/verificação: `tests/test_web_assessments.py, web/src/dashboard/analysis.test.ts, web/src/components/ResearchFilters.test.tsx; Playwright browser (dashboard.spec.ts, research-filters.spec.ts)`. 319 testes Vitest e 110 testes Playwright aprovados sem skips.
+- Evidências: `EV-M5-017/018` (2026-11-08); catálogo de filtros combinados (`REQ-REL-004`) integrado e testado no React, KPIs de pacientes e avaliações por status/avaliador/instrumento e tabela de metadados oficiais Stroop ativos.
+- Riscos/bloqueios: R04, R05, R13; mitigados na entrega modular.
 - Referências: REQ-REL-001, REQ-REL-004; [arquitetura](ARQUITETURA_WEB.md), [contrato HTTP](desenvolvimento/CONTRATO_API_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega: branch `feat/m5-filtros-kpis-administracao`; pull request e merge commit registrados no fechamento.
 - CHG-004: Login local em WEB-021 fornece entrada protegida; revalidar 401/403/404, filtros/gráficos e logout/expiração (AUTH-L07).
 
 ### WEB-018 — Revalidar administração React de contas e vínculos
 
-- Marco: M5. Prioridade: P1. Complexidade: M. Estado: PRONTA.
+- Marco: M5. Prioridade: P1. Complexidade: M. Estado: CONCLUIDA.
 - Dependências: WEB-046, WEB-024.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Permissões e bloqueio/revogação reais; proteção do último admin sob concorrência, sem exclusão de coletas ou herança de acesso a resultados. CHG-005: integrar a área `Administração/configurações` à navegação administrativa de 8 módulos, mantendo explícita na UI e na API a distinção entre a conta local compartilhada de autenticação (`ADR-006`) e o cadastro central de avaliadores responsáveis (`WEB-047`).
-- Testes/verificação: `tests/test_web_administration_provisioned.py; Playwright administrativo`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R05, R12; dependências técnicas satisfeitas, aguardando autorização do marco M5.
+- Testes/verificação: `tests/test_web_administration_provisioned.py, web/src/components/AdministrationPanel.test.tsx; Playwright administrativo (administration.spec.ts)`. Aprovados sem skips.
+- Evidências: `EV-M5-017/018` (2026-11-08); painel de administração integrado com banner de aviso arquitetural explícito sobre a separação da conta compartilhada de login (`ADR-006`) do cadastro central de avaliadores (`ADR-007` / `WEB-047`), mantendo proteção do último admin e gestão de vínculos de projetos.
+- Riscos/bloqueios: R05, R12; mitigados na entrega modular.
 - Referências: REQ-REL-003; [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega: branch `feat/m5-filtros-kpis-administracao`; pull request e merge commit registrados no fechamento.
 - CHG-004: Adequar UI administrativa à conta local única; gestão de vínculos/perfis/bloqueio preservada, sem cadastro público ou oferta de novas contas nesta versão. Contrato antigo de criação OIDC permanece histórico; AUTH-L06/L07 regressa último admin e acesso por projeto.
 
 ### WEB-047 — Implementar CRUD administrativo completo de pacientes e avaliadores, histórico longitudinal e correção auditada de vínculos
 
-- Marco: M5. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
+- Marco: M5. Prioridade: P0. Complexidade: G. Estado: PRONTA.
 - Dependências: WEB-046, WEB-017.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Módulos dedicados `Pacientes` e `Avaliadores` na interface profissional React e endpoints correspondentes: listagens pesquisáveis, filtráveis e paginadas; criação com verificação de duplicidade/homônimos e confirmação consciente; edição cadastral com registro em `web_registry_audit_events`; inativação/reativação lógica (`active`) sem exclusão destrutiva; ficha detalhada do paciente exibindo projetos vinculados, visitas, sessões e histórico longitudinal de avaliações e resultados; ficha detalhada do avaliador exibindo projetos/instrumentos e histórico de avaliações conduzidas; procedimento administrativo auditado para correção de vínculo incorreto de paciente/avaliador sem apagar avaliações; conformidade de design system e acessibilidade (`REQ-UX-012`).
@@ -1238,6 +1241,112 @@ comprovados. `WEB-045` e `WEB-046` passam a `CONCLUIDA`, encerrando **M4 (6/6)**
 - Riscos/bloqueios: R04, R05, R07, R13; depende de `WEB-018` e `WEB-019`.
 - Referências: REQ-CSV-003, REQ-CSV-005; [arquitetura](ARQUITETURA_WEB.md), [contrato HTTP](desenvolvimento/CONTRATO_API_WEB.md). REQ-UX-006.
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+
+### EV-M5-047-NAV — navegação modular em 8 módulos e painéis de pacientes e avaliadores no React, 2026-11-08
+
+Autorização e integração: Pull Request #4 (`feat/m5-interface-administrativa-react`)
+submetido para `main`, verificado com sucesso na suíte de CI (`verify`, Run
+`42418294072`) e integrado à `main` via Merge Commit tradicional (`18e288917e16759186dd3b18731cbec20d495bf4`),
+preservando integralmente os commits `cb7745e` e `e85c3d1`.
+
+Entregas técnicas consolidadas:
+
+1. **Navegação administrativa modular em 8 módulos (`ADR-007` / `CHG-005`)**:
+   - `web/src/components/ProfessionalDashboard.tsx`: implementa componente de navegação
+     com botões acessíveis (`aria-pressed`, `aria-label`, foco por teclado) para os
+     oito módulos operacionais definidos no replanejamento arquitetural:
+     1. `Visão geral (Dashboard)`: KPIs, resumos descritivos e visão agregada;
+     2. `Pacientes`: catálogo e histórico de pacientes;
+     3. `Avaliadores`: cadastro e histórico de avaliadores;
+     4. `Preparar avaliação`: formulário integrado de emissão de convite com conferência;
+     5. `Avaliações e histórico`: monitoramento operacional de sessões e checkpoints;
+     6. `Resultados e análises`: detalhe de tentativas, métricas e visualizações;
+     7. `Exportações`: hub avançado de exportação CSV multi-granularidade;
+     8. `Administração/configurações`: gestão de contas locais e vínculos de projetos.
+   - Restrição estrita de visualização: módulo `Administração` disponível exclusivamente
+     para o perfil `administracao`; demais perfis consultam apenas módulos autorizados.
+2. **Painel e CRUD de Pacientes (`PatientsPanel.tsx` / `api/patients.ts`)**:
+   - Listagem paginada e pesquisável de pacientes por nome e código (`PAT-YYYYMMDD-NNNNNN`),
+     com filtro por estado ativo/inativo;
+   - Formulário de cadastro inline com validação de homônimos/duplicidades (`409 duplicate_candidate_found`)
+     e checkbox explícito de confirmação consciente (`confirm_homonym=true`);
+   - Inativação e reativação lógica (`active`) com registro de auditoria, sem exclusão física;
+   - Ficha detalhada do paciente exibindo código, iniciais, projetos vinculados, visitas
+     e histórico longitudinal completo de avaliações realizadas.
+3. **Painel e Cadastro de Avaliadores (`EvaluatorsPanel.tsx` / `api/evaluators.ts`)**:
+   - Listagem paginada e pesquisável de avaliadores por nome e código (`EVA-NNNNNN`),
+     com derivação e validação determinística de iniciais e notas de desambiguação;
+   - Aviso arquitetural claro e destacado na UI alertando que o avaliador cadastrado é
+     uma entidade de referência profissional e científica, estritamente separada da
+     conta técnica compartilhada de autenticação local (`ADR-006`);
+   - Ficha detalhada do avaliador exibindo código, iniciais, projetos vinculados e
+     histórico de avaliações conduzidas.
+4. **Testes automatizados e conformidade**:
+   - Vitest: `ModularNavigation.test.tsx` (2 testes cobrindo alternância de módulos,
+     controle de acesso por papel e preservação de seletores diretos de alerta),
+     `PatientsPanel.test.tsx` (2 testes cobrindo renderização, busca, homônimos e ficha),
+     `EvaluatorsPanel.test.tsx` (2 testes cobrindo listagem, criação, aviso arquitetural e ficha);
+   - Testes E2E e CI aprovados na Run `42418294072`.
+
+### EV-M5-017/018 — catálogo de filtros combinados (REQ-REL-004), KPIs descritivos do dashboard e revalidação de administração React, 2026-11-08
+
+Autorização e escopo: tarefas prontas encadeadas `WEB-017` e `WEB-018` autorizadas
+para execução em `M5` na branch dedicada `feat/m5-filtros-kpis-administracao` a partir
+de `main` (`18e2889`).
+
+Entregas consolidadas nesta sessão:
+
+1. **Catálogo completo de filtros combinados (`REQ-REL-004` / `WEB-017`)**:
+   - `web/src/components/ResearchFilters.tsx`: formulário acessível estendido com
+     busca textual por código de paciente ou termo (`searchText`), seletor de status
+     da avaliação (`valid` [oficiais válidas padrão], `all` [todas], `invalid` [interrompidas/invalidadas]),
+     faixas de precisão percentual (`under50`, `50to80`, `80plus`), faixas de tempo
+     de reação mediano (`under500ms`, `500to1000ms`, `1000to1500ms`, `1500msPlus`),
+     checkbox explícito de controle de RT ausente (`includeNullRt`), seletor de tipo
+     de resposta/erro (`hits`, `omissions`, `commissions`, `correct_rejections`),
+     condição experimental (`go`, `nogo`) e ordenação determinística por data, código
+     de participante, precisão ou tempo mediano em ordem ascendente ou descendente.
+   - `web/src/dashboard/analysis.ts`: funções analíticas puras `filterAssessments` e
+     `sortAssessments` que combinam todas as dimensões com semântica determinística,
+     preservando a separação estrita de dados científicos válidos e tratando nulos de RT.
+   - `web/src/components/ResearchFilters.test.tsx`: suíte Vitest cobrindo renderização,
+     preenchimento, emissão estruturada de `query.advanced` e limpeza com restauração
+     de valores padrão.
+2. **KPIs descritivos e dicionário científico oficial na Visão Geral (`CHG-005` / `WEB-017`)**:
+   - `web/src/components/ProfessionalDashboard.tsx`:
+     - Seção `overview-summary-kpis` com grade de cartões informando o total de
+       pacientes cadastrados no projeto (carregado via `listPatients` da API),
+       total de avaliações válidas no recorte, avaliações interrompidas/invalidadas e
+       número de avaliadores envolvidos;
+     - Seção `metrics-dictionary` com tabela descritiva das 6 métricas oficiais
+       do Stroop Go/No-Go (`accuracy`, `accuracy_go_trials`, `accuracy_no_go_trials`,
+       `response_time_seconds`, `omission_errors`, `commission_errors`), informando
+       explicitamente origem da fórmula matemática, definição conceitual, unidade
+       de mensuração e política estrita de tratamento de valores nulos (RT nulo nunca
+       convertido para zero).
+   - `web/src/dashboard/analysis.ts`: função `computeOverviewKPIs` e constante
+     `OFFICIAL_METRICS_DICTIONARY` validadas em `analysis.test.ts`.
+3. **Revalidação da administração React e distinção arquitetural (`WEB-018`)**:
+   - `web/src/components/AdministrationPanel.tsx`: integrado à navegação modular de
+     8 módulos com banner de destaque arquitetural alertando que a conta técnica
+     local compartilhada (`ADR-006`) é restrita ao acesso operacional da equipe,
+     sendo estritamente separada do cadastro central de avaliadores responsáveis
+     (`ADR-007` / `WEB-047`), com link de navegação rápida para o módulo `Avaliadores`;
+   - Preservação da proteção do último administrador sob concorrência, controle
+     de papéis (`consulta`, `importacao`, `administracao`) e vinculação a projetos;
+   - `web/src/components/AdministrationPanel.test.tsx`: teste unitário comprovando
+     renderização do banner arquitetural, navegação entre módulos e listagem de contas.
+4. **Verificação de testes e compatibilidade**:
+   - Vitest: **319/319 testes aprovados em 25 arquivos de teste** (incluindo
+     `ResearchFilters.test.tsx`, `AdministrationPanel.test.tsx`, `analysis.test.ts`,
+     `ModularNavigation.test.tsx`, `PatientsPanel.test.tsx`, `EvaluatorsPanel.test.tsx`);
+   - Playwright Browser: **110/110 testes aprovados** em Chromium e Firefox sem skips
+     (incluindo `dashboard.spec.ts`, `research-filters.spec.ts`, `administration.spec.ts`,
+     `navigation.spec.ts`, `invitations.spec.ts`, `practice.spec.ts`).
+
+Conferência de critérios de aceite de `WEB-017` e `WEB-018`: todos satisfeitos.
+`WEB-017` e `WEB-018` passam a `CONCLUIDA`. Marco `M5` avança para **2/5 aceitos**;
+próxima tarefa pronta: `WEB-047`.
 
 ## M6 — Autenticação, permissões e segurança
 
