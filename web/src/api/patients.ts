@@ -252,3 +252,147 @@ export function createPatient(
     signal,
   );
 }
+
+export type PatientProjectLink = {
+  project_id: string;
+  project_code: string;
+  project_name: string;
+  participant_uuid?: string;
+  participant_code?: string;
+  created_at?: string;
+};
+
+export type PatientVisitLink = {
+  visit_uuid: string;
+  project_id: string;
+  project_code: string;
+  visit: string;
+  created_at: string;
+};
+
+export type PatientAssessmentLink = {
+  assessment_id: string;
+  project_id: string;
+  project_code: string;
+  test_code: string;
+  test_version: string;
+  visit: string;
+  created_at: string;
+};
+
+export type PatientDetail = PatientRecord & {
+  projects: PatientProjectLink[];
+  visits: PatientVisitLink[];
+  assessments: PatientAssessmentLink[];
+};
+
+export type UpdatePatientInput = {
+  full_name?: string;
+  initials?: string | null;
+  disambiguation_note?: string | null;
+  active?: boolean;
+  reason_code: string;
+};
+
+export function getPatient(
+  patientId: string,
+  signal?: AbortSignal,
+): Promise<PatientDetail> {
+  if (!validId(patientId)) {
+    throw new ApiError('invalid_request', 422);
+  }
+  return request(
+    `/api/v1/patients/${patientId}`,
+    { method: 'GET', headers: { Accept: 'application/json' } },
+    async response => {
+      if (response.status !== 200) throw new ApiError('invalid_response', response.status);
+      let body: unknown;
+      try {
+        body = await response.json();
+      } catch {
+        throw new ApiError('invalid_response', response.status);
+      }
+      if (!record(body)) throw new ApiError('invalid_response', response.status);
+      const base = decodePatient(body, response.status);
+      const projects: PatientProjectLink[] = Array.isArray(body.projects)
+        ? body.projects.filter(record).map(p => ({
+            project_id: String(p.project_id),
+            project_code: String(p.project_code),
+            project_name: String(p.project_name),
+            participant_uuid: typeof p.participant_uuid === 'string' ? p.participant_uuid : undefined,
+            participant_code: typeof p.participant_code === 'string' ? p.participant_code : undefined,
+            created_at: typeof p.created_at === 'string' ? p.created_at : undefined,
+          }))
+        : [];
+      const visits: PatientVisitLink[] = Array.isArray(body.visits)
+        ? body.visits.filter(record).map(v => ({
+            visit_uuid: String(v.visit_uuid),
+            project_id: String(v.project_id),
+            project_code: String(v.project_code),
+            visit: String(v.visit),
+            created_at: String(v.created_at),
+          }))
+        : [];
+      const assessments: PatientAssessmentLink[] = Array.isArray(body.assessments)
+        ? body.assessments.filter(record).map(a => ({
+            assessment_id: String(a.assessment_id),
+            project_id: String(a.project_id),
+            project_code: String(a.project_code),
+            test_code: String(a.test_code),
+            test_version: String(a.test_version),
+            visit: String(a.visit),
+            created_at: String(a.created_at),
+          }))
+        : [];
+      return { ...base, projects, visits, assessments };
+    },
+    signal,
+  );
+}
+
+export function updatePatient(
+  patientId: string,
+  input: UpdatePatientInput,
+  csrfToken: string,
+  signal?: AbortSignal,
+): Promise<PatientRecord> {
+  if (!validId(patientId)) {
+    throw new ApiError('invalid_request', 422);
+  }
+  const payload: Record<string, unknown> = {
+    reason_code: input.reason_code.trim() || 'correcao_cadastral',
+  };
+  if (input.full_name !== undefined) {
+    const trimmed = input.full_name.trim().replace(/\s+/g, ' ');
+    if (trimmed.length < 2 || trimmed.length > 120) throw new ApiError('invalid_request', 422);
+    payload.full_name = trimmed;
+  }
+  if (input.initials !== undefined) {
+    payload.initials = input.initials ? input.initials.trim().toUpperCase() : null;
+  }
+  if (input.disambiguation_note !== undefined) {
+    payload.disambiguation_note = input.disambiguation_note ? input.disambiguation_note.trim() : null;
+  }
+  if (input.active !== undefined) {
+    payload.active = Boolean(input.active);
+  }
+  return request(
+    `/api/v1/patients/${patientId}`,
+    {
+      method: 'PATCH',
+      headers: headers(csrfToken),
+      body: JSON.stringify(payload),
+    },
+    async response => {
+      if (response.status !== 200) throw new ApiError('invalid_response', response.status);
+      let body: unknown;
+      try {
+        body = await response.json();
+      } catch {
+        throw new ApiError('invalid_response', response.status);
+      }
+      return decodePatient(body, response.status);
+    },
+    signal,
+  );
+}

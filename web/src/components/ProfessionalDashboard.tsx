@@ -5,6 +5,9 @@ import { CsvImportPanel } from './CsvImportPanel'
 import { ResearchFilters } from './ResearchFilters'
 import { ResultsTable } from './ResultsTable'
 import { ResearchVisualizations, GenericInstrumentResults } from './ResearchVisualizations'
+import { PatientsPanel } from './PatientsPanel'
+import { EvaluatorsPanel } from './EvaluatorsPanel'
+import { AdministrationPanel } from './AdministrationPanel'
 import type { ScopedAssessment } from './ResultsTable'
 import type { ResearchQuery } from './ResearchFilters'
 import { ApiError, apiErrorMessage } from '../api/client'
@@ -14,9 +17,35 @@ import { exportAssessmentView } from '../api/aggregate'
 import type { ExportContext } from '../api/aggregate'
 import { accuracyByVisit, countByDate, formatMetric as number, responseDistribution, summarize } from '../dashboard/analysis'
 
-const filterLabels: Record<string, string> = { start_date: 'Data inicial', end_date: 'Data final', participant_id: 'Participantes', visit: 'Visitas', evaluator_id: 'Avaliadores', test_version: 'Versões', platform: 'Plataformas', test_code: 'Instrumento' }
+export type AdministrativeModule =
+  | 'dashboard'
+  | 'pacientes'
+  | 'avaliadores'
+  | 'preparar'
+  | 'historico'
+  | 'resultados'
+  | 'exportacoes'
+  | 'administracao'
 
-export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfile }) {
+const filterLabels: Record<string, string> = {
+  start_date: 'Data inicial',
+  end_date: 'Data final',
+  participant_id: 'Participantes',
+  visit: 'Visitas',
+  evaluator_id: 'Avaliadores',
+  test_version: 'Versões',
+  platform: 'Plataformas',
+  test_code: 'Instrumento',
+}
+
+export function ProfessionalDashboard({
+  profile,
+  initialModule = 'dashboard',
+}: {
+  profile: ProfessionalProfile
+  initialModule?: AdministrativeModule
+}) {
+  const [activeModule, setActiveModule] = useState<AdministrativeModule>(initialModule)
   const [projects, setProjects] = useState<Project[]>([])
   const [project, setProject] = useState('')
   const [projectsLoading, setProjectsLoading] = useState(true)
@@ -37,9 +66,12 @@ export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfil
   const [aggregateContext, setAggregateContext] = useState<ExportContext | null>(null)
   const [aggregateBusy, setAggregateBusy] = useState(false)
   const [aggregateMessage, setAggregateMessage] = useState<string | null>(null)
+
   const detailPanel = useRef<HTMLElement>(null)
   const downloadIO = useRef<AbortController | null>(null)
+  const aggregateIO = useRef<AbortController | null>(null)
 
+  // Carrega lista de projetos autorizados
   useEffect(() => {
     const io = new AbortController()
     void (async () => {
@@ -57,13 +89,20 @@ export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfil
           if (cursor && cursors.has(cursor)) throw new ApiError('invalid_response', 200)
           if (cursor) cursors.add(cursor)
         } while (cursor)
-        if (!io.signal.aborted) { setProjects(items); setProject(items[0]?.id ?? '') }
-      } catch (cause) { if (!io.signal.aborted) setError(apiErrorMessage(cause)) }
-      finally { if (!io.signal.aborted) setProjectsLoading(false) }
+        if (!io.signal.aborted) {
+          setProjects(items)
+          setProject(items[0]?.id ?? '')
+        }
+      } catch (cause) {
+        if (!io.signal.aborted) setError(apiErrorMessage(cause))
+      } finally {
+        if (!io.signal.aborted) setProjectsLoading(false)
+      }
     })()
     return () => io.abort()
   }, [revision])
 
+  // Carrega avaliações conforme projeto e filtros
   useEffect(() => {
     const io = new AbortController()
     setRows([]); setAggregateContext(null); setAggregateMessage(null); setDetail(null); setDetailId(''); setDetailError(null); setDownloadMessage(null)
@@ -107,12 +146,25 @@ export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfil
           setRows(items)
           setAggregateContext(snapshots.length === selected.length ? { projects: snapshots, filters: appliedFilters } : null)
         }
-      } catch (cause) { if (!io.signal.aborted) { setRows([]); setError(cause instanceof ApiError && cause.status === 422 ? 'A consulta não pôde ser concluída com estes filtros. Restrinja o período ou os projetos (até 5.000 avaliações); nenhum total parcial foi exibido.' : cause instanceof ApiError && cause.code === 'state_conflict' ? 'O conjunto mudou durante a consulta. Atualize para carregar todas as páginas novamente; nenhum total parcial foi exibido.' : apiErrorMessage(cause)) } }
-      finally { if (!io.signal.aborted) setLoading(false) }
+      } catch (cause) {
+        if (!io.signal.aborted) {
+          setRows([])
+          setError(
+            cause instanceof ApiError && cause.status === 422
+              ? 'A consulta não pôde ser concluída com estes filtros. Restrinja o período ou os projetos (até 5.000 avaliações); nenhum total parcial foi exibido.'
+              : cause instanceof ApiError && cause.code === 'state_conflict'
+                ? 'O conjunto mudou durante a consulta. Atualize para carregar todas as páginas novamente; nenhum total parcial foi exibido.'
+                : apiErrorMessage(cause),
+          )
+        }
+      } finally {
+        if (!io.signal.aborted) setLoading(false)
+      }
     })()
     return () => { io.abort(); downloadIO.current?.abort(); aggregateIO.current?.abort() }
   }, [project, query, revision])
 
+  // Detalhe individual de avaliação
   useEffect(() => {
     const io = new AbortController()
     setDetail(null); setDetailError(null); setDownloadMessage(null)
@@ -122,9 +174,9 @@ export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfil
     }, cause => { if (!io.signal.aborted) setDetailError(apiErrorMessage(cause)) })
     return () => io.abort()
   }, [detailProject, detailId])
+
   useEffect(() => { if (detail) detailPanel.current?.focus() }, [detail])
   useEffect(() => () => downloadIO.current?.abort(), [])
-  const aggregateIO = useRef<AbortController | null>(null)
   useEffect(() => () => aggregateIO.current?.abort(), [])
 
   async function downloadAggregate() {
@@ -132,17 +184,36 @@ export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfil
     const io = new AbortController(); aggregateIO.current = io
     setAggregateBusy(true); setAggregateMessage(null)
     try {
-      const result = await exportAssessmentView(aggregateContext,
-        { test_code: selectedInstrument, ...(platform ? { platform: platform as 'web' | 'psychopy' } : {}) }, profile.csrf_token, io.signal)
+      const result = await exportAssessmentView(
+        aggregateContext,
+        { test_code: selectedInstrument, ...(platform ? { platform: platform as 'web' | 'psychopy' } : {}) },
+        profile.csrf_token,
+        io.signal,
+      )
       if (io.signal.aborted) return
       const url = URL.createObjectURL(result.blob)
-      try { const link = document.createElement('a'); link.href = url; link.download = result.filename; document.body.append(link); link.click(); link.remove() }
-      finally { setTimeout(() => URL.revokeObjectURL(url), 1000) }
+      try {
+        const link = document.createElement('a')
+        link.href = url
+        link.download = result.filename
+        document.body.append(link)
+        link.click()
+        link.remove()
+      } finally {
+        setTimeout(() => URL.revokeObjectURL(url), 1000)
+      }
       setAggregateMessage('Arquivo agregado preparado para download.')
-    } catch (cause) { if (!io.signal.aborted) setAggregateMessage(cause instanceof ApiError && cause.status === 409
-      ? 'Os dados mudaram desde a consulta. Atualize os filtros para recarregar todas as páginas antes de exportar.'
-      : apiErrorMessage(cause)) }
-    finally { if (!io.signal.aborted) setAggregateBusy(false) }
+    } catch (cause) {
+      if (!io.signal.aborted) {
+        setAggregateMessage(
+          cause instanceof ApiError && cause.status === 409
+            ? 'Os dados mudaram desde a consulta. Atualize os filtros para recarregar todas as páginas antes de exportar.'
+            : apiErrorMessage(cause),
+        )
+      }
+    } finally {
+      if (!io.signal.aborted) setAggregateBusy(false)
+    }
   }
 
   async function download() {
@@ -154,99 +225,747 @@ export function ProfessionalDashboard({ profile }: { profile: ProfessionalProfil
       if (io.signal.aborted) return
       const url = URL.createObjectURL(result.blob)
       try {
-        const link = document.createElement('a'); link.href = url; link.download = result.filename
-        document.body.append(link); link.click(); link.remove()
-      } finally { setTimeout(() => URL.revokeObjectURL(url), 1000) }
+        const link = document.createElement('a')
+        link.href = url
+        link.download = result.filename
+        document.body.append(link)
+        link.click()
+        link.remove()
+      } finally {
+        setTimeout(() => URL.revokeObjectURL(url), 1000)
+      }
       setDownloadMessage('Arquivo preparado para download.')
-    } catch (cause) { if (!io.signal.aborted) setDownloadMessage(apiErrorMessage(cause)) }
-    finally { if (!io.signal.aborted) setExporting(false) }
+    } catch (cause) {
+      if (!io.signal.aborted) setDownloadMessage(apiErrorMessage(cause))
+    } finally {
+      if (!io.signal.aborted) setExporting(false)
+    }
   }
 
+  const currentProject = projects.find(item => item.id === project) ?? null
   const instruments = [...new Set(rows.map(row => row.test_code))].sort()
   const selectedInstrument = instrument || instruments[0] || ''
   const visible = rows.filter(row => row.test_code === selectedInstrument && (!platform || row.platform === platform))
   const totals = summarize(visible)
   const dates = countByDate(visible)
   const peak = Math.max(1, ...dates.map(([, count]) => count))
-  return <div className="professional-dashboard">
-    <h2>Resultados da pesquisa</h2>
-    <p className="notice">Resultados descritivos. Este painel não representa avaliação clínica ou diagnóstico.</p>
-    {projectsLoading && <p role="status">Carregando projetos…</p>}
-    {error && <><p role="alert">{error}</p><button className="button secondary" onClick={() => setRevision(value => value + 1)}>Atualizar consultas</button></>}
-    {!projectsLoading && !projects.length && !error && <p role="status">Nenhum projeto disponível para sua conta.</p>}
-    {projects.length > 0 && <>
+
+  // Renderizador do seletor de projeto compartilhado
+  const renderProjectSelector = () => (
+    <div className="project-selector-wrapper">
       <label htmlFor="research-project">Projeto</label>
-      <select id="research-project" value={project} onChange={event => { if (event.target.value !== project) { aggregateIO.current?.abort(); setAggregateContext(null); setAggregateBusy(false); setRows([]); setDetail(null); setProject(event.target.value); setQuery(null) } }}>
-        {projects.map(item => <option key={item.id} value={item.id}>{item.code} — {item.name}{item.active ? '' : ' (inativo)'}</option>)}
+      <select
+        id="research-project"
+        value={project}
+        onChange={event => {
+          if (event.target.value !== project) {
+            aggregateIO.current?.abort()
+            setAggregateContext(null)
+            setAggregateBusy(false)
+            setRows([])
+            setDetail(null)
+            setProject(event.target.value)
+            setQuery(null)
+          }
+        }}
+      >
+        {projects.map(item => (
+          <option key={item.id} value={item.id}>
+            {item.code} — {item.name}
+            {item.active ? '' : ' (inativo)'}
+          </option>
+        ))}
       </select>
-      {projects.find(item => item.id === project)?.active && profile.role !== 'consulta'
-        && <CsvImportPanel project={projects.find(item => item.id === project)!} profile={profile}
-          onImported={() => setRevision(value => value + 1)} />}
-      {projects.find(item => item.id === project)?.active && profile.role !== 'consulta' && <SessionInvitation key={`invitation:${project}`} project={projects.find(item => item.id === project)!} profile={profile} />}
-      <ResearchFilters key={`filters:${project}`} projects={projects} initialProject={project} loading={loading} onApply={value => { aggregateIO.current?.abort(); setAggregateContext(null); setAggregateBusy(false); setRows([]); setQuery(value) }} />
-      {query && <p className="quiet" role="status">Filtros aplicados: {query.projects.length} projeto(s); {Object.entries(query.filters).filter(([, value]) => Array.isArray(value) ? value.length : !!value).map(([key, value]) => `${filterLabels[key] ?? key}: ${Array.isArray(value) ? value.join(', ') : value}`).join(' · ') || 'sem restrições adicionais'}.</p>}
-      {loading && <p role="status">Carregando avaliações… {loaded} recebidas.</p>}
-      {!loading && !error && <>
-        {!rows.length ? <p role="status">Nenhuma avaliação corresponde aos filtros.</p> : <>
-          <div className="dashboard-filters">
-            <label>Instrumento<select value={selectedInstrument} onChange={event => { aggregateIO.current?.abort(); setAggregateBusy(false); setAggregateMessage(null); setInstrument(event.target.value); setDetailId('') }}>{instruments.map(code => <option key={code}>{code}</option>)}</select></label>
-            <label>Plataforma<select value={platform} onChange={event => { aggregateIO.current?.abort(); setAggregateBusy(false); setAggregateMessage(null); setPlatform(event.target.value); setDetailId('') }}><option value="">Todas</option><option value="web">WEB</option><option value="psychopy">PsychoPy local</option></select></label>
-          </div>
-          <button className="button secondary" disabled={aggregateBusy || !aggregateContext || !['stroop_go_nogo_ptbr', 'instrumento_sintetico_demo'].includes(selectedInstrument)} onClick={() => void downloadAggregate()}>{aggregateBusy ? 'Preparando arquivo agregado…' : 'Exportar visão filtrada'}</button>
-          {aggregateMessage && <p role="status">{aggregateMessage}</p>}
-          <p className="quiet">Os totais consideram todas as páginas do projeto e os filtros aplicados. Um instrumento por vez. Datas seguem o início registrado; horários legados sem fuso conservam sua referência original.</p>
-          <dl className="dashboard-cards">
-            <div><dt>Avaliações</dt><dd>{totals.assessments}</dd></div><div><dt>Participantes únicos</dt><dd>{totals.participants}</dd></div>
-            {selectedInstrument === 'stroop_go_nogo_ptbr' && <>
-              <div><dt>Precisão média</dt><dd>{number(totals.meanAccuracy, 1)}%</dd></div><div><dt>Precisão mediana</dt><dd>{number(totals.medianAccuracy, 1)}%</dd></div>
-              <div><dt>Mediana dos tempos por avaliação</dt><dd>{number(totals.medianResponseSeconds, 3)} s</dd></div>
-              <div><dt>Omissões</dt><dd>{totals.omissions}</dd></div><div><dt>Comissões</dt><dd>{totals.commissions}</dd></div>
-            </>}
-          </dl>
-          <figure className="dashboard-chart"><figcaption>Avaliações por data de início</figcaption>
-            <ul>{dates.map(([day, count]) => <li key={day}><span>{day}</span><meter min={0} max={peak} value={count} aria-label={`${day}: ${count} avaliações`} /><strong>{count}</strong></li>)}</ul>
-          </figure>
-          {selectedInstrument === 'stroop_go_nogo_ptbr' && <>
-            <figure className="dashboard-chart"><figcaption>Precisão média por visita (%)</figcaption><ul>{accuracyByVisit(visible).map(([visit, accuracy]) => <li key={visit}><span>{visit}</span><meter min={0} max={100} value={accuracy} aria-label={`${visit}: ${number(accuracy, 1)}%`} /><strong>{number(accuracy, 1)}</strong></li>)}</ul></figure>
-            <figure className="dashboard-chart"><figcaption>Distribuição dos tempos medianos por avaliação</figcaption><ul>{responseDistribution(visible).map(([range, count]) => <li key={range}><span>{range}</span><meter min={0} max={Math.max(1, visible.length)} value={count} aria-label={`${range}: ${count} avaliações`} /><strong>{count}</strong></li>)}</ul><p className="quiet">Avaliações sem acertos não possuem tempo mediano e ficam fora desta distribuição.</p></figure>
-            <ResearchVisualizations rows={visible} projects={projects} />
-          </>}
-          {selectedInstrument !== 'stroop_go_nogo_ptbr' && <GenericInstrumentResults rows={visible} projects={projects} />}
-          <ResultsTable rows={visible} projects={projects} onDetail={row => { aggregateIO.current?.abort(); setAggregateBusy(false); setDetailProject(row.project_id); setDetailId(row.assessment_id) }} />
-        </>}
-      </>}
-    </>}
-    {detailId && !detail && !detailError && <p role="status">Carregando detalhe…</p>}
-    {detailError && <p role="alert">{detailError}</p>}
-    {detail && <section ref={detailPanel} tabIndex={-1} className="assessment-detail" aria-label="Detalhe da avaliação">
-      <h3>Detalhe da avaliação</h3>
-      <dl className="assessment-metadata">
-        <div><dt>Avaliação</dt><dd>{detail.assessment_id}</dd></div>
-        <div><dt>Sessão</dt><dd>{detail.session_id ?? 'Legado sem sessão WEB'}</dd></div>
-        <div><dt>Projeto</dt><dd>{projects.find(item => item.id === detail.project_id)?.code ?? detail.project_id} ({detail.project_id})</dd></div>
-        <div><dt>Participante</dt><dd>{detail.participant_id}</dd></div><div><dt>Visita</dt><dd>{detail.visit}</dd></div>
-        <div><dt>Avaliador</dt><dd>{detail.evaluator_id ?? 'Legado sem identificação técnica'}</dd></div>
-        <div><dt>Início</dt><dd>{detail.started_at}</dd></div><div><dt>Conclusão</dt><dd>{detail.completed_at ?? 'Não registrada no legado'}</dd></div>
-        <div><dt>Plataforma</dt><dd>{detail.platform === 'web' ? 'WEB' : 'PsychoPy local (importado)'}</dd></div>
-        <div><dt>Instrumento</dt><dd>{detail.test_code}</dd></div><div><dt>Versão</dt><dd>{detail.test_version}</dd></div>
-        <div><dt>Protocolo</dt><dd>{detail.protocol_id ?? 'Legado sem protocolo WEB'}</dd></div>
-        <div><dt>Aplicativo</dt><dd>{detail.app_version ?? 'Não registrado'}</dd></div>
-        <div><dt>Período de quadro observado (ms)</dt><dd>{number(detail.frame_period_ms, 3)}</dd></div>
-      </dl>
-      {'accuracy' in detail.summary && <section aria-label="Contagens das respostas">
-        <h4>Contagens das respostas principais</h4>
-        <dl className="dashboard-cards">
-          <div><dt>Acertos (hit)</dt><dd>{detail.summary.hits}</dd></div>
-          <div><dt>Omissões (omission)</dt><dd>{detail.summary.omission_errors}</dd></div>
-          <div><dt>Rejeições corretas (correct_rejection)</dt><dd>{detail.summary.correct_rejections}</dd></div>
-          <div><dt>Comissões (commission)</dt><dd>{detail.summary.commission_errors}</dd></div>
+    </div>
+  )
+
+  // Renderizador do painel de detalhe de avaliação
+  const renderAssessmentDetail = () =>
+    detail ? (
+      <section ref={detailPanel} tabIndex={-1} className="assessment-detail" aria-label="Detalhe da avaliação">
+        <h3>Detalhe da avaliação</h3>
+        <dl className="assessment-metadata">
+          <div><dt>Avaliação</dt><dd className="tabular-nums">{detail.assessment_id}</dd></div>
+          <div><dt>Sessão</dt><dd className="tabular-nums">{detail.session_id ?? 'Legado sem sessão WEB'}</dd></div>
+          <div><dt>Projeto</dt><dd>{projects.find(item => item.id === detail.project_id)?.code ?? detail.project_id} ({detail.project_id})</dd></div>
+          <div><dt>Participante</dt><dd className="tabular-nums">{detail.participant_id}</dd></div>
+          <div><dt>Visita</dt><dd>{detail.visit}</dd></div>
+          <div><dt>Avaliador</dt><dd>{detail.evaluator_id ?? 'Legado sem identificação técnica'}</dd></div>
+          <div><dt>Início</dt><dd className="tabular-nums">{detail.started_at}</dd></div>
+          <div><dt>Conclusão</dt><dd className="tabular-nums">{detail.completed_at ?? 'Não registrada no legado'}</dd></div>
+          <div><dt>Plataforma</dt><dd>{detail.platform === 'web' ? 'WEB' : 'PsychoPy local (importado)'}</dd></div>
+          <div><dt>Instrumento</dt><dd>{detail.test_code}</dd></div>
+          <div><dt>Versão</dt><dd className="tabular-nums">{detail.test_version}</dd></div>
+          <div><dt>Protocolo</dt><dd>{detail.protocol_id ?? 'Legado sem protocolo WEB'}</dd></div>
+          <div><dt>Aplicativo</dt><dd>{detail.app_version ?? 'Não registrado'}</dd></div>
+          <div><dt>Período de quadro observado (ms)</dt><dd className="tabular-nums">{number(detail.frame_period_ms, 3)}</dd></div>
         </dl>
-      </section>}
-      <dl>{detail.metrics.map(metric => <div key={metric.metric_code}><dt>{metric.metric_label}</dt><dd>{number(metric.metric_value, 3)} {metric.unit}</dd></div>)}</dl>
-      {detail.trials.length > 0 && <div className="table-scroll"><table><caption>Tentativas registradas</caption><thead><tr><th>Tentativa</th><th>Palavra</th><th>Cor</th><th>Condição</th><th>Resposta</th><th>Classificação</th><th>RT (s)</th></tr></thead><tbody>{detail.trials.map(trial => <tr key={trial.trial_number}><td>{trial.trial_number}</td><td>{trial.word}</td><td>{trial.ink_color}</td><td>{trial.condition}</td><td>{trial.key_pressed ?? '—'}</td><td>{trial.error_type}</td><td>{number(trial.reaction_time_seconds, 3)}</td></tr>)}</tbody></table></div>}
-      {detail.test_code === 'stroop_go_nogo_ptbr' && <button className="button primary" disabled={exporting} onClick={() => void download()}>{exporting ? 'Preparando arquivo…' : 'Exportar CSV oficial'}</button>}
-      {downloadMessage && <p role="status">{downloadMessage}</p>}
-      <button className="button secondary" onClick={() => setDetailId('')}>Fechar detalhe</button>
-    </section>}
-  </div>
+        {'accuracy' in detail.summary && (
+          <section aria-label="Contagens das respostas">
+            <h4>Contagens das respostas principais</h4>
+            <dl className="dashboard-cards">
+              <div><dt>Acertos (hit)</dt><dd className="tabular-nums">{detail.summary.hits}</dd></div>
+              <div><dt>Omissões (omission)</dt><dd className="tabular-nums">{detail.summary.omission_errors}</dd></div>
+              <div><dt>Rejeições corretas (correct_rejection)</dt><dd className="tabular-nums">{detail.summary.correct_rejections}</dd></div>
+              <div><dt>Comissões (commission)</dt><dd className="tabular-nums">{detail.summary.commission_errors}</dd></div>
+            </dl>
+          </section>
+        )}
+        <dl>
+          {detail.metrics.map(metric => (
+            <div key={metric.metric_code}>
+              <dt>{metric.metric_label}</dt>
+              <dd className="tabular-nums">
+                {number(metric.metric_value, 3)} {metric.unit}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        {detail.trials.length > 0 && (
+          <div className="table-scroll">
+            <table>
+              <caption>Tentativas registradas</caption>
+              <thead>
+                <tr>
+                  <th>Tentativa</th>
+                  <th>Palavra</th>
+                  <th>Cor</th>
+                  <th>Condição</th>
+                  <th>Resposta</th>
+                  <th>Classificação</th>
+                  <th>RT (s)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {detail.trials.map(trial => (
+                  <tr key={trial.trial_number}>
+                    <td className="tabular-nums">{trial.trial_number}</td>
+                    <td>{trial.word}</td>
+                    <td>{trial.ink_color}</td>
+                    <td>{trial.condition}</td>
+                    <td>{trial.key_pressed ?? '—'}</td>
+                    <td>{trial.error_type}</td>
+                    <td className="tabular-nums">{number(trial.reaction_time_seconds, 3)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {detail.test_code === 'stroop_go_nogo_ptbr' && (
+          <button className="button primary" disabled={exporting} onClick={() => void download()}>
+            {exporting ? 'Preparando arquivo…' : 'Exportar CSV oficial'}
+          </button>
+        )}
+        {downloadMessage && <p role="status">{downloadMessage}</p>}
+        <button className="button secondary" onClick={() => setDetailId('')}>
+          Fechar detalhe
+        </button>
+      </section>
+    ) : null
+
+  return (
+    <div className="professional-dashboard" aria-label="Painel administrativo da pesquisa">
+      {/* Barra de Navegação Modular em 8 Módulos (ADR-007 / CHG-005) */}
+      <nav aria-label="Módulos administrativos" className="professional-areas professional-modules">
+        <button
+          type="button"
+          className="button secondary"
+          aria-pressed={activeModule === 'dashboard'}
+          onClick={() => {
+            setActiveModule('dashboard')
+            setDetailId('')
+          }}
+        >
+          Visão geral (Dashboard)
+        </button>
+        <button
+          type="button"
+          className="button secondary"
+          aria-pressed={activeModule === 'pacientes'}
+          onClick={() => {
+            setActiveModule('pacientes')
+            setDetailId('')
+          }}
+        >
+          Pacientes
+        </button>
+        <button
+          type="button"
+          className="button secondary"
+          aria-pressed={activeModule === 'avaliadores'}
+          onClick={() => {
+            setActiveModule('avaliadores')
+            setDetailId('')
+          }}
+        >
+          Avaliadores
+        </button>
+        <button
+          type="button"
+          className="button secondary"
+          aria-pressed={activeModule === 'preparar'}
+          onClick={() => {
+            setActiveModule('preparar')
+            setDetailId('')
+          }}
+        >
+          Preparar avaliação
+        </button>
+        <button
+          type="button"
+          className="button secondary"
+          aria-pressed={activeModule === 'historico'}
+          onClick={() => {
+            setActiveModule('historico')
+            setDetailId('')
+          }}
+        >
+          Avaliações e histórico
+        </button>
+        <button
+          type="button"
+          className="button secondary"
+          aria-pressed={activeModule === 'resultados'}
+          onClick={() => {
+            setActiveModule('resultados')
+            setDetailId('')
+          }}
+        >
+          Resultados e análises
+        </button>
+        <button
+          type="button"
+          className="button secondary"
+          aria-pressed={activeModule === 'exportacoes'}
+          onClick={() => {
+            setActiveModule('exportacoes')
+            setDetailId('')
+          }}
+        >
+          Exportações
+        </button>
+        {profile.role === 'administracao' && (
+          <button
+            type="button"
+            className="button secondary"
+            aria-pressed={activeModule === 'administracao'}
+            onClick={() => {
+              setActiveModule('administracao')
+              setDetailId('')
+            }}
+          >
+            Administração
+          </button>
+        )}
+      </nav>
+
+      {/* MÓDULO 1: VISÃO GERAL (DASHBOARD) */}
+      {activeModule === 'dashboard' && (
+        <>
+          <h2>Resultados da pesquisa</h2>
+          <p className="notice">
+            Resultados descritivos. Este painel não representa avaliação clínica ou diagnóstico.
+          </p>
+
+          {projectsLoading && <p role="status">Carregando projetos…</p>}
+          {error && (
+            <>
+              <p role="alert">{error}</p>
+              <button className="button secondary" onClick={() => setRevision(value => value + 1)}>
+                Atualizar consultas
+              </button>
+            </>
+          )}
+          {!projectsLoading && !projects.length && !error && (
+            <p role="status">Nenhum projeto disponível para sua conta.</p>
+          )}
+
+          {projects.length > 0 && (
+            <>
+              {renderProjectSelector()}
+
+              {/* Importação CSV mantida durante a transição M5 até M7 */}
+              {currentProject?.active && profile.role !== 'consulta' && (
+                <CsvImportPanel
+                  project={currentProject}
+                  profile={profile}
+                  onImported={() => setRevision(value => value + 1)}
+                />
+              )}
+
+              {/* Preparação rápida de convite integrada na visão geral */}
+              {currentProject?.active && profile.role !== 'consulta' && (
+                <SessionInvitation
+                  key={`invitation:${project}`}
+                  project={currentProject}
+                  profile={profile}
+                />
+              )}
+
+              <ResearchFilters
+                key={`filters:${project}`}
+                projects={projects}
+                initialProject={project}
+                loading={loading}
+                onApply={value => {
+                  aggregateIO.current?.abort()
+                  setAggregateContext(null)
+                  setAggregateBusy(false)
+                  setRows([])
+                  setQuery(value)
+                }}
+              />
+
+              {query && (
+                <p className="quiet" role="status">
+                  Filtros aplicados: {query.projects.length} projeto(s);{' '}
+                  {Object.entries(query.filters)
+                    .filter(([, value]) => (Array.isArray(value) ? value.length : !!value))
+                    .map(
+                      ([key, value]) =>
+                        `${filterLabels[key] ?? key}: ${Array.isArray(value) ? value.join(', ') : value}`,
+                    )
+                    .join(' · ') || 'sem restrições adicionais'}
+                  .
+                </p>
+              )}
+
+              {loading && <p role="status">Carregando avaliações… {loaded} recebidas.</p>}
+
+              {!loading && !error && (
+                <>
+                  {!rows.length ? (
+                    <p role="status">Nenhuma avaliação corresponde aos filtros.</p>
+                  ) : (
+                    <>
+                      <div className="dashboard-filters">
+                        <label>
+                          Instrumento
+                          <select
+                            value={selectedInstrument}
+                            onChange={event => {
+                              aggregateIO.current?.abort()
+                              setAggregateBusy(false)
+                              setAggregateMessage(null)
+                              setInstrument(event.target.value)
+                              setDetailId('')
+                            }}
+                          >
+                            {instruments.map(code => (
+                              <option key={code}>{code}</option>
+                            ))}
+                          </select>
+                        </label>
+                        <label>
+                          Plataforma
+                          <select
+                            value={platform}
+                            onChange={event => {
+                              aggregateIO.current?.abort()
+                              setAggregateBusy(false)
+                              setAggregateMessage(null)
+                              setPlatform(event.target.value)
+                              setDetailId('')
+                            }}
+                          >
+                            <option value="">Todas</option>
+                            <option value="web">WEB</option>
+                            <option value="psychopy">PsychoPy local</option>
+                          </select>
+                        </label>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="button secondary"
+                        disabled={
+                          aggregateBusy ||
+                          !aggregateContext ||
+                          !['stroop_go_nogo_ptbr', 'instrumento_sintetico_demo'].includes(
+                            selectedInstrument,
+                          )
+                        }
+                        onClick={() => void downloadAggregate()}
+                      >
+                        {aggregateBusy ? 'Preparando arquivo agregado…' : 'Exportar visão filtrada'}
+                      </button>
+
+                      {aggregateMessage && <p role="status">{aggregateMessage}</p>}
+
+                      <p className="quiet">
+                        Os totais consideram todas as páginas do projeto e os filtros aplicados. Um instrumento
+                        por vez. Datas seguem o início registrado; horários legados sem fuso conservam sua
+                        referência original.
+                      </p>
+
+                      <dl className="dashboard-cards">
+                        <div>
+                          <dt>Avaliações</dt>
+                          <dd className="tabular-nums">{totals.assessments}</dd>
+                        </div>
+                        <div>
+                          <dt>Participantes únicos</dt>
+                          <dd className="tabular-nums">{totals.participants}</dd>
+                        </div>
+                        {selectedInstrument === 'stroop_go_nogo_ptbr' && (
+                          <>
+                            <div>
+                              <dt>Precisão média</dt>
+                              <dd className="tabular-nums">{number(totals.meanAccuracy, 1)}%</dd>
+                            </div>
+                            <div>
+                              <dt>Precisão mediana</dt>
+                              <dd className="tabular-nums">{number(totals.medianAccuracy, 1)}%</dd>
+                            </div>
+                            <div>
+                              <dt>Mediana dos tempos por avaliação</dt>
+                              <dd className="tabular-nums">{number(totals.medianResponseSeconds, 3)} s</dd>
+                            </div>
+                            <div>
+                              <dt>Omissões</dt>
+                              <dd className="tabular-nums">{totals.omissions}</dd>
+                            </div>
+                            <div>
+                              <dt>Comissões</dt>
+                              <dd className="tabular-nums">{totals.commissions}</dd>
+                            </div>
+                          </>
+                        )}
+                      </dl>
+
+                      <figure className="dashboard-chart">
+                        <figcaption>Avaliações por data de início</figcaption>
+                        <ul>
+                          {dates.map(([day, count]) => (
+                            <li key={day}>
+                              <span>{day}</span>
+                              <meter
+                                min={0}
+                                max={peak}
+                                value={count}
+                                aria-label={`${day}: ${count} avaliações`}
+                              />
+                              <strong className="tabular-nums">{count}</strong>
+                            </li>
+                          ))}
+                        </ul>
+                      </figure>
+
+                      {selectedInstrument === 'stroop_go_nogo_ptbr' && (
+                        <>
+                          <figure className="dashboard-chart">
+                            <figcaption>Precisão média por visita (%)</figcaption>
+                            <ul>
+                              {accuracyByVisit(visible).map(([v, accuracy]) => (
+                                <li key={v}>
+                                  <span>{v}</span>
+                                  <meter
+                                    min={0}
+                                    max={100}
+                                    value={accuracy}
+                                    aria-label={`${v}: ${number(accuracy, 1)}%`}
+                                  />
+                                  <strong className="tabular-nums">{number(accuracy, 1)}</strong>
+                                </li>
+                              ))}
+                            </ul>
+                          </figure>
+                          <figure className="dashboard-chart">
+                            <figcaption>Distribuição dos tempos medianos por avaliação</figcaption>
+                            <ul>
+                              {responseDistribution(visible).map(([range, count]) => (
+                                <li key={range}>
+                                  <span>{range}</span>
+                                  <meter
+                                    min={0}
+                                    max={Math.max(1, visible.length)}
+                                    value={count}
+                                    aria-label={`${range}: ${count} avaliações`}
+                                  />
+                                  <strong className="tabular-nums">{count}</strong>
+                                </li>
+                              ))}
+                            </ul>
+                            <p className="quiet">
+                              Avaliações sem acertos não possuem tempo mediano e ficam fora desta distribuição.
+                            </p>
+                          </figure>
+                          <ResearchVisualizations rows={visible} projects={projects} />
+                        </>
+                      )}
+
+                      {selectedInstrument !== 'stroop_go_nogo_ptbr' && (
+                        <GenericInstrumentResults rows={visible} projects={projects} />
+                      )}
+
+                      <ResultsTable
+                        rows={visible}
+                        projects={projects}
+                        onDetail={row => {
+                          aggregateIO.current?.abort()
+                          setAggregateBusy(false)
+                          setDetailProject(row.project_id)
+                          setDetailId(row.assessment_id)
+                        }}
+                      />
+                    </>
+                  )}
+                </>
+              )}
+
+              {detailId && !detail && !detailError && <p role="status">Carregando detalhe…</p>}
+              {detailError && <p role="alert">{detailError}</p>}
+              {renderAssessmentDetail()}
+            </>
+          )}
+        </>
+      )}
+
+      {/* MÓDULO 2: PACIENTES (WEB-047) */}
+      {activeModule === 'pacientes' && (
+        <PatientsPanel profile={profile} project={currentProject} />
+      )}
+
+      {/* MÓDULO 3: AVALIADORES (WEB-047) */}
+      {activeModule === 'avaliadores' && (
+        <EvaluatorsPanel profile={profile} project={currentProject} />
+      )}
+
+      {/* MÓDULO 4: PREPARAR AVALIAÇÃO */}
+      {activeModule === 'preparar' && (
+        <section aria-label="Módulo Preparar avaliação">
+          <h2>Preparar avaliação</h2>
+          <p className="quiet">
+            Emissão de convites de uso único para aplicação da Tarefa de Correspondência de Cores.
+            Selecione o paciente e o avaliador cadastrados, informe a visita e confira o resumo.
+          </p>
+
+          {renderProjectSelector()}
+
+          {currentProject?.active && profile.role !== 'consulta' ? (
+            <SessionInvitation
+              key={`invitation-mod:${project}`}
+              project={currentProject}
+              profile={profile}
+            />
+          ) : profile.role === 'consulta' ? (
+            <p className="notice" role="status">
+              Seu perfil é de consulta e não tem permissão para gerar novos convites de avaliação.
+            </p>
+          ) : (
+            <p className="notice" role="status">
+              O projeto selecionado está inativo. Selecione um projeto ativo para preparar novas sessões.
+            </p>
+          )}
+        </section>
+      )}
+
+      {/* MÓDULO 5: AVALIAÇÕES E HISTÓRICO */}
+      {activeModule === 'historico' && (
+        <section aria-label="Módulo Avaliações e histórico">
+          <h2>Avaliações e histórico</h2>
+          <p className="quiet">
+            Acompanhamento operacional de sessões, tentativas registradas e conferência detalhada de resultados.
+          </p>
+
+          {renderProjectSelector()}
+
+          <div className="dashboard-filters">
+            <label>
+              Instrumento
+              <select
+                value={selectedInstrument}
+                onChange={event => {
+                  setInstrument(event.target.value)
+                  setDetailId('')
+                }}
+              >
+                {instruments.map(code => (
+                  <option key={code}>{code}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Plataforma
+              <select
+                value={platform}
+                onChange={event => {
+                  setPlatform(event.target.value)
+                  setDetailId('')
+                }}
+              >
+                <option value="">Todas</option>
+                <option value="web">WEB</option>
+                <option value="psychopy">PsychoPy local</option>
+              </select>
+            </label>
+          </div>
+
+          {loading && <p role="status">Carregando histórico de avaliações…</p>}
+
+          {!loading && !rows.length && (
+            <p role="status">Nenhuma avaliação encontrada para este projeto.</p>
+          )}
+
+          {!loading && rows.length > 0 && (
+            <ResultsTable
+              rows={visible}
+              projects={projects}
+              onDetail={row => {
+                setDetailProject(row.project_id)
+                setDetailId(row.assessment_id)
+              }}
+            />
+          )}
+
+          {detailId && !detail && !detailError && <p role="status">Carregando detalhe…</p>}
+          {detailError && <p role="alert">{detailError}</p>}
+          {renderAssessmentDetail()}
+        </section>
+      )}
+
+      {/* MÓDULO 6: RESULTADOS E ANÁLISES (WEB-019) */}
+      {activeModule === 'resultados' && (
+        <section aria-label="Módulo Resultados e análises">
+          <h2>Resultados e análises</h2>
+          <p className="notice">
+            Visualizações descritivas e análises de pesquisa (REQ-REL-005). Não constitui avaliação clínica.
+          </p>
+
+          {renderProjectSelector()}
+
+          <ResearchFilters
+            key={`analytics-filters:${project}`}
+            projects={projects}
+            initialProject={project}
+            loading={loading}
+            onApply={value => {
+              setRows([])
+              setQuery(value)
+            }}
+          />
+
+          <dl className="dashboard-cards">
+            <div>
+              <dt>Avaliações analisadas</dt>
+              <dd className="tabular-nums">{totals.assessments}</dd>
+            </div>
+            <div>
+              <dt>Participantes únicos</dt>
+              <dd className="tabular-nums">{totals.participants}</dd>
+            </div>
+            {selectedInstrument === 'stroop_go_nogo_ptbr' && (
+              <>
+                <div>
+                  <dt>Precisão média</dt>
+                  <dd className="tabular-nums">{number(totals.meanAccuracy, 1)}%</dd>
+                </div>
+                <div>
+                  <dt>Precisão mediana</dt>
+                  <dd className="tabular-nums">{number(totals.medianAccuracy, 1)}%</dd>
+                </div>
+                <div>
+                  <dt>Tempo mediano de resposta</dt>
+                  <dd className="tabular-nums">{number(totals.medianResponseSeconds, 3)} s</dd>
+                </div>
+              </>
+            )}
+          </dl>
+
+          {selectedInstrument === 'stroop_go_nogo_ptbr' && (
+            <ResearchVisualizations rows={visible} projects={projects} />
+          )}
+
+          {selectedInstrument !== 'stroop_go_nogo_ptbr' && (
+            <GenericInstrumentResults rows={visible} projects={projects} />
+          )}
+        </section>
+      )}
+
+      {/* MÓDULO 7: EXPORTAÇÕES (WEB-020) */}
+      {activeModule === 'exportacoes' && (
+        <section aria-label="Módulo Exportações" className="export-hub-panel">
+          <h2>Central de exportações</h2>
+          <p className="quiet">
+            Exportação de dados da plataforma em formato CSV aberto (ADR-007 / REQ-CSV-005).
+          </p>
+
+          {renderProjectSelector()}
+
+          <div className="content-card export-hub-card">
+            <h3>Exportar visão agregada filtrada</h3>
+            <p className="quiet">
+              Gera arquivo CSV consolidado contendo todas as avaliações que atendem aos filtros atuais do projeto
+              selecionado ({currentProject?.code ?? '—'}).
+            </p>
+
+            <button
+              type="button"
+              className="button primary"
+              disabled={
+                aggregateBusy ||
+                !aggregateContext ||
+                !['stroop_go_nogo_ptbr', 'instrumento_sintetico_demo'].includes(selectedInstrument)
+              }
+              onClick={() => void downloadAggregate()}
+            >
+              {aggregateBusy ? 'Preparando arquivo agregado…' : 'Exportar visão filtrada'}
+            </button>
+
+            {aggregateMessage && <p role="status">{aggregateMessage}</p>}
+          </div>
+
+          <div className="content-card export-info-card">
+            <h3>Granularidades e políticas de exportação (REQ-CSV-005)</h3>
+            <ul>
+              <li>
+                <strong>Pacientes (<code>pacientes</code>):</strong> Dados cadastrais, identificador PAT-...,
+                projetos vinculados e total de avaliações.
+              </li>
+              <li>
+                <strong>Avaliações (<code>avaliacoes</code>):</strong> Metadados de sessão, datas, projeto,
+                avaliador e status de conclusão.
+              </li>
+              <li>
+                <strong>Tentativas (<code>tentativas</code>):</strong> Registro individual de cada tentativa com
+                palavra, cor, condição experimental, tecla e tempo de resposta (RT).
+              </li>
+              <li>
+                <strong>Métricas (<code>metricas</code>):</strong> As 12 métricas oficiais do Stroop com valores,
+                rótulos e unidades padronizadas.
+              </li>
+              <li>
+                <strong>Stroop 21 colunas:</strong> Formato clássico compatível com PsychoPy Builder e scripts
+                históricos de análise em R/Python/SPSS.
+              </li>
+            </ul>
+
+            <div className="notice" role="region" aria-label="Proteção e privacidade">
+              <strong>Privacidade e segurança:</strong>
+              <ul>
+                <li>
+                  <strong>Modo desidentificado (padrão):</strong> Exporta códigos estáveis PAT-... e EVA-... sem
+                  nomes nominais.
+                </li>
+                <li>
+                  <strong>Modo nominal:</strong> Restrito a perfis autorizados mediante habilitação
+                  institucional formal (DEC-03).
+                </li>
+                <li>
+                  <strong>Proteção ativa contra CSV Formula Injection:</strong> Células iniciadas por =, +, -,
+                  @, tab ou carriage return são neutralizadas de forma segura.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* MÓDULO 8: ADMINISTRAÇÃO (AdministrationPanel.tsx) */}
+      {activeModule === 'administracao' && profile.role === 'administracao' && (
+        <AdministrationPanel profile={profile} />
+      )}
+    </div>
+  )
 }
