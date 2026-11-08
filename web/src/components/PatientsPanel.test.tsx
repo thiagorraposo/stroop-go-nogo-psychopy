@@ -59,6 +59,30 @@ const mockPatientDetail = {
       created_at: '2026-11-05T14:30:00Z',
     },
   ],
+  sessions: [
+    {
+      invitation_id: '55555555-5555-5555-8555-555555555555',
+      session_id: '66666666-6666-6666-8666-666666666666',
+      project_id: '11111111-1111-4111-8111-111111111111',
+      project_code: 'PROJ_DEMO',
+      visit: 'V1',
+      evaluator_code: 'EVA-0001',
+      test_code: 'stroop_go_nogo_ptbr',
+      test_version: '1.0.0',
+      invitation_state: 'completed',
+      session_state: 'completed',
+      created_at: '2026-11-05T14:00:00Z',
+    },
+  ],
+  audit_history: [
+    {
+      event_id: '77777777-7777-7777-8777-777777777777',
+      entity_type: 'patient',
+      action: 'create',
+      reason_code: 'cadastro_inicial',
+      occurred_at: '2026-11-01T10:00:00Z',
+    },
+  ],
 }
 
 let container: HTMLDivElement
@@ -232,4 +256,199 @@ test('cria novo paciente com verificação de homônimo e confirmação conscien
 
   expect(created).toBe(true)
   expect(container.textContent).toContain('Paciente cadastrado com sucesso! Código gerado: PAT-0002')
+})
+
+test('exibe sessões vinculadas e trilha de auditoria cadastral na ficha detalhada', async () => {
+  fetchMock.mockImplementation(async input => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+    if (url.includes('/api/v1/patients/00000000-0000-4000-8000-000000000001')) {
+      return jsonResponse(mockPatientDetail)
+    }
+    if (url.startsWith('/api/v1/patients')) {
+      return jsonResponse({
+        items: [mockPatient1],
+        total: 1,
+        page: 1,
+        page_size: 20,
+      })
+    }
+    return jsonResponse({}, 404)
+  })
+
+  await act(async () => {
+    root.render(<PatientsPanel profile={profileAdmin} />)
+  })
+
+  const viewButton = container.querySelector('button[aria-label^="Ver ficha"]') as HTMLButtonElement
+  await act(async () => {
+    viewButton.click()
+  })
+
+  // Confere sessões e convites preparados
+  expect(container.textContent).toContain('Sessões e convites preparados')
+  expect(container.textContent).toContain('EVA-0001')
+
+  // Confere trilha de auditoria cadastral
+  expect(container.textContent).toContain('Trilha de auditoria cadastral')
+  expect(container.textContent).toContain('cadastro_inicial')
+})
+
+test('edita dados cadastrais do paciente com motivo obrigatório e atualiza ficha', async () => {
+  let patchPayload: unknown = null
+  let currentDetail = { ...mockPatientDetail }
+
+  fetchMock.mockImplementation(async (input, init) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+    const method = init?.method ?? 'GET'
+
+    if (url.includes('/api/v1/patients/00000000-0000-4000-8000-000000000001') && method === 'PATCH') {
+      patchPayload = JSON.parse(init?.body as string)
+      currentDetail = {
+        ...currentDetail,
+        full_name: 'Ana Carolina Sintetica Retificada',
+        initials: 'ACSR',
+        disambiguation_note: 'Grupo Retificado',
+      }
+      return jsonResponse(currentDetail)
+    }
+
+    if (url.includes('/api/v1/patients/00000000-0000-4000-8000-000000000001')) {
+      return jsonResponse(currentDetail)
+    }
+
+    if (url.startsWith('/api/v1/patients')) {
+      return jsonResponse({
+        items: [mockPatient1],
+        total: 1,
+        page: 1,
+        page_size: 20,
+      })
+    }
+    return jsonResponse({}, 404)
+  })
+
+  await act(async () => {
+    root.render(<PatientsPanel profile={profileAdmin} />)
+  })
+
+  const viewButton = container.querySelector('button[aria-label^="Ver ficha"]') as HTMLButtonElement
+  await act(async () => {
+    viewButton.click()
+  })
+
+  // Clica em Editar cadastro
+  const editButton = Array.from(container.querySelectorAll('button')).find(
+    b => b.textContent?.trim() === 'Editar cadastro',
+  )
+  expect(editButton).not.toBeUndefined()
+  await act(async () => {
+    editButton!.click()
+  })
+
+  expect(container.textContent).toContain('Editar dados cadastrais do paciente')
+
+  // Altera campos
+  const nameInput = container.querySelector('#edit-patient-fullname') as HTMLInputElement
+  const initialsInput = container.querySelector('#edit-patient-initials') as HTMLInputElement
+  const reasonInput = container.querySelector('#edit-patient-reason') as HTMLInputElement
+
+  await act(async () => {
+    setInputValue(nameInput, 'Ana Carolina Sintetica Retificada')
+    setInputValue(initialsInput, 'ACSR')
+    setInputValue(reasonInput, 'correcao_ortografica_homologada')
+  })
+
+  const saveButton = Array.from(container.querySelectorAll('button')).find(
+    b => b.textContent?.trim() === 'Salvar alterações',
+  )
+  expect(saveButton).not.toBeUndefined()
+  await act(async () => {
+    saveButton!.click()
+  })
+
+  expect(patchPayload).toEqual({
+    full_name: 'Ana Carolina Sintetica Retificada',
+    initials: 'ACSR',
+    disambiguation_note: 'Grupo Controle',
+    reason_code: 'correcao_ortografica_homologada',
+  })
+  expect(container.textContent).toContain('atualizado com sucesso (evento auditado)')
+})
+
+test('executa procedimento administrativo auditado para correção de vínculo da avaliação', async () => {
+  let relinkCalled = false
+  let relinkPayload: unknown = null
+
+  fetchMock.mockImplementation(async (input, init) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+    const method = init?.method ?? 'GET'
+
+    if (url.includes('/relink') && method === 'POST') {
+      relinkCalled = true
+      relinkPayload = JSON.parse(init?.body as string)
+      return jsonResponse({
+        assessment_id: '33333333-3333-4333-8333-333333333333',
+        project_id: '11111111-1111-4111-8111-111111111111',
+        patient_id: '00000000-0000-4000-8000-000000000001',
+        evaluator_id: '00000000-0000-4000-8000-000000000101',
+        relinked: true,
+      })
+    }
+
+    if (url.includes('/api/v1/patients/00000000-0000-4000-8000-000000000001')) {
+      return jsonResponse(mockPatientDetail)
+    }
+
+    if (url.startsWith('/api/v1/patients')) {
+      return jsonResponse({
+        items: [mockPatient1],
+        total: 1,
+        page: 1,
+        page_size: 20,
+      })
+    }
+    return jsonResponse({}, 404)
+  })
+
+  await act(async () => {
+    root.render(<PatientsPanel profile={profileAdmin} />)
+  })
+
+  const viewButton = container.querySelector('button[aria-label^="Ver ficha"]') as HTMLButtonElement
+  await act(async () => {
+    viewButton.click()
+  })
+
+  const relinkButton = container.querySelector(
+    'button[aria-label^="Corrigir vínculo da avaliação"]',
+  ) as HTMLButtonElement
+  expect(relinkButton).not.toBeNull()
+  await act(async () => {
+    relinkButton.click()
+  })
+
+  expect(container.textContent).toContain('Correção auditada de vínculo — Avaliação')
+
+  const evaluatorInput = container.querySelector('#relink-new-evaluator') as HTMLInputElement
+  const reasonInput = container.querySelector('#relink-reason') as HTMLInputElement
+
+  await act(async () => {
+    setInputValue(evaluatorInput, '00000000-0000-4000-8000-000000000101')
+    setInputValue(reasonInput, 'correcao_erro_humano_avaliador')
+  })
+
+  const submitRelinkButton = Array.from(container.querySelectorAll('button')).find(
+    b => b.textContent?.trim() === 'Confirmar revinculação auditada',
+  )
+  expect(submitRelinkButton).not.toBeUndefined()
+  await act(async () => {
+    submitRelinkButton!.click()
+  })
+
+  expect(relinkCalled).toBe(true)
+  expect(relinkPayload).toEqual({
+    evaluator_id: '00000000-0000-4000-8000-000000000101',
+    reason_code: 'correcao_erro_humano_avaliador',
+  })
+  expect(container.textContent).toContain('corrigido com sucesso (evento auditado)')
 })

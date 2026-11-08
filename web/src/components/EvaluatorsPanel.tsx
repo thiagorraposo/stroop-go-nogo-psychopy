@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import { ApiError, apiErrorMessage } from '../api/client'
 import type { ProfessionalProfile } from '../api/client'
 import type { Project } from '../api/assessments'
+import { relinkAssessment } from '../api/assessments'
 import {
   createEvaluator,
   getEvaluator,
@@ -52,6 +53,25 @@ export function EvaluatorsPanel({
   const [confirmHomonym, setConfirmHomonym] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [createError, setCreateError] = useState<string | null>(null)
+
+  // Edição cadastral
+  const [isEditing, setIsEditing] = useState(false)
+  const [editFullName, setEditFullName] = useState('')
+  const [editInitials, setEditInitials] = useState('')
+  const [editReasonCode, setEditReasonCode] = useState('correcao_cadastral')
+  const [editSubmitting, setEditSubmitting] = useState(false)
+  const [editError, setEditError] = useState<string | null>(null)
+
+  // Correção auditada de vínculo (relink)
+  const [relinkingAssessment, setRelinkingAssessment] = useState<{
+    assessment_id: string
+    project_id: string
+  } | null>(null)
+  const [relinkNewEvaluatorId, setRelinkNewEvaluatorId] = useState('')
+  const [relinkNewPatientId, setRelinkNewPatientId] = useState('')
+  const [relinkReasonCode, setRelinkReasonCode] = useState('correcao_erro_humano_vinculo')
+  const [relinkSubmitting, setRelinkSubmitting] = useState(false)
+  const [relinkError, setRelinkError] = useState<string | null>(null)
 
   const detailPanelRef = useRef<HTMLElement>(null)
 
@@ -181,6 +201,88 @@ export function EvaluatorsPanel({
       setError(apiErrorMessage(err))
     } finally {
       setUpdatingStatus(false)
+    }
+  }
+
+  function startEditing(target: EvaluatorRecord | EvaluatorDetail) {
+    setEditFullName(target.full_name)
+    setEditInitials(target.initials ?? '')
+    setEditReasonCode('correcao_cadastral')
+    setEditError(null)
+    setIsEditing(true)
+  }
+
+  async function handleSaveEdit(e: FormEvent) {
+    e.preventDefault()
+    if (!detail) return
+    const reason = editReasonCode.trim()
+    if (!reason) {
+      setEditError('Informe o motivo da alteração cadastral.')
+      return
+    }
+    setEditSubmitting(true)
+    setEditError(null)
+    try {
+      await updateEvaluator(
+        detail.id,
+        {
+          full_name: editFullName.trim(),
+          initials: editInitials.trim() || null,
+          reason_code: reason,
+        },
+        profile.csrf_token,
+      )
+      setNotice(`Cadastro de ${editFullName.trim()} atualizado com sucesso (evento auditado).`)
+      setIsEditing(false)
+      setRevision(v => v + 1)
+      const refreshed = await getEvaluator(detail.id)
+      setDetail(refreshed)
+    } catch (err) {
+      setEditError(apiErrorMessage(err))
+    } finally {
+      setEditSubmitting(false)
+    }
+  }
+
+  async function handleConfirmRelink(e: FormEvent) {
+    e.preventDefault()
+    if (!relinkingAssessment || !detail) return
+    const reason = relinkReasonCode.trim()
+    if (!reason) {
+      setRelinkError('Informe o motivo da correção de vínculo.')
+      return
+    }
+    if (!relinkNewEvaluatorId.trim() && !relinkNewPatientId.trim()) {
+      setRelinkError('Informe pelo menos um novo ID de avaliador ou paciente.')
+      return
+    }
+    setRelinkSubmitting(true)
+    setRelinkError(null)
+    try {
+      await relinkAssessment(
+        relinkingAssessment.project_id,
+        relinkingAssessment.assessment_id,
+        {
+          evaluator_id: relinkNewEvaluatorId.trim() || undefined,
+          patient_id: relinkNewPatientId.trim() || undefined,
+          reason_code: reason,
+        },
+        profile.csrf_token,
+      )
+      setNotice(
+        `Vínculo da avaliação ${relinkingAssessment.assessment_id} corrigido com sucesso (evento auditado).`,
+      )
+      setRelinkingAssessment(null)
+      setRelinkNewEvaluatorId('')
+      setRelinkNewPatientId('')
+      setRelinkReasonCode('correcao_erro_humano_vinculo')
+      setRevision(v => v + 1)
+      const refreshed = await getEvaluator(detail.id)
+      setDetail(refreshed)
+    } catch (err) {
+      setRelinkError(apiErrorMessage(err))
+    } finally {
+      setRelinkSubmitting(false)
     }
   }
 
@@ -444,13 +546,30 @@ export function EvaluatorsPanel({
         >
           <div className="panel-header">
             <h3>Ficha cadastral do avaliador</h3>
-            <button
-              type="button"
-              className="button secondary"
-              onClick={() => setSelectedEvaluatorId(null)}
-            >
-              Fechar ficha
-            </button>
+            <div className="panel-actions">
+              {profile.role !== 'consulta' && (
+                <button
+                  type="button"
+                  className="button secondary"
+                  onClick={() => (isEditing ? setIsEditing(false) : startEditing(detail!))}
+                  disabled={!detail}
+                  aria-expanded={isEditing}
+                >
+                  {isEditing ? 'Cancelar edição' : 'Editar cadastro'}
+                </button>
+              )}
+              <button
+                type="button"
+                className="button secondary"
+                onClick={() => {
+                  setSelectedEvaluatorId(null)
+                  setIsEditing(false)
+                  setRelinkingAssessment(null)
+                }}
+              >
+                Fechar ficha
+              </button>
+            </div>
           </div>
 
           {detailLoading && <p role="status">Carregando dados da ficha…</p>}
@@ -458,6 +577,166 @@ export function EvaluatorsPanel({
 
           {detail && (
             <>
+              {/* Formulário de edição cadastral do avaliador */}
+              {isEditing && (
+                <section
+                  className="content-card evaluator-edit-card"
+                  aria-label="Edição de cadastro do avaliador"
+                  style={{ marginBottom: 16 }}
+                >
+                  <h4>Editar dados cadastrais do avaliador</h4>
+                  <p className="quiet">
+                    Alterações de nome ou iniciais são registradas com trilha de auditoria em{' '}
+                    <code>web_registry_audit_events</code>, mantendo o histórico de avaliações conduzidas.
+                  </p>
+                  <form onSubmit={e => void handleSaveEdit(e)}>
+                    <div className="form-field">
+                      <label htmlFor="edit-evaluator-fullname">
+                        Nome completo <strong>*</strong>
+                      </label>
+                      <input
+                        id="edit-evaluator-fullname"
+                        type="text"
+                        required
+                        minLength={2}
+                        maxLength={120}
+                        value={editFullName}
+                        onChange={e => setEditFullName(e.target.value)}
+                        autoComplete="off"
+                      />
+                    </div>
+
+                    <div className="form-field">
+                      <label htmlFor="edit-evaluator-initials">Iniciais</label>
+                      <input
+                        id="edit-evaluator-initials"
+                        type="text"
+                        maxLength={16}
+                        value={editInitials}
+                        onChange={e => setEditInitials(e.target.value.toUpperCase())}
+                        autoComplete="off"
+                      />
+                    </div>
+
+                    <div className="form-field">
+                      <label htmlFor="edit-evaluator-reason">
+                        Motivo da alteração cadastral <strong>*</strong>
+                      </label>
+                      <input
+                        id="edit-evaluator-reason"
+                        type="text"
+                        required
+                        maxLength={120}
+                        value={editReasonCode}
+                        onChange={e => setEditReasonCode(e.target.value)}
+                        placeholder="Ex.: correcao_ortografica, ajuste_cadastral"
+                        autoComplete="off"
+                      />
+                    </div>
+
+                    {editError && (
+                      <p role="alert" className="notice error">
+                        {editError}
+                      </p>
+                    )}
+
+                    <div className="form-actions">
+                      <button type="submit" className="button primary" disabled={editSubmitting}>
+                        {editSubmitting ? 'Salvando alterações…' : 'Salvar alterações'}
+                      </button>
+                      <button
+                        type="button"
+                        className="button secondary"
+                        onClick={() => setIsEditing(false)}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
+                </section>
+              )}
+
+              {/* Formulário de correção auditada de vínculo */}
+              {relinkingAssessment && (
+                <section
+                  className="content-card relink-card notice"
+                  aria-label="Correção auditada de vínculo de avaliação"
+                  style={{ marginBottom: 16 }}
+                >
+                  <h4>
+                    Correção auditada de vínculo — Avaliação <code>{relinkingAssessment.assessment_id}</code>
+                  </h4>
+                  <p className="quiet">
+                    Procedimento administrativo auditado para retificar erro humano na vinculação do
+                    avaliador responsável ou paciente, sem apagar resultados experimentais ou tentativas.
+                  </p>
+                  <form onSubmit={e => void handleConfirmRelink(e)}>
+                    <div className="form-field">
+                      <label htmlFor="relink-evaluator-new-eval">
+                        ID UUID do novo avaliador responsável (opcional)
+                      </label>
+                      <input
+                        id="relink-evaluator-new-eval"
+                        type="text"
+                        value={relinkNewEvaluatorId}
+                        onChange={e => setRelinkNewEvaluatorId(e.target.value.trim())}
+                        placeholder="Ex.: 00000000-0000-4000-8000-000000000101"
+                        autoComplete="off"
+                      />
+                    </div>
+
+                    <div className="form-field">
+                      <label htmlFor="relink-evaluator-new-pat">
+                        ID UUID do novo paciente vinculado (opcional)
+                      </label>
+                      <input
+                        id="relink-evaluator-new-pat"
+                        type="text"
+                        value={relinkNewPatientId}
+                        onChange={e => setRelinkNewPatientId(e.target.value.trim())}
+                        placeholder="Ex.: 00000000-0000-4000-8000-000000000001"
+                        autoComplete="off"
+                      />
+                    </div>
+
+                    <div className="form-field">
+                      <label htmlFor="relink-evaluator-reason">
+                        Motivo da retificação de vínculo <strong>*</strong>
+                      </label>
+                      <input
+                        id="relink-evaluator-reason"
+                        type="text"
+                        required
+                        maxLength={120}
+                        value={relinkReasonCode}
+                        onChange={e => setRelinkReasonCode(e.target.value)}
+                        placeholder="Ex.: correcao_erro_humano_vinculo"
+                        autoComplete="off"
+                      />
+                    </div>
+
+                    {relinkError && (
+                      <p role="alert" className="notice error">
+                        {relinkError}
+                      </p>
+                    )}
+
+                    <div className="form-actions">
+                      <button type="submit" className="button primary" disabled={relinkSubmitting}>
+                        {relinkSubmitting ? 'Processando revinculação…' : 'Confirmar revinculação auditada'}
+                      </button>
+                      <button
+                        type="button"
+                        className="button secondary"
+                        onClick={() => setRelinkingAssessment(null)}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
+                </section>
+              )}
+
               <dl className="assessment-metadata">
                 <div>
                   <dt>Código do avaliador</dt>
@@ -497,13 +776,27 @@ export function EvaluatorsPanel({
                 </div>
               </dl>
 
+              {/* Instrumentos utilizados */}
+              <h4>Instrumentos utilizados ({detail.instruments?.length ?? 0})</h4>
+              {!detail.instruments || detail.instruments.length === 0 ? (
+                <p className="quiet">Nenhum instrumento registrado para este avaliador.</p>
+              ) : (
+                <ul className="instruments-list" aria-label="Lista de instrumentos do avaliador">
+                  {detail.instruments.map(inst => (
+                    <li key={inst}>
+                      <span className="badge">{inst}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
               {/* Histórico de avaliações conduzidas */}
               <h4>Histórico de avaliações conduzidas ({detail.assessments.length})</h4>
               {detail.assessments.length === 0 ? (
                 <p className="quiet">Nenhuma avaliação experimental registrada sob este avaliador.</p>
               ) : (
                 <div className="table-scroll">
-                  <table>
+                  <table aria-label="Histórico de avaliações conduzidas pelo avaliador">
                     <caption>Avaliações conduzidas por este avaliador</caption>
                     <thead>
                       <tr>
@@ -513,6 +806,7 @@ export function EvaluatorsPanel({
                         <th scope="col">Versão</th>
                         <th scope="col">Visita</th>
                         <th scope="col">Data</th>
+                        {profile.role !== 'consulta' && <th scope="col">Ações</th>}
                       </tr>
                     </thead>
                     <tbody>
@@ -524,6 +818,57 @@ export function EvaluatorsPanel({
                           <td className="tabular-nums">{a.test_version}</td>
                           <td>{a.visit}</td>
                           <td className="tabular-nums">{a.created_at}</td>
+                          {profile.role !== 'consulta' && (
+                            <td>
+                              <button
+                                type="button"
+                                className="button secondary"
+                                onClick={() => {
+                                  setRelinkingAssessment({
+                                    assessment_id: a.assessment_id,
+                                    project_id: a.project_id,
+                                  })
+                                  setRelinkReasonCode('correcao_erro_humano_vinculo')
+                                  setRelinkError(null)
+                                }}
+                                aria-label={`Corrigir vínculo da avaliação ${a.assessment_id}`}
+                              >
+                                Corrigir vínculo
+                              </button>
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Trilha de auditoria cadastral */}
+              <h4>Trilha de auditoria cadastral ({detail.audit_history?.length ?? 0})</h4>
+              {!detail.audit_history || detail.audit_history.length === 0 ? (
+                <p className="quiet">Nenhum evento de auditoria cadastral registrado.</p>
+              ) : (
+                <div className="table-scroll">
+                  <table aria-label="Trilha de auditoria cadastral do avaliador">
+                    <caption>Eventos auditados em web_registry_audit_events</caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Ação</th>
+                        <th scope="col">Motivo</th>
+                        <th scope="col">Entidade</th>
+                        <th scope="col">Data / Hora</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {detail.audit_history.map(ev => (
+                        <tr key={ev.event_id}>
+                          <td>
+                            <strong>{ev.action}</strong>
+                          </td>
+                          <td>{ev.reason_code || '—'}</td>
+                          <td>{ev.entity_type}</td>
+                          <td className="tabular-nums">{ev.occurred_at}</td>
                         </tr>
                       ))}
                     </tbody>

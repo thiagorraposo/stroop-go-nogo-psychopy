@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import { ApiError, apiErrorMessage } from '../api/client'
 import type { ProfessionalProfile } from '../api/client'
 import type { Project } from '../api/assessments'
+import { relinkAssessment } from '../api/assessments'
 import {
   checkDuplicatePatients,
   createPatient,
@@ -57,6 +58,26 @@ export function PatientsPanel({
   const [checkingDuplicates, setCheckingDuplicates] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [createError, setCreateError] = useState<string | null>(null)
+
+  // Edição cadastral
+  const [isEditing, setIsEditing] = useState(false)
+  const [editFullName, setEditFullName] = useState('')
+  const [editInitials, setEditInitials] = useState('')
+  const [editDisambiguationNote, setEditDisambiguationNote] = useState('')
+  const [editReasonCode, setEditReasonCode] = useState('correcao_cadastral')
+  const [editSubmitting, setEditSubmitting] = useState(false)
+  const [editError, setEditError] = useState<string | null>(null)
+
+  // Correção auditada de vínculo (relink)
+  const [relinkingAssessment, setRelinkingAssessment] = useState<{
+    assessment_id: string
+    project_id: string
+  } | null>(null)
+  const [relinkNewPatientId, setRelinkNewPatientId] = useState('')
+  const [relinkNewEvaluatorId, setRelinkNewEvaluatorId] = useState('')
+  const [relinkReasonCode, setRelinkReasonCode] = useState('correcao_erro_humano_vinculo')
+  const [relinkSubmitting, setRelinkSubmitting] = useState(false)
+  const [relinkError, setRelinkError] = useState<string | null>(null)
 
   const detailPanelRef = useRef<HTMLElement>(null)
 
@@ -210,6 +231,90 @@ export function PatientsPanel({
       setError(apiErrorMessage(err))
     } finally {
       setUpdatingStatus(false)
+    }
+  }
+
+  function startEditing(target: PatientRecord | PatientDetail) {
+    setEditFullName(target.full_name)
+    setEditInitials(target.initials ?? '')
+    setEditDisambiguationNote(target.disambiguation_note ?? '')
+    setEditReasonCode('correcao_cadastral')
+    setEditError(null)
+    setIsEditing(true)
+  }
+
+  async function handleSaveEdit(e: FormEvent) {
+    e.preventDefault()
+    if (!detail) return
+    const reason = editReasonCode.trim()
+    if (!reason) {
+      setEditError('Informe o motivo da alteração cadastral.')
+      return
+    }
+    setEditSubmitting(true)
+    setEditError(null)
+    try {
+      await updatePatient(
+        detail.id,
+        {
+          full_name: editFullName.trim(),
+          initials: editInitials.trim() || null,
+          disambiguation_note: editDisambiguationNote.trim() || null,
+          reason_code: reason,
+        },
+        profile.csrf_token,
+      )
+      setNotice(`Cadastro de ${editFullName.trim()} atualizado com sucesso (evento auditado).`)
+      setIsEditing(false)
+      setRevision(v => v + 1)
+      const refreshed = await getPatient(detail.id)
+      setDetail(refreshed)
+    } catch (err) {
+      setEditError(apiErrorMessage(err))
+    } finally {
+      setEditSubmitting(false)
+    }
+  }
+
+  async function handleConfirmRelink(e: FormEvent) {
+    e.preventDefault()
+    if (!relinkingAssessment || !detail) return
+    const reason = relinkReasonCode.trim()
+    if (!reason) {
+      setRelinkError('Informe o motivo da correção de vínculo.')
+      return
+    }
+    if (!relinkNewPatientId.trim() && !relinkNewEvaluatorId.trim()) {
+      setRelinkError('Informe pelo menos um novo ID de paciente ou avaliador.')
+      return
+    }
+    setRelinkSubmitting(true)
+    setRelinkError(null)
+    try {
+      await relinkAssessment(
+        relinkingAssessment.project_id,
+        relinkingAssessment.assessment_id,
+        {
+          patient_id: relinkNewPatientId.trim() || undefined,
+          evaluator_id: relinkNewEvaluatorId.trim() || undefined,
+          reason_code: reason,
+        },
+        profile.csrf_token,
+      )
+      setNotice(
+        `Vínculo da avaliação ${relinkingAssessment.assessment_id} corrigido com sucesso (evento auditado).`,
+      )
+      setRelinkingAssessment(null)
+      setRelinkNewPatientId('')
+      setRelinkNewEvaluatorId('')
+      setRelinkReasonCode('correcao_erro_humano_vinculo')
+      setRevision(v => v + 1)
+      const refreshed = await getPatient(detail.id)
+      setDetail(refreshed)
+    } catch (err) {
+      setRelinkError(apiErrorMessage(err))
+    } finally {
+      setRelinkSubmitting(false)
     }
   }
 
@@ -516,13 +621,30 @@ export function PatientsPanel({
         >
           <div className="panel-header">
             <h3>Ficha cadastral do paciente</h3>
-            <button
-              type="button"
-              className="button secondary"
-              onClick={() => setSelectedPatientId(null)}
-            >
-              Fechar ficha
-            </button>
+            <div className="panel-actions">
+              {profile.role !== 'consulta' && (
+                <button
+                  type="button"
+                  className="button secondary"
+                  onClick={() => (isEditing ? setIsEditing(false) : startEditing(detail!))}
+                  disabled={!detail}
+                  aria-expanded={isEditing}
+                >
+                  {isEditing ? 'Cancelar edição' : 'Editar cadastro'}
+                </button>
+              )}
+              <button
+                type="button"
+                className="button secondary"
+                onClick={() => {
+                  setSelectedPatientId(null)
+                  setIsEditing(false)
+                  setRelinkingAssessment(null)
+                }}
+              >
+                Fechar ficha
+              </button>
+            </div>
           </div>
 
           {detailLoading && <p role="status">Carregando dados da ficha…</p>}
@@ -530,6 +652,180 @@ export function PatientsPanel({
 
           {detail && (
             <>
+              {/* Formulário de edição cadastral */}
+              {isEditing && (
+                <section
+                  className="content-card patient-edit-card"
+                  aria-label="Edição de cadastro do paciente"
+                  style={{ marginBottom: 16 }}
+                >
+                  <h4>Editar dados cadastrais do paciente</h4>
+                  <p className="quiet">
+                    As alterações cadastrais são registradas com trilha auditável em{' '}
+                    <code>web_registry_audit_events</code> preservando todos os vínculos históricos.
+                  </p>
+                  <form onSubmit={e => void handleSaveEdit(e)}>
+                    <div className="form-field">
+                      <label htmlFor="edit-patient-fullname">
+                        Nome completo <strong>*</strong>
+                      </label>
+                      <input
+                        id="edit-patient-fullname"
+                        type="text"
+                        required
+                        minLength={2}
+                        maxLength={120}
+                        value={editFullName}
+                        onChange={e => setEditFullName(e.target.value)}
+                        autoComplete="off"
+                      />
+                    </div>
+
+                    <div className="form-field">
+                      <label htmlFor="edit-patient-initials">Iniciais</label>
+                      <input
+                        id="edit-patient-initials"
+                        type="text"
+                        maxLength={16}
+                        value={editInitials}
+                        onChange={e => setEditInitials(e.target.value.toUpperCase())}
+                        autoComplete="off"
+                      />
+                    </div>
+
+                    <div className="form-field">
+                      <label htmlFor="edit-patient-disambiguation">
+                        Desambiguação / Anotação de coorte
+                      </label>
+                      <input
+                        id="edit-patient-disambiguation"
+                        type="text"
+                        maxLength={160}
+                        value={editDisambiguationNote}
+                        onChange={e => setEditDisambiguationNote(e.target.value)}
+                        autoComplete="off"
+                      />
+                    </div>
+
+                    <div className="form-field">
+                      <label htmlFor="edit-patient-reason">
+                        Motivo da alteração cadastral <strong>*</strong>
+                      </label>
+                      <input
+                        id="edit-patient-reason"
+                        type="text"
+                        required
+                        maxLength={120}
+                        value={editReasonCode}
+                        onChange={e => setEditReasonCode(e.target.value)}
+                        placeholder="Ex.: correcao_ortografica, ajuste_cadastral"
+                        autoComplete="off"
+                      />
+                    </div>
+
+                    {editError && (
+                      <p role="alert" className="notice error">
+                        {editError}
+                      </p>
+                    )}
+
+                    <div className="form-actions">
+                      <button type="submit" className="button primary" disabled={editSubmitting}>
+                        {editSubmitting ? 'Salvando alterações…' : 'Salvar alterações'}
+                      </button>
+                      <button
+                        type="button"
+                        className="button secondary"
+                        onClick={() => setIsEditing(false)}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
+                </section>
+              )}
+
+              {/* Formulário de correção auditada de vínculo */}
+              {relinkingAssessment && (
+                <section
+                  className="content-card relink-card notice"
+                  aria-label="Correção auditada de vínculo de avaliação"
+                  style={{ marginBottom: 16 }}
+                >
+                  <h4>
+                    Correção auditada de vínculo — Avaliação <code>{relinkingAssessment.assessment_id}</code>
+                  </h4>
+                  <p className="quiet">
+                    Procedimento administrativo auditado para retificar erro humano na vinculação de
+                    paciente ou avaliador, sem apagar resultados científicos ou tentativas.
+                  </p>
+                  <form onSubmit={e => void handleConfirmRelink(e)}>
+                    <div className="form-field">
+                      <label htmlFor="relink-new-patient">
+                        ID UUID do novo paciente (deixe em branco se mantiver o paciente atual)
+                      </label>
+                      <input
+                        id="relink-new-patient"
+                        type="text"
+                        value={relinkNewPatientId}
+                        onChange={e => setRelinkNewPatientId(e.target.value.trim())}
+                        placeholder="Ex.: 00000000-0000-4000-8000-000000000001"
+                        autoComplete="off"
+                      />
+                    </div>
+
+                    <div className="form-field">
+                      <label htmlFor="relink-new-evaluator">
+                        ID UUID do novo avaliador responsável (opcional)
+                      </label>
+                      <input
+                        id="relink-new-evaluator"
+                        type="text"
+                        value={relinkNewEvaluatorId}
+                        onChange={e => setRelinkNewEvaluatorId(e.target.value.trim())}
+                        placeholder="Ex.: 00000000-0000-4000-8000-000000000101"
+                        autoComplete="off"
+                      />
+                    </div>
+
+                    <div className="form-field">
+                      <label htmlFor="relink-reason">
+                        Motivo da retificação de vínculo <strong>*</strong>
+                      </label>
+                      <input
+                        id="relink-reason"
+                        type="text"
+                        required
+                        maxLength={120}
+                        value={relinkReasonCode}
+                        onChange={e => setRelinkReasonCode(e.target.value)}
+                        placeholder="Ex.: correcao_erro_humano_vinculo"
+                        autoComplete="off"
+                      />
+                    </div>
+
+                    {relinkError && (
+                      <p role="alert" className="notice error">
+                        {relinkError}
+                      </p>
+                    )}
+
+                    <div className="form-actions">
+                      <button type="submit" className="button primary" disabled={relinkSubmitting}>
+                        {relinkSubmitting ? 'Processando revinculação…' : 'Confirmar revinculação auditada'}
+                      </button>
+                      <button
+                        type="button"
+                        className="button secondary"
+                        onClick={() => setRelinkingAssessment(null)}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
+                </section>
+              )}
+
               <dl className="assessment-metadata">
                 <div>
                   <dt>Código do paciente</dt>
@@ -627,13 +923,53 @@ export function PatientsPanel({
                 </div>
               )}
 
+              {/* Sessões e convites preparados */}
+              <h4>Sessões e convites preparados ({detail.sessions?.length ?? 0})</h4>
+              {!detail.sessions || detail.sessions.length === 0 ? (
+                <p className="quiet">Nenhuma sessão preparada ou convite registrado para este paciente.</p>
+              ) : (
+                <div className="table-scroll">
+                  <table aria-label="Sessões e convites preparados para o paciente">
+                    <caption>Sessões preparadas para o paciente</caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Projeto</th>
+                        <th scope="col">Visita</th>
+                        <th scope="col">Avaliador</th>
+                        <th scope="col">Instrumento</th>
+                        <th scope="col">Estado convite</th>
+                        <th scope="col">Estado sessão</th>
+                        <th scope="col">Criado em</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {detail.sessions.map(s => (
+                        <tr key={s.invitation_id}>
+                          <td className="tabular-nums">{s.project_code}</td>
+                          <td>{s.visit}</td>
+                          <td className="tabular-nums">{s.evaluator_code ?? '—'}</td>
+                          <td>{s.test_code}</td>
+                          <td>
+                            <span className="badge">{s.invitation_state}</span>
+                          </td>
+                          <td>
+                            <span className="badge">{s.session_state ?? '—'}</span>
+                          </td>
+                          <td className="tabular-nums">{s.created_at}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
               {/* Histórico longitudinal de avaliações */}
               <h4>Histórico longitudinal de avaliações ({detail.assessments.length})</h4>
               {detail.assessments.length === 0 ? (
                 <p className="quiet">Nenhuma avaliação experimental associada até o momento.</p>
               ) : (
                 <div className="table-scroll">
-                  <table>
+                  <table aria-label="Histórico longitudinal de avaliações do paciente">
                     <caption>Avaliações realizadas pelo paciente</caption>
                     <thead>
                       <tr>
@@ -643,6 +979,7 @@ export function PatientsPanel({
                         <th scope="col">Versão</th>
                         <th scope="col">Visita</th>
                         <th scope="col">Data</th>
+                        {profile.role !== 'consulta' && <th scope="col">Ações</th>}
                       </tr>
                     </thead>
                     <tbody>
@@ -654,6 +991,57 @@ export function PatientsPanel({
                           <td className="tabular-nums">{a.test_version}</td>
                           <td>{a.visit}</td>
                           <td className="tabular-nums">{a.created_at}</td>
+                          {profile.role !== 'consulta' && (
+                            <td>
+                              <button
+                                type="button"
+                                className="button secondary"
+                                onClick={() => {
+                                  setRelinkingAssessment({
+                                    assessment_id: a.assessment_id,
+                                    project_id: a.project_id,
+                                  })
+                                  setRelinkReasonCode('correcao_erro_humano_vinculo')
+                                  setRelinkError(null)
+                                }}
+                                aria-label={`Corrigir vínculo da avaliação ${a.assessment_id}`}
+                              >
+                                Corrigir vínculo
+                              </button>
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Trilha de auditoria cadastral */}
+              <h4>Trilha de auditoria cadastral ({detail.audit_history?.length ?? 0})</h4>
+              {!detail.audit_history || detail.audit_history.length === 0 ? (
+                <p className="quiet">Nenhum evento de auditoria cadastral registrado.</p>
+              ) : (
+                <div className="table-scroll">
+                  <table aria-label="Trilha de auditoria cadastral do paciente">
+                    <caption>Eventos auditados em web_registry_audit_events</caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Ação</th>
+                        <th scope="col">Motivo</th>
+                        <th scope="col">Entidade</th>
+                        <th scope="col">Data / Hora</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {detail.audit_history.map(ev => (
+                        <tr key={ev.event_id}>
+                          <td>
+                            <strong>{ev.action}</strong>
+                          </td>
+                          <td>{ev.reason_code || '—'}</td>
+                          <td>{ev.entity_type}</td>
+                          <td className="tabular-nums">{ev.occurred_at}</td>
                         </tr>
                       ))}
                     </tbody>

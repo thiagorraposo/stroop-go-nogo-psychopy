@@ -267,6 +267,56 @@ def update_evaluator(
     )
 
 
+def relink_assessment(
+    database_url: str,
+    actor: AppUser,
+    *,
+    project_id: UUID,
+    assessment_id: str,
+    patient_id: UUID | None = None,
+    evaluator_id: UUID | None = None,
+    reason_code: str,
+) -> dict:
+    if patient_id is None and evaluator_id is None:
+        raise InvalidRegistryDataError("Informe pelo menos um novo vinculo de paciente ou avaliador.")
+    cleaned_reason = validate_reason_code(reason_code)
+    return persistence.relink_assessment(
+        database_url,
+        project_id=project_id,
+        assessment_id=assessment_id,
+        patient_id=patient_id,
+        evaluator_id=evaluator_id,
+        reason_code=cleaned_reason,
+        issuer=actor.issuer,
+        subject=actor.subject,
+    )
+
+
+def relink_invitation(
+    database_url: str,
+    actor: AppUser,
+    *,
+    project_id: UUID,
+    invitation_id: UUID,
+    patient_id: UUID | None = None,
+    evaluator_id: UUID | None = None,
+    reason_code: str,
+) -> dict:
+    if patient_id is None and evaluator_id is None:
+        raise InvalidRegistryDataError("Informe pelo menos um novo vinculo de paciente ou avaliador.")
+    cleaned_reason = validate_reason_code(reason_code)
+    return persistence.relink_invitation(
+        database_url,
+        project_id=project_id,
+        invitation_id=invitation_id,
+        patient_id=patient_id,
+        evaluator_id=evaluator_id,
+        reason_code=cleaned_reason,
+        issuer=actor.issuer,
+        subject=actor.subject,
+    )
+
+
 __all__ = [
     "DuplicateCandidateError",
     "ForbiddenRegistryError",
@@ -280,6 +330,8 @@ __all__ = [
     "get_patient",
     "list_evaluators",
     "list_patients",
+    "relink_assessment",
+    "relink_invitation",
     "update_evaluator",
     "update_patient",
 ]
