@@ -91,3 +91,45 @@ test('demo conserva negativos e metrica ausente sem preencher com zero', async (
   expect(values).toEqual(['Ausente', '-4,000 count', 'Ausente', '-2,500 unit'])
   expect(container.textContent).not.toContain('0,000')
 })
+
+test('exibe distribuição de RTs, precisão Go/No-Go e comparações por visita e avaliador (REQ-REL-005)', async () => {
+  const r1 = { ...row('A1'), evaluator_id: 'EVA-000001', visit: 'V1' }
+  const r2 = { ...row('A2'), evaluator_id: 'EVA-000002', visit: 'V2', summary: {
+    ...r1.summary,
+    accuracy_go_trials: 100,
+    accuracy_no_go_trials: 50,
+    total_go_trials: 8,
+    total_no_go_trials: 8,
+    hits: 8,
+    omission_errors: 0,
+    correct_rejections: 4,
+    commission_errors: 4,
+    response_time_seconds: 0.450,
+  } }
+
+  await act(async () => root.render(<ResearchVisualizations rows={[r1, r2]} projects={projects} />))
+
+  // 1. Tabela de distribuição de RTs
+  const rtTable = table('Distribuição de tempos de reação')
+  expect(rtTable).toBeDefined()
+  expect(rtTable.textContent).toContain('< 0,5 s')
+  expect(rtTable.textContent).toContain('0,5 a < 1 s')
+
+  // 2. Tabela de condição experimental (Go / No-Go)
+  const condTable = table('Desempenho por condição experimental (Go / No-Go)')
+  expect(condTable).toBeDefined()
+  expect(condTable.textContent).toContain('Go (resposta com barra de espaço)')
+  expect(condTable.textContent).toContain('No-Go (inibição de resposta motora)')
+  expect(condTable.textContent).toContain('14 (acertos)')
+  expect(condTable.textContent).toContain('2 (omissões)')
+
+  // 3. Tabela por visita
+  const visitTable = table('Desempenho e contagens de erros por visita')
+  expect(visitTable).toBeDefined()
+  expect([...visitTable.tBodies[0]!.rows].map(r => r.cells[0]!.textContent)).toEqual(['V1', 'V2'])
+
+  // 4. Tabela por avaliador
+  const evalTable = table('Desempenho e contagens de erros por avaliador')
+  expect(evalTable).toBeDefined()
+  expect([...evalTable.tBodies[0]!.rows].map(r => r.cells[0]!.textContent)).toEqual(['EVA-000001', 'EVA-000002'])
+})
