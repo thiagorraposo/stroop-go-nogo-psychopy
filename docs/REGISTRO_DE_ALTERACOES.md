@@ -4,6 +4,23 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-08 — CRUD de pacientes, avaliadores e correção de vínculos (M5 / WEB-047)
+
+- Implementados na interface React e endpoints FastAPI a edição cadastral de pacientes
+  e avaliadores com justificativa obrigatória (`reason_code`) e trilha de auditoria
+  em `web_registry_audit_events` (`REQ-AUD-001`, `REQ-PAR-005`, `REQ-AVA-004`).
+- Ficha detalhada do paciente expandida com histórico longitudinal de avaliações e
+  visualização de convites/sessões preparados (`REQ-PAR-004`).
+- Ficha detalhada do avaliador expandida com histórico de instrumentos utilizados e
+  avaliações conduzidas (`REQ-AVA-004`).
+- Implementado procedimento administrativo auditado para retificação e revinculação
+  de paciente e avaliador em avaliações e convites (`relink_assessment` e `relink_invitation`),
+  com resolução idempotente de chaves estrangeiras compostas e auditoria bidirecional.
+- Entregue via Pull Request #6 (`feat/m5-crud-pacientes-avaliadores-vinculos`),
+  aprovado na CI (`verify`, Run 42508601295) e integrado à `main` via Merge Commit
+  tradicional (`b050e4c`). Aceite registrado em `EV-M5-047`. Progresso avança para
+  31/48 entregáveis aceitos (64,6%).
+
 ## 2026-11-07 — Incorporação de Pull Request, Push e Merge Commit tradicional ao workflow
 
 - Por instrução do responsável, o workflow do projeto adota formalmente o ciclo
