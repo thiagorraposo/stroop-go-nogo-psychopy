@@ -4,6 +4,16 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-08 — Exportações CSV multi-granularidade e conclusão do marco M5 (M5 / WEB-020)
+
+- Implementado o módulo `Exportações` (`REQ-CSV-005`, `DEC-03`):
+  - No domínio (`stroop/domain/web_multi_export.py`): catálogo canônico para as 5 granularidades (`pacientes`, `avaliacoes`, `tentativas`, `metricas` e `stroop_21_colunas`), projeção dinâmica de colunas, mascaramento desidentificado por padrão, controle de acesso nominal restrito à administração (`403 permission_denied` em outros perfis) e sanitização estrita contra *CSV formula injection* (`_safe_cell`).
+  - Na persistência SQL (`stroop/persistence/web_multi_export.py`): consultas otimizadas por projeto e intervalo de datas com exclusão estrita de sessões invalidadas ou parciais.
+  - Na API (`api/exports.py`): endpoints `POST /api/v1/exports/preview` (contagem e amostra das 5 primeiras linhas) e `POST /api/v1/exports/download` (download seguro com HMAC efêmero assinado de 15 min).
+  - No frontend React (`web/src/components/ExportHubPanel.tsx` e `web/src/api/exports.ts`): seletor de granularidades, seleção/desmarcação granular de colunas, chaveamento nominal/desidentificado com bloqueio visual para não-administradores, painel de prévia com contagem e download direto Blob com feedback de estado.
+- Entregue via Pull Request #10 (`feat/m5-exportacoes-csv-filtradas`), aprovado na CI (`verify`, Run `42522885308`) e integrado à `main` via Merge Commit tradicional (`ff45b7a`).
+- Marco M5 integralmente concluído com 5 de 5 entregáveis aceitos (`EV-M5-020`). Progresso global avança para 33/48 entregáveis aceitos (68,8%). Marco seguinte: M7.
+
 ## 2026-11-08 — Detalhe de avaliações, histórico operacional e análises descritivas (M5 / WEB-019)
 
 - Consolidados os módulos operacionais `Avaliações e histórico` e `Resultados e análises` (`REQ-REL-005`):

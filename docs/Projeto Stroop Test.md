@@ -38,14 +38,15 @@ de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
 Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
 não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
 
-Progresso atual: **32/48 entregáveis aceitos (WEB-000 a WEB-019, WEB-021 a WEB-024, WEB-029/030, WEB-042/043/044, WEB-045/046 e WEB-047)**.
+Progresso atual: **33/48 entregáveis aceitos (WEB-000 a WEB-024, WEB-029/030, WEB-042/043/044, WEB-045/046 e WEB-047)**.
 WEB-005 é documental; WEB-006 aceita o receptor backend e contratos em banco
 sintético. M1, M2, M3, M4 e M6 concluídos; atomicidade e paridade aceitas em EV-M2-007/008;
 autenticação local e revisão de segurança aceitas em EV-M6-021/024; M4 integralmente concluído (6/6);
-M5 em andamento (4/5 aceitos), com navegação modular e painéis base em EV-M5-047-NAV, catálogo de filtros
+M5 concluído (5/5 aceitos), com navegação modular e painéis base em EV-M5-047-NAV, catálogo de filtros
 combinados (`REQ-REL-004`) + KPIs descritivos e administração React aceitos em EV-M5-017/018, CRUD
-completo de pacientes/avaliadores com correção auditada de vínculos aceito em EV-M5-047, e detalhe
-completo de tentativas, histórico operacional e análises descritivas aceitas em EV-M5-019.
+completo de pacientes/avaliadores com correção auditada de vínculos aceito em EV-M5-047, detalhe
+completo de tentativas, histórico operacional e análises descritivas aceitas em EV-M5-019, e exportações
+CSV multi-granularidade filtradas aceitas em EV-M5-020.
 
 ## Painel visual de acompanhamento
 
@@ -53,10 +54,10 @@ Atualizado em **2026-11-08**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **32 de 48 · 66,7%** | **16** | **M5 autorizado (4/5 aceitos)** | Implementar WEB-020 em M5 para conclusão integral do marco; WEB-031 aguarda destino externo |
+| **33 de 48 · 68,8%** | **15** | **M5 concluído (5/5 aceitos)** | Iniciar marco M7 (Migração, paridade e retirada do Streamlit); WEB-031 aguarda destino externo |
 
 ```text
-Aceites   █████████████░░░░░░░   66,7%
+Aceites   ██████████████░░░░░░   68,8%
 ```
 
 A barra global é aproximada; os números são exatos, com percentual arredondado.
@@ -78,7 +79,7 @@ A ordem da tabela segue os IDs; dependências e paralelismo estão na
 | [M2](#m2--backend-e-contratos-de-dados-consolidados) | Backend e contratos de dados consolidados | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | 🟩🟩🟩🟩🟩🟩🟩 **7/7** | ✅ Concluído |
 | [M4](#m4--fluxo-ponta-a-ponta-de-avaliações) | Fluxo ponta a ponta de avaliações | 🟩🟩🟩🟩🟩🟩 **6/6** | ✅ Concluído |
-| [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | 🟩🟩🟩🟩⬜ **4/5** | ◐ Em andamento |
+| [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | 🟩🟩🟩🟩🟩 **5/5** | ✅ Concluído |
 | [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M7](#m7--integração-compatibilidade-histórica-e-transição) | Integração, compatibilidade histórica e transição | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M8](#m8--ci-infraestrutura-e-preparação-operacional) | CI, infraestrutura e preparação operacional | 🟩🟩⬜⬜ **2/4** | ◐ Parcial; réplica externa e release pendentes |
@@ -116,6 +117,7 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 | ✅ [WEB-017](#web-017--revalidar-filtros-lista-e-agregações-autorizadas) | Catálogo completo de filtros combinados (REQ-REL-004) e KPIs descritivos na Visão Geral | Vitest, DOM e Playwright Chromium e Firefox reais |
 | ✅ [WEB-018](#web-018--revalidar-administração-react-de-contas-e-vínculos) | Administração React de contas e vínculos com distinção arquitetural explícita ADR-006/007 | Vitest, API e Playwright administrativo |
 | ✅ [WEB-047](#web-047--implementar-crud-administrativo-completo-de-pacientes-e-avaliadores-histórico-longitudinal-e-correção-auditada-de-vínculos) | CRUD de pacientes e avaliadores, histórico longitudinal e correção auditada de vínculos | Vitest, Python/PG e Playwright HTTPS/API/PG reais em Chromium e Firefox |
+| ✅ [WEB-020](#web-020--conferir-exportação-do-conjunto-filtrado-no-react) | Exportação CSV multi-granularidade filtrada | Interface React, API e PostgreSQL real sintético |
 | ✅ [WEB-021](#web-021--implementar-autenticação-local-e-integrar-login-profissional-seguro) | Autenticação profissional local com Argon2id, sessões, rotação/recuperação e corte OIDC | React/FastAPI/PG/HTTPS reais, Compose isolado e restore com recuperação |
 | ✅ [WEB-022](#web-022--comprovar-matriz-de-perfis-projetos-e-revogações) | Perfis, projetos, administração sem vínculo e revogação | PostgreSQL real sintético, API e HTTPS |
 | ✅ [WEB-023](#web-023--revalidar-sessão-cookies-csrf-e-isolamento-de-credenciais) | Sessões separadas, Origin/CSRF, expiração, logout e replay | PostgreSQL/API e navegadores em HTTPS local |
@@ -125,15 +127,15 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 
 ### Foco do marco atual
 
-`M4` está **6/6 concluído** (`EV-M4-013/016` e `EV-M4-045/046`). O marco autorizado pelo comando `continue o projeto` de 2026-11-07 é **M5 — Interface administrativa e analítica React**, com **4 de 5 entregáveis aceitos** (`WEB-017`, `WEB-018`, `WEB-047` e `WEB-019` **CONCLUIDAS** em `EV-M5-017/018`, `EV-M5-047` e `EV-M5-019`). A próxima tarefa de M5 é `WEB-020` (`PRONTA`).
+`M4` está **6/6 concluído** (`EV-M4-013/016` e `EV-M4-045/046`). O marco autorizado pelo comando `continue o projeto` de 2026-11-07 é **M5 — Interface administrativa e analítica React**, **concluído com 5 de 5 entregáveis aceitos** (`WEB-017`, `WEB-018`, `WEB-047`, `WEB-019` e `WEB-020` **CONCLUIDAS** em `EV-M5-017/018`, `EV-M5-047`, `EV-M5-019` e `EV-M5-020`). O próximo marco a ser autorizado é **M7**.
 
-| ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito | ⬜ Próxima |
+| ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito |
 |---|---|---|---|---|
 | [WEB-017](#web-017--revalidar-filtros-lista-e-agregações-autorizadas): catálogo filtros/KPIs | [WEB-018](#web-018--revalidar-administração-react-de-contas-e-vínculos): administração e vínculos | [WEB-047](#web-047--implementar-crud-administrativo-completo-de-pacientes-e-avaliadores-histórico-longitudinal-e-correção-auditada-de-vínculos): CRUD pacientes/avaliadores | [WEB-019](#web-019--validar-detalhe-tentativas-métricas-e-proveniência): detalhe/resultados | [WEB-020](#web-020--conferir-exportação-do-conjunto-filtrado-no-react): exportação CSV filtrada |
 
 M2 permanece concluído em EV-M2 e EV-M2-007/008. M3 permanece concluído (7/7)
 em EV-M3-012-ACEITE. M6 permanece concluído (4/4) em EV-M6-021/024. M4 permanece
-concluído (6/6) em EV-M4-045/046. M5 em andamento (3/5 aceitos).
+concluído (6/6) em EV-M4-045/046. M5 concluído (5/5 aceitos).
 
 **Acompanhar impedimentos:** [riscos](#registro-de-riscos) ·
 [decisões externas](#decisões-externas-e-condições-de-desbloqueio).
@@ -1236,13 +1238,13 @@ comprovados. `WEB-045` e `WEB-046` passam a `CONCLUIDA`, encerrando **M4 (6/6)**
 
 ### WEB-020 — Conferir exportação do conjunto filtrado no React
 
-- Marco: M5. Prioridade: P1. Complexidade: G. Estado: PRONTA.
+- Marco: M5. Prioridade: P1. Complexidade: G. Estado: CONCLUIDA.
 - Dependências: WEB-018, WEB-019.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: CSV individual/agregado coincide com consulta autorizada; revogação pré-download nega; células protegidas; M5 aceito. CHG-003: remoção do HUD não altera CSV individual/agregado nem relatórios e 12 métricas. CHG-005: implementar módulo `Exportações` (`REQ-CSV-005`) com exportação CSV do subconjunto filtrado nas granularidades `pacientes`, `avaliacoes`, `tentativas`, `metricas` e `stroop_21_colunas`, seleção de colunas permitidas, pré-visualização com contagem de linhas (`POST /api/v1/exports/preview`), identificação explícita dos critérios aplicados, modo `deidentified` por padrão e modo `nominal` restrito a autorização de perfil e habilitação `DEC-03`, exclusão estrita de sessões parciais/invalidadas e neutralização contra *CSV formula injection*.
-- Testes/verificação: `tests/test_web_export.py, test_web_aggregate_export.py; HTTPS real (EXP-CSV-01)`. Arquivos citados existem; verificações PLANEJADAS não têm resultado. Adicional PLANEJADO: paridade de exportações multi-granularidade contra fixtures sintéticas.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R04, R05, R07, R13; depende de `WEB-018` e `WEB-019`.
+- Testes/verificação: `tests/test_web_multi_export.py, test_web_export.py, test_web_aggregate_export.py; Vitest/Playwright (EXP-CSV-01)`. Aprovados integralmente na CI Actions (`verify`, Run `42522885308`).
+- Evidências: `EV-M5-020` (2026-11-08); exportações CSV nas 5 granularidades com seleção de colunas, prévia de contagem e amostra, controle estrito de anonimização (nominal exclusivo para administração), escape contra injeção de fórmulas e exclusão de parciais/invalidadas.
+- Riscos/bloqueios: R04, R05, R07, R13 mitigados.
 - Referências: REQ-CSV-003, REQ-CSV-005; [arquitetura](ARQUITETURA_WEB.md), [contrato HTTP](desenvolvimento/CONTRATO_API_WEB.md). REQ-UX-006.
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 
@@ -1351,6 +1353,56 @@ Entregas consolidadas nesta sessão:
 Conferência de critérios de aceite de `WEB-017` e `WEB-018`: todos satisfeitos.
 `WEB-017` e `WEB-018` passam a `CONCLUIDA`. Marco `M5` avança para **2/5 aceitos**;
 próxima tarefa pronta: `WEB-047`.
+
+### EV-M5-020 — exportações CSV multi-granularidade no React, 2026-11-08
+
+Autorização e escopo: tarefa pronta `WEB-020` autorizada para execução em `M5`
+na branch dedicada `feat/m5-exportacoes-csv-filtradas` a partir de `main` (`d426c2f`).
+
+Entregas técnicas consolidadas:
+
+1. **Domínio de exportações multi-granularidade (`REQ-CSV-005`, `DEC-03`)**:
+   - `stroop/domain/web_multi_export.py`:
+     - Catálogo formal e canônico das 5 granularidades: `pacientes`, `avaliacoes`,
+       `tentativas`, `metricas` e `stroop_21_colunas`.
+     - Projeção dinâmica de colunas solicitadas respeitando a lista permitida de cada catálogo.
+     - Anonimização estrita: modo `deidentified` mascara nomes e identificadores diretos
+       por padrão; modo `nominal` restrito exclusivamente ao perfil `administracao`
+       (retorna `403 permission_denied` em outros perfis).
+     - Proteção contra *CSV formula injection* (`_safe_cell` prefixa células que iniciam
+       com `=`, `+`, `-`, `@`, `\t`, `\r` ou `\n` com `'`).
+     - Ausências de RT mantêm célula vazia `""` sem conversão espúria para zero.
+
+2. **Persistência SQL filtrada e íntegra (`stroop/persistence/web_multi_export.py`)**:
+   - Consultas SQL otimizadas filtradas por projeto e intervalo de datas.
+   - Exclusão rigorosa de sessões incompletas ou invalidadas (`valid_session = TRUE` e
+     `invalidated_at IS NULL`), garantindo integridade dos dados exportados para pesquisa.
+
+3. **Endpoints de pré-visualização e download (`api/exports.py`, `api/main.py`)**:
+   - `POST /api/v1/exports/preview`: retorna contagem total de registros do subconjunto filtrado,
+     total de colunas projetadas e amostra tabular das 5 primeiras linhas.
+   - `POST /api/v1/exports/download`: gera token HMAC efêmero assinado (15 min) e entrega o
+     arquivo CSV com headers `Content-Disposition`, `X-Content-Type-Options: nosniff` e
+     `Cache-Control: no-store`.
+
+4. **Interface React modular de exportação (`web/src/components/ExportHubPanel.tsx`)**:
+   - Seletor acessível das 5 granularidades com contagem e descrição clara de escopo.
+   - Seleção granular de colunas com botões rápidos "Selecionar todas" e "Limpar seleção".
+   - Controle de modo de identificação com bloqueio visual e aviso explícito para não-administradores.
+   - Painel de prévia com contagem em destaque, critérios aplicados e amostra das primeiras linhas.
+   - Download direto do arquivo CSV via Blob seguro com feedback de progresso e tratamento de erro.
+   - Cliente HTTP tipado em `web/src/api/exports.ts` com proteção CSRF.
+
+5. **Validação automatizada e CI remota**:
+   - 329 testes unitários aprovados no Vitest (`npm --prefix web test`).
+   - 22 testes unitários de exportação aprovados no backend (`tests/test_web_multi_export.py`,
+     `tests/test_web_export.py`, `tests/test_web_aggregate_export.py`).
+   - Typecheck TypeScript (`tsc --noEmit`) e build de produção do Vite aprovados sem advertências impeditivas.
+   - Suíte completa de CI Actions (`verify`, Run `42522885308`) 100% verde na branch de entrega.
+   - Merge Commit tradicional na `main` (`ff45b7a`) via Pull Request #10.
+
+Com a aceitação de `EV-M5-020`, **todas as 5 tarefas de M5 estão CONCLUIDAS**. Marco `M5`
+concluído com **5/5 entregáveis aceitos**. Progresso global avança para **33 de 48 entregáveis aceitos (68,8%)**.
 
 ### EV-M5-019 — detalhe de avaliações, histórico operacional e análises descritivas, 2026-11-08
 
@@ -2672,7 +2724,25 @@ Verificações locais executadas nesta missão documental (`Python 3.12.3`, sem 
 
 ## Retomada
 
-### Retomada vigente — validação de detalhe, histórico e análises descritivas (WEB-019), 2026-11-08
+### Retomada vigente — conclusão do marco M5 e exportações CSV (WEB-020), 2026-11-08
+
+Marco vigente **M5 integralmente concluído com 5 de 5 entregáveis aceitos**
+(`WEB-017`, `WEB-018`, `WEB-047`, `WEB-019` e `WEB-020` **CONCLUIDAS**).
+Tarefa final `WEB-020` entregue via Pull Request #10 (`feat/m5-exportacoes-csv-filtradas`)
+aprovado na CI (Run `42522885308`) e integrado à `main` via Merge Commit tradicional (`ff45b7a`).
+
+Progresso global do projeto: **33/48 entregáveis aceitos (68,8%)**, 15 sem aceite:
+marco **M5 com 5/5 aceitos**, encerrado sem pendências funcionais.
+`WEB-031` permanece **BLOQUEADA** aguardando definição de destino externo.
+
+Próximo marco: **M7 (Migração, paridade e retirada do Streamlit)**, dependente de
+autorização expressa do responsável para início da execução técnica.
+
+Git da entrega: branch `feat/m5-exportacoes-csv-filtradas`, commit `f6cc03b`,
+PR #10, Run de CI `42522885308` e Merge Commit tradicional `ff45b7a` na `main`.
+Fast-forward local na `main` concluído e confirmado.
+
+### Retomada anterior — validação de detalhe, histórico e análises descritivas (WEB-019), 2026-11-08
 
 Tarefa pronta `WEB-019` concluída em M5, entregue via Pull Request #8
 (`feat/m5-detalhes-resultados-metricas`) aprovado na CI (Run `42517336016`) e
