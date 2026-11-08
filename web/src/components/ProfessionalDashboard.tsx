@@ -8,6 +8,7 @@ import { ResearchVisualizations, GenericInstrumentResults } from './ResearchVisu
 import { PatientsPanel } from './PatientsPanel'
 import { EvaluatorsPanel } from './EvaluatorsPanel'
 import { AdministrationPanel } from './AdministrationPanel'
+import { ExportHubPanel } from './ExportHubPanel'
 import type { ScopedAssessment } from './ResultsTable'
 import type { ResearchQuery } from './ResearchFilters'
 import { ApiError, apiErrorMessage } from '../api/client'
@@ -994,79 +995,8 @@ export function ProfessionalDashboard({
       {/* MÓDULO 7: EXPORTAÇÕES (WEB-020) */}
       {activeModule === 'exportacoes' && (
         <section aria-label="Módulo Exportações" className="export-hub-panel">
-          <h2>Central de exportações</h2>
-          <p className="quiet">
-            Exportação de dados da plataforma em formato CSV aberto (ADR-007 / REQ-CSV-005).
-          </p>
-
           {renderProjectSelector()}
-
-          <div className="content-card export-hub-card">
-            <h3>Exportar visão agregada filtrada</h3>
-            <p className="quiet">
-              Gera arquivo CSV consolidado contendo todas as avaliações que atendem aos filtros atuais do projeto
-              selecionado ({currentProject?.code ?? '—'}).
-            </p>
-
-            <button
-              type="button"
-              className="button primary"
-              disabled={
-                aggregateBusy ||
-                !aggregateContext ||
-                !['stroop_go_nogo_ptbr', 'instrumento_sintetico_demo'].includes(selectedInstrument)
-              }
-              onClick={() => void downloadAggregate()}
-            >
-              {aggregateBusy ? 'Preparando arquivo agregado…' : 'Exportar visão filtrada'}
-            </button>
-
-            {aggregateMessage && <p role="status">{aggregateMessage}</p>}
-          </div>
-
-          <div className="content-card export-info-card">
-            <h3>Granularidades e políticas de exportação (REQ-CSV-005)</h3>
-            <ul>
-              <li>
-                <strong>Pacientes (<code>pacientes</code>):</strong> Dados cadastrais, identificador PAT-...,
-                projetos vinculados e total de avaliações.
-              </li>
-              <li>
-                <strong>Avaliações (<code>avaliacoes</code>):</strong> Metadados de sessão, datas, projeto,
-                avaliador e status de conclusão.
-              </li>
-              <li>
-                <strong>Tentativas (<code>tentativas</code>):</strong> Registro individual de cada tentativa com
-                palavra, cor, condição experimental, tecla e tempo de resposta (RT).
-              </li>
-              <li>
-                <strong>Métricas (<code>metricas</code>):</strong> As 12 métricas oficiais do Stroop com valores,
-                rótulos e unidades padronizadas.
-              </li>
-              <li>
-                <strong>Stroop 21 colunas:</strong> Formato clássico compatível com PsychoPy Builder e scripts
-                históricos de análise em R/Python/SPSS.
-              </li>
-            </ul>
-
-            <div className="notice" role="region" aria-label="Proteção e privacidade">
-              <strong>Privacidade e segurança:</strong>
-              <ul>
-                <li>
-                  <strong>Modo desidentificado (padrão):</strong> Exporta códigos estáveis PAT-... e EVA-... sem
-                  nomes nominais.
-                </li>
-                <li>
-                  <strong>Modo nominal:</strong> Restrito a perfis autorizados mediante habilitação
-                  institucional formal (DEC-03).
-                </li>
-                <li>
-                  <strong>Proteção ativa contra CSV Formula Injection:</strong> Células iniciadas por =, +, -,
-                  @, tab ou carriage return são neutralizadas de forma segura.
-                </li>
-              </ul>
-            </div>
-          </div>
+          <ExportHubPanel profile={profile} project={currentProject} />
         </section>
       )}
 
