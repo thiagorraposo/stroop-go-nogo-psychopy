@@ -4,6 +4,22 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-08 — Detalhe de avaliações, histórico operacional e análises descritivas (M5 / WEB-019)
+
+- Consolidados os módulos operacionais `Avaliações e histórico` e `Resultados e análises` (`REQ-REL-005`):
+  - No módulo Histórico: lista de avaliações com proveniência e integridade operacional (`ADR-005`),
+    detalhe completo com metadados cadastrais (`PAT-...`, `EVA-...`), quatro respostas visíveis
+    (`hits`, `omission_errors`, `correct_rejections`, `commission_errors`), 12 métricas oficiais
+    com unidades e tratamento explícito de tempo de reação ausente sem zero espúrio, e tabela
+    completa de tentativas registradas.
+  - No módulo Resultados e análises: visualizações descritivas com evolução longitudinal do paciente
+    por avaliação, distribuição de tempos de reação (RT mediano) em faixas padronizadas, precisão e
+    contagens de erro por condição experimental Go vs. No-Go, e comparações descritivas por visita e
+    por avaliador responsável, sempre com tabelas acessíveis equivalentes (`<caption>`, `<th>`, `<td>`).
+- Entregue via Pull Request #8 (`feat/m5-detalhes-resultados-metricas`), aprovado na CI (`verify`,
+  Run `42517336016`) e integrado à `main` via Merge Commit tradicional (`6be3042`).
+  Aceite registrado em `EV-M5-019`. Progresso avança para 32/48 entregáveis aceitos (66,7%).
+
 ## 2026-11-08 — CRUD de pacientes, avaliadores e correção de vínculos (M5 / WEB-047)
 
 - Implementados na interface React e endpoints FastAPI a edição cadastral de pacientes

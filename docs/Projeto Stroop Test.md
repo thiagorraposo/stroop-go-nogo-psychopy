@@ -38,13 +38,14 @@ de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
 Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
 não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
 
-Progresso atual: **31/48 entregáveis aceitos (WEB-000 a WEB-018, WEB-021 a WEB-024, WEB-029/030, WEB-042/043/044, WEB-045/046 e WEB-047)**.
+Progresso atual: **32/48 entregáveis aceitos (WEB-000 a WEB-019, WEB-021 a WEB-024, WEB-029/030, WEB-042/043/044, WEB-045/046 e WEB-047)**.
 WEB-005 é documental; WEB-006 aceita o receptor backend e contratos em banco
 sintético. M1, M2, M3, M4 e M6 concluídos; atomicidade e paridade aceitas em EV-M2-007/008;
 autenticação local e revisão de segurança aceitas em EV-M6-021/024; M4 integralmente concluído (6/6);
-M5 em andamento (3/5 aceitos), com navegação modular e painéis base em EV-M5-047-NAV, catálogo de filtros
-combinados (`REQ-REL-004`) + KPIs descritivos e administração React aceitos em EV-M5-017/018, e CRUD
-completo de pacientes/avaliadores com correção auditada de vínculos aceito em EV-M5-047.
+M5 em andamento (4/5 aceitos), com navegação modular e painéis base em EV-M5-047-NAV, catálogo de filtros
+combinados (`REQ-REL-004`) + KPIs descritivos e administração React aceitos em EV-M5-017/018, CRUD
+completo de pacientes/avaliadores com correção auditada de vínculos aceito em EV-M5-047, e detalhe
+completo de tentativas, histórico operacional e análises descritivas aceitas em EV-M5-019.
 
 ## Painel visual de acompanhamento
 
@@ -52,10 +53,10 @@ Atualizado em **2026-11-08**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **31 de 48 · 64,6%** | **17** | **M5 autorizado (3/5 aceitos)** | Implementar WEB-019 e WEB-020 em M5; WEB-031 aguarda destino externo |
+| **32 de 48 · 66,7%** | **16** | **M5 autorizado (4/5 aceitos)** | Implementar WEB-020 em M5 para conclusão integral do marco; WEB-031 aguarda destino externo |
 
 ```text
-Aceites   █████████████░░░░░░░   64,6%
+Aceites   █████████████░░░░░░░   66,7%
 ```
 
 A barra global é aproximada; os números são exatos, com percentual arredondado.
@@ -77,7 +78,7 @@ A ordem da tabela segue os IDs; dependências e paralelismo estão na
 | [M2](#m2--backend-e-contratos-de-dados-consolidados) | Backend e contratos de dados consolidados | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M3](#m3--viabilidade-e-motor-experimental-no-navegador) | Viabilidade e motor experimental no navegador | 🟩🟩🟩🟩🟩🟩🟩 **7/7** | ✅ Concluído |
 | [M4](#m4--fluxo-ponta-a-ponta-de-avaliações) | Fluxo ponta a ponta de avaliações | 🟩🟩🟩🟩🟩🟩 **6/6** | ✅ Concluído |
-| [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | 🟩🟩🟩⬜⬜ **3/5** | ◐ Em andamento |
+| [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | 🟩🟩🟩🟩⬜ **4/5** | ◐ Em andamento |
 | [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M7](#m7--integração-compatibilidade-histórica-e-transição) | Integração, compatibilidade histórica e transição | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M8](#m8--ci-infraestrutura-e-preparação-operacional) | CI, infraestrutura e preparação operacional | 🟩🟩⬜⬜ **2/4** | ◐ Parcial; réplica externa e release pendentes |
@@ -124,9 +125,9 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 
 ### Foco do marco atual
 
-`M4` está **6/6 concluído** (`EV-M4-013/016` e `EV-M4-045/046`). O marco autorizado pelo comando `continue o projeto` de 2026-11-07 é **M5 — Interface administrativa e analítica React**, com **3 de 5 entregáveis aceitos** (`WEB-017`, `WEB-018` e `WEB-047` **CONCLUIDAS** em `EV-M5-017/018` e `EV-M5-047`). A próxima tarefa de M5 é `WEB-019` (`PRONTA`), seguida de `WEB-020`.
+`M4` está **6/6 concluído** (`EV-M4-013/016` e `EV-M4-045/046`). O marco autorizado pelo comando `continue o projeto` de 2026-11-07 é **M5 — Interface administrativa e analítica React**, com **4 de 5 entregáveis aceitos** (`WEB-017`, `WEB-018`, `WEB-047` e `WEB-019` **CONCLUIDAS** em `EV-M5-017/018`, `EV-M5-047` e `EV-M5-019`). A próxima tarefa de M5 é `WEB-020` (`PRONTA`).
 
-| ✅ Aceito | ✅ Aceito | ✅ Aceito | ⬜ Próxima | ⬜ Pendente |
+| ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito | ⬜ Próxima |
 |---|---|---|---|---|
 | [WEB-017](#web-017--revalidar-filtros-lista-e-agregações-autorizadas): catálogo filtros/KPIs | [WEB-018](#web-018--revalidar-administração-react-de-contas-e-vínculos): administração e vínculos | [WEB-047](#web-047--implementar-crud-administrativo-completo-de-pacientes-e-avaliadores-histórico-longitudinal-e-correção-auditada-de-vínculos): CRUD pacientes/avaliadores | [WEB-019](#web-019--validar-detalhe-tentativas-métricas-e-proveniência): detalhe/resultados | [WEB-020](#web-020--conferir-exportação-do-conjunto-filtrado-no-react): exportação CSV filtrada |
 
@@ -1222,19 +1223,20 @@ comprovados. `WEB-045` e `WEB-046` passam a `CONCLUIDA`, encerrando **M4 (6/6)**
 
 ### WEB-019 — Validar detalhe, tentativas, métricas e proveniência
 
-- Marco: M5. Prioridade: P1. Complexidade: G. Estado: PRONTA.
+- Marco: M5. Prioridade: P1. Complexidade: G. Estado: CONCLUIDA.
 - Dependências: WEB-017, WEB-047.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Unidades/ausência RT, quatro respostas e versões visíveis; gráficos e rótulos descritivos com testes UI/API. CHG-003: revisar tokens/componentes compartilhados, teclado/foco/legibilidade, loading/erro e resoluções; dashboard mantém precisão/gráficos autorizados. CHG-005: consolidar os módulos `Avaliações e histórico` (acompanhamento operacional de convites/sessões, checkpoints `ADR-005` e invalidações) e `Resultados e análises` (`REQ-REL-005`: detalhe completo com vínculos de paciente e avaliador responsável, visualizações interativas de evolução longitudinal do paciente entre visitas/testes, distribuição de RTs, precisão e erros por condição experimental Go/No-Go e congruente/incongruente, projeto, visita e avaliador, sempre com tabelas acessíveis equivalentes e sem normas clínicas).
-- Testes/verificação: `tests/test_web_assessments.py, test_web_results.py; Vitest/Playwright (DASH-01)`. Arquivos citados existem; verificações PLANEJADAS não têm resultado. Adicional PLANEJADO: componentes Vitest, árvore acessível e Chromium/Firefox; regressão de ResearchVisualizations/ResultsTable/analysis.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R04, R05, R13; depende de `WEB-017` e `WEB-047`.
+- Testes/verificação: `tests/test_web_assessments.py, test_web_results.py; Vitest/Playwright (DASH-01)`. Aprovados integralmente localmente e na suíte CI do GitHub Actions (`verify`).
+- Evidências: `EV-M5-019` (2026-11-08); detalhe completo de avaliações com proveniência e integridade operacional, quatro respostas visíveis (hits, omissions, correct_rejections, commissions), ausência de RT explícita sem zero arbitrário, distribuição de RTs por faixas, desempenho por condição Go/No-Go e comparações por visita e por avaliador em tabelas acessíveis equivalentes (`<caption>`, `<th>`, `<td>`).
+- Riscos/bloqueios: R04, R05, R13; resolvidos no escopo do marco M5.
 - Referências: REQ-MET-003, REQ-REL-002, REQ-REL-005; [arquitetura](ARQUITETURA_WEB.md), [UX](experimento/UX_DECISIONS.md). REQ-UX-006/011/012.
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Git da entrega: branch `feat/m5-detalhes-resultados-metricas`, commit `48839a2`, PR #8, Run de CI `42517336016` e Merge Commit tradicional `6be3042` na `main`.
+
 
 ### WEB-020 — Conferir exportação do conjunto filtrado no React
 
-- Marco: M5. Prioridade: P1. Complexidade: G. Estado: PENDENTE.
+- Marco: M5. Prioridade: P1. Complexidade: G. Estado: PRONTA.
 - Dependências: WEB-018, WEB-019.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: CSV individual/agregado coincide com consulta autorizada; revogação pré-download nega; células protegidas; M5 aceito. CHG-003: remoção do HUD não altera CSV individual/agregado nem relatórios e 12 métricas. CHG-005: implementar módulo `Exportações` (`REQ-CSV-005`) com exportação CSV do subconjunto filtrado nas granularidades `pacientes`, `avaliacoes`, `tentativas`, `metricas` e `stroop_21_colunas`, seleção de colunas permitidas, pré-visualização com contagem de linhas (`POST /api/v1/exports/preview`), identificação explícita dos critérios aplicados, modo `deidentified` por padrão e modo `nominal` restrito a autorização de perfil e habilitação `DEC-03`, exclusão estrita de sessões parciais/invalidadas e neutralização contra *CSV formula injection*.
@@ -1349,6 +1351,55 @@ Entregas consolidadas nesta sessão:
 Conferência de critérios de aceite de `WEB-017` e `WEB-018`: todos satisfeitos.
 `WEB-017` e `WEB-018` passam a `CONCLUIDA`. Marco `M5` avança para **2/5 aceitos**;
 próxima tarefa pronta: `WEB-047`.
+
+### EV-M5-019 — detalhe de avaliações, histórico operacional e análises descritivas, 2026-11-08
+
+Autorização e escopo: tarefa pronta `WEB-019` autorizada para execução em `M5`
+na branch dedicada `feat/m5-detalhes-resultados-metricas` a partir de `main` (`421bc58`).
+
+Entregas técnicas consolidadas:
+
+1. **Acompanhamento operacional de avaliações e sessões no módulo Histórico (`ADR-005`, `CHG-005`)**:
+   - `web/src/components/ProfessionalDashboard.tsx`, `web/src/components/ResultsTable.tsx`:
+     - Tabela de avaliações com identificação de proveniência (plataforma WEB com `session_id`,
+       `protocol_id`, `app_version` e `frame_period_ms` vs. importação legado PsychoPy local),
+       status de integridade/resultado e botão acessível de abertura do painel de detalhe.
+     - Painel de detalhe com proveniência completa, metadados cadastrais (`participant_id` PAT-...,
+       `evaluator_id` EVA-...), motivo de invalidação em destaque quando aplicável e fechamento
+       acessível com retorno de foco.
+
+2. **Detalhamento completo de respostas, métricas e tentativas (`REQ-REL-005`)**:
+   - Resumo descritivo com contagens das quatro respostas principais: Acertos (`hits`),
+     Erros de omissão (`omission_errors`), Rejeições corretas (`correct_rejections`) e
+     Erros de comissão (`commission_errors`).
+   - Apresentação das 12 métricas oficiais do Stroop com rótulos padronizados e unidades
+     (`%`, `s`, contagem). Tratamento explícito de tempo de reação ausente (`—`) quando
+     `hits = 0`, sem conversão espúria para zero.
+   - Tabela de tentativas completas com bloco, tentativa (#), palavra, cor da tinta,
+     condição experimental, tecla pressionada (ou `—`), classificação e tempo de reação (s e ms).
+
+3. **Visualizações analíticas descritivas no módulo Resultados e análises (`REQ-REL-005`)**:
+   - `web/src/components/ResearchVisualizations.tsx`:
+     - Evolução longitudinal do paciente por avaliação ordenada cronologicamente, com
+       gráficos acessíveis (`<meter>`) de precisão e RT mediano e tabela de evolução equivalente.
+     - Distribuição de tempos de reação (RTs) por faixas (< 0,5s, 0,5 a < 1s, 1 a < 1,5s,
+       1,5 a < 2s, ≥ 2s e ausente), com contagens, proporções e tabela acessível.
+     - Precisão e contagens de erros por condição experimental Go vs. No-Go.
+     - Comparações descritivas por visita e por avaliador responsável.
+     - Toda informação mantida estritamente com rótulos descritivos de pesquisa, sem inferência
+       diagnóstica, laudos ou normas clínicas.
+
+Verificações e testes:
+- Backend: `tests/test_web_assessments.py` (20 testes aprovados com PostgreSQL descartável),
+  `tests/test_web_results.py` (19 testes aprovados de validação, 4 classificações e ausência de RT);
+- Frontend: 327 testes Vitest aprovados (`ModularNavigation.test.tsx`, `ResearchVisualizations.test.tsx`,
+  `analysis.test.ts`, etc.);
+- Typecheck (`tsc --noEmit`) e Vite build (`dist/`) concluídos com sucesso;
+- CI oficial remota (`verify`, Run `42517336016`) aprovada em todos os steps (scanners,
+  backend com PostgreSQL real, Vitest, Playwright em Chromium e Firefox e integração ponta a ponta).
+
+Git da entrega: branch `feat/m5-detalhes-resultados-metricas`, commit `48839a2`,
+PR #8 aprovado na CI e integrado à `main` via Merge Commit tradicional (`6be3042`).
 
 ### EV-M5-047 — CRUD administrativo de pacientes, avaliadores e correção auditada de vínculos, 2026-11-08
 
@@ -2621,7 +2672,27 @@ Verificações locais executadas nesta missão documental (`Python 3.12.3`, sem 
 
 ## Retomada
 
-### Retomada vigente — conclusão de WEB-047 (CRUD administrativo de pacientes, avaliadores e correção de vínculos), 2026-11-08
+### Retomada vigente — validação de detalhe, histórico e análises descritivas (WEB-019), 2026-11-08
+
+Tarefa pronta `WEB-019` concluída em M5, entregue via Pull Request #8
+(`feat/m5-detalhes-resultados-metricas`) aprovado na CI (Run `42517336016`) e
+integrado à `main` via Merge Commit tradicional (`6be3042`).
+
+Progresso global do projeto: **32/48 entregáveis aceitos (66,7%)**, 16 sem aceite:
+marco **M5 com 4 de 5 entregáveis aceitos** (`WEB-017`, `WEB-018`, `WEB-047` e `WEB-019` **CONCLUIDAS**),
+`WEB-020` **PRONTA** e `WEB-031` **BLOQUEADA** por destino externo autorizado indisponível.
+
+Próxima ação exata: prosseguir no marco vigente **M5** executando a próxima tarefa
+pronta `WEB-020` ("Conferir exportação do conjunto filtrado no React"), implementando
+o módulo `Exportações` (`REQ-CSV-005`) com 5 granularidades (`pacientes`, `avaliacoes`,
+`tentativas`, `metricas`, `stroop_21_colunas`), seleção de colunas, pré-visualização de contagem,
+controle `deidentified` vs. `nominal` e neutralização de CSV formula injection.
+
+Git da entrega: branch `feat/m5-detalhes-resultados-metricas`, commit `48839a2`,
+PR #8, Run de CI `42517336016` e Merge Commit tradicional `6be3042` na `main`.
+Fast-forward local na `main` concluído e confirmado.
+
+### Retomada anterior — conclusão de WEB-047 (CRUD administrativo de pacientes, avaliadores e correção de vínculos), 2026-11-08
 
 Comando `continue o projeto` no marco vigente **M5** avançou com a conclusão da tarefa
 `WEB-047` ("Implementar CRUD administrativo completo de pacientes e avaliadores,
