@@ -11,6 +11,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, Response
 
 from api.errors import APIError
+from api.models import RequestModel
 from api.sessions import (
     _professional_read, _professional_write, _reject_empty_body, _reject_query,
 )
@@ -187,6 +188,52 @@ async def export_assessment(request: Request, project_id: UUID, assessment_id: s
         raise APIError('service_unavailable') from None
     return Response(content, media_type='text/csv; charset=utf-8',
                     headers={'Content-Disposition': f'attachment; filename="{filename}"'})
+
+
+class RelinkAssessmentRequest(RequestModel):
+    patient_id: str | None = None
+    evaluator_id: str | None = None
+    reason_code: str
+
+
+@router.post('/{assessment_id}/relink')
+async def relink_assessment(
+    request: Request,
+    project_id: UUID,
+    assessment_id: str,
+    body: RelinkAssessmentRequest,
+):
+    _reject_query(request)
+    actor = _professional_write(request, 'manage_patients')
+    _identifier(assessment_id)
+    patient_uuid: UUID | None = None
+    evaluator_uuid: UUID | None = None
+    try:
+        if body.patient_id is not None:
+            patient_uuid = UUID(body.patient_id)
+        if body.evaluator_id is not None:
+            evaluator_uuid = UUID(body.evaluator_id)
+    except ValueError:
+        raise APIError('invalid_request') from None
+    from stroop.application import web_registry
+    try:
+        return web_registry.relink_assessment(
+            request.app.state.config.database_url,
+            actor,
+            project_id=project_id,
+            assessment_id=assessment_id,
+            patient_id=patient_uuid,
+            evaluator_id=evaluator_uuid,
+            reason_code=body.reason_code,
+        )
+    except web_registry.InvalidRegistryDataError:
+        raise APIError('invalid_request') from None
+    except web_registry.ForbiddenRegistryError:
+        raise APIError('permission_denied') from None
+    except web_registry.MissingRegistryError:
+        raise APIError('not_found') from None
+    except web_registry.PersistenceError:
+        raise APIError('service_unavailable') from None
 
 
 @export_router.post('/export')

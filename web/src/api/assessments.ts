@@ -224,3 +224,69 @@ export function exportAssessment(projectId: string, assessmentId: string, signal
       return { filename: match[1], blob };
     }, signal);
 }
+
+export type RelinkAssessmentInput = {
+  patient_id?: string;
+  evaluator_id?: string;
+  reason_code: string;
+};
+
+export type RelinkAssessmentResponse = {
+  assessment_id: string;
+  project_id: string;
+  patient_id: string | null;
+  evaluator_id: string | null;
+  relinked: boolean;
+};
+
+export function relinkAssessment(
+  projectId: string,
+  assessmentId: string,
+  input: RelinkAssessmentInput,
+  csrfToken: string,
+  signal?: AbortSignal,
+): Promise<RelinkAssessmentResponse> {
+  const reason = input.reason_code.trim();
+  if (!reason || reason.length > 120) throw new ApiError('invalid_request', 422);
+  const payload: Record<string, unknown> = { reason_code: reason };
+  if (input.patient_id) {
+    if (!uuidPattern.test(input.patient_id)) throw new ApiError('invalid_request', 422);
+    payload.patient_id = input.patient_id;
+  }
+  if (input.evaluator_id) {
+    if (!uuidPattern.test(input.evaluator_id)) throw new ApiError('invalid_request', 422);
+    payload.evaluator_id = input.evaluator_id;
+  }
+  return request(
+    `${assessmentPath(projectId, assessmentId)}/relink` as ApiPath,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      body: JSON.stringify(payload),
+    },
+    async response => {
+      if (response.status !== 200) throw new ApiError('invalid_response', response.status);
+      let body: unknown;
+      try {
+        body = await response.json();
+      } catch {
+        throw new ApiError('invalid_response', response.status);
+      }
+      if (!record(body) || typeof body.assessment_id !== 'string') {
+        throw new ApiError('invalid_response', response.status);
+      }
+      return {
+        assessment_id: String(body.assessment_id),
+        project_id: String(body.project_id),
+        patient_id: typeof body.patient_id === 'string' ? body.patient_id : null,
+        evaluator_id: typeof body.evaluator_id === 'string' ? body.evaluator_id : null,
+        relinked: Boolean(body.relinked),
+      };
+    },
+    signal,
+  );
+}

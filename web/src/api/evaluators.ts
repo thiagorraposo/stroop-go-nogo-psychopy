@@ -158,8 +158,18 @@ export type EvaluatorAssessmentLink = {
   created_at: string;
 };
 
+export type EvaluatorAuditEvent = {
+  event_id: string;
+  entity_type: string;
+  action: string;
+  reason_code: string;
+  occurred_at: string;
+};
+
 export type EvaluatorDetail = EvaluatorRecord & {
+  instruments: string[];
   assessments: EvaluatorAssessmentLink[];
+  audit_history: EvaluatorAuditEvent[];
 };
 
 export type UpdateEvaluatorInput = {
@@ -197,10 +207,22 @@ export function getEvaluator(
             test_code: String(a.test_code),
             test_version: String(a.test_version),
             visit: String(a.visit),
-            created_at: String(a.created_at),
+            created_at: String(a.created_at ?? a.completed_at ?? ''),
           }))
         : [];
-      return { ...base, assessments };
+      const instruments: string[] = Array.isArray(body.instruments)
+        ? body.instruments.filter((i): i is string => typeof i === 'string')
+        : [];
+      const audit_history: EvaluatorAuditEvent[] = Array.isArray(body.audit_history)
+        ? body.audit_history.filter(record).map(h => ({
+            event_id: String(h.event_id),
+            entity_type: String(h.entity_type),
+            action: String(h.action),
+            reason_code: String(h.reason_code),
+            occurred_at: String(h.occurred_at),
+          }))
+        : [];
+      return { ...base, instruments, assessments, audit_history };
     },
     signal,
   );

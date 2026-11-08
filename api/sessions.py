@@ -72,6 +72,12 @@ class EmptyRequest(RequestModel):
     pass
 
 
+class RelinkInvitation(RequestModel):
+    patient_id: str | None = None
+    evaluator_id: str | None = None
+    reason_code: str
+
+
 def _reject_query(request: Request) -> None:
     if request.query_params:
         raise APIError("invalid_request")
@@ -396,6 +402,45 @@ async def revoke_invitation(project_id: UUID, invitation_id: UUID, request: Requ
     if not revoked:
         raise APIError("not_found")
     return Response(status_code=204)
+
+
+@router.post("/projects/{project_id}/invitations/{invitation_id}/relink")
+async def relink_invitation(
+    project_id: UUID,
+    invitation_id: UUID,
+    request: Request,
+    body: RelinkInvitation,
+):
+    _reject_query(request)
+    actor = _professional_write(request, "manage_patients")
+    patient_uuid: UUID | None = None
+    evaluator_uuid: UUID | None = None
+    try:
+        if body.patient_id is not None:
+            patient_uuid = UUID(body.patient_id)
+        if body.evaluator_id is not None:
+            evaluator_uuid = UUID(body.evaluator_id)
+    except ValueError:
+        raise APIError("invalid_request") from None
+    from stroop.application import web_registry
+    try:
+        return web_registry.relink_invitation(
+            request.app.state.config.database_url,
+            actor,
+            project_id=project_id,
+            invitation_id=invitation_id,
+            patient_id=patient_uuid,
+            evaluator_id=evaluator_uuid,
+            reason_code=body.reason_code,
+        )
+    except web_registry.InvalidRegistryDataError:
+        raise APIError("invalid_request") from None
+    except web_registry.ForbiddenRegistryError:
+        raise APIError("permission_denied") from None
+    except web_registry.MissingRegistryError:
+        raise APIError("not_found") from None
+    except web_registry.PersistenceError:
+        raise APIError("service_unavailable") from None
 
 
 @router.post("/participant/redeem", status_code=201)

@@ -212,6 +212,131 @@ class WebEvaluatorsPostgresTests(unittest.TestCase):
             ["deactivate", "create"],
         )
 
+    def test_revinculacao_auditada_avaliador_e_controles(self) -> None:
+        ev1 = self.h.importer.post(
+            "/api/v1/evaluators",
+            json={"full_name": "Dr. Avaliador Inicial Errado", "initials": "AIE"},
+        ).json()
+        ev2 = self.h.importer.post(
+            "/api/v1/evaluators",
+            json={"full_name": "Dra. Avaliadora Destino Correta", "initials": "ADC"},
+        ).json()
+        patient = self.h.importer.post(
+            "/api/v1/patients",
+            json={"full_name": "Paciente da Avaliação", "initials": "PA"},
+        ).json()
+
+        inv = self.h.importer.post(
+            f"/api/v1/projects/{self.h.project_id}/invitations",
+            json={
+                "patient_id": patient["id"],
+                "evaluator_id": ev1["id"],
+                "visit": "V1",
+                "test_code": "stroop_go_nogo_ptbr",
+                "initials": "PA",
+            },
+        ).json()
+
+        participant = self.h._participant_client()
+        self.addCleanup(participant.close)
+        redeemed = participant.post("/api/v1/participant/redeem", json={"code": inv["code"]})
+        self.assertEqual(redeemed.status_code, 201, redeemed.text)
+        participant.headers["X-CSRF-Token"] = redeemed.json()["csrf_token"]
+        bootstrap = participant.get("/api/v1/participant/session").json()
+        started = participant.post(
+            "/api/v1/participant/start",
+            json={"app_version": "synthetic-web-0.1.0"},
+        )
+        self.assertEqual(started.status_code, 200, started.text)
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute(
+                "UPDATE web_participant_sessions SET started_at = clock_timestamp() - interval '61 seconds' WHERE session_id = %s",
+                (inv["session_id"],),
+            )
+        trials = [
+            {
+                "trial_number": idx + 1,
+                "condition_id": cond["condition_id"],
+                "key_pressed": "space" if cond["condition_id"] % 2 == 0 else None,
+                "reaction_time_ms": 500.0 if cond["condition_id"] % 2 == 0 else None,
+                "trial_start_ms": idx * 3750,
+                "stimulus_onset_ms": idx * 3750 + 300,
+                "stimulus_offset_ms": idx * 3750 + 2800,
+                "trial_end_ms": idx * 3750 + 3750,
+                "key_at_ms": idx * 3750 + 800.0 if cond["condition_id"] % 2 == 0 else None,
+            }
+            for idx, cond in enumerate(bootstrap["main_conditions"])
+        ]
+        completed = participant.post(
+            "/api/v1/participant/complete",
+            json={
+                "protocol_id": bootstrap["protocol_id"],
+                "test_version": bootstrap["test_version"],
+                "platform": "web",
+                "app_version": "synthetic-web-0.1.0",
+                "frame_period_ms": 16,
+                "trials": trials,
+            },
+        )
+        self.assertEqual(completed.status_code, 201, completed.text)
+        assessment_id = completed.json()["assessment_id"]
+
+        # Executa revinculacao auditada para ev2
+        relink_resp = self.h.importer.post(
+            f"/api/v1/projects/{self.h.project_id}/assessments/{assessment_id}/relink",
+            json={
+                "evaluator_id": ev2["id"],
+                "reason_code": "correcao_erro_humano_avaliador",
+            },
+        )
+        self.assertEqual(relink_resp.status_code, 200, relink_resp.text)
+        relink_data = relink_resp.json()
+        self.assertEqual(relink_data["assessment_id"], assessment_id)
+        self.assertEqual(relink_data["evaluator_id"], ev2["id"])
+        self.assertTrue(relink_data["relinked"])
+
+        # Confere atualizacao nas tabelas
+        with psycopg.connect(self.database_url) as connection:
+            wa_row = connection.execute(
+                "SELECT evaluator_uuid FROM web_assessments WHERE assessment_id = %s",
+                (assessment_id,),
+            ).fetchone()
+            self.assertEqual(str(wa_row[0]), ev2["id"])
+
+            a_row = connection.execute(
+                "SELECT evaluator FROM assessments WHERE assessment_id = %s",
+                (assessment_id,),
+            ).fetchone()
+            self.assertEqual(a_row[0], ev2["evaluator_code"])
+
+            inv_row = connection.execute(
+                "SELECT evaluator_uuid, evaluator_id FROM web_invitations WHERE invitation_id = %s",
+                (inv["invitation_id"],),
+            ).fetchone()
+            self.assertEqual(str(inv_row[0]), ev2["id"])
+            self.assertEqual(inv_row[1], ev2["evaluator_code"])
+
+            audit_events = connection.execute(
+                """SELECT entity_id, action, reason_code FROM web_registry_audit_events
+                   WHERE action = 'relink' AND entity_type = 'invitation_link'
+                   ORDER BY occurred_at ASC""",
+            ).fetchall()
+            self.assertGreaterEqual(len(audit_events), 2)
+            entity_ids = {str(row[0]) for row in audit_events}
+            self.assertIn(ev1["id"], entity_ids)
+            self.assertIn(ev2["id"], entity_ids)
+
+        # Ficha do ev2 exibe a avaliacao
+        detail_ev2 = self.h.consulta.get(f"/api/v1/evaluators/{ev2['id']}").json()
+        self.assertEqual(detail_ev2["assessment_count"], 1)
+        self.assertEqual(detail_ev2["assessments"][0]["assessment_id"], assessment_id)
+        self.assertIn("relink", [ev["action"] for ev in detail_ev2["audit_history"]])
+
+        # Ficha do ev1 nao tem mais a avaliacao, mas tem o relink auditado
+        detail_ev1 = self.h.consulta.get(f"/api/v1/evaluators/{ev1['id']}").json()
+        self.assertEqual(detail_ev1["assessment_count"], 0)
+        self.assertIn("relink", [ev["action"] for ev in detail_ev1["audit_history"]])
+
 
 if __name__ == "__main__":
     unittest.main()

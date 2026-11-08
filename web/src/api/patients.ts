@@ -280,10 +280,38 @@ export type PatientAssessmentLink = {
   created_at: string;
 };
 
+export type PatientSessionLink = {
+  invitation_id: string;
+  session_id: string;
+  project_id: string;
+  project_code: string;
+  visit: string;
+  evaluator_code?: string;
+  evaluator_id?: string | null;
+  test_code: string;
+  test_version: string;
+  invitation_state: string;
+  session_state?: string | null;
+  created_at: string;
+  expires_at?: string | null;
+  redeemed_at?: string | null;
+  revoked_at?: string | null;
+};
+
+export type RegistryAuditEvent = {
+  event_id: string;
+  entity_type: string;
+  action: string;
+  reason_code: string;
+  occurred_at: string;
+};
+
 export type PatientDetail = PatientRecord & {
   projects: PatientProjectLink[];
   visits: PatientVisitLink[];
   assessments: PatientAssessmentLink[];
+  sessions: PatientSessionLink[];
+  audit_history: RegistryAuditEvent[];
 };
 
 export type UpdatePatientInput = {
@@ -341,10 +369,38 @@ export function getPatient(
             test_code: String(a.test_code),
             test_version: String(a.test_version),
             visit: String(a.visit),
-            created_at: String(a.created_at),
+            created_at: String(a.created_at ?? a.completed_at ?? ''),
           }))
         : [];
-      return { ...base, projects, visits, assessments };
+      const sessions: PatientSessionLink[] = Array.isArray(body.sessions)
+        ? body.sessions.filter(record).map(s => ({
+            invitation_id: String(s.invitation_id),
+            session_id: String(s.session_id),
+            project_id: String(s.project_id),
+            project_code: String(s.project_code),
+            visit: String(s.visit),
+            evaluator_code: typeof s.evaluator_code === 'string' ? s.evaluator_code : undefined,
+            evaluator_id: typeof s.evaluator_id === 'string' ? s.evaluator_id : null,
+            test_code: String(s.test_code),
+            test_version: String(s.test_version),
+            invitation_state: String(s.invitation_state),
+            session_state: typeof s.session_state === 'string' ? s.session_state : null,
+            created_at: String(s.created_at),
+            expires_at: typeof s.expires_at === 'string' ? s.expires_at : null,
+            redeemed_at: typeof s.redeemed_at === 'string' ? s.redeemed_at : null,
+            revoked_at: typeof s.revoked_at === 'string' ? s.revoked_at : null,
+          }))
+        : [];
+      const audit_history: RegistryAuditEvent[] = Array.isArray(body.audit_history)
+        ? body.audit_history.filter(record).map(h => ({
+            event_id: String(h.event_id),
+            entity_type: String(h.entity_type),
+            action: String(h.action),
+            reason_code: String(h.reason_code),
+            occurred_at: String(h.occurred_at),
+          }))
+        : [];
+      return { ...base, projects, visits, assessments, sessions, audit_history };
     },
     signal,
   );
