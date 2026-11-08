@@ -122,10 +122,20 @@ function ProfessionalAccess() {
       <button className="button secondary" onClick={() => setRevision(value => value + 1)}>Tentar novamente</button>
     </>}
     {state.phase === 'ready' && <>
-      <p className="lead">Sua sessão está ativa.</p>
-      <p className="role-badge">{roleNames[state.profile.role]}</p>
-      {logoutError && <p role="alert" className="notice">Não foi possível confirmar o encerramento. Tente novamente.</p>}
-      <button className="button secondary" disabled={ending} onClick={() => void endSession(state.profile)}>{ending ? 'Encerrando…' : 'Encerrar sessão'}</button>
+      <div className="session-bar">
+        <div className="session-bar-info">
+          <p className="lead" style={{ margin: 0 }}>Sua sessão está ativa.</p>
+          <p className={`role-badge role-badge-${state.profile.role === 'administracao' ? 'admin' : state.profile.role === 'importacao' ? 'import' : 'query'}`}>
+            {roleNames[state.profile.role]}
+          </p>
+        </div>
+        <div className="session-bar-actions">
+          {logoutError && <p role="alert" className="notice" style={{ margin: 0 }}>Não foi possível confirmar o encerramento. Tente novamente.</p>}
+          <button className="button secondary button-danger" disabled={ending} onClick={() => void endSession(state.profile)}>
+            {ending ? 'Encerrando…' : 'Encerrar sessão'}
+          </button>
+        </div>
+      </div>
       {!ending && <>
         <ProfessionalPassword profile={state.profile} onEnded={() => setState({ phase: 'login' })} />
         <ProfessionalDashboard profile={state.profile} />

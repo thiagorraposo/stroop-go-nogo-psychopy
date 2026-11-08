@@ -169,167 +169,265 @@ export function ResearchFilters({
     onApply({ projects: [initialProject], filters: {} })
   }
 
-  return (
-    <form onSubmit={apply} className="research-filters" aria-label="Filtros da consulta">
-      <h3>Filtrar resultados</h3>
-      <p className="quiet">
-        Seleções do mesmo campo são alternativas; os campos são combinados. Sem seleção, todas as opções desse campo.
-        Use Ctrl/Cmd ou Shift e as setas para selecionar várias opções.
-      </p>
+  const activeChips: { label: string; onRemove: () => void }[] = []
+  if (searchText) {
+    activeChips.push({ label: `Busca: "${searchText}"`, onRemove: () => setSearchText('') })
+  }
+  if (start || end) {
+    activeChips.push({ label: `Período: ${start || '…'} a ${end || '…'}`, onRemove: () => { setStart(''); setEnd('') } })
+  }
+  if (instrument) {
+    activeChips.push({ label: `Instrumento: ${instrument}`, onRemove: () => setInstrument('') })
+  }
+  if (status !== 'valid') {
+    activeChips.push({ label: `Status: ${status === 'all' ? 'Todas' : 'Inválidas'}`, onRemove: () => setStatus('valid') })
+  }
+  if (accuracyRange !== 'all') {
+    activeChips.push({ label: `Precisão: ${accuracyRange}`, onRemove: () => setAccuracyRange('all') })
+  }
+  if (rtRange !== 'all') {
+    activeChips.push({ label: `RT: ${rtRange}`, onRemove: () => setRtRange('all') })
+  }
+  if (condition !== 'all') {
+    activeChips.push({ label: `Condição: ${condition}`, onRemove: () => setCondition('all') })
+  }
+  if (responseType !== 'all') {
+    activeChips.push({ label: `Resposta: ${responseType}`, onRemove: () => setResponseType('all') })
+  }
+  for (const key of Object.keys(labels) as (keyof typeof labels)[]) {
+    if (values[key].length > 0) {
+      activeChips.push({
+        label: `${labels[key]}: ${values[key].length} sel.`,
+        onRemove: () => setValues({ ...values, [key]: [] }),
+      })
+    }
+  }
 
-      {/* Catálogo de filtros combinados básicos e avançados (REQ-REL-004) */}
-      <div className="dashboard-filters">
-        <label className="project-filter">
-          Projetos da consulta
-          <select
-            multiple
-            value={selected}
-            onChange={event => setSelected([...event.target.selectedOptions].map(option => option.value))}
-          >
-            {projects.map(project => (
-              <option key={project.id} value={project.id} title={`${project.code} — ${project.name}`}>
-                {project.code}
-                {project.active ? '' : ' (inativo)'}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Data inicial
-          <input type="date" value={start} onChange={event => setStart(event.target.value)} />
-        </label>
-        <label>
-          Data final
-          <input type="date" value={end} onChange={event => setEnd(event.target.value)} />
-        </label>
-        <label>
-          Instrumento da consulta
-          <select value={instrument} onChange={event => setInstrument(event.target.value)}>
-            <option value="">Todos (exibir um por vez)</option>
-            {[...new Set([...facets.test_code, ...(instrument ? [instrument] : [])])].map(code => (
-              <option key={code}>{code}</option>
-            ))}
-          </select>
-        </label>
-        {(Object.keys(labels) as (keyof typeof labels)[]).map(key => (
-          <label key={key}>
-            {labels[key]}
+  return (
+    <form onSubmit={apply} className="research-filters filter-catalog-card" aria-label="Filtros da consulta">
+      <div className="panel-header-section" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: '0.75rem' }}>
+        <h3>Filtrar resultados</h3>
+        <p className="panel-subtitle">Catálogo unificado de filtros por projeto, dimensões experimentais e métricas.</p>
+      </div>
+
+      <details className="context-help-details">
+        <summary className="context-help-summary">
+          <span>ℹ️ Orientações e regras de combinação dos filtros</span>
+        </summary>
+        <div className="context-help-content">
+          <p className="quiet">
+            Seleções do mesmo campo são alternativas; os campos são combinados. Sem seleção, todas as opções desse campo.
+            Use Ctrl/Cmd ou Shift e as setas para selecionar várias opções.
+          </p>
+          <p className="quiet">
+            Período inclusivo pela data da avaliação: WEB usa o dia UTC do início; legado conserva a data civil registrada,
+            sem atribuir fuso. Máximo de 20 projetos e 5.000 avaliações completas por consulta; restrinja os filtros para
+            volumes maiores.
+          </p>
+        </div>
+      </details>
+
+      {activeChips.length > 0 && (
+        <div className="active-filters-bar" aria-label="Filtros ativos">
+          <span className="active-filters-label">Filtros ativos ({activeChips.length}):</span>
+          {activeChips.map((chip, idx) => (
+            <span key={idx} className="filter-chip">
+              {chip.label}
+              <button
+                type="button"
+                className="filter-chip-remove"
+                aria-label={`Remover filtro ${chip.label}`}
+                onClick={chip.onRemove}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Catálogo de filtros combinados básicos e avançados em 4 grupos (REQ-REL-004) */}
+      <div className="filter-groups-grid">
+        {/* GRUPO 1: ESCOPO E PERÍODO */}
+        <div className="filter-group-box">
+          <div className="filter-group-legend">
+            <span>📅</span>
+            <span>1. Escopo e Período</span>
+          </div>
+          <label className="project-filter">
+            Projetos da consulta
             <select
               multiple
-              value={values[key]}
-              onChange={event => setValues({ ...values, [key]: [...event.target.selectedOptions].map(option => option.value) })}
+              value={selected}
+              onChange={event => setSelected([...event.target.selectedOptions].map(option => option.value))}
             >
-              {[...new Set([...facets[key], ...values[key]])].sort().map(value => (
-                <option key={value} value={value} title={value}>
-                  {value === 'LEGADO_NAO_MAPEADO' && key === 'evaluator_id'
-                    ? 'Legado sem identificação técnica'
-                    : value}
+              {projects.map(project => (
+                <option key={project.id} value={project.id} title={`${project.code} — ${project.name}`}>
+                  {project.code}
+                  {project.active ? '' : ' (inativo)'}
                 </option>
               ))}
             </select>
           </label>
-        ))}
+          <label>
+            Data inicial
+            <input type="date" value={start} onChange={event => setStart(event.target.value)} />
+          </label>
+          <label>
+            Data final
+            <input type="date" value={end} onChange={event => setEnd(event.target.value)} />
+          </label>
+          <label>
+            Instrumento da consulta
+            <select value={instrument} onChange={event => setInstrument(event.target.value)}>
+              <option value="">Todos (exibir um por vez)</option>
+              {[...new Set([...facets.test_code, ...(instrument ? [instrument] : [])])].map(code => (
+                <option key={code}>{code}</option>
+              ))}
+            </select>
+          </label>
+        </div>
 
-        {/* Filtros avançados do catálogo analítico (REQ-REL-004) */}
-        <label>
-          Busca textual (paciente/código)
-          <input
-            type="search"
-            placeholder="Ex: PAT-, V1, EVA-..."
-            value={searchText}
-            onChange={event => setSearchText(event.target.value)}
-          />
-        </label>
-        <label>
-          Status da avaliação
-          <select value={status} onChange={event => setStatus(event.target.value as AdvancedFilterValues['status'])}>
-            <option value="valid">Oficiais válidas (padrão)</option>
-            <option value="all">Todas as avaliações</option>
-            <option value="invalid">Interrompidas / Invalidadas</option>
-          </select>
-        </label>
-        <label>
-          Faixa de precisão
-          <select
-            value={accuracyRange}
-            onChange={event => setAccuracyRange(event.target.value as AdvancedFilterValues['accuracyRange'])}
-          >
-            <option value="all">Todas as precisões</option>
-            <option value="under50">&lt; 50%</option>
-            <option value="50to80">50% a 79%</option>
-            <option value="80plus">≥ 80%</option>
-          </select>
-        </label>
-        <label>
-          Faixa de tempo de reação (RT)
-          <select
-            value={rtRange}
-            onChange={event => setRtRange(event.target.value as AdvancedFilterValues['rtRange'])}
-          >
-            <option value="all">Todos os tempos</option>
-            <option value="under500ms">&lt; 0,5 s</option>
-            <option value="500to1000ms">0,5 a &lt; 1,0 s</option>
-            <option value="1000to1500ms">1,0 a &lt; 1,5 s</option>
-            <option value="1500msPlus">≥ 1,5 s</option>
-          </select>
-        </label>
-        <label>
-          Tipo de resposta / erro
-          <select
-            value={responseType}
-            onChange={event => setResponseType(event.target.value as AdvancedFilterValues['responseType'])}
-          >
-            <option value="all">Todos os tipos</option>
-            <option value="hits">Com acertos (Hits &gt; 0)</option>
-            <option value="omissions">Com erros de omissão (&gt; 0)</option>
-            <option value="commissions">Com erros de comissão (&gt; 0)</option>
-            <option value="correct_rejections">Com rejeições corretas (&gt; 0)</option>
-          </select>
-        </label>
-        <label>
-          Condição experimental
-          <select
-            value={condition}
-            onChange={event => setCondition(event.target.value as AdvancedFilterValues['condition'])}
-          >
-            <option value="all">Todas as condições</option>
-            <option value="go">Apenas blocos com Go</option>
-            <option value="nogo">Apenas blocos com No-Go</option>
-          </select>
-        </label>
-        <label>
-          Critério de ordenação
-          <select
-            value={sortBy}
-            onChange={event => setSortBy(event.target.value as AdvancedFilterValues['sortBy'])}
-          >
-            <option value="date">Data de início</option>
-            <option value="participant">Participante (código)</option>
-            <option value="accuracy">Precisão</option>
-            <option value="response_time">Tempo de reação mediano</option>
-          </select>
-        </label>
-        <label>
-          Direção da ordenação
-          <select
-            value={sortOrder}
-            onChange={event => setSortOrder(event.target.value as AdvancedFilterValues['sortOrder'])}
-          >
-            <option value="desc">Decrescente (mais recente / maior)</option>
-            <option value="asc">Crescente (mais antigo / menor)</option>
-          </select>
-        </label>
-      </div>
+        {/* GRUPO 2: DIMENSÕES EXPERIMENTAIS */}
+        <div className="filter-group-box">
+          <div className="filter-group-legend">
+            <span>🔬</span>
+            <span>2. Dimensões Experimentais</span>
+          </div>
+          {(Object.keys(labels) as (keyof typeof labels)[]).map(key => (
+            <label key={key}>
+              {labels[key]}
+              <select
+                multiple
+                value={values[key]}
+                onChange={event => setValues({ ...values, [key]: [...event.target.selectedOptions].map(option => option.value) })}
+              >
+                {[...new Set([...facets[key], ...values[key]])].sort().map(value => (
+                  <option key={value} value={value} title={value}>
+                    {value === 'LEGADO_NAO_MAPEADO' && key === 'evaluator_id'
+                      ? 'Legado sem identificação técnica'
+                      : value}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ))}
+        </div>
 
-      <div style={{ marginTop: '0.5rem', marginBottom: '0.5rem' }}>
-        <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-          <input
-            type="checkbox"
-            checked={includeNullRt}
-            onChange={event => setIncludeNullRt(event.target.checked)}
-          />
-          <span>Tratamento explícito de RT ausente: incluir avaliações sem acertos (RT mediano ausente)</span>
-        </label>
+        {/* GRUPO 3: CRITÉRIOS DE PESQUISA & MÉTRICAS */}
+        <div className="filter-group-box">
+          <div className="filter-group-legend">
+            <span>📊</span>
+            <span>3. Critérios & Métricas</span>
+          </div>
+          <label>
+            Busca textual (paciente/código)
+            <input
+              type="search"
+              placeholder="Ex: PAT-, V1, EVA-..."
+              value={searchText}
+              onChange={event => setSearchText(event.target.value)}
+            />
+          </label>
+          <label>
+            Status da avaliação
+            <select value={status} onChange={event => setStatus(event.target.value as AdvancedFilterValues['status'])}>
+              <option value="valid">Oficiais válidas (padrão)</option>
+              <option value="all">Todas as avaliações</option>
+              <option value="invalid">Interrompidas / Invalidadas</option>
+            </select>
+          </label>
+          <label>
+            Faixa de precisão
+            <select
+              value={accuracyRange}
+              onChange={event => setAccuracyRange(event.target.value as AdvancedFilterValues['accuracyRange'])}
+            >
+              <option value="all">Todas as precisões</option>
+              <option value="under50">&lt; 50%</option>
+              <option value="50to80">50% a 79%</option>
+              <option value="80plus">≥ 80%</option>
+            </select>
+          </label>
+          <label>
+            Faixa de tempo de reação (RT)
+            <select
+              value={rtRange}
+              onChange={event => setRtRange(event.target.value as AdvancedFilterValues['rtRange'])}
+            >
+              <option value="all">Todos os tempos</option>
+              <option value="under500ms">&lt; 0,5 s</option>
+              <option value="500to1000ms">0,5 a &lt; 1,0 s</option>
+              <option value="1000to1500ms">1,0 a &lt; 1,5 s</option>
+              <option value="1500msPlus">≥ 1,5 s</option>
+            </select>
+          </label>
+          <label>
+            Tipo de resposta / erro
+            <select
+              value={responseType}
+              onChange={event => setResponseType(event.target.value as AdvancedFilterValues['responseType'])}
+            >
+              <option value="all">Todos os tipos</option>
+              <option value="hits">Com acertos (Hits &gt; 0)</option>
+              <option value="omissions">Com erros de omissão (&gt; 0)</option>
+              <option value="commissions">Com erros de comissão (&gt; 0)</option>
+              <option value="correct_rejections">Com rejeições corretas (&gt; 0)</option>
+            </select>
+          </label>
+          <label>
+            Condição experimental
+            <select
+              value={condition}
+              onChange={event => setCondition(event.target.value as AdvancedFilterValues['condition'])}
+            >
+              <option value="all">Todas as condições</option>
+              <option value="go">Apenas blocos com Go</option>
+              <option value="nogo">Apenas blocos com No-Go</option>
+            </select>
+          </label>
+        </div>
+
+        {/* GRUPO 4: ORDENAÇÃO E TRATAMENTO */}
+        <div className="filter-group-box">
+          <div className="filter-group-legend">
+            <span>⚙️</span>
+            <span>4. Ordenação & Tratamento</span>
+          </div>
+          <label>
+            Critério de ordenação
+            <select
+              value={sortBy}
+              onChange={event => setSortBy(event.target.value as AdvancedFilterValues['sortBy'])}
+            >
+              <option value="date">Data de início</option>
+              <option value="participant">Participante (código)</option>
+              <option value="accuracy">Precisão</option>
+              <option value="response_time">Tempo de reação mediano</option>
+            </select>
+          </label>
+          <label>
+            Direção da ordenação
+            <select
+              value={sortOrder}
+              onChange={event => setSortOrder(event.target.value as AdvancedFilterValues['sortOrder'])}
+            >
+              <option value="desc">Decrescente (mais recente / maior)</option>
+              <option value="asc">Crescente (mais antigo / menor)</option>
+            </select>
+          </label>
+          <div style={{ marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-subtle)' }}>
+            <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', cursor: 'pointer', fontSize: '12px' }}>
+              <input
+                type="checkbox"
+                checked={includeNullRt}
+                onChange={event => setIncludeNullRt(event.target.checked)}
+                style={{ width: 'auto', marginTop: '2px' }}
+              />
+              <span>Tratamento explícito de RT ausente: incluir avaliações sem acertos (RT mediano ausente)</span>
+            </label>
+          </div>
+        </div>
       </div>
 
       <p className="quiet">
@@ -347,12 +445,17 @@ export function ResearchFilters({
           </button>
         </>
       )}
-      <button className="button primary" type="submit" disabled={loading || pending || !!error}>
-        Aplicar filtros
-      </button>
-      <button className="button secondary" type="button" onClick={clear}>
-        Limpar filtros
-      </button>
+      <div className="filter-form-actions" style={{ display: 'flex', gap: '10px', alignItems: 'center', marginTop: '1.25rem', flexWrap: 'wrap' }}>
+        <button className="button primary" type="submit" disabled={loading || pending || !!error}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+          </svg>
+          Aplicar filtros
+        </button>
+        <button className="button secondary" type="button" onClick={clear}>
+          Limpar filtros
+        </button>
+      </div>
     </form>
   )
 }
