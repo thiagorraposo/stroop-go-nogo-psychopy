@@ -259,6 +259,26 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 - Origem: Auditoria de código em AUDITORIA_REPLANEJAMENTO.md e decisão do responsável de 2026-11-05.
 - Impacto CHG-003: REQ-UX-010 e WEB-011/015 preservam estratégia ADR-005, parciais e limites residuais, agora com layout final.
 
+### REQ-INT-004
+
+- Descrição: Estruturar a navegação profissional da plataforma em 3 eixos fundamentais inspirados no modelo mental do Streamlit (Eixo 1: Resultados e Análise Unificada; Eixo 2: Aplicação Direta / Nova Avaliação; Eixo 3: Gestão Cadastral e Acessos), eliminando a fragmentação cognitiva em 8 abas isoladas.
+- Justificativa: Agiliza a rotina clínica e investigativa, integrando o funil analítico e reduzindo a alternância de contexto do operador.
+- Prioridade: P0. Estado da especificação: **Confirmado** (CHG-006; ADR-008).
+- Aceite verificável: Interface da equipe organiza todas as capacidades operacionais nos 3 eixos, provê transições acessíveis e fluidas, garante controle de visibilidade conforme perfil e não interfere no isolamento do motor experimental jsPsych (INT-01).
+- Dependências: WEB-047, WEB-017 e pré-requisitos registrados no backlog.
+- Restrições conhecidas: Acesso restrito a usuários autenticados da equipe; preservação dos componentes de design system já validados.
+- Origem: Missão de replanejamento documental do proprietário em 2026-11-08 (`CHG-006`).
+
+### REQ-INT-005
+
+- Descrição: Prover painel unificado de resultados e análise em tela única coesa, integrando indicadores (KPIs), catálogo de filtros combinados reativos, visualizações gráficas descritivas, histórico de tentativas e exportação CSV multi-granularidade sobre o recorte ativo.
+- Justificativa: Garante paridade de fluidez e reatividade com o Streamlit, assegurando que o mesmo conjunto filtrado se reflita instantaneamente em métricas, gráficos e downloads.
+- Prioridade: P1. Estado da especificação: **Confirmado** (CHG-006; ADR-008).
+- Aceite verificável: Qualquer alteração nos filtros combinados (paciente, avaliador, visita, projeto, faixas de RT/precisão, condição Go/No-Go) atualiza de forma síncrona KPIs, gráficos, listagem de tentativas e o arquivo gerado pelo hub de exportação CSV, mantendo separação estrita de dados desidentificados vs nominais (DASH-01, EXP-CSV-01).
+- Dependências: WEB-017, WEB-019, WEB-020 e pré-requisitos registrados no backlog.
+- Restrições conhecidas: Não exibir escores normativos, diagnósticos clínicos ou percentis não autorizados pelo protocolo científico.
+- Origem: Missão de replanejamento documental do proprietário em 2026-11-08 (`CHG-006`).
+
 ## F. Cálculo das métricas
 
 ### REQ-MET-001
@@ -673,6 +693,39 @@ na revisão D3/D4 de 2026-11-05; DEC-04 não aprovada. Especificação visual de
 - Dependências: WEB-047, WEB-046, WEB-019 e gates do marco no backlog.
 - Restrições conhecidas: Não alterar estímulos, paleta experimental, HUD, contorno branco ou tempos D5.
 - Origem: Missão de replanejamento funcional e UX do proprietário em 2026-11-07 (`CHG-005`, Seção 10); `UX_DECISIONS.md`.
+- Impacto CHG-006: A consolidação em 3 eixos fundamentais (`REQ-INT-004`) e o fluxo direto de avaliação (`REQ-SESS-001`) simplificam o design system e a navegação administrativa, mantendo a consistência visual, o foco por teclado e o contraste acessível em um fluxo único e coeso.
+
+## N. Usabilidade e preparação de sessões
+
+### REQ-SESS-001
+
+- Descrição: Prover fluxo sem fricção de aplicação direta e preparação de avaliação em formulário unificado de etapa única estilo PsychoPy Runner, informando Participante, Visita e Projeto com pré-seleções contextuais inteligentes.
+- Justificativa: Reduz o tempo de preparação para menos de 10 segundos no consultório, eliminando a navegação obrigatória prévia por telas de cadastro de pacientes.
+- Prioridade: P0. Estado da especificação: **Confirmado** (CHG-006; ADR-008).
+- Aceite verificável: Formulário em etapa única aceita seleção com busca instantânea ou digitação de novo nome, preenche visita, seleciona projeto/avaliador responsável contextual e valida em tempo real sem redirecionamentos intermediários (PREP-02).
+- Dependências: WEB-046, WEB-045 e pré-requisitos registrados no backlog.
+- Restrições conhecidas: Manter derivação determinística de iniciais e validação de nomes sem introduzir campos demográficos não autorizados.
+- Origem: Missão de replanejamento documental do proprietário em 2026-11-08 (`CHG-006`).
+
+### REQ-SESS-002
+
+- Descrição: Disponibilizar modalidades duais de execução imediata da avaliação: modo presencial ("Iniciar Agora neste Dispositivo") e modo remoto ("Gerar Link / QR Code").
+- Justificativa: Atende simultaneamente à aplicação clínica direta assistida no consultório/laboratório e à coleta remota ou em dispositivo secundário do participante.
+- Prioridade: P0. Estado da especificação: **Confirmado** (CHG-006; ADR-008).
+- Aceite verificável: Modo "Iniciar Agora" oculta o painel da equipe, abre imediatamente a execução experimental no mesmo navegador e, ao término/interrupção com recibo, bloqueia o retorno aos dados confidenciais de outros pacientes exigindo confirmação/credencial da equipe; modo "Gerar Link / QR Code" exibe URL de uso único com botão de cópia e renderiza QR Code dinâmico em alta definição para leitura ótica direta (FLOW-02).
+- Dependências: WEB-046, WEB-013, WEB-015 e pré-requisitos registrados no backlog.
+- Restrições conhecidas: Preservar estritamente o motor jsPsych, a apresentação com contorno branco `stroop-web-outline/1.0.0` e os limites temporais D5.
+- Origem: Missão de replanejamento documental do proprietário em 2026-11-08 (`CHG-006`).
+
+### REQ-SESS-003
+
+- Descrição: Orquestrar de forma transparente e atômica no backend e frontend as entidades relacionais de paciente (`web_patients`), avaliador (`web_evaluators`), visita (`web_participant_visits`), vínculo de projeto (`web_project_participants`), sessão (`web_participant_sessions`) e convite (`web_invitations`).
+- Justificativa: Elimina a fragmentação do pipeline operacional sem perder a integridade relacional, a auditabilidade e o rigor do modelo de dados PostgreSQL.
+- Prioridade: P0. Estado da especificação: **Confirmado** (CHG-006; ADR-008).
+- Aceite verificável: Submissão do formulário unificado executa resolução idempotente ou criação transacional do paciente, assegura vínculo ao projeto, gera visita e emite convite assinado em uma única requisição HTTP atômica, retornando identificadores estáveis (`PAT-...`, `EVA-...`) e token de sessão (ORQ-01).
+- Dependências: WEB-045, WEB-046 e pré-requisitos registrados no backlog.
+- Restrições conhecidas: Não permitir bypass de validações cadastrais de homônimos ou restrições de chave estrangeira no banco.
+- Origem: Missão de replanejamento documental do proprietário em 2026-11-08 (`CHG-006`).
 
 ## Matriz de rastreabilidade
 
@@ -708,6 +761,8 @@ já existe ou participa da regressão geral. WEB-000 é exclusivamente documenta
 | REQ-INT-001 | ADR-004 | M2 | WEB-006 | `stroop/domain/web_results.py, api/results.py` | `tests/test_web_results.py, tests/test_web_sessions.py, tests/test_web_checkpoints.py` | EXECUTADA em WEB-006; EV-M2 no backlog |
 | REQ-INT-002 | ADR-004 | M2 | WEB-007 | `stroop/persistence/web_sessions.py, web_checkpoints.py` | `tests/test_web_checkpoints.py, tests/test_web_sessions.py, tests/test_web_database_provision.py, tests/test_postgres_migrations.py` | EXECUTADA em WEB-007; EV-M2-007/008 no backlog |
 | REQ-INT-003 | ADR-004/005 | M2 | WEB-005 | `ParticipantRun.ts, checkpoint-worker.ts e modelo lógico` | `tests/test_web_checkpoints.py, web/src/transport/checkpoint-queue.test.ts, web/src/participant/ParticipantRun.test.ts, web/e2e/integrated/participant.spec.ts` | Aceite documental em EV-M2-005-R2; receptor/banco em EV-M2, worker/timing em EV-M3-011 e integração de produto aceita em WEB-015/016 (EV-M4-013/016) |
+| REQ-INT-004 | CHG-006; ADR-008 | M5 | WEB-047 | `web/src/components/ProfessionalDashboard.tsx, web/src/components/UnifiedNavigation.tsx` | `web/src/components/ModularNavigation.test.tsx, web/e2e/integrated/dashboard.spec.ts` | PLANEJADO em M5/M7; componentes base aceitos em EV-M5-047-NAV |
+| REQ-INT-005 | CHG-006; ADR-008 | M5 | WEB-017 | `web/src/components/UnifiedAnalyticsPanel.tsx, web/src/dashboard/analysis.ts` | `web/src/components/ResearchFilters.test.tsx, web/src/dashboard/analysis.test.ts, web/e2e/integrated/dashboard.spec.ts` | PLANEJADO em M5/M7; filtros e KPIs aceitos em EV-M5-017/018 |
 | REQ-MET-001 | ADR-004 | M2 | WEB-008 | `stroop/domain/stroop.py, web_results.py` | `tests/test_nucleo_compartilhado.py, tests/test_web_export.py, tests/test_web_checkpoints.py` | EXECUTADA em WEB-008; EV-M2-007/008 no backlog |
 | REQ-MET-002 | ADR-004 | M2 | WEB-008 | `stroop/domain/stroop.py, web/src/dashboard/analysis.ts` | `tests/test_web_results.py, web/src/dashboard/analysis.test.ts` | EXECUTADA em WEB-008; EV-M2-007/008 no backlog |
 | REQ-MET-003 | ADR-004 | M5 | WEB-019 | `web_assessments, api/assessments.py` | `tests/test_web_assessments.py` | PLANEJADA; consultar WEB-019 no backlog |
@@ -745,6 +800,9 @@ já existe ou participa da regressão geral. WEB-000 é exclusivamente documenta
 | REQ-UX-010 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M4 | WEB-015 | `web/src/participant/ParticipantRun.ts, web/src/components/ResultSummary.tsx, api/results.py` | `web/src/participant/ParticipantRun.test.ts, web/src/api/participant.test.ts, web/e2e/integrated/participant.spec.ts, web/e2e/integrated/complete-results.spec.ts` | ACEITO em WEB-015/016; EV-M4-013/016 no backlog |
 | REQ-UX-011 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M5 | WEB-019 | `web/src/styles.css, web/src/App.tsx, web/src/components/, web/src/dashboard/` | `PLANEJADO: componentes Vitest, teclado/árvore acessível e E2E M5; cobertura experimental WEB-044` | Cobertura experimental M3 conferida em EV-M3-044; restante e aceite M5 WEB-019 PLANEJADOS |
 | REQ-UX-012 | CHG-005; ADR-007 | M5 | WEB-047 | `web/src/styles.css, web/src/components/ProfessionalDashboard.tsx, web/src/components/PatientsPanel.tsx, web/src/components/EvaluatorsPanel.tsx` | `PLANEJADO: DASH-01 e E2E-FLOW-01 em Vitest e Playwright (teclado, foco, contraste, estados e não regressão experimental) em WEB-047 e WEB-019` | PLANEJADA; consultar WEB-047 e WEB-019 no backlog |
+| REQ-SESS-001 | CHG-006; ADR-008 | M4 | WEB-046 | `web/src/components/DirectSessionLauncher.tsx, web/src/api/sessions.ts` | `web/src/components/SessionInvitation.test.tsx, web/e2e/integrated/invitations.spec.ts` | PLANEJADO em M4/M7; preparação base aceita em EV-M4-045/046 |
+| REQ-SESS-002 | CHG-006; ADR-008 | M4 | WEB-046 | `web/src/components/DirectSessionLauncher.tsx, web/src/components/QrCodeModal.tsx, web/src/App.tsx` | `web/src/components/SessionInvitation.test.tsx, web/e2e/integrated/invitations.spec.ts, web/e2e/integrated/participant.spec.ts` | PLANEJADO em M4/M7; fluxo de convite e participante aceito em EV-M4-013/016 e EV-M4-045/046 |
+| REQ-SESS-003 | CHG-006; ADR-008 | M4 | WEB-045 | `api/sessions.py, stroop/application/web_sessions.py, stroop/persistence/web_registry.py` | `tests/test_web_sessions.py, tests/test_web_patients.py, tests/test_web_evaluators.py` | PLANEJADO em M4/M7; fundação relacional aceita em EV-M4-045/046 |
 
 Estados de evidência (todos os requisitos, inclusive autenticação local): **PLANEJADO** (critério sem execução), **IMPLEMENTADO**
 (código disponível), **TESTADO** (comandos/resultados/SHA registrados), **ACEITO**

@@ -15,9 +15,21 @@ comandos atuais nem resultados reexecutados.
   - Implementado em `stroop/persistence/web_registry.py` e rotas em `api/administration.py` o procedimento administrativo auditado para associação de registros legados (`link_legacy_entity`, `deactivate_legacy_entity_link`, `list_legacy_entity_links`) com `web_legacy_entity_links` e `web_registry_audit_events`.
   - Comprovado por testes reais no PostgreSQL que a reconciliação é reversível, exige `reason_code` e proíbe terminantemente fusão automática por coincidência textual ou de códigos.
 - **WEB-028 (Revisão de cobertura e paridade Streamlit/PsychoPy):**
-  - Formalizada a [ADR-008](arquitetura/ADR-008-paridade-operacional-e-simplificacao-3-eixos.md) estabelecendo a simplificação em 3 eixos operacionais (`CHG-006`): aplicação direta em 1 etapa (presencial e remota), análise reativa em tela única (estilo Streamlit) e exportação multi-granularidade.
-  - Atualizada a matriz de paridade em `docs/operacao/TRANSICAO_WEB.md` e assegurada a preservação física total de launchers (`abrir_dashboard.sh/bat`), CLIs e código Streamlit sem remoção física.
+  - Consolidada a matriz de paridade em `docs/operacao/TRANSICAO_WEB.md` e a simplificação em 3 eixos operacionais (`CHG-006` / [ADR-008](arquitetura/ADR-008-simplificacao-estrutural-e-fluxo-direto-sessao.md)): aplicação direta em 1 etapa (presencial e remota), análise reativa em tela única (estilo Streamlit) e exportação multi-granularidade.
+  - Assegurada a preservação física total de launchers (`abrir_dashboard.sh/bat`), CLIs e código Streamlit sem remoção física.
 - Marco M7 integralmente concluído com 4 de 4 entregáveis aceitos (`EV-M7-025..028`). Progresso global avança para 37/48 entregáveis aceitos (77,1%). Próximo marco: M8.
+
+## 2026-11-08 — Replanejamento operacional, simplificação em 3 eixos e fluxo direto de avaliação (CHG-006 / ADR-008)
+
+- Executada a missão documental de replanejamento **CHG-006** ([ADR-008](arquitetura/ADR-008-simplificacao-estrutural-e-fluxo-direto-sessao.md)):
+  - **Modelo mental inspirado no Streamlit e PsychoPy:** consolidação da navegação profissional em **3 eixos fundamentais**, superando a divisão em 8 abas isoladas:
+    - *Eixo 1 (Resultados e Análise Unificada):* tela única reativa integrando KPIs executivos, catálogo completo de filtros combinados (`REQ-REL-004`), visualizações gráficas descritivas (`REQ-REL-005`), detalhe de tentativas e exportação CSV multi-granularidade sobre o recorte ativo (`REQ-CSV-005`, `REQ-INT-005`).
+    - *Eixo 2 (Aplicação Direta / Nova Avaliação):* fluxo sem fricção estilo PsychoPy Runner em formulário unificado de 1 etapa (Participante + Visita + Projeto) com modalidades duais imediatas: *"Iniciar Agora neste Dispositivo"* para aplicação presencial no consultório/laboratório (com isolamento visual e bloqueio seguro da tela ao término para proteger dados confidenciais) e *"Gerar Link / QR Code"* para aplicação remota/assistida com QR Code dinâmico (`REQ-SESS-001`, `REQ-SESS-002`).
+    - *Eixo 3 (Gestão Cadastral e Acessos):* área administrativa secundária para manutenção de fichas de pacientes/avaliadores, correção auditada de vínculos de sessões (`relink`), usuários e governança.
+  - **Orquestração relacional atômica e transparente (`REQ-SESS-003`):** resolução idempotente ou criação transacional de paciente (`web_patients`), visita (`web_participant_visits`), sessão (`web_participant_sessions`) e convite (`web_invitations`) em uma única requisição HTTP, eliminando pré-cadastramentos manuais em múltiplas etapas.
+  - **Preservação científica integral:** motor jsPsych, apresentação visual com contorno branco `stroop-web-outline/1.0.0` (`CHG-003`), paleta de 10 cores, HUD sem precisão agregada, limites temporais D5, persistência incremental (`ADR-005`), 12 métricas oficiais e formatos de exportação CSV rigorosamente intocados.
+- Criados 5 novos requisitos canônicos (`REQ-INT-004`, `REQ-INT-005`, `REQ-SESS-001`, `REQ-SESS-002`, `REQ-SESS-003`), totalizando 64 requisitos na matriz de rastreabilidade.
+- Documentos sincronizados: `ADR-008`, `Projeto Stroop Test.md`, `ARQUITETURA_WEB.md`, `REQUISITOS_E_RASTREABILIDADE.md` e `REGISTRO_DE_ALTERACOES.md`.
 
 ## 2026-11-08 — Exportações CSV multi-granularidade e conclusão do marco M5 (M5 / WEB-020)
 
