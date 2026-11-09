@@ -324,12 +324,70 @@ def cmd_deploy(args: argparse.Namespace) -> int:
         raise DeployError(f"Falha ao executar backup preventivo na VPS: {res.stderr.strip()}")
     print("      Backup preventivo e snapshot do ambiente concluídos.")
 
-    # 4. Preparação do diretório da nova release na VPS
+    # 4. Compilação e transferência de imagens Docker (se não ignorado)
+    if not args.dry_run and not args.skip_build:
+        print(f"3/9. Compilando imagens Docker para {short_sha}...")
+        api_build = subprocess.run(
+            ["docker", "build", "-f", "Dockerfile.api", "-t", api_image_tag, "."],
+            cwd=ROOT,
+            check=False,
+        )
+        if api_build.returncode != 0:
+            raise DeployError("Falha na compilação da imagem Docker da API.")
+
+        proxy_build = subprocess.run(
+            ["docker", "build", "-f", "Dockerfile.web", "-t", proxy_image_tag, "."],
+            cwd=ROOT,
+            check=False,
+        )
+        if proxy_build.returncode != 0:
+            raise DeployError("Falha na compilação da imagem Docker do Proxy/Web.")
+    else:
+        print("3/9. Compilação de imagens Docker: ignorada ou em modo simulação.")
+
+    if not args.dry_run and not args.skip_transfer:
+        print("4/9. Transferindo imagens Docker compactadas para a VPS via SSH stream...")
+        ssh_cmd_base = client.build_ssh_args()
+        for tag in (api_image_tag, proxy_image_tag):
+            print(f"      Enviando {tag}...")
+            save_proc = subprocess.Popen(["docker", "save", tag], stdout=subprocess.PIPE)
+            gzip_proc = subprocess.Popen(["gzip", "-1"], stdin=save_proc.stdout, stdout=subprocess.PIPE)
+            if save_proc.stdout:
+                save_proc.stdout.close()
+            remote_load = subprocess.Popen(ssh_cmd_base + ["gunzip | docker load"], stdin=gzip_proc.stdout)
+            if gzip_proc.stdout:
+                gzip_proc.stdout.close()
+            remote_load.communicate()
+            if remote_load.returncode != 0:
+                raise DeployError(f"Falha ao carregar imagem {tag} na VPS.")
+    else:
+        print("4/9. Transferência de imagens Docker: ignorada ou em modo simulação.")
+
+    # 5. Preparação do diretório da nova release na VPS e envio dos manifestos
     release_dir = f"{args.runtime_dir}/releases/{short_sha}"
-    print(f"3/8. Criando diretório de release: {release_dir}...")
+    print(f"5/9. Criando diretório de release e enviando manifestos: {release_dir}...")
     client.run(f"mkdir -p {release_dir}")
 
-    # 5. Manifesto da release
+    if not args.dry_run and not args.skip_package:
+        tar_items = ["compose.web.yaml", "deploy", "scripts"]
+        if (ROOT / "migrations").is_dir():
+            tar_items.append("migrations")
+        if (ROOT / "compose.restore-test.yaml").is_file():
+            tar_items.append("compose.restore-test.yaml")
+        if (ROOT / "web/deploy").is_dir():
+            tar_items.append("web/deploy")
+
+        print("      Empacotando e sincronizando fontes da release...")
+        tar_proc = subprocess.Popen(["tar", "-czf", "-"] + tar_items, cwd=ROOT, stdout=subprocess.PIPE)
+        ssh_cmd_base = client.build_ssh_args()
+        remote_tar = subprocess.Popen(ssh_cmd_base + [f"tar -xzf - -C {release_dir}"], stdin=tar_proc.stdout)
+        if tar_proc.stdout:
+            tar_proc.stdout.close()
+        remote_tar.communicate()
+        if remote_tar.returncode != 0:
+            raise DeployError(f"Falha ao descompactar arquivos da release em {release_dir}.")
+
+    # 6. Manifesto da release
     manifest = {
         "commit_sha": sha,
         "short_sha": short_sha,
@@ -340,26 +398,26 @@ def cmd_deploy(args: argparse.Namespace) -> int:
         "status": "active",
     }
     manifest_json = json.dumps(manifest, indent=2)
-    print("4/8. Registrando manifesto da release...")
+    print("      Registrando manifesto da release...")
     write_manifest_cmd = f"cat << 'EOF' > {release_dir}/release.json\n{manifest_json}\nEOF"
     client.run(write_manifest_cmd)
 
-    # 6. Atualização controlada do arquivo de ambiente (tags de imagens)
-    print("5/8. Atualizando referências de imagens em web.env...")
+    # 7. Atualização controlada do arquivo de ambiente (tags de imagens)
+    print("6/9. Atualizando referências de imagens em web.env...")
     update_env_cmd = (
         f"sed -i 's|^WEB_API_IMAGE=.*|WEB_API_IMAGE={api_image_tag}|' {args.env_file} && "
         f"sed -i 's|^WEB_PROXY_IMAGE=.*|WEB_PROXY_IMAGE={proxy_image_tag}|' {args.env_file}"
     )
     client.run(update_env_cmd)
 
-    # 7. Execução transacional de migrations e permissões (se aplicável)
-    print("6/8. Executando migrations aditivas e provisionamento de papéis...")
+    # 8. Execução transacional de migrations e permissões (se aplicável)
+    print("7/9. Executando migrations aditivas e provisionamento de papéis...")
     migrate_cmd = (
         f"docker compose --project-name stroop-web --env-file {args.env_file} "
-        f"-f {args.runtime_dir}/current/compose.web.yaml -f {args.runtime_dir}/compose.vps.yaml "
+        f"-f {release_dir}/compose.web.yaml -f {args.runtime_dir}/compose.vps.yaml "
         f"--profile web --profile web-tools run --rm web-migrate "
         f"&& docker compose --project-name stroop-web --env-file {args.env_file} "
-        f"-f {args.runtime_dir}/current/compose.web.yaml -f {args.runtime_dir}/compose.vps.yaml "
+        f"-f {release_dir}/compose.web.yaml -f {args.runtime_dir}/compose.vps.yaml "
         f"--profile web --profile web-tools run --rm web-provision"
     )
     res = client.run(migrate_cmd)
@@ -368,8 +426,8 @@ def cmd_deploy(args: argparse.Namespace) -> int:
         cmd_rollback(args)
         raise DeployError(f"Falha na execução de migrations: {res.stderr.strip()}")
 
-    # 8. Troca atômica de symlink e recriação dos contêineres web-api e web-proxy
-    print("7/8. Chaveando symlink 'current' e reiniciando serviços web...")
+    # 9. Troca atômica de symlink e recriação dos contêineres web-api e web-proxy
+    print("8/9. Chaveando symlink 'current' e reiniciando serviços web...")
     switch_cmd = (
         f"ln -sfn {release_dir} {args.runtime_dir}/current && "
         f"docker compose --project-name stroop-web --env-file {args.env_file} "
@@ -382,8 +440,8 @@ def cmd_deploy(args: argparse.Namespace) -> int:
         cmd_rollback(args)
         raise DeployError(f"Falha na recriação de contêineres: {res.stderr.strip()}")
 
-    # 9. Healthcheck pós-implantação
-    print("8/8. Verificando healthcheck pós-deploy...")
+    # 10. Healthcheck pós-implantação
+    print("9/9. Verificando healthcheck pós-deploy...")
     if args.dry_run:
         print("      [DRY-RUN] Healthcheck simulado: OK.")
     elif not args.skip_healthcheck:
@@ -491,6 +549,9 @@ def build_parser() -> argparse.ArgumentParser:
     p_dep.add_argument("--dry-run", action="store_true", help="Executa em modo simulação sem aplicar alterações")
     p_dep.add_argument("--skip-ci-check", action="store_true", help="Ignora verificação de CI")
     p_dep.add_argument("--skip-healthcheck", action="store_true", help="Pula verificação pós-deploy")
+    p_dep.add_argument("--skip-build", action="store_true", help="Pula compilação local das imagens Docker")
+    p_dep.add_argument("--skip-transfer", action="store_true", help="Pula transferência das imagens Docker para a VPS")
+    p_dep.add_argument("--skip-package", action="store_true", help="Pula empacotamento e envio das fontes para a VPS")
     p_dep.add_argument("--token", default=None, help="GitHub Token")
     p_dep.add_argument("--repo", default=DEFAULT_REPO, help="Repositório GitHub")
 
