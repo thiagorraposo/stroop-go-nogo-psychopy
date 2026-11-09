@@ -6,7 +6,7 @@ import { expect, test } from '@playwright/test'
 
 const python = fileURLToPath(new URL('../../../.venv/bin/python', import.meta.url))
 const manageScript = fileURLToPath(new URL('./dashboard-manage.py', import.meta.url))
-type Prepared = { cookie_name: string; token: string; project_id: string }
+type Prepared = { cookie_name: string; token: string; csrf: string; project_id: string }
 
 test('EXP-CSV-01: comprova ausencia de upload CSV na UI e bloqueio 410 no backend integrado', async ({ page, context }) => {
   const prepared = JSON.parse(execFileSync(python, [manageScript], {
@@ -31,7 +31,8 @@ test('EXP-CSV-01: comprova ausencia de upload CSV na UI e bloqueio 410 no backen
     data: 'project,participant_id\nPROJ,P1\n',
     headers: {
       'Content-Type': 'text/csv; charset=utf-8',
-      'X-CSRF-Token': 's'.repeat(43),
+      'X-CSRF-Token': prepared.csrf,
+      Origin: new URL(page.url()).origin,
     },
   })
   expect(response.status()).toBe(410)
