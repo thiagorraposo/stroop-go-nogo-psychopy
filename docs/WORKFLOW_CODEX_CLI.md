@@ -111,7 +111,9 @@ Ciclo de entrega e integração:
 Push falhou: investigar sem sobrescrever histórico, registrar causa/pendência; não
 força, não altera proteção. Se houver bloqueio de CI ou pendência de revisão, manter
 o PR aberto e registrar o motivo. Deploy, tags, dados reais e operações destrutivas
-têm aprovação específica e não decorrem de commit/push/merge.
+têm aprovação específica e não decorrem de commit/push/merge. Quando autorizado, a
+publicação na VPS HostGator utiliza o workflow [Deploy VPS HostGator](../.github/workflows/deploy.yml)
+ou o script `scripts/deploy_vps.py`, conforme [DEPLOY_WEB_VPS](operacao/DEPLOY_WEB_VPS.md).
 
 No backlog: ID, estado/aceite, branch, SHA real, testes/evidências/data, limitações,
 push, PR e CI. Evitar autorreferência de SHA: registrar hash da entrega no fechamento

@@ -110,6 +110,9 @@ configura nem autoriza deploy. Consulte
 [`docs/operacao/HARDENING_PRODUCAO.md`](docs/operacao/HARDENING_PRODUCAO.md), o
 [`threat model`](docs/seguranca/THREAT_MODEL.md) e a
 [`resposta a incidentes`](docs/seguranca/RESPOSTA_A_INCIDENTES.md).
+Para a operação e publicação na VPS HostGator (`strooptest.thiagorraposo.dev`)
+integradas ao GitHub Flow com deploy sob demanda via GitHub Actions, consulte
+[`docs/operacao/DEPLOY_WEB_VPS.md`](docs/operacao/DEPLOY_WEB_VPS.md).
 
 O schema PostgreSQL versionado e a migracao legada SQLite -> PostgreSQL sao
 operacoes explicitas documentadas em

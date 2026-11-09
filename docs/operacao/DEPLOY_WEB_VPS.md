@@ -1,190 +1,276 @@
-# Implantacao WEB na VPS existente
+# Implantação WEB na VPS HostGator e Integração ao GitHub Flow
 
-Nota de planejamento CHG-004, 2026-11-06 — **PLANEJADO**:
-Registros de configuração/login Google abaixo são históricos datados; alvo
-WEB-037/038 usa conta local provisionada por procedimento protegido e smoke
-HTTPS/login/logout/negações. Exigir autorização específica de deploy; esta
-revisão não modifica ambiente remoto.
-Decisão: [ADR-006](../arquitetura/ADR-006-autenticacao-local.md). Execução/aceite somente no backlog canônico.
+Este documento estabelece os procedimentos operacionais e mecanismos técnicos de implantação da aplicação WEB na VPS HostGator existente (`strooptest.thiagorraposo.dev`), integrados ao **GitHub Flow** com Pull Request, Push e Merge Commit tradicional.
 
+Decisões arquiteturais associadas: [ADR-002](../arquitetura/ADR-002-hospedagem-vps.md) (hospedagem VPS), [ADR-004](../arquitetura/ADR-004-replanejamento-plataforma.md) (replanejamento da plataforma web), [ADR-006](../arquitetura/ADR-006-autenticacao-local.md) (autenticação profissional local) e governança em [CONTRIBUTING.md](../../CONTRIBUTING.md) e [WORKFLOW_CODEX_CLI.md](../WORKFLOW_CODEX_CLI.md).
 
-Substituicao explicitamente autorizada pelo responsavel em 2026-10-16,
-executada sem alterar dominio. Publicacao destinada exclusivamente a testes
-sinteticos; nao concede homologacao temporal W16, capacidade W21 ou autorizacao
-para coleta real. Estado e pendencias no [roadmap](../ROADMAP_WEB.md).
+> [!IMPORTANT]
+> O repositório adota **deploy controlado sob demanda** (`workflow_dispatch`). O merge de Pull Requests na `main` **não** executa deploy automático. A implantação de releases em produção requer autorização explícita do responsável e validação prévia na CI. O marco M10 do backlog canônico reserva a implantação formal e não é antecipado implicitamente.
 
-## Instalacao publicada
+---
 
-| Item | Estado observado |
+## 1. Visão Geral e Infraestrutura
+
+A aplicação Stroop Web está hospedada em uma VPS dedicada na HostGator Brasil, configurada exclusivamente para o projeto:
+
+| Parâmetro | Valor / Configuração |
 |---|---|
-| URL | https://strooptest.thiagorraposo.dev |
-| SSH | `raposo@108.174.145.177`, porta22022, chave local; IP do dominio e hostkey conhecida conferidos |
-| Host | Ubuntu22.04.5 LTS, x86_64, 2vCPU, aproximadamente4GBRAM |
-| Runtime | `/home/raposo/stroop-web` |
-| Release | `current` aponta para `releases/26fa9bf`; fonte/manifesto sem dados ou secrets |
-| Configuracao | `web.env` externo0600 e `compose.vps.yaml`; projeto Compose `stroop-web` |
-| Secrets | `/home/raposo/.local/share/stroop-web/secrets`, diretorio0700, arquivos0600 por UID especifico |
-| Portas | Somente proxy:80/443; API8000 e PostgreSQL5432 sem publicacao |
-| Persistencia WEB | Volume `stroop-web_web_postgres_data`, banco `stroop_web` |
-| Legado preservado | `/opt/stroop-go-nogo-psychopy` e volume `stroop-production_postgres_data`; proxy antigo parado |
+| **URL Pública** | `https://strooptest.thiagorraposo.dev` |
+| **Acesso SSH** | `raposo@108.174.145.177`, porta `22022`, chave OpenSSH Ed25519 |
+| **Sistema Operacional** | Ubuntu 22.04.5 LTS (Jammy Jellyfish), kernel 6.8 |
+| **Recursos de Hardware** | 2 vCPUs AMD EPYC, 4 GB RAM, 98 GB SSD (11% ocupado) |
+| **Motor de Contêineres** | Docker Engine 29.8+, Docker Compose v5+ |
+| **Diretório da Aplicação** | `/home/raposo/stroop-web` |
+| **Release Ativa** | Symlink `/home/raposo/stroop-web/current` apontando para a release atual |
+| **Arquivo de Ambiente** | `/home/raposo/stroop-web/web.env` (permissão `0600`, fora do repositório) |
+| **Secrets Operacionais** | `/home/raposo/.local/share/stroop-web/secrets` (`0700` diretório, `0600` arquivos) |
+| **Certificado TLS** | Let's Encrypt (ECDSA), renovado via Certbot webroot (`acme/`) |
+| **Portas Públicas** | `80/tcp` (redirecionamento HTTPS) e `443/tcp` (TLS 1.3 Nginx proxy) |
+| **Portas Internas** | `5432` (PostgreSQL) e `8000` (FastAPI) restritas às redes internas Docker |
+| **Persistência WEB** | Volume Docker nomeado `stroop-web_web_postgres_data` |
 
-O hostname SSH fornecido nao resolveu DNS durante a implantacao; usou-se o IP
-resolvido do dominio, confirmando o hostname remoto e as chaves de host ja
-conhecidas. Nao houve substituicao silenciosa de hostkey. Nenhuma senha/key
-foi impressa ou incorporada ao repositorio/imagens.
+Nenhum arquivo `.env` com credenciais, chave privada ou dump de dados é versionado no Git.
 
-Imagens transferidas prontas, sem compilar sobre dados/configuracoes da VPS:
+---
 
-- API `stroop-web-api:fix-oidc-20261017`, ID
-  `sha256:b78bc442321e53691affb24a401bc3204f2e3004eb5139da23b9f9f18e868f2b`.
-- Proxy `stroop-web-proxy:deploy-20261017`, ID
-  `sha256:51b05c773eccd163c171a9b1f64a8ad2a0020a2a2b312555cac34862bed1277f`.
+## 2. Ciclo de Desenvolvimento e GitHub Flow com Deploy
 
-Registre os IDs antes de atualizar; tags locais nao substituem identificacao
-imutavel do artefato. O overlay usa [este modelo](../../deploy/compose.vps.example.yaml):
-webroot ACME e logs Docker limitados a10MB/3arquivos por servico. API/proxy
-nao-root, filesystemRO, capabilities removidas e limites de recursos preservados.
+O fluxo de entrega do projeto preserva rigorosamente as seguintes etapas:
 
-## Dados, autenticacao e troca de trafego
-
-O banco original tinha3migrations, nenhuma avaliacao e uma conta. Seu backup
-criptografado foi restaurado e conferido em PostgreSQL isolado antes de qualquer
-migration. Restaurou-se outra copia em volume WEB novo; aplicaram-se migrations
-0004–0008 e papeis novos de escrita/leitura. O banco original permaneceu intacto.
-A conta original foi preservada por `issuer+subject`, sem alterar email/perfil.
-Fixtures administrativas sinteticas usadas no ensaio foram desativadas.
-
-TLS e cliente Google existentes foram reutilizados. Configurou-se
-`WEB_OIDC_CALLBACK_PATH=/oauth2callback`, mantendo o callback previamente
-cadastrado. O alias chama o mesmo handler seguro da API; nao encaminha codigo
-por uma URL intermediaria. O padrao novo continua `/api/v1/auth/callback` em
-instalacoes sem essa opcao. Veja o [contrato](../desenvolvimento/CONTRATO_API_WEB.md).
-
-O candidato foi validado em loopback8088/8448 antes de trocar as portas.
-Cutover em `2026-10-17T01:11:40Z`: proxy antigo parado e novo proxy passou a80/443;
-a operacao levou6,444s. O procedimento tinha retorno automatico ao proxy antigo
-se falhasse a prontidao. Nao se restaurou backup sobre novas coletas.
-
-## Operacao e manutencao
-
-Correcao26fa9bf publicada apos relato de `invalid_oidc_state`: o callback aceita
-metadados Google conhecidos sem usa-los para autorizar. Regressao322/322 e
-smoke sintetico HTTPS aprovados; login pessoal aguarda nova tentativa.
-Atualizou-se somente a API, com backup previo e sem migration. A imagem anterior
-`stroop-web-api:deploy-20261017`, releaseaa6c844 e `web.env.pre-oidc-fix` foram
-preservados. Para reverter apenas essa correcao, restaure o arquivo de ambiente
-protegido, aponte current para aa6c844 e execute o Compose abaixo com
-`up -d --no-deps --no-build --wait web-api`, conferindo `/health/ready` em seguida.
-Nao execute o rollback legado completo para reverter somente esta correcao.
-
-Na VPS, inspecione sem carregar `.env` por descoberta:
-
-```bash
-docker compose --project-name stroop-web --env-file /home/raposo/stroop-web/web.env -f /home/raposo/stroop-web/current/compose.web.yaml -f /home/raposo/stroop-web/compose.vps.yaml --profile web ps
-python3 /home/raposo/stroop-web/current/scripts/monitor_web.py --env-file /home/raposo/stroop-web/web.env --project-name stroop-web
+```
+Branch de entrega (feat/fix/docs)
+      │
+      ▼
+Commit convencional em português
+      │
+      ▼
+Push com upstream (git push -u origin BRANCH)
+      │
+      ▼
+Pull Request para a main (gh pr create)
+      │
+      ▼
+CI remota obrigatória (job verify em web.yml)
+      │
+      ▼
+Merge Commit tradicional na main (gh pr merge --merge)
+      │
+      ▼
+Deploy controlado sob demanda (workflow_dispatch em deploy.yml)
+      │
+      ▼
+Validação do SHA, status da CI e healthchecks pós-deploy
 ```
 
-Para jobs de migracao/provisionamento, ative ambos os perfis `web` e `web-tools`
-e chame explicitamente `run --rm`; nao use `up` para iniciar ferramentas em
-paralelo. Antes de atualizar, backup/restauracao, compatibilidade de schema e
-grants sao obrigatorios. Confira [WEB_DOCKER](WEB_DOCKER.md) e
-[WEB_RECUPERACAO](WEB_RECUPERACAO.md). Nunca use `down -v` para atualizar.
+### Regras do fluxo integrado
+1. **Reaproveitamento de CI sem duplicação:** O workflow `WEB validada` (`.github/workflows/web.yml`) é a fonte única de verificação automatizada (`verify`). O pipeline de deploy **não duplica** testes unitários, testes de navegador ou scanner de segredos; ele valida diretamente que o SHA alvo já foi aprovado com sucesso pelo job `verify`.
+2. **Merge tradicional obrigatório:** Nunca utilizar Squash Merge, Rebase Merge ou push direto na `main`. Todos os commits da branch de entrega são preservados como ancestrais de `origin/main`.
+3. **Deploy desacoplado do merge:** O merge na `main` integra o código aprovado, mas não toca na VPS. O deploy ocorre em momento controlado através do workflow `Deploy VPS HostGator` (`.github/workflows/deploy.yml`).
 
-O crontab de `raposo` foi preservado e recebeu bloco gerenciado:
+---
 
-- monitor a cada minuto, ultimo JSON em
-  `/home/raposo/.local/share/stroop-web/logs/health-last.json`;
-- backup diario02:15, pela rotina `tools/vps-maintenance.sh backup`;
-- restauracao isolada semanal, domingo03:30, `restore-check`.
+## 3. Configuração de Secrets e Proteção do Environment no GitHub
 
-Horarios seguem o fuso do host. Logs de manutencao sao privados em
-`/home/raposo/.local/share/stroop-web/logs`; nao enviar seus arquivos integrais
-a tickets. O monitor emite apenas saude/contagens e saida1 em falha; nenhum
-canal externo de notificacao foi configurado. RPO24h/RTO4h continuam objetivos,
-dependentes de agenda, custodia e armazenamento externo estavel.
+Para habilitar a execução do deploy via GitHub Actions, as credenciais de acesso à VPS e as proteções de ambiente devem ser configuradas na interface do GitHub:
 
-## Renovacao TLS
+### 3.1 Proteção do Environment `production`
+1. Navegue até **Settings** → **Environments** → **New environment** → nome: `production`.
+2. Em **Deployment protection rules**:
+   - Ative **Required reviewers** e adicione os revisores autorizados (ex.: mantenedor do repositório). Isso garante que nenhum deploy execute sem aprovação humana expressa no GitHub.
+   - Ative **Deployment branches** e configure para aceitar **apenas** a branch `main` (`Selected branches` → `main`).
+3. Em **Environment URL**, informe: `https://strooptest.thiagorraposo.dev`.
 
-Certificado atual valido ate2027-01-05. O timer Certbot existente foi mantido.
-Sua configuracao passou de `standalone` para `webroot`, usando
-`/home/raposo/stroop-web/acme`. O proxy permite somente o caminho HTTP de desafio
-ACME; os demais caminhos HTTP redirecionam ao HTTPS fixo. A configuracao anterior
-completa de `/etc/letsencrypt` foi criptografada e autenticada antes da alteracao.
+### 3.2 Secrets do Repositório / Environment
+Configure as seguintes secrets em **Settings** → **Secrets and variables** → **Actions** (ou vinculadas ao environment `production`):
 
-Hook instalado em `/etc/letsencrypt/renewal-hooks/deploy/20-deploy-stroop-certificate`,
-com fonte [vps-renew-tls.sh](../../deploy/vps-renew-tls.sh). Ele valida hostname,
-validade e par certificado/chave, substitui os dois arquivos com UID101 e recria
-somente o proxy. Recriar e necessario por causa dos inodes dos mounts de arquivo.
-Dry-run ACME e execucao real do hook passaram; o segundo recriou o proxy e
-aguardou saude. Testes nao emitiram nem imprimiram chaves.
+| Secret | Descrição | Exemplo / Formato |
+|---|---|---|
+| `HOSTGATOR_SSH_HOST` | IP ou DNS público da VPS | `108.174.145.177` |
+| `HOSTGATOR_SSH_PORT` | Porta do serviço OpenSSH | `22022` |
+| `HOSTGATOR_SSH_USER` | Usuário do sistema na VPS | `raposo` |
+| `HOSTGATOR_SSH_KEY` | Chave privada OpenSSH sem passphrase | Conteúdo de `id_ed25519` (iniciando em `-----BEGIN OPENSSH PRIVATE KEY-----`) |
+| `HOSTGATOR_KNOWN_HOSTS` | Linha de hostkey pública da VPS | `[108.174.145.177]:22022 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI...` |
 
-No host, um operador com privilegio administrativo pode revalidar com
-`certbot renew --cert-name strooptest.thiagorraposo.dev --dry-run`. Nao executar
-renovacoes concorrentes. Preserve o webroot ao atualizar o proxy.
+> [!CAUTION]
+> Nunca versione a chave privada SSH ou a coloque em arquivos monitorados pelo Git. A ferramenta de verificação do CI (`verify_web_ci.py`) e o scanner Gitleaks bloqueiam commits que contenham padrões de chaves sensíveis.
 
-## Backup, recuperacao e rollback
+---
 
-Backups criptografados ficam em `/home/raposo/.local/share/stroop-web/backups`;
-as chaves ficam separadas em `keys`, com0600. Backup diario WEB usa
-`keys/web-backup.key`, retendo30geracoes. Backups de preimplantacao/configuracao
-usam `keys/predeploy.key` e preservam os dados/configuracoes anteriores.
+## 4. Como Executar um Deploy Manual Autorizado
 
-Foram guardadas copias criptografadas fora da VPS, neste computador, em
-`/home/raposo/.local/share/stroop-web-vps-backups`; chaves em diretorio distinto
-`/home/raposo/.local/share/stroop-web-vps-keys`. Integridade SHA256 conferida.
-Ainda falta definir destino estavel para replicas externas automaticas; essas
-copias iniciais nao garantem RPO externo continuo. Nao versionar esses arquivos.
+### 4.1 Via Interface Web do GitHub (Recomendado)
+1. Acesse a aba **Actions** no repositório.
+2. Na barra lateral esquerda, clique em **Deploy VPS HostGator**.
+3. Clique no botão **Run workflow** (no canto superior direito):
+   - **Branch**: Selecione `main`.
+   - **commit_sha**: Deixe em branco para implantar o `HEAD` da `main`, ou informe o SHA exato de 40 caracteres a ser publicado.
+   - **dry_run**: Mantenha desmarcado (`false`) para deploy real, ou marque (`true`) para realizar simulação sem alterações remotas.
+   - **skip_ci_check**: Mantenha desmarcado (`false`).
+4. Clique em **Run workflow**.
+5. Se o Environment `production` exigir aprovação, o revisor receberá notificação e deverá aprovar a execução na interface do GitHub.
 
-Para recuperar, restaure primeiro em banco novo/isolado, valide contagens e
-integridade WEB, recomponha secrets/grants e confira prontidao antes de trocar
-trafego. O dump nao inclui owners/grants; remova EXECUTE de PUBLIC da funcao
-SECURITYDEFINER conhecida antes de `web-provision`, conforme o runbook.
-Recupere configuracoes a partir dos arquivos autenticados, sem imprimir seu
-conteudo; preserve permissoes/UIDs e a separacao das chaves. Arquive nova copia
-criptografada apos rotacionar credenciais ou alterar configuracao operacional.
-
-Rollback imediato de trafego, sem apagar banco WEB ou novas coletas:
+### 4.2 Via GitHub CLI (`gh`)
+Para acionar o deploy pelo terminal:
 
 ```bash
-sh /home/raposo/stroop-web/tools/vps-rollback.sh
+# Simulação sem efeitos colaterais na VPS (dry-run):
+gh workflow run deploy.yml -f commit_sha="HEAD" -f dry_run=true
+
+# Deploy real autorizado da versão integrada na main:
+gh workflow run deploy.yml -f commit_sha="b5fccbbd5e199e0312467b26486a7734448e20c8" -f dry_run=false
+
+# Acompanhar a execução do job:
+gh run list --workflow=deploy.yml
+gh run watch
 ```
 
-A [rotina](../../deploy/vps-rollback.sh) para o proxy WEB e inicia dashboard/proxy
-legados preservados e confirma resposta HTTPS; se nao conseguir, reinicia o proxy WEB. Nao reverte schema
-nem copia backup antigo sobre o volume WEB. E uma recuperacao temporaria: o
-legado nao exibe as novas coletas WEB. Para rollback prolongado, recomponha
-tambem a configuracao Certbot compativel a partir do backup e valide a renovacao;
-o webroot da nova versao nao e servido pelo proxy legado original.
+### 4.3 Via Utilitário Local Direto (`scripts/deploy_vps.py`)
+Um operador devidamente autorizado com chave SSH local configurada em `~/.ssh/` pode executar o script canônico diretamente:
 
-## Evidencias e limites
+```bash
+# Validação de integridade do SHA e status na CI:
+python3 scripts/deploy_vps.py validate --commit HEAD
 
-Em 2026-10-27, a inspecao autorizada reconfirmou a release publica `26fa9bf` e
-os containers saudaveis. Novo backup foi criado com sucesso; o ensaio agendado
-`restore-check` falhou porque `compose.restore-test.yaml` nao estava no pacote
-remoto. Foi reposto o arquivo identico ao versionado na release original e a
-mesma rotina passou. Nao houve alteracao de imagens, schema ou trafego publico.
-Uma copia criptografada nova foi guardada fora da VPS, no computador do
-responsavel, com checksum conferido. O destino automatico estavel continua
-pendente; copia manual nao garante o RPO externo continuo. O
-[procedimento de transicao](TRANSICAO_WEB.md) orienta empacotar todas as fontes
-versionadas, incluindo o Compose da restauracao.
+# Simulação completa de deploy:
+python3 scripts/deploy_vps.py deploy --commit HEAD --dry-run
 
-O candidato `af73939` foi ensaiado em pilhas isoladas no proprio alvo, conforme
-a [homologacao](HOMOLOGACAO_WEB.md). Capacidade, reinicio dos containers,
-restauracao e retorno do candidato invalido foram medidos sem substituir a
-release publica. Reboot do host e login Google pessoal ainda carecem de prova;
-inicio OIDC com redirecionamento ao Google nao conclui o login.
+# Execução real com chave privada local:
+python3 scripts/deploy_vps.py deploy \
+  --commit HEAD \
+  --ssh-host 108.174.145.177 \
+  --ssh-port 22022 \
+  --ssh-user raposo \
+  --ssh-key-file ~/.ssh/hostgator_stroop_ed25519
+```
 
-Python317/317, callback5/5 e proxy6/6 aprovados antes da publicacao. Na VPS e
-no dominio publico: HTTPS/headers/Host/bodylimit, prontidao, convite/resgate,
-conclusao/retry/consulta/CSV e persistencia aprovados. Chromium executou pratica
-e principal real60s pelo dominio publico, salvou uma unica avaliacao com
-16tentativas/12metricas, nao usou JSstorage e encerrou o cookie. Sem erroJS.
-Controle de falha do rollback coberto por dois testes sem alterar trafego real.
-Google abriu sua pagina de login sem erro de cliente/callback; confirmacao da
-sessao pessoal do administrador permanece solicitada ao responsavel.
+---
 
-Backups PostgreSQL legado e WEB restaurados isoladamente; rotina agendada de
-backup/restauracao tambem executada. Containers recriados para aplicar logs
-limitados mantiveram o volume e as coletas. Nenhum desses ensaios representa
-medicao fisica W16 ou teste de capacidade/reboot da VPS para aceite W21.
+## 5. Sequência Técnica de Atualização na VPS
+
+O script `scripts/deploy_vps.py` orquestra a implantação seguindo 8 etapas atômicas:
+
+1. **Validação pré-voo:**
+   - Valida que o SHA informado possui 40 caracteres hexadecimais válidos.
+   - Confirma que o commit pertence à branch estável `main`.
+   - Consulta a API do GitHub Actions para garantir que o check `verify` foi concluído com `success`.
+2. **Conectividade SSH:**
+   - Testa a autenticação via chave SSH e a resolução da VPS com timeout seguro.
+3. **Snapshot e Salvaguarda Pré-Deploy:**
+   - Executa backup criptografado do banco PostgreSQL com a chave `/home/raposo/.local/share/stroop-web/keys/predeploy.key`.
+   - Grava snapshot de segurança de `web.env` em `web.env.pre-deploy`.
+   - Registra o caminho da release anterior ativa em `/home/raposo/stroop-web/previous_release`.
+4. **Criação do Diretório de Release:**
+   - Cria `/home/raposo/stroop-web/releases/<SHA>`.
+   - Gera o manifesto imutável `release.json` com SHA, timestamp UTC, autor e tags das imagens.
+5. **Atualização Controlada das Tags de Imagem:**
+   - Atualiza `WEB_API_IMAGE=stroop-web-api:deploy-<SHA>` e `WEB_PROXY_IMAGE=stroop-web-proxy:deploy-<SHA>` no arquivo `web.env`.
+   - Nenhuma credencial ou variável de conexão é modificada.
+6. **Migrations e Permissões:**
+   - Executa migrations pendentes de forma idempotente via contêiner efêmero `web-migrate`.
+   - Executa provisionamento de papéis e privilégios via `web-provision`.
+7. **Chaveamento Atômico de Tráfego:**
+   - Atualiza o symlink de produção: `ln -sfn /home/raposo/stroop-web/releases/<SHA> /home/raposo/stroop-web/current`.
+   - Recria os contêineres de aplicação (`web-api` e `web-proxy`) com `--wait` via Compose:
+     ```bash
+     docker compose --project-name stroop-web --env-file web.env \
+       -f current/compose.web.yaml -f compose.vps.yaml \
+       --profile web up -d --no-deps --no-build --wait web-api web-proxy
+     ```
+   - O contêiner de banco de dados (`web-postgres`) e seu volume persistente são preservados sem reinicialização.
+8. **Healthcheck Pós-Deploy:**
+   - Sonda o endpoint público de prontidão `https://strooptest.thiagorraposo.dev/health/ready` por até 8 tentativas.
+   - Em caso de insucesso, dispara rollback automático imediato.
+
+---
+
+## 6. Verificação do SHA Publicado e Monitoramento
+
+Após o deploy, confirme a integridade da versão em produção:
+
+### 6.1 Verificação do Endpoint HTTPS
+```bash
+# Prontidão da aplicação:
+curl -fsS https://strooptest.thiagorraposo.dev/health/ready
+# Esperado: {"status":"ready"}
+
+# Verificação do cabeçalho de segurança e redirecionamento:
+curl -I https://strooptest.thiagorraposo.dev/
+```
+
+### 6.2 Inspecionando o Manifesto Remoto na VPS
+No terminal SSH da VPS:
+
+```bash
+# Ler o manifesto da release ativa:
+cat /home/raposo/stroop-web/current/release.json
+
+# Verificar a saúde dos contêineres:
+docker compose --project-name stroop-web --env-file /home/raposo/stroop-web/web.env \
+  -f /home/raposo/stroop-web/current/compose.web.yaml -f /home/raposo/stroop-web/compose.vps.yaml \
+  --profile web ps
+
+# Executar diagnóstico pelo script oficial de monitoramento:
+python3 /home/raposo/stroop-web/current/scripts/monitor_web.py \
+  --env-file /home/raposo/stroop-web/web.env --project-name stroop-web
+```
+
+---
+
+## 7. Investigação de Falhas e Procedimento de Rollback
+
+### 7.1 Rollback Automático
+O script `deploy_vps.py` aciona rollback automático sempre que:
+- Ocorrer erro durante a execução de migrations ou provisionamento de papéis;
+- A recriação dos contêineres `web-api` ou `web-proxy` falhar;
+- O healthcheck público `/health/ready` não responder HTTP 200 dentro do tempo limite estipulado.
+
+O rollback automático restaura imediatamente o symlink `current` para a release gravada em `previous_release`, reaplica o `web.env.pre-deploy` e recria os contêineres na versão anterior estável, finalizando com código de saída 1 para alertar os operadores.
+
+### 7.2 Rollback Manual Rápido (RTO < 30s)
+Caso seja necessário reverter manualmente uma versão com anomalia funcional:
+
+#### Opção A: Pelo utilitário local
+```bash
+python3 scripts/deploy_vps.py rollback \
+  --ssh-host 108.174.145.177 \
+  --ssh-port 22022 \
+  --ssh-user raposo \
+  --ssh-key-file ~/.ssh/hostgator_stroop_ed25519
+```
+
+#### Opção B: Diretamente na VPS via script canônico
+```bash
+# Reverte para a release anterior gravada em previous_release:
+sh /home/raposo/stroop-web/current/deploy/vps-web-rollback.sh
+
+# Ou especificando uma release conhecida:
+sh /home/raposo/stroop-web/current/deploy/vps-web-rollback.sh 26fa9bf
+```
+
+### 7.3 Rollback Emergencial para a Stack Streamlit Legada
+Se houver falha catastrófica de infraestrutura que impeça a stack React/FastAPI de subir, a VPS preserva os contêineres legados do Streamlit (`stroop-production-dashboard-1` e `stroop-production-proxy-1`). O retorno pode ser executado via:
+
+```bash
+sh /home/raposo/stroop-web/deploy/vps-rollback.sh
+```
+
+Esse script desativa o proxy WEB e religa o proxy legado nas portas 80/443, confirmando resposta HTTPS em `/_stcore/health` antes de concluir.
+
+---
+
+## 8. Condições para Habilitar Deploy Automático no Futuro
+
+Atualmente, o deploy automático em push na `main` é **proibido por governança** (marcos M8–M10 do backlog). Para que um gatilho de Continuous Deployment (CD) direto após o merge possa ser habilitado no futuro, os seguintes pré-requisitos técnicos e institucionais devem ser atendidos:
+
+1. **Aprovação Formal dos Marcos M8, M9 e M10:**
+   - Conclusão e aceite da réplica externa independente e runbooks de recuperação (`WEB-031` e `WEB-032`).
+   - Validação metodológica e temporal do experimento em ambiente controlado (`WEB-034` e `WEB-036`).
+   - Conclusão da homologação e handoff operacional (`WEB-037` a `WEB-040`).
+2. **Decisão Institucional DEC-05:**
+   - Autorização expressa do coordenador da pesquisa e do responsável pelo repositório para transição para o modo operacional contínuo.
+3. **Maturidade e Idempotência Total de Migrations:**
+   - Comprovação de que todas as alterações de schema do banco relacional são puramente aditivas e compatíveis retroativamente (Zero Downtime Migrations / expand-contract pattern).
+4. **Infraestrutura de Observabilidade Remota:**
+   - Notificações automatizadas (ex.: webhook Slack/Discord ou e-mail seguro) informando sobre deploys realizados e alertas de falha no monitor agendado.
+
+Enquanto essas condições não forem formalizadas, o acionamento via `workflow_dispatch` permanece a única via homologada de publicação.

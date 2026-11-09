@@ -2768,7 +2768,36 @@ Verificações locais executadas nesta missão documental (`Python 3.12.3`, sem 
 
 ## Retomada
 
-### Retomada vigente — conclusão do marco M7: Integração, compatibilidade histórica e transição (WEB-025 a WEB-028), 2026-11-09
+### Retomada vigente — implementação de mecanismos de deploy controlado na VPS HostGator (GitHub Flow), 2026-11-09
+
+Implementação e documentação dos mecanismos de implantação para a VPS HostGator (`strooptest.thiagorraposo.dev`),
+integrados ao GitHub Flow adotado pelo projeto Stroop:
+**Branch → Commit → Push → Pull Request → CI verify → Merge Commit na main → Deploy controlado**.
+
+Entregáveis técnicos implementados:
+1. **Pipeline de Deploy no GitHub Actions:** workflow [deploy.yml](../.github/workflows/deploy.yml) protegido
+   pelo Environment `production`, acionado exclusivamente sob demanda (`workflow_dispatch`), sem duplicar os testes da CI
+   (`web.yml`) e sem gatilho automático pós-merge.
+2. **Utilitário Canônico de Deploy e Validação:** script [`scripts/deploy_vps.py`](../scripts/deploy_vps.py) com subcomandos
+   `validate`, `deploy`, `rollback` e `healthcheck`. Valida o SHA exato de 40 dígitos, confirma se o commit pertence à `main`
+   e se o check `verify` foi aprovado com sucesso na CI do GitHub antes de autorizar qualquer operação. Suporta modo simulação
+   (`--dry-run`), snapshot pré-deploy, atualização atômica de symlink e rollback automático em falha de healthcheck.
+3. **Mecanismo de Rollback da Aplicação WEB:** script [`deploy/vps-web-rollback.sh`](../deploy/vps-web-rollback.sh) para reversão
+   rápida de release (RTO < 30s) na VPS, preservando integralmente o PostgreSQL, volumes persistentes, certificados e secrets.
+4. **Documentação Operacional Canônica:** atualização completa de [DEPLOY_WEB_VPS](operacao/DEPLOY_WEB_VPS.md), detalhando a
+   configuração de Secrets e proteção do Environment `production`, execução manual de deploy, verificação de SHA, investigação
+   de falhas e critérios técnicos/metodológicos para habilitar Continuous Deployment no futuro.
+
+Progresso global do projeto: **37/48 entregáveis aceitos (77,1%)**, 11 sem aceite.
+Os marcos **M8** (2/4 aceitos, `WEB-031` bloqueada, `WEB-032` pendente), **M9** (0/4) e **M10** (0/5) permanecem estritamente
+preservados com seus estados e critérios originais. A implantação de releases em ambiente de produção permanece reservada ao marco M10.
+
+Próxima ação exata: aprovação do Pull Request da branch `feat/deploy-vps-github-flow`, merge via Merge Commit tradicional na `main`,
+e posterior autorização formal do responsável pelo repositório para início das tarefas pendentes de **M8** (`WEB-031` e `WEB-032`).
+
+Git da entrega: branch `feat/deploy-vps-github-flow`.
+
+### Retomada anterior — conclusão do marco M7: Integração, compatibilidade histórica e transição (WEB-025 a WEB-028), 2026-11-09
 
 Marco vigente **M7 integralmente concluído com 4 de 4 entregáveis aceitos**
 (`WEB-025`, `WEB-026`, `WEB-027` e `WEB-028` **CONCLUIDAS**).
