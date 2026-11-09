@@ -36,6 +36,8 @@ def _database_error() -> APIError:
 
 @router.post('/{operation_id}')
 async def upload_csv(project_id: UUID, operation_id: UUID, request: Request):
+    if not getattr(request.app.state.config, 'enable_legacy_csv_import', False):
+        raise APIError('csv_import_disabled')
     _reject_query(request)
     actor = _professional_write(request, 'import_csv')
     content_types = request.headers.getlist('content-type')
@@ -67,6 +69,8 @@ async def upload_csv(project_id: UUID, operation_id: UUID, request: Request):
 
 @router.get('/{operation_id}')
 async def get_import_status(project_id: UUID, operation_id: UUID, request: Request):
+    if not getattr(request.app.state.config, 'enable_legacy_csv_import', False):
+        raise APIError('csv_import_disabled')
     await request.body()  # Empty-body invariant and request-boundary replay.
     _reject_query(request)
     actor = _professional_read(request, 'import_csv')

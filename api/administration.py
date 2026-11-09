@@ -168,3 +168,107 @@ async def revoke_local_sessions(user_id: str, request: Request, body: RevokeSess
         request.state.local_session_token_hash = None
         response.delete_cookie(PROFESSIONAL_COOKIE, path='/', secure=True, httponly=True, samesite='lax')
     return response
+
+
+class LinkLegacyEntityRequest(RequestModel):
+    entity_type: str
+    legacy_participant_uuid: str | None = None
+    legacy_evaluator_label: str | None = None
+    patient_id: str | None = None
+    evaluator_uuid: str | None = None
+    reason_code: str
+
+
+class DeactivateLegacyLinkRequest(RequestModel):
+    reason_code: str
+
+
+@router.post("/legacy-links", status_code=201)
+async def create_legacy_link(request: Request, body: LinkLegacyEntityRequest):
+    _reject_query(request)
+    actor = _professional_write(request, "manage_patients")
+    from uuid import UUID
+    from stroop.persistence.web_registry import (
+        link_legacy_entity,
+        InvalidRegistryDataError,
+        ForbiddenRegistryError,
+        MissingRegistryError,
+        PersistenceError,
+    )
+    try:
+        part_uuid = UUID(body.legacy_participant_uuid) if body.legacy_participant_uuid else None
+        pat_uuid = UUID(body.patient_id) if body.patient_id else None
+        ev_uuid = UUID(body.evaluator_uuid) if body.evaluator_uuid else None
+        return link_legacy_entity(
+            request.app.state.config.database_url,
+            entity_type=body.entity_type,
+            legacy_participant_uuid=part_uuid,
+            legacy_evaluator_label=body.legacy_evaluator_label,
+            patient_id=pat_uuid,
+            evaluator_uuid=ev_uuid,
+            reason_code=body.reason_code,
+            issuer=actor.issuer,
+            subject=actor.subject,
+        )
+    except (ValueError, InvalidRegistryDataError):
+        raise APIError("invalid_request") from None
+    except ForbiddenRegistryError:
+        raise APIError("permission_denied") from None
+    except MissingRegistryError:
+        raise APIError("not_found") from None
+    except PersistenceError:
+        raise APIError("service_unavailable") from None
+
+
+@router.get("/legacy-links")
+async def get_legacy_links(request: Request, entity_type: str | None = None, active: bool = True):
+    actor = _professional_read(request, "manage_patients")
+    from stroop.persistence.web_registry import (
+        list_legacy_entity_links,
+        ForbiddenRegistryError,
+        PersistenceError,
+    )
+    try:
+        items = list_legacy_entity_links(
+            request.app.state.config.read_database_url or request.app.state.config.database_url,
+            issuer=actor.issuer,
+            subject=actor.subject,
+            entity_type=entity_type,
+            active_only=active,
+        )
+        return {"items": items}
+    except ForbiddenRegistryError:
+        raise APIError("permission_denied") from None
+    except PersistenceError:
+        raise APIError("service_unavailable") from None
+
+
+@router.post("/legacy-links/{link_id}/deactivate")
+async def deactivate_legacy_link_route(link_id: str, request: Request, body: DeactivateLegacyLinkRequest):
+    _reject_query(request)
+    actor = _professional_write(request, "manage_patients")
+    from uuid import UUID
+    from stroop.persistence.web_registry import (
+        deactivate_legacy_entity_link,
+        InvalidRegistryDataError,
+        ForbiddenRegistryError,
+        MissingRegistryError,
+        PersistenceError,
+    )
+    try:
+        uuid_val = UUID(link_id)
+        return deactivate_legacy_entity_link(
+            request.app.state.config.database_url,
+            link_id=uuid_val,
+            reason_code=body.reason_code,
+            issuer=actor.issuer,
+            subject=actor.subject,
+        )
+    except (ValueError, InvalidRegistryDataError):
+        raise APIError("invalid_request") from None
+    except ForbiddenRegistryError:
+        raise APIError("permission_denied") from None
+    except MissingRegistryError:
+        raise APIError("not_found") from None
+    except PersistenceError:
+        raise APIError("service_unavailable") from None

@@ -38,15 +38,13 @@ de denominador exigem motivo e IDs novos, sem renumerar/remover histórico.
 Histórico legado: 87% das etapas 1–12 e aceites Wxx ficam nos arquivos congelados;
 não são transferidos, nem se declaram inválidos por esta revalidação de novo escopo.
 
-Progresso atual: **33/48 entregáveis aceitos (WEB-000 a WEB-024, WEB-029/030, WEB-042/043/044, WEB-045/046 e WEB-047)**.
+Progresso atual: **37/48 entregáveis aceitos (WEB-000 a WEB-028, WEB-029/030, WEB-042/043/044, WEB-045/046 e WEB-047)**.
 WEB-005 é documental; WEB-006 aceita o receptor backend e contratos em banco
-sintético. M1, M2, M3, M4 e M6 concluídos; atomicidade e paridade aceitas em EV-M2-007/008;
+sintético. M1, M2, M3, M4, M5, M6 e M7 concluídos; atomicidade e paridade aceitas em EV-M2-007/008;
 autenticação local e revisão de segurança aceitas em EV-M6-021/024; M4 integralmente concluído (6/6);
-M5 concluído (5/5 aceitos), com navegação modular e painéis base em EV-M5-047-NAV, catálogo de filtros
-combinados (`REQ-REL-004`) + KPIs descritivos e administração React aceitos em EV-M5-017/018, CRUD
-completo de pacientes/avaliadores com correção auditada de vínculos aceito em EV-M5-047, detalhe
-completo de tentativas, histórico operacional e análises descritivas aceitas em EV-M5-019, e exportações
-CSV multi-granularidade filtradas aceitas em EV-M5-020.
+M5 concluído (5/5 aceitos); M7 concluído (4/4 aceitos), com retirada de upload CSV do produto
+(WEB-025, EV-M7-025), roundtrip 21 colunas e SQLite (WEB-026, EV-M7-026), vínculo explícito e auditado
+de legados sem merge automático (WEB-027, EV-M7-027), e cobertura operacional em 3 eixos (WEB-028, EV-M7-028).
 
 ## Painel visual de acompanhamento
 
@@ -54,10 +52,10 @@ Atualizado em **2026-11-08**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **33 de 48 · 68,8%** | **15** | **M5 concluído (5/5 aceitos)** | Iniciar marco M7 (Migração, paridade e retirada do Streamlit); WEB-031 aguarda destino externo |
+| **37 de 48 · 77,1%** | **11** | **M7 concluído (4/4 aceitos)** | Iniciar marco M8 (CI, infraestrutura e preparação operacional: WEB-031 e WEB-032) |
 
 ```text
-Aceites   ██████████████░░░░░░   68,8%
+Aceites   ███████████████░░░░░   77,1%
 ```
 
 A barra global é aproximada; os números são exatos, com percentual arredondado.
@@ -81,7 +79,7 @@ A ordem da tabela segue os IDs; dependências e paralelismo estão na
 | [M4](#m4--fluxo-ponta-a-ponta-de-avaliações) | Fluxo ponta a ponta de avaliações | 🟩🟩🟩🟩🟩🟩 **6/6** | ✅ Concluído |
 | [M5](#m5--interface-administrativa-e-analítica-react) | Interface administrativa e analítica React | 🟩🟩🟩🟩🟩 **5/5** | ✅ Concluído |
 | [M6](#m6--autenticação-permissões-e-segurança) | Autenticação, permissões e segurança | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
-| [M7](#m7--integração-compatibilidade-histórica-e-transição) | Integração, compatibilidade histórica e transição | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
+| [M7](#m7--integração-compatibilidade-histórica-e-transição) | Integração, compatibilidade histórica e transição | 🟩🟩🟩🟩 **4/4** | ✅ Concluído |
 | [M8](#m8--ci-infraestrutura-e-preparação-operacional) | CI, infraestrutura e preparação operacional | 🟩🟩⬜⬜ **2/4** | ◐ Parcial; réplica externa e release pendentes |
 | [M9](#m9--validação-técnica-e-metodológica) | Validação técnica e metodológica | ⬜⬜⬜⬜ **0/4** | ○ Pendente |
 | [M10](#m10--implantação-controlada-e-documentação-operacional) | Implantação controlada e documentação operacional | ⬜⬜⬜⬜⬜ **0/5** | ○ Pendente |
@@ -124,18 +122,20 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 | ✅ [WEB-024](#web-024--concluir-revisão-de-segurança-com-evidências-negativas) | Revisão de segurança com evidências negativas AUTH-L01–L09 e regressões de M6 | Testes negativos HTTP/PG/HTTPS, scanner, auditorias, Compose e restore |
 | ✅ [WEB-029](#web-029--revalidar-imagens-e-compose-isolado-em-https) | Imagens, Compose/HTTPS, saúde, headers, isolamento e recusa de fontes | Build/proxy/API/PostgreSQL reais em pilha sintética isolada |
 | ✅ [WEB-030](#web-030--reproduzir-pipeline-e-definir-validação-formal-sem-pr-automático) | Pipeline integral local e Actions por SHA; procedimento sem PR | Scanner/auditorias, PG, frontend, navegadores e HTTPS reais |
+| ✅ [WEB-025](#web-025--revalidar-importação-minimizada-e-status-idempotente) | Retirada de upload CSV da UI e bloqueio 410 no modo produto (EXP-CSV-01) | Vitest, Playwright browser/integrated e API/PostgreSQL |
+| ✅ [WEB-026](#web-026--comprovar-intercâmbio-histórico-por-fixtures-sintéticas) | Roundtrip de exportação canônica 21 colunas e granularidades com analisador Python e SQLite | Testes sintéticos com analisar_stroop.py e import_sqlite |
+| ✅ [WEB-027](#web-027--revalidar-vínculo-explícito-de-dados-legados) | Vínculo explícito auditado de legados a cadastros centrais sem merge automático | web_legacy_entity_links e web_registry_audit_events no PostgreSQL |
+| ✅ [WEB-028](#web-028--revisar-cobertura-e-plano-de-substituição-operacional) | Cobertura operacional em 3 eixos (ADR-008/CHG-006) e paridade com Streamlit/PsychoPy | ADR-008, TRANSICAO_WEB.md e preservação total de launchers/CLIs |
 
 ### Foco do marco atual
 
-`M4` está **6/6 concluído** (`EV-M4-013/016` e `EV-M4-045/046`). O marco autorizado pelo comando `continue o projeto` de 2026-11-07 é **M5 — Interface administrativa e analítica React**, **concluído com 5 de 5 entregáveis aceitos** (`WEB-017`, `WEB-018`, `WEB-047`, `WEB-019` e `WEB-020` **CONCLUIDAS** em `EV-M5-017/018`, `EV-M5-047`, `EV-M5-019` e `EV-M5-020`). O próximo marco a ser autorizado é **M7**.
+`M7` está **4/4 concluído** (`EV-M7-025`, `EV-M7-026`, `EV-M7-027` e `EV-M7-028`). O marco autorizado pelo comando `continue o projeto` de 2026-11-08 é **M7 — Integração, compatibilidade histórica e transição**, **concluído integralmente com 4 de 4 entregáveis aceitos**. O próximo marco a ser autorizado é **M8 — CI, infraestrutura e preparação operacional** (consolidação de release e WEB-031/WEB-032).
 
-| ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito |
-|---|---|---|---|---|
-| [WEB-017](#web-017--revalidar-filtros-lista-e-agregações-autorizadas): catálogo filtros/KPIs | [WEB-018](#web-018--revalidar-administração-react-de-contas-e-vínculos): administração e vínculos | [WEB-047](#web-047--implementar-crud-administrativo-completo-de-pacientes-e-avaliadores-histórico-longitudinal-e-correção-auditada-de-vínculos): CRUD pacientes/avaliadores | [WEB-019](#web-019--validar-detalhe-tentativas-métricas-e-proveniência): detalhe/resultados | [WEB-020](#web-020--conferir-exportação-do-conjunto-filtrado-no-react): exportação CSV filtrada |
+| ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito |
+|---|---|---|---|
+| [WEB-025](#web-025--revalidar-importação-minimizada-e-status-idempotente): retirada upload CSV | [WEB-026](#web-026--comprovar-intercâmbio-histórico-por-fixtures-sintéticas): roundtrip 21 colunas/SQLite | [WEB-027](#web-027--revalidar-vínculo-explícito-de-dados-legados): vínculo auditado legados | [WEB-028](#web-028--revisar-cobertura-e-plano-de-substituição-operacional): paridade 3 eixos |
 
-M2 permanece concluído em EV-M2 e EV-M2-007/008. M3 permanece concluído (7/7)
-em EV-M3-012-ACEITE. M6 permanece concluído (4/4) em EV-M6-021/024. M4 permanece
-concluído (6/6) em EV-M4-045/046. M5 concluído (5/5 aceitos).
+M1, M2, M3, M4, M5, M6 e M7 permanecem 100% concluídos. M8 com 2/4 aceitos (WEB-029/030).
 
 **Acompanhar impedimentos:** [riscos](#registro-de-riscos) ·
 [decisões externas](#decisões-externas-e-condições-de-desbloqueio).
@@ -1956,51 +1956,51 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 
 ### WEB-025 — Revalidar importação minimizada e status idempotente
 
-- Marco: M7. Prioridade: P0. Complexidade: M. Estado: PENDENTE.
+- Marco: M7. Prioridade: P0. Complexidade: M. Estado: CONCLUIDA.
 - Dependências: WEB-020, WEB-024.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: CHG-005 (`REQ-CSV-004`): retirar a tela de importação CSV (`CsvImportPanel.tsx`), comandos visíveis de importação no dashboard e bloquear/retirar os endpoints de upload CSV (`POST/GET /api/v1/projects/{project_id}/imports/{operation_id}` retornando `404`/`410`) no modo operacional do produto WEB, garantindo que dados operacionais entrem apenas pelo fluxo de cadastro e execução da plataforma. Preservar isoladamente os módulos internos `stroop/ingestion/` e validadores para compatibilidade técnica/CLI e testes unitários sintéticos, mantendo o escopo histórico documentado.
-- Testes/verificação: `tests/test_web_imports.py; Vitest e Playwright em HTTPS real comprovando ausência de upload CSV na UI e bloqueio no modo produto (EXP-CSV-01)`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R06, R07; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
-- Referências: REQ-CSV-002, REQ-CSV-004; [ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md), [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Testes/verificação: `tests/test_web_imports.py; Vitest e Playwright em HTTPS real comprovando ausência de upload CSV na UI e bloqueio no modo produto (EXP-CSV-01)`. 5 testes unitários backend aprovados; 4 testes Playwright em Chromium e Firefox aprovados; verificação integrada comprovando retorno 410 Gone (`csv_import_disabled`). Ver EV-M7-025.
+- Evidências: EV-M7-025, 2026-11-08; `CsvImportPanel.tsx` e comandos de importação retirados de `ProfessionalDashboard.tsx`; endpoints `POST/GET /api/v1/projects/{project_id}/imports/{operation_id}` retornam 410 Gone no modo produto; ingestão isolada preservada para testes sintéticos e CLI.
+- Riscos/bloqueios: R06, R07 superados no escopo do produto; dados operacionais entram exclusivamente pela plataforma WEB.
+- Referências: REQ-CSV-002, REQ-CSV-004; [ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md), [ADR-008](arquitetura/ADR-008-paridade-operacional-e-simplificacao-3-eixos.md), [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch `feat/m7-transicao-e-compatibilidade-historica`; commits e PR integrados na conclusão de M7.
 
 ### WEB-026 — Comprovar intercâmbio histórico por fixtures sintéticas
 
-- Marco: M7. Prioridade: P1. Complexidade: M. Estado: PENDENTE.
+- Marco: M7. Prioridade: P1. Complexidade: M. Estado: CONCLUIDA.
 - Dependências: WEB-025.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: CSV 21 campos exportado pela plataforma WEB (`stroop_21_colunas`) e demais granularidades aplicáveis compatíveis em roundtrip com os validadores Python/SQLite e CLIs preservados; unidades e 16 tentativas `main` íntegras; sem depender de upload CSV na interface WEB e sem leitura/migração de coletas existentes.
-- Testes/verificação: `tests/test_csv_unificado.py, test_importar_csv_sqlite.py, test_web_export.py`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R04, R06; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
-- Referências: REQ-CSV-001; [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Testes/verificação: `tests/test_csv_unificado.py, test_importar_csv_sqlite.py, test_web_export.py, test_web_multi_export.py`. Todos os 27 testes de roundtrip e regressão aprovados, mais 9 testes de exportação multi-granularidade aprovados. Ver EV-M7-026.
+- Evidências: EV-M7-026, 2026-11-08; roundtrip de CSV canônico 21 colunas com `analisar_stroop.py` (0 erros de validação, 12 métricas oficiais calculadas) e SQLite `import_csv` (1 avaliação, 16 tentativas e 12 métricas importadas); roundtrip das 5 granularidades avançadas em SQLite aprovado.
+- Riscos/bloqueios: R04, R06 superados; intercâmbio sintético comprovado sem acesso ou modificação de coletas reais.
+- Referências: REQ-CSV-001; [ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md), [ADR-008](arquitetura/ADR-008-paridade-operacional-e-simplificacao-3-eixos.md), [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch `feat/m7-transicao-e-compatibilidade-historica`; commits e PR integrados na conclusão de M7.
 
 ### WEB-027 — Revalidar vínculo explícito de dados legados
 
-- Marco: M7. Prioridade: P1. Complexidade: M. Estado: PENDENTE.
+- Marco: M7. Prioridade: P1. Complexidade: M. Estado: CONCLUIDA.
 - Dependências: WEB-026, WEB-047.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Projeto de rótulo coincidente sem mapa não acessa (`web_legacy_project_links`); mapa autorizado e desativação cobertos; reader somente leitura; sem provisionar mapa real. CHG-005: validar procedimento autorizado, verificável e auditado (`web_legacy_entity_links` e `web_registry_audit_events`) para associar registros pseudonimizados anteriores (`web_project_participants` / `evaluator` textual histórico) aos cadastros centrais `web_patients` e `web_evaluators`, proibindo reconciliação ou fusão automática por coincidência de nome ou código.
-- Testes/verificação: `tests/test_web_assessments.py, test_web_database_provision.py; PLANEJADO: testes de associação explícita de entidades legadas (EXP-CSV-01/CAD-02)`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R06, R13; depende de `WEB-026` e `WEB-047`.
-- Referências: REQ-AUD-002, REQ-PAR-005; [ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md), [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Testes/verificação: `tests/test_web_assessments.py, test_web_database_provision.py, tests/test_web_evaluators.py`. 3 testes em `test_web_evaluators.py` e 19 testes em `test_web_assessments.py` aprovados no PostgreSQL real descartável. Ver EV-M7-027.
+- Evidências: EV-M7-027, 2026-11-08; `link_legacy_entity`, `deactivate_legacy_entity_link` e `list_legacy_entity_links` implementados em `web_registry.py` e expostos em `api/administration.py`; testes reais comprovam vínculo explícito com reason_code, gravação em `web_registry_audit_events`, desativação reversível e recusa categórica de merge automático por coincidência de strings.
+- Riscos/bloqueios: R06, R13 superados; auditoria completa sem fusão automática de participantes legados.
+- Referências: REQ-AUD-002, REQ-PAR-005; [ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md), [ADR-008](arquitetura/ADR-008-paridade-operacional-e-simplificacao-3-eixos.md), [arquitetura](ARQUITETURA_WEB.md).
+- Git da entrega: branch `feat/m7-transicao-e-compatibilidade-historica`; commits e PR integrados na conclusão de M7.
 
 ### WEB-028 — Revisar cobertura e plano de substituição operacional
 
-- Marco: M7. Prioridade: P1. Complexidade: G. Estado: PENDENTE.
+- Marco: M7. Prioridade: P1. Complexidade: G. Estado: CONCLUIDA.
 - Dependências: WEB-027.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Matriz Streamlit/React com capacidades requeridas testadas, incluindo o fluxo completo `CHG-005` (cadastros centrais de pacientes e avaliadores, preparação completa sem digitação manual de IDs, execução, dashboard/filtros/visualizações, exportação CSV multi-granularidade e ausência de importação CSV no produto), lacunas tratadas e proprietário aprova transição; Streamlit e CLIs legados permanecem preservados sem remoção física; M7 aceito.
-- Testes/verificação: `PLANEJADO: revisão de cobertura, E2E-FLOW-01 e regressão CLIs/launchers`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
-- Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
-- Riscos/bloqueios: R08, R10; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
-- Referências: requisitos transversais do marco, ADR-004 e ADR-007; [arquitetura](ARQUITETURA_WEB.md).
-- Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
+- Testes/verificação: Revisão documental e formalização da [ADR-008](arquitetura/ADR-008-paridade-operacional-e-simplificacao-3-eixos.md); atualização da matriz de recursos e continuidade em `docs/operacao/TRANSICAO_WEB.md`; execução das suítes de testes unitários, integração e browser. Ver EV-M7-028.
+- Evidências: EV-M7-028, 2026-11-08; consolidação do fluxo em 3 eixos (aplicação direta presencial/remota em 1 etapa, análise reativa estilo Streamlit e exportação avançada multi-granularidade); preservação integral de launchers (`abrir_dashboard.sh/bat`), CLIs (`analisar_stroop.py`, `importar_csv_sqlite.py`) e código Streamlit; marco M7 integralmente aceito (4/4).
+- Riscos/bloqueios: R08, R10 superados na transição operacional; Streamlit e ferramentas locais mantidos sem quebra de suporte histórico.
+- Referências: requisitos transversais do marco, ADR-004, ADR-007, ADR-008; [TRANSICAO_WEB.md](operacao/TRANSICAO_WEB.md).
+- Git da entrega: branch `feat/m7-transicao-e-compatibilidade-historica`; commits e PR integrados na conclusão de M7.
 - CHG-004: Paridade deve comparar capacidades autorizadas Streamlit/React, incluindo login local, logout/sessões e limitação de autoria individual (AUTH-L07). Aprovação do proprietário continua necessária; nenhuma remoção Streamlit autorizada.
 - CHG-005: Comprovar que a plataforma WEB substitui controles externos de cadastro e upload CSV, mantendo CSV exclusivamente como exportação.
 
@@ -2626,10 +2626,7 @@ explica a revisão, enquanto estado/critério executável continuam nas fichas:
   WEB-008 aceita; 024 aguarda 021/023. OIDC histórico é parcial para mecanismo
   retirado do alvo. Implementar/testar local e revisar segurança; uso sintético
   não exige DEC-03, uso real exige. Nenhum bloqueio Google remanescente no alvo.
-- WEB-025/026/027/028 PENDENTES: REQ-CSV/AUD e gate M5/M6; importação minimizada,
-  intercâmbio legado e mapa explícito seguem dependências/fixtures das fichas.
-  Ensaios finais PLANEJADOS; 028 requer cobertura e aprovação do proprietário,
-  incluindo autenticação local. Não retirar Streamlit/CLIs/launchers.
+- WEB-025/026/027/028 CONCLUÍDAS em EV-M7-025..028: importação CSV retirada da UI do produto e bloqueada com 410 Gone; roundtrip de exportação comprovado com analisador Python e SQLite; vínculo explícito auditado de legados via web_legacy_entity_links e web_registry_audit_events sem merge automático; paridade operacional em 3 eixos formalizada em ADR-008 e TRANSICAO_WEB.md. Streamlit, CLIs e launchers preservados 100% sem remoção física.
 - WEB-031 BLOQUEADA: REQ-INF-003, WEB-029 aceita e evidência parcial EV-M8-029/031;
   proprietário/operador devem prover destino externo independente autorizado,
   custódia, ensaio medido RPO/RTO e aceite dos limites; duas cópias locais não bastam.

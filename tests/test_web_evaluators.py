@@ -337,6 +337,131 @@ class WebEvaluatorsPostgresTests(unittest.TestCase):
         self.assertEqual(detail_ev1["assessment_count"], 0)
         self.assertIn("relink", [ev["action"] for ev in detail_ev1["audit_history"]])
 
+    def test_vinculo_explicito_e_associacao_auditada_de_legados_web027(self) -> None:
+        """WEB-027: Testa vinculo explicito auditado de entidades legadas (REQ-AUD-002 / REQ-PAR-005)."""
+        from uuid import uuid4
+
+        # 1. Cria paciente e avaliador centrais
+        pat_res = self.h.importer.post("/api/v1/patients", json={"full_name": "Paciente Central Legado"})
+        self.assertEqual(pat_res.status_code, 201)
+        pat = pat_res.json()
+
+        ev_res = self.h.importer.post("/api/v1/evaluators", json={"full_name": "Avaliador Central Legado"})
+        self.assertEqual(ev_res.status_code, 201)
+        ev = ev_res.json()
+
+        # 2. Cria participante pseudonimizado legado anterior a CHG-005 (sem patient_id)
+        legacy_part_uuid = str(uuid4())
+        with psycopg.connect(self.database_url) as conn:
+            conn.execute(
+                """INSERT INTO web_project_participants (participant_uuid, project_id, pseudonym, patient_id)
+                   VALUES (%s, %s, 'PSEUDO_LEGADO_001', NULL)""",
+                (legacy_part_uuid, self.h.project_id),
+            )
+
+        # 3. Comprova que coincidencia textual NAO unifica automaticamente
+        with psycopg.connect(self.database_url) as conn:
+            part_check = conn.execute(
+                "SELECT patient_id FROM web_project_participants WHERE participant_uuid = %s",
+                (legacy_part_uuid,),
+            ).fetchone()[0]
+            self.assertIsNone(part_check, "Participante legado nao deve ser associado automaticamente.")
+
+        # 4. Perfil sem permissao (consulta) e recusado ao tentar associar legado
+        forbidden_link = self.h.consulta.post(
+            "/api/v1/admin/legacy-links",
+            json={
+                "entity_type": "patient",
+                "legacy_participant_uuid": legacy_part_uuid,
+                "patient_id": pat["id"],
+                "reason_code": "MIGRACAO_AUDITADA_HISTORICA",
+            },
+        )
+        self.assertEqual(forbidden_link.status_code, 403)
+
+        # 5. Administrador realiza vinculo explicito de participante legado a paciente central
+        link_pat_res = self.h.admin.post(
+            "/api/v1/admin/legacy-links",
+            json={
+                "entity_type": "patient",
+                "legacy_participant_uuid": legacy_part_uuid,
+                "patient_id": pat["id"],
+                "reason_code": "MIGRACAO_AUDITADA_HISTORICA",
+            },
+        )
+        self.assertEqual(link_pat_res.status_code, 201, link_pat_res.text)
+        link_pat = link_pat_res.json()
+        self.assertEqual(link_pat["entity_type"], "patient")
+        self.assertEqual(link_pat["patient_id"], pat["id"])
+        self.assertTrue(link_pat["active"])
+
+        # Confere que web_project_participants foi atualizado e auditoria gravada
+        with psycopg.connect(self.database_url) as conn:
+            updated_pid = conn.execute(
+                "SELECT patient_id FROM web_project_participants WHERE participant_uuid = %s",
+                (legacy_part_uuid,),
+            ).fetchone()[0]
+            self.assertEqual(str(updated_pid), pat["id"])
+
+            audit_evt = conn.execute(
+                """SELECT action, reason_code FROM web_registry_audit_events
+                   WHERE entity_type = 'patient' AND entity_id = %s AND action = 'relink'""",
+                (pat["id"],),
+            ).fetchone()
+            self.assertIsNotNone(audit_evt)
+            self.assertEqual(audit_evt[1], "MIGRACAO_AUDITADA_HISTORICA")
+
+        # 6. Administrador vincula rotulo textual de avaliador historico a avaliador central
+        link_ev_res = self.h.admin.post(
+            "/api/v1/admin/legacy-links",
+            json={
+                "entity_type": "evaluator",
+                "legacy_evaluator_label": "E_SINTETICO_LEGADO_2024",
+                "evaluator_uuid": ev["id"],
+                "reason_code": "RECONCILIACAO_AVALIADOR_AUDITADA",
+            },
+        )
+        self.assertEqual(link_ev_res.status_code, 201, link_ev_res.text)
+        link_ev = link_ev_res.json()
+        self.assertEqual(link_ev["entity_type"], "evaluator")
+        self.assertEqual(link_ev["evaluator_uuid"], ev["id"])
+
+        # 7. Consulta listagem de vinculos legados
+        listed = self.h.admin.get("/api/v1/admin/legacy-links").json()
+        self.assertGreaterEqual(len(listed["items"]), 2)
+        link_ids = {row["link_id"] for row in listed["items"]}
+        self.assertIn(link_pat["link_id"], link_ids)
+        self.assertIn(link_ev["link_id"], link_ids)
+
+        # 8. Desativacao reversivel de vinculo legado
+        deact = self.h.admin.post(
+            f"/api/v1/admin/legacy-links/{link_pat['link_id']}/deactivate",
+            json={"reason_code": "DESVINCULACAO_SOLICITADA"},
+        )
+        self.assertEqual(deact.status_code, 200, deact.text)
+        self.assertFalse(deact.json()["active"])
+
+        with psycopg.connect(self.database_url) as conn:
+            deact_link = conn.execute(
+                "SELECT active FROM web_legacy_entity_links WHERE link_id = %s",
+                (link_pat["link_id"],),
+            ).fetchone()[0]
+            self.assertFalse(deact_link)
+
+            cleared_pid = conn.execute(
+                "SELECT patient_id FROM web_project_participants WHERE participant_uuid = %s",
+                (legacy_part_uuid,),
+            ).fetchone()[0]
+            self.assertIsNone(cleared_pid, "Desativacao deve limpar patient_id sem exclusao destrutiva.")
+
+            unlink_evt = conn.execute(
+                """SELECT action, reason_code FROM web_registry_audit_events
+                   WHERE entity_type = 'patient' AND entity_id = %s AND action = 'deactivate'""",
+                (pat["id"],),
+            ).fetchone()
+            self.assertIsNotNone(unlink_evt)
+            self.assertEqual(unlink_evt[1], "DESVINCULACAO_SOLICITADA")
+
 
 if __name__ == "__main__":
     unittest.main()

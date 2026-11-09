@@ -94,6 +94,7 @@ class APIConfig:
     read_database_url: str = field(default="", repr=False)
     oidc_callback_path: str = "/api/v1/auth/callback"
     auth_mode: str = "local"
+    enable_legacy_csv_import: bool = False
 
     def __post_init__(self) -> None:
         if self.auth_mode not in {"local", "oidc"} or (self.auth_mode == "oidc" and self.app_env != "test"):
@@ -105,6 +106,8 @@ class APIConfig:
         ):
             if type(value) is not int or not 1 <= value <= upper_bound:
                 _invalid()
+        if not isinstance(self.enable_legacy_csv_import, bool):
+            _invalid()
         if self.oidc_callback_path not in ("/api/v1/auth/callback", "/oauth2callback"):
             _invalid()
         if self.app_env not in {"development", "test", "production"}:
@@ -198,10 +201,12 @@ class APIConfig:
             participant_read_rate_limit = int(values.get("API_PARTICIPANT_READ_RATE_LIMIT", "120"))
             participant_write_rate_limit = int(values.get("API_PARTICIPANT_WRITE_RATE_LIMIT", "60"))
             participant_rate_window_seconds = int(values.get("API_PARTICIPANT_RATE_WINDOW_SECONDS", "60"))
+            enable_legacy_csv_import = values.get("API_ENABLE_LEGACY_CSV_IMPORT", "false").lower() in {"true", "1"}
         except (TypeError, ValueError):
             _invalid()
         return cls(
             auth_mode=values.get("API_AUTH_MODE", "local"),
+            enable_legacy_csv_import=enable_legacy_csv_import,
             database_url=secret_value(values, "API_DATABASE_URL"),
             read_database_url=secret_value(values, "API_READ_DATABASE_URL"),
             oidc_callback_path=values.get("OIDC_CALLBACK_PATH", "/api/v1/auth/callback"),

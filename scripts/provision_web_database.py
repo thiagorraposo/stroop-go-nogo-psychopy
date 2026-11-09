@@ -51,7 +51,7 @@ WRITER = {
         'UPDATE (full_name,normalized_name,initials,active,updated_at)',
     ),
     'web_registry_audit_events': ('SELECT', 'INSERT'),
-    'web_legacy_entity_links': ('SELECT',),
+    'web_legacy_entity_links': ('SELECT', 'INSERT', 'UPDATE (active)'),
     'web_session_observations': ('SELECT', 'INSERT'),
     'web_session_checkpoints': ('SELECT', 'INSERT',
         'UPDATE (confirmed_through,prefix_hash,received_at)'),
