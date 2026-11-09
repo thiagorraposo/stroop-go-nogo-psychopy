@@ -286,7 +286,7 @@ A primeira parte da interface visual conduz o participante por abertura, tutoria
 ## Estrutura do projeto
 
 ```text
-stroop-cognifit/
+stroop-test-web/
 ├── stroop_go_nogo_ptbr.psyexp
 ├── condicoes/                 # fontes das tentativas
 ├── assets/                    # recursos proprios

@@ -3778,7 +3778,7 @@ Escopo: nove documentos Markdown; nenhuma suite funcional reexecutada.
 CI da branch consultada: nenhuma execução; não equivale a aprovação funcional.
 Sem PR, merge, deploy, instalação, migration ou acesso a dados reais.
 
-Checkout de desenvolvimento: `/home/raposo/Projetos/experimentos-psicopy/stroop-cognifit`.
+Checkout de desenvolvimento: `/home/raposo/Projetos/experimentos-psicopy/stroop-test-web`.
 Worktree sintética M1 `/tmp/stroop-m1-baseline-20261104` preservada em HEAD
 destacada; não repetir baseline global sem divergência concreta.
 
