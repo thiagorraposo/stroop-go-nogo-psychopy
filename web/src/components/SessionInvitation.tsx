@@ -424,28 +424,41 @@ export function SessionInvitation({
 
   return (
     <section
-      className="assessment-detail session-invitation"
+      className="assessment-detail session-invitation session-complete-stepper"
       aria-label="Preparar sessão"
       ref={panel}
       tabIndex={-1}
       aria-busy={busy}
     >
-      <h3>Preparar sessão</h3>
-      <p>
-        Projeto: {project.code} — {project.name}
-      </p>
-      <p>
-        Conta autenticada: {profile.user_id}.{' '}
-        {selectedEvaluator
-          ? `Avaliador responsável selecionado: ${selectedEvaluator.full_name} (${selectedEvaluator.evaluator_code}).`
-          : `Avaliador responsável: selecione no cadastro central ou utilize sua conta autenticada (${profile.user_id}).`}
-      </p>
-      <p className="quiet">
-        Selecione ou cadastre o paciente e o avaliador responsável para gerar os códigos
-        automaticamente sem digitação manual de IDs. Metadados técnicos (assessment_id,
-        session_id, invitation_id, assessment_date, started_at, test_version: 0.2.2-web.1) são
-        preenchidos automaticamente pelo servidor.
-      </p>
+      <div className="session-prep-header-box">
+        <h3>Preparar sessão</h3>
+        <p className="session-prep-meta-project">
+          Projeto: {project.code} — {project.name}
+        </p>
+        <p className="session-prep-meta-account">
+          Conta autenticada: {profile.user_id}.{' '}
+          {selectedEvaluator
+            ? `Avaliador responsável selecionado: ${selectedEvaluator.full_name} (${selectedEvaluator.evaluator_code}).`
+            : `Avaliador responsável: selecione no cadastro central ou utilize sua conta autenticada (${profile.user_id}).`}
+        </p>
+        <div className="session-prep-meta-row">
+          <span className="session-prep-chip">
+            Projeto: <strong>{project.code}</strong>
+          </span>
+          <span className="session-prep-chip">
+            Avaliador: <strong>{selectedEvaluator ? selectedEvaluator.full_name : profile.user_id}</strong>
+          </span>
+          <span className="session-prep-chip">
+            Instrumento: <strong>Stroop Go/No-Go</strong> (0.2.2-web.1)
+          </span>
+        </div>
+        <p className="quiet" style={{ margin: '8px 0 0 0' }}>
+          Selecione ou cadastre o paciente e o avaliador responsável para gerar os códigos
+          automaticamente sem digitação manual de IDs. Metadados técnicos (assessment_id,
+          session_id, invitation_id, assessment_date, started_at, test_version: 0.2.2-web.1) são
+          preenchidos automaticamente pelo servidor.
+        </p>
+      </div>
 
       {!saved && !unknownCreation && !revoked && (
         <form onSubmit={event => void create(event)} noValidate className="dashboard-filters invitation-stepper-grid">
@@ -470,7 +483,7 @@ export function SessionInvitation({
                   onChange={event => setPatientSearch(event.target.value)}
                 />
               </label>
-              <label htmlFor="session-patient-select">
+              <label htmlFor="session-patient-select" style={{ marginTop: '8px' }}>
                 Paciente cadastrado
                 <select
                   id="session-patient-select"
@@ -494,6 +507,7 @@ export function SessionInvitation({
               <button
                 type="button"
                 className="button secondary button-sm"
+                style={{ marginTop: '8px' }}
                 disabled={busy}
                 onClick={() => {
                   setShowNewPatient(prev => !prev)
@@ -600,7 +614,7 @@ export function SessionInvitation({
               </div>
             )}
 
-            <div className="registry-selector" style={{ marginTop: '12px' }}>
+            <div className="registry-selector" style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border-subtle)' }}>
               <label htmlFor="session-evaluator-search">
                 Buscar avaliador responsável
                 <input
@@ -614,7 +628,7 @@ export function SessionInvitation({
                   onChange={event => setEvaluatorSearch(event.target.value)}
                 />
               </label>
-              <label htmlFor="session-evaluator-select">
+              <label htmlFor="session-evaluator-select" style={{ marginTop: '8px' }}>
                 Avaliador responsável
                 <select
                   id="session-evaluator-select"
@@ -639,6 +653,7 @@ export function SessionInvitation({
               <button
                 type="button"
                 className="button secondary button-sm"
+                style={{ marginTop: '8px' }}
                 disabled={busy}
                 onClick={() => {
                   setShowNewEvaluator(prev => !prev)
@@ -743,7 +758,7 @@ export function SessionInvitation({
               </select>
             </label>
 
-            <label htmlFor="session-participant">
+            <label htmlFor="session-participant" style={{ marginTop: '8px' }}>
               Código do participante
               <input
                 ref={participantInput}
@@ -770,7 +785,7 @@ export function SessionInvitation({
               </p>
             )}
 
-            <label htmlFor="session-initials">
+            <label htmlFor="session-initials" style={{ marginTop: '8px' }}>
               Iniciais na sessão
               <input
                 id="session-initials"
@@ -792,7 +807,7 @@ export function SessionInvitation({
               </p>
             )}
 
-            <label htmlFor="session-visit">
+            <label htmlFor="session-visit" style={{ marginTop: '8px' }}>
               Visita da sessão
               <input
                 ref={visitInput}
@@ -802,6 +817,7 @@ export function SessionInvitation({
                 value={visit}
                 disabled={busy}
                 autoComplete="off"
+                placeholder="Ex.: V1, V2, T1..."
                 aria-invalid={!!errors.visit}
                 aria-describedby={errors.visit ? 'session-visit-error' : undefined}
                 onChange={event => {
@@ -824,33 +840,40 @@ export function SessionInvitation({
               <h4 className="step-card-title">Modalidade e Emissão</h4>
             </div>
 
-            <div className="application-mode-selection" style={{ marginBottom: '16px' }}>
+            <div className="application-mode-selection">
               <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
                 Modalidade de Aplicação:
               </label>
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <div className="mode-selection-grid">
                 <button
                   type="button"
-                  className={`button ${applicationMode === 'presencial' ? 'primary' : 'secondary'}`}
+                  className={`mode-card ${applicationMode === 'presencial' ? 'active' : ''}`}
                   onClick={() => setApplicationMode('presencial')}
-                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                  aria-pressed={applicationMode === 'presencial'}
                 >
-                  🏢 Presencial (Iniciar Agora)
+                  <div className="mode-card-header">
+                    <span className="mode-card-title">🏢 Presencial (Iniciar Agora)</span>
+                    <span className="mode-card-badge">Local</span>
+                  </div>
+                  <p className="mode-card-desc">
+                    Abre a prática diretamente neste navegador com 1 clique (estilo PsychoPy Runner).
+                  </p>
                 </button>
                 <button
                   type="button"
-                  className={`button ${applicationMode === 'remota' ? 'primary' : 'secondary'}`}
+                  className={`mode-card ${applicationMode === 'remota' ? 'active' : ''}`}
                   onClick={() => setApplicationMode('remota')}
-                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                  aria-pressed={applicationMode === 'remota'}
                 >
-                  🌐 Remota (Link Único)
+                  <div className="mode-card-header">
+                    <span className="mode-card-title">🌐 Remota (Link Único)</span>
+                    <span className="mode-card-badge">Distância</span>
+                  </div>
+                  <p className="mode-card-desc">
+                    Emite convite com código criptográfico de uso único para envio ao participante.
+                  </p>
                 </button>
               </div>
-              <p className="quiet" style={{ margin: '8px 0 0 0' }}>
-                {applicationMode === 'presencial'
-                  ? 'Modalidade Presencial: Abre a prática diretamente neste navegador com 1 clique (estilo PsychoPy Runner).'
-                  : 'Modalidade Remota: Emite link com código de uso único para envio ao participante.'}
-              </p>
             </div>
 
             <p className="quiet" style={{ margin: '0 0 12px 0' }}>
@@ -943,8 +966,10 @@ export function SessionInvitation({
       )}
 
       {saved && (
-        <div className="preparation-review-card" style={{ background: '#f8fafc', borderColor: '#cbd5e1' }}>
-          <h4>Convite criado com sucesso</h4>
+        <div className="invitation-success-card" role="region" aria-label="Convite criado com sucesso">
+          <h4>
+            <span aria-hidden="true" style={{ color: '#16a34a' }}>✓</span> Convite criado com sucesso
+          </h4>
           <p>
             Participante: {saved.participant} · Visita: {saved.visit}
           </p>
@@ -967,7 +992,7 @@ export function SessionInvitation({
             apagado ao trocar de projeto, sair ou recarregar. Abrir a prática exige informar o
             convite; o código não é incluído no endereço.
           </p>
-          <div style={{ display: 'flex', gap: '10px', marginTop: '16px', flexWrap: 'wrap' }}>
+          <div className="invitation-actions-row">
             <a
               className="button primary"
               href="/pratica"

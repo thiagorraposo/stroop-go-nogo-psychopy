@@ -115,6 +115,7 @@ export function ProfessionalDashboard({
   initialModule?: AdministrativeModule
 }) {
   const [activeModule, setActiveModule] = useState<AdministrativeModule>(initialModule)
+  const [analyticsTab, setAnalyticsTab] = useState<'geral' | 'visitas' | 'condicoes' | 'operacional' | 'tabela'>('geral')
   const [projects, setProjects] = useState<Project[]>([])
   const [project, setProject] = useState('')
   const [projectsLoading, setProjectsLoading] = useState(true)
@@ -596,13 +597,24 @@ export function ProfessionalDashboard({
             <>
               {renderProjectSelector()}
 
-              {/* Preparação rápida de convite integrada na visão geral */}
+              {/* Ação rápida de preparação de avaliação integrada à visão geral */}
               {currentProject?.active && profile.role !== 'consulta' && (
-                <SessionInvitation
-                  key={`invitation:${project}`}
-                  project={currentProject}
-                  profile={profile}
-                />
+                <div className="quick-action-banner" role="region" aria-label="Ação rápida de preparação">
+                  <div className="quick-action-info">
+                    <h3>⚡ Preparar Nova Avaliação</h3>
+                    <p>Emita convites remotos únicos ou inicie uma aplicação presencial imediata para este projeto.</p>
+                  </div>
+                  <button
+                    type="button"
+                    className="button primary"
+                    onClick={() => {
+                      setActiveModule('preparar')
+                      setDetailId('')
+                    }}
+                  >
+                    Ir para Preparar Avaliação →
+                  </button>
+                </div>
               )}
 
               <ResearchFilters
@@ -645,11 +657,11 @@ export function ProfessionalDashboard({
                     <p role="status">Nenhuma avaliação corresponde aos filtros.</p>
                   ) : (
                     <>
-                      {/* KPIs da Visão Geral (CHG-005 / REQ-REL-004) */}
+                      {/* KPIs Executivos da Visão Geral */}
                       <section className="overview-summary-kpis" aria-label="KPIs da Visão Geral">
                         <div className="kpi-grid">
                           <div className="kpi-box">
-                            <span className="kpi-label">Pacientes cadastrados no projeto</span>
+                            <span className="kpi-label">Pacientes cadastrados</span>
                             <strong className="kpi-value tabular-nums">
                               {registeredPatientsCount !== null ? registeredPatientsCount : '—'}
                             </strong>
@@ -659,225 +671,325 @@ export function ProfessionalDashboard({
                             <strong className="kpi-value tabular-nums">{overviewKpis.byStatus.valid}</strong>
                           </div>
                           <div className="kpi-box">
-                            <span className="kpi-label">Avaliações interrompidas / inválidas</span>
-                            <strong className="kpi-value tabular-nums">{overviewKpis.byStatus.invalid}</strong>
+                            <span className="kpi-label">Participantes distintos</span>
+                            <strong className="kpi-value tabular-nums">{totals.participants}</strong>
                           </div>
                           <div className="kpi-box">
-                            <span className="kpi-label">Avaliadores no recorte</span>
-                            <strong className="kpi-value tabular-nums">
-                              {Object.keys(overviewKpis.byEvaluator).length}
-                            </strong>
+                            <span className="kpi-label">Precisão média</span>
+                            <strong className="kpi-value tabular-nums">{number(totals.meanAccuracy, 1)}%</strong>
+                          </div>
+                          <div className="kpi-box">
+                            <span className="kpi-label">Precisão mediana</span>
+                            <strong className="kpi-value tabular-nums">{number(totals.medianAccuracy, 1)}%</strong>
+                          </div>
+                          <div className="kpi-box">
+                            <span className="kpi-label">Tempo mediano de RT</span>
+                            <strong className="kpi-value tabular-nums">{number(totals.medianResponseSeconds, 3)} s</strong>
                           </div>
                         </div>
                       </section>
 
-                      <div className="dashboard-filters">
-                        <label>
-                          Instrumento
-                          <select
-                            value={selectedInstrument}
-                            onChange={event => {
-                              aggregateIO.current?.abort()
-                              setAggregateBusy(false)
-                              setAggregateMessage(null)
-                              setInstrument(event.target.value)
-                              setDetailId('')
-                            }}
+                      {/* Sub-navegação em Abas Temáticas de Análise */}
+                      <div className="analytics-tabs-container">
+                        <nav className="analytics-subnav" aria-label="Visualizações analíticas">
+                          <button
+                            type="button"
+                            className={`button secondary analytics-subnav-btn ${analyticsTab === 'geral' ? 'active' : ''}`}
+                            onClick={() => setAnalyticsTab('geral')}
+                            aria-pressed={analyticsTab === 'geral'}
                           >
-                            {instruments.map(code => (
-                              <option key={code}>{code}</option>
-                            ))}
-                          </select>
-                        </label>
-                        <label>
-                          Plataforma
-                          <select
-                            value={platform}
-                            onChange={event => {
-                              aggregateIO.current?.abort()
-                              setAggregateBusy(false)
-                              setAggregateMessage(null)
-                              setPlatform(event.target.value)
-                              setDetailId('')
-                            }}
+                            📊 Desempenho Geral
+                          </button>
+                          <button
+                            type="button"
+                            className={`button secondary analytics-subnav-btn ${analyticsTab === 'visitas' ? 'active' : ''}`}
+                            onClick={() => setAnalyticsTab('visitas')}
+                            aria-pressed={analyticsTab === 'visitas'}
                           >
-                            <option value="">Todas</option>
-                            <option value="web">WEB</option>
-                            <option value="psychopy">PsychoPy local</option>
-                          </select>
-                        </label>
+                            🔄 Análises por Visita
+                          </button>
+                          <button
+                            type="button"
+                            className={`button secondary analytics-subnav-btn ${analyticsTab === 'condicoes' ? 'active' : ''}`}
+                            onClick={() => setAnalyticsTab('condicoes')}
+                            aria-pressed={analyticsTab === 'condicoes'}
+                          >
+                            🎯 Condições (Go / No-Go)
+                          </button>
+                          <button
+                            type="button"
+                            className={`button secondary analytics-subnav-btn ${analyticsTab === 'operacional' ? 'active' : ''}`}
+                            onClick={() => setAnalyticsTab('operacional')}
+                            aria-pressed={analyticsTab === 'operacional'}
+                          >
+                            📈 Volume & Operação
+                          </button>
+                          <button
+                            type="button"
+                            className={`button secondary analytics-subnav-btn ${analyticsTab === 'tabela' ? 'active' : ''}`}
+                            onClick={() => setAnalyticsTab('tabela')}
+                            aria-pressed={analyticsTab === 'tabela'}
+                          >
+                            📋 Registros & Métricas
+                          </button>
+                        </nav>
                       </div>
 
-                      <button
-                        type="button"
-                        className="button secondary"
-                        disabled={
-                          aggregateBusy ||
-                          !aggregateContext ||
-                          !['stroop_go_nogo_ptbr', 'instrumento_sintetico_demo'].includes(
-                            selectedInstrument,
-                          )
-                        }
-                        onClick={() => void downloadAggregate()}
-                      >
-                        {aggregateBusy ? 'Preparando arquivo agregado…' : 'Exportar visão filtrada'}
-                      </button>
+                      {/* CONTEÚDO DA ABA 1: DESEMPENHO GERAL */}
+                      {analyticsTab === 'geral' && (
+                        <div className="analytics-tab-panel" role="region" aria-label="Painel Desempenho Geral">
+                          <div className="dashboard-filters" style={{ margin: '1rem 0' }}>
+                            <label>
+                              Instrumento
+                              <select
+                                value={selectedInstrument}
+                                onChange={event => {
+                                  aggregateIO.current?.abort()
+                                  setAggregateBusy(false)
+                                  setAggregateMessage(null)
+                                  setInstrument(event.target.value)
+                                  setDetailId('')
+                                }}
+                              >
+                                {instruments.map(code => (
+                                  <option key={code}>{code}</option>
+                                ))}
+                              </select>
+                            </label>
+                            <label>
+                              Plataforma
+                              <select
+                                value={platform}
+                                onChange={event => {
+                                  aggregateIO.current?.abort()
+                                  setAggregateBusy(false)
+                                  setAggregateMessage(null)
+                                  setPlatform(event.target.value)
+                                  setDetailId('')
+                                }}
+                              >
+                                <option value="">Todas</option>
+                                <option value="web">WEB</option>
+                                <option value="psychopy">PsychoPy local</option>
+                              </select>
+                            </label>
+                          </div>
 
-                      {aggregateMessage && <p role="status">{aggregateMessage}</p>}
+                          <dl className="dashboard-cards">
+                            <div>
+                              <dt>Avaliações analisadas</dt>
+                              <dd className="tabular-nums">{totals.assessments}</dd>
+                            </div>
+                            <div>
+                              <dt>Participantes únicos</dt>
+                              <dd className="tabular-nums">{totals.participants}</dd>
+                            </div>
+                            {selectedInstrument === 'stroop_go_nogo_ptbr' && (
+                              <>
+                                <div>
+                                  <dt>Precisão média</dt>
+                                  <dd className="tabular-nums">{number(totals.meanAccuracy, 1)}%</dd>
+                                </div>
+                                <div>
+                                  <dt>Precisão mediana</dt>
+                                  <dd className="tabular-nums">{number(totals.medianAccuracy, 1)}%</dd>
+                                </div>
+                                <div>
+                                  <dt>Mediana dos tempos de reação</dt>
+                                  <dd className="tabular-nums">{number(totals.medianResponseSeconds, 3)} s</dd>
+                                </div>
+                                <div>
+                                  <dt>Total de omissões</dt>
+                                  <dd className="tabular-nums">{totals.omissions}</dd>
+                                </div>
+                                <div>
+                                  <dt>Total de comissões</dt>
+                                  <dd className="tabular-nums">{totals.commissions}</dd>
+                                </div>
+                              </>
+                            )}
+                          </dl>
 
-                      <p className="quiet">
-                        Os totais consideram todas as páginas do projeto e os filtros aplicados. Um instrumento
-                        por vez. Datas seguem o início registrado; horários legados sem fuso conservam sua
-                        referência original.
-                      </p>
+                          {selectedInstrument === 'stroop_go_nogo_ptbr' && (
+                            <div className="comparison-tables-grid">
+                              <figure className="dashboard-chart analytics-card">
+                                <figcaption>Precisão média por visita (%)</figcaption>
+                                <ul className="chart-meter-list">
+                                  {accuracyByVisit(visible).map(([v, accuracy]) => (
+                                    <li key={v}>
+                                      <span>Visita {v}</span>
+                                      <meter
+                                        min={0}
+                                        max={100}
+                                        value={accuracy}
+                                        aria-label={`${v}: ${number(accuracy, 1)}%`}
+                                      />
+                                      <strong className="tabular-nums">{number(accuracy, 1)}%</strong>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </figure>
 
-                      <dl className="dashboard-cards">
-                        <div>
-                          <dt>Avaliações</dt>
-                          <dd className="tabular-nums">{totals.assessments}</dd>
+                              <figure className="dashboard-chart analytics-card">
+                                <figcaption>Distribuição dos tempos medianos por avaliação</figcaption>
+                                <ul className="chart-meter-list">
+                                  {responseDistribution(visible).map(([range, count]) => (
+                                    <li key={range}>
+                                      <span>{range}</span>
+                                      <meter
+                                        min={0}
+                                        max={Math.max(1, visible.length)}
+                                        value={count}
+                                        aria-label={`${range}: ${count} avaliações`}
+                                      />
+                                      <strong className="tabular-nums">{count}</strong>
+                                    </li>
+                                  ))}
+                                </ul>
+                                <p className="quiet" style={{ marginTop: '8px' }}>
+                                  Avaliações sem acertos não possuem tempo mediano e ficam fora desta distribuição.
+                                </p>
+                              </figure>
+                            </div>
+                          )}
+
+                          {selectedInstrument !== 'stroop_go_nogo_ptbr' && (
+                            <GenericInstrumentResults rows={visible} projects={projects} />
+                          )}
                         </div>
-                        <div>
-                          <dt>Participantes únicos</dt>
-                          <dd className="tabular-nums">{totals.participants}</dd>
+                      )}
+
+                      {/* CONTEÚDO DA ABA 2: ANÁLISES POR VISITA */}
+                      {analyticsTab === 'visitas' && (
+                        <div className="analytics-tab-panel" role="region" aria-label="Painel Análises por Visita">
+                          {selectedInstrument === 'stroop_go_nogo_ptbr' ? (
+                            <ResearchVisualizations rows={visible} projects={projects} viewMode="visitas" />
+                          ) : (
+                            <GenericInstrumentResults rows={visible} projects={projects} />
+                          )}
                         </div>
-                        {selectedInstrument === 'stroop_go_nogo_ptbr' && (
-                          <>
-                            <div>
-                              <dt>Precisão média</dt>
-                              <dd className="tabular-nums">{number(totals.meanAccuracy, 1)}%</dd>
-                            </div>
-                            <div>
-                              <dt>Precisão mediana</dt>
-                              <dd className="tabular-nums">{number(totals.medianAccuracy, 1)}%</dd>
-                            </div>
-                            <div>
-                              <dt>Mediana dos tempos por avaliação</dt>
-                              <dd className="tabular-nums">{number(totals.medianResponseSeconds, 3)} s</dd>
-                            </div>
-                            <div>
-                              <dt>Omissões</dt>
-                              <dd className="tabular-nums">{totals.omissions}</dd>
-                            </div>
-                            <div>
-                              <dt>Comissões</dt>
-                              <dd className="tabular-nums">{totals.commissions}</dd>
-                            </div>
-                          </>
-                        )}
-                      </dl>
+                      )}
 
-                      <figure className="dashboard-chart">
-                        <figcaption>Avaliações por data de início</figcaption>
-                        <ul>
-                          {dates.map(([day, count]) => (
-                            <li key={day}>
-                              <span>{day}</span>
-                              <meter
-                                min={0}
-                                max={peak}
-                                value={count}
-                                aria-label={`${day}: ${count} avaliações`}
-                              />
-                              <strong className="tabular-nums">{count}</strong>
-                            </li>
-                          ))}
-                        </ul>
-                      </figure>
+                      {/* CONTEÚDO DA ABA 3: CONDIÇÕES (GO / NO-GO) */}
+                      {analyticsTab === 'condicoes' && (
+                        <div className="analytics-tab-panel" role="region" aria-label="Painel Condições">
+                          {selectedInstrument === 'stroop_go_nogo_ptbr' ? (
+                            <ResearchVisualizations rows={visible} projects={projects} viewMode="condicoes" />
+                          ) : (
+                            <GenericInstrumentResults rows={visible} projects={projects} />
+                          )}
+                        </div>
+                      )}
 
-                      {selectedInstrument === 'stroop_go_nogo_ptbr' && (
-                        <>
-                          <figure className="dashboard-chart">
-                            <figcaption>Precisão média por visita (%)</figcaption>
-                            <ul>
-                              {accuracyByVisit(visible).map(([v, accuracy]) => (
-                                <li key={v}>
-                                  <span>{v}</span>
+                      {/* CONTEÚDO DA ABA 4: VOLUME & OPERAÇÃO */}
+                      {analyticsTab === 'operacional' && (
+                        <div className="analytics-tab-panel" role="region" aria-label="Painel Volume e Operação">
+                          <figure className="dashboard-chart analytics-card">
+                            <div className="analytics-card-header">
+                              <h4 className="analytics-card-title">Volume de coletas ao longo do tempo</h4>
+                            </div>
+                            <figcaption>Avaliações por data de início</figcaption>
+                            <ul className="chart-meter-list">
+                              {dates.map(([day, count]) => (
+                                <li key={day}>
+                                  <span>{day}</span>
                                   <meter
                                     min={0}
-                                    max={100}
-                                    value={accuracy}
-                                    aria-label={`${v}: ${number(accuracy, 1)}%`}
-                                  />
-                                  <strong className="tabular-nums">{number(accuracy, 1)}</strong>
-                                </li>
-                              ))}
-                            </ul>
-                          </figure>
-                          <figure className="dashboard-chart">
-                            <figcaption>Distribuição dos tempos medianos por avaliação</figcaption>
-                            <ul>
-                              {responseDistribution(visible).map(([range, count]) => (
-                                <li key={range}>
-                                  <span>{range}</span>
-                                  <meter
-                                    min={0}
-                                    max={Math.max(1, visible.length)}
+                                    max={peak}
                                     value={count}
-                                    aria-label={`${range}: ${count} avaliações`}
+                                    aria-label={`${day}: ${count} avaliações`}
                                   />
                                   <strong className="tabular-nums">{count}</strong>
                                 </li>
                               ))}
                             </ul>
-                            <p className="quiet">
-                              Avaliações sem acertos não possuem tempo mediano e ficam fora desta distribuição.
-                            </p>
                           </figure>
-                          <ResearchVisualizations rows={visible} projects={projects} />
-                        </>
-                      )}
 
-                      {selectedInstrument !== 'stroop_go_nogo_ptbr' && (
-                        <GenericInstrumentResults rows={visible} projects={projects} />
-                      )}
-
-                      <ResultsTable
-                        rows={visible}
-                        projects={projects}
-                        onDetail={row => {
-                          aggregateIO.current?.abort()
-                          setAggregateBusy(false)
-                          setDetailProject(row.project_id)
-                          setDetailId(row.assessment_id)
-                        }}
-                      />
-
-                      {/* Resumo e Dicionário Descritivo das Métricas Oficiais (CHG-005) */}
-                      <section className="metrics-dictionary" aria-labelledby="metrics-dictionary-title">
-                        <h3 id="metrics-dictionary-title">Resumo Descritivo das Métricas Oficiais</h3>
-                        <p className="quiet">
-                          Definições conceituais, origens de cálculo e convenção de tratamento de valores nulos
-                          das métricas oficiais Stroop Go/No-Go.
-                        </p>
-                        <div className="table-scroll">
-                          <table aria-label="Definições conceituais e tratamento de nulos">
-                            <thead>
-                              <tr>
-                                <th>Métrica oficial</th>
-                                <th>Origem da fórmula</th>
-                                <th>Definição conceitual</th>
-                                <th>Unidade</th>
-                                <th>Tratamento de nulos</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {OFFICIAL_METRICS_DICTIONARY.map(m => (
-                                <tr key={m.code}>
-                                  <td>
-                                    <strong>{m.label}</strong> (<code>{m.code}</code>)
-                                  </td>
-                                  <td>{m.origin}</td>
-                                  <td>{m.definition}</td>
-                                  <td>
-                                    <span className="badge">{m.unit}</span>
-                                  </td>
-                                  <td>{m.nullTreatment}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                          {selectedInstrument === 'stroop_go_nogo_ptbr' && (
+                            <ResearchVisualizations rows={visible} projects={projects} viewMode="operacional" />
+                          )}
                         </div>
-                      </section>
+                      )}
+
+                      {/* CONTEÚDO DA ABA 5: REGISTROS E MÉTRICAS */}
+                      {analyticsTab === 'tabela' && (
+                        <div className="analytics-tab-panel" role="region" aria-label="Painel Registros e Métricas">
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '10px' }}>
+                            <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Tabela de Registros Filtrados ({visible.length})</h3>
+                            <button
+                              type="button"
+                              className="button secondary button-sm"
+                              disabled={
+                                aggregateBusy ||
+                                !aggregateContext ||
+                                !['stroop_go_nogo_ptbr', 'instrumento_sintetico_demo'].includes(
+                                  selectedInstrument,
+                                )
+                              }
+                              onClick={() => void downloadAggregate()}
+                            >
+                              {aggregateBusy ? 'Preparando arquivo…' : 'Exportar visão filtrada (CSV)'}
+                            </button>
+                          </div>
+
+                          {aggregateMessage && <p role="status">{aggregateMessage}</p>}
+
+                          <ResultsTable
+                            rows={visible}
+                            projects={projects}
+                            onDetail={row => {
+                              aggregateIO.current?.abort()
+                              setAggregateBusy(false)
+                              setDetailProject(row.project_id)
+                              setDetailId(row.assessment_id)
+                            }}
+                          />
+
+                          {/* Resumo e Dicionário Descritivo das Métricas Oficiais (em acordeão recolhível) */}
+                          <details className="metrics-dictionary-details analytics-card" style={{ marginTop: '1.5rem' }}>
+                            <summary style={{ cursor: 'pointer', fontWeight: 600, padding: '4px 0' }}>
+                              <span>📖 Resumo Descritivo das Métricas Oficiais (Clique para expandir)</span>
+                            </summary>
+                            <div style={{ marginTop: '1rem' }}>
+                              <h3 id="metrics-dictionary-title" style={{ fontSize: '1rem', margin: '0 0 8px 0' }}>
+                                Resumo Descritivo das Métricas Oficiais
+                              </h3>
+                              <p className="quiet">
+                                Definições conceituais, origens de cálculo e convenção de tratamento de valores nulos
+                                das métricas oficiais Stroop Go/No-Go.
+                              </p>
+                              <div className="table-scroll">
+                                <table aria-label="Definições conceituais e tratamento de nulos">
+                                  <thead>
+                                    <tr>
+                                      <th>Métrica oficial</th>
+                                      <th>Origem da fórmula</th>
+                                      <th>Definição conceitual</th>
+                                      <th>Unidade</th>
+                                      <th>Tratamento de nulos</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {OFFICIAL_METRICS_DICTIONARY.map(m => (
+                                      <tr key={m.code}>
+                                        <td>
+                                          <strong>{m.label}</strong> (<code>{m.code}</code>)
+                                        </td>
+                                        <td>{m.origin}</td>
+                                        <td>{m.definition}</td>
+                                        <td>
+                                          <span className="badge">{m.unit}</span>
+                                        </td>
+                                        <td>{m.nullTreatment}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </details>
+                        </div>
+                      )}
                     </>
                   )}
                 </>
