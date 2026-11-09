@@ -64,6 +64,7 @@ export function SessionInvitation({
   const [initials, setInitials] = useState('')
   const [visit, setVisit] = useState('')
   const [testCode, setTestCode] = useState('stroop_go_nogo_ptbr')
+  const [applicationMode, setApplicationMode] = useState<'presencial' | 'remota'>('remota')
   const [reviewing, setReviewing] = useState(false)
 
   const [errors, setErrors] = useState({
@@ -338,6 +339,9 @@ export function SessionInvitation({
           summary,
         })
         setReviewing(false)
+        if (applicationMode === 'presencial') {
+          window.open(`/pratica?convite=${encodeURIComponent(invitation.code)}`, '_blank')
+        }
       }
     } catch (cause) {
       if (!io.signal.aborted) {
@@ -820,11 +824,40 @@ export function SessionInvitation({
           <div className="step-card">
             <div className="step-card-header">
               <span className="step-number-badge">3</span>
-              <h4 className="step-card-title">Emissão e Conferência</h4>
+              <h4 className="step-card-title">Modalidade e Emissão</h4>
+            </div>
+
+            <div className="application-mode-selection" style={{ marginBottom: '16px' }}>
+              <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
+                Modalidade de Aplicação:
+              </label>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className={`button ${applicationMode === 'presencial' ? 'primary' : 'secondary'}`}
+                  onClick={() => setApplicationMode('presencial')}
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  🏢 Presencial (Iniciar Agora)
+                </button>
+                <button
+                  type="button"
+                  className={`button ${applicationMode === 'remota' ? 'primary' : 'secondary'}`}
+                  onClick={() => setApplicationMode('remota')}
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  🌐 Remota (Gerar Convite)
+                </button>
+              </div>
+              <p className="quiet" style={{ margin: '8px 0 0 0' }}>
+                {applicationMode === 'presencial'
+                  ? 'Modalidade Presencial: Abre a prática diretamente neste navegador com 1 clique (estilo PsychoPy Runner).'
+                  : 'Modalidade Remota: Emite link com código de uso único para envio ao participante.'}
+              </p>
             </div>
 
             <p className="quiet" style={{ margin: '0 0 12px 0' }}>
-              Confira os parâmetros antes de emitir o convite único. O código gerado terá validade limitada e uso único.
+              Confira os parâmetros antes de emitir a sessão. O código gerado terá validade limitada e uso único.
             </p>
 
             <div className="session-actions" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
@@ -837,7 +870,9 @@ export function SessionInvitation({
                 Revisar preparação
               </button>
               <button className="button primary" disabled={busy} type="submit">
-                {busy ? 'Gerando convite…' : 'Gerar convite'}
+                {busy
+                  ? (applicationMode === 'presencial' ? 'Iniciando…' : 'Gerando convite…')
+                  : (applicationMode === 'presencial' ? '🚀 Iniciar Agora' : 'Gerar convite')}
               </button>
             </div>
 
@@ -854,6 +889,10 @@ export function SessionInvitation({
                     <dd>
                       {project.code} — {project.name}
                     </dd>
+                  </div>
+                  <div>
+                    <dt>Modalidade</dt>
+                    <dd>{applicationMode === 'presencial' ? '🏢 Presencial (Iniciar Agora)' : '🌐 Remota'}</dd>
                   </div>
                   <div>
                     <dt>Paciente</dt>
@@ -891,7 +930,9 @@ export function SessionInvitation({
                     disabled={busy}
                     onClick={() => void issueInvitation()}
                   >
-                    {busy ? 'Confirmando…' : 'Confirmar e emitir convite'}
+                    {busy
+                      ? 'Confirmando…'
+                      : (applicationMode === 'presencial' ? '🚀 Confirmar e Iniciar Agora' : 'Confirmar e emitir convite')}
                   </button>
                   <button
                     type="button"
@@ -910,7 +951,16 @@ export function SessionInvitation({
 
       {saved && (
         <div className="preparation-review-card" style={{ background: '#f8fafc', borderColor: '#cbd5e1' }}>
-          <h4>Convite criado com sucesso</h4>
+          <h4>
+            {applicationMode === 'presencial'
+              ? '🚀 Aplicação Presencial Iniciada!'
+              : 'Convite criado com sucesso'}
+          </h4>
+          {applicationMode === 'presencial' && (
+            <p className="notice" style={{ margin: '8px 0', background: '#ecfdf5', borderColor: '#a7f3d0', color: '#065f46' }}>
+              A janela da tarefa experimental foi aberta automaticamente. Se o navegador bloqueou o pop-up, utilize o botão abaixo para abrir a prática.
+            </p>
+          )}
           <p>
             Participante: {saved.participant} · Visita: {saved.visit}
           </p>
@@ -929,14 +979,29 @@ export function SessionInvitation({
           </p>
           <p>Expira em: {saved.invitation.expires_at} (UTC). Após o prazo, solicite uma nova sessão.</p>
           <p className="quiet">
-            Entregue o código ao participante por canal apropriado. Ele só aparece agora e será
-            apagado ao trocar de projeto, sair ou recarregar. Abrir a prática exige informar o
-            convite; o código não é incluído no endereço.
+            {applicationMode === 'presencial'
+              ? 'Ambiente de laboratório/consultório: a prática abre diretamente com as credenciais associadas.'
+              : 'Entregue o código ou o link ao participante. O código expira após o uso.'}
           </p>
           <div style={{ display: 'flex', gap: '10px', marginTop: '16px', flexWrap: 'wrap' }}>
-            <a className="button primary" href="/pratica" target="_blank" rel="noopener noreferrer">
-              Abrir prática em outra aba ↗
+            <a
+              className="button primary"
+              href={`/pratica?convite=${encodeURIComponent(saved.invitation.code)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {applicationMode === 'presencial' ? '🚀 Abrir prática novamente ↗' : 'Abrir prática em outra aba ↗'}
             </a>
+            <button
+              type="button"
+              className="button secondary"
+              onClick={() => {
+                const link = `${window.location.origin}/pratica?convite=${encodeURIComponent(saved.invitation.code)}`
+                void navigator.clipboard.writeText(link)
+              }}
+            >
+              📋 Copiar link do participante
+            </button>
             <button className="button secondary button-danger" disabled={busy} onClick={() => void revoke()}>
               {busy ? 'Revogando…' : 'Revogar convite'}
             </button>
