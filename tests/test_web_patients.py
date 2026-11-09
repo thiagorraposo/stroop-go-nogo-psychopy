@@ -445,6 +445,37 @@ class WebPatientsPostgresTests(unittest.TestCase):
             422,
         )
 
+    def test_administrador_pode_gerenciar_pacientes_sem_membro_de_projeto(self) -> None:
+        # Remove o admin explicitamente de web_project_members
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute(
+                "DELETE FROM web_project_members WHERE subject = %s",
+                (helpers.ADMIN,),
+            )
+
+        # O administrador deve continuar conseguindo criar e listar pacientes
+        created = self.h.admin.post(
+            "/api/v1/patients",
+            json={
+                "full_name": "Paciente Cadastrado Pelo Admin",
+                "disambiguation_note": "Sem vinculo explicito de membro",
+            },
+        )
+        self.assertEqual(created.status_code, 201, created.text)
+        patient_id = created.json()["id"]
+
+        # O administrador lista pacientes normalmente
+        listed = self.h.admin.get("/api/v1/patients")
+        self.assertEqual(listed.status_code, 200, listed.text)
+        self.assertTrue(any(p["id"] == patient_id for p in listed.json()["items"]))
+
+        # Ja o usuario outsider (sem membro em projetos e sem perfil admin) recebe 403
+        outsider_res = self.h.outsider.post(
+            "/api/v1/patients",
+            json={"full_name": "Paciente Nao Autorizado"},
+        )
+        self.assertEqual(outsider_res.status_code, 403, outsider_res.text)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -62,9 +62,13 @@ def project_invitation_access(database_url: str, project_id: UUID,
                    WHERE p.project_id=%s""",
                 (issuer, subject, issuer, subject, project_id),
             ).fetchone()
-        if row is None or not row[0] or row[1] is not True or row[2] is not True:
+        if row is None or not row[0] or row[2] is not True:
             return "not_found"
-        return "allowed" if row[3] in {"importacao", "administracao"} else "forbidden"
+        if row[3] == "administracao":
+            return "allowed"
+        if row[1] is not True:
+            return "not_found"
+        return "allowed" if row[3] == "importacao" else "forbidden"
     return _run(operation)
 
 
@@ -115,6 +119,12 @@ def create_project(database_url: str, project_id: UUID, code: str, name: str,
                    VALUES (%s, %s, %s, %s, %s) RETURNING created_at""",
                 (project_id, code, name, issuer, subject),
             ).fetchone()[0]
+            connection.execute(
+                """INSERT INTO web_project_members(project_id, issuer, subject, active)
+                   VALUES (%s, %s, %s, TRUE)
+                   ON CONFLICT (project_id, issuer, subject) DO UPDATE SET active=TRUE""",
+                (project_id, issuer, subject),
+            )
             _audit(connection, issuer, subject, "manage_projects")
             return created_at
     try:
@@ -180,9 +190,15 @@ def create_invitation(database_url: str, invitation_id: UUID, session_id: UUID,
                 "SELECT active,role FROM public.web_lock_emitter(%s,%s)",
                 (issuer, subject),
             ).fetchone()
-            if (project is None or not project[0] or project[1] != 'synthetic'
-                    or member is None or not member[0] or user is None
-                    or not user[0] or user[1] not in {'importacao','administracao'}):
+            is_admin = user is not None and user[0] and user[1] == 'administracao'
+            is_member_writer = (
+                member is not None and member[0]
+                and user is not None and user[0]
+                and user[1] in {'importacao', 'administracao'}
+            )
+            if project is None or not project[0] or project[1] != 'synthetic':
+                return False
+            if not (is_admin or is_member_writer):
                 return False
             connection.execute(
                 """INSERT INTO web_project_participants(participant_uuid,project_id,pseudonym)
@@ -250,15 +266,19 @@ def create_cadastral_invitation(
                 "SELECT active,role FROM public.web_lock_emitter(%s,%s)",
                 (issuer, subject),
             ).fetchone()
+            is_admin = user is not None and user[0] and user[1] == "administracao"
+            is_member_writer = (
+                member is not None
+                and member[0]
+                and user is not None
+                and user[0]
+                and user[1] in {"importacao", "administracao"}
+            )
             if (
                 project is None
                 or not project[0]
                 or project[1] != "synthetic"
-                or member is None
-                or not member[0]
-                or user is None
-                or not user[0]
-                or user[1] not in {"importacao", "administracao"}
+                or not (is_admin or is_member_writer)
             ):
                 return None
 
@@ -390,9 +410,13 @@ def revoke_invitation(database_url: str, project_id: UUID, invitation_id: UUID,
                 "SELECT active,role FROM public.web_lock_emitter(%s,%s)",
                 (issuer, subject),
             ).fetchone()
-            if (project is None or not project[0] or member is None or not member[0]
-                    or user is None or not user[0]
-                    or user[1] not in {'importacao','administracao'}):
+            is_admin = user is not None and user[0] and user[1] == 'administracao'
+            is_member_writer = (
+                member is not None and member[0]
+                and user is not None and user[0]
+                and user[1] in {'importacao', 'administracao'}
+            )
+            if project is None or not project[0] or not (is_admin or is_member_writer):
                 return False
             row = connection.execute(
                 """SELECT session_id,state,revoked_at FROM web_invitations
@@ -517,9 +541,14 @@ def redeem(database_url: str, code_hash: str, token_hash: str,
                    FROM web_invitations WHERE invitation_id=%s FOR UPDATE""",
                 (candidate[0],),
             ).fetchone()
+            issuer_admin = user is not None and user[0] and user[1] == 'administracao'
+            issuer_member = (
+                member is not None and member[0]
+                and user is not None and user[0]
+                and user[1] in {'importacao', 'administracao'}
+            )
             if (project is None or not project[0] or project[1] != 'synthetic'
-                    or member is None or not member[0] or user is None or not user[0]
-                    or user[1] not in {'importacao','administracao'} or row[4] is not None):
+                    or not (issuer_admin or issuer_member) or row[4] is not None):
                 raise MissingError
             if row[2] == 'redeemed':
                 raise ConflictError
@@ -580,18 +609,23 @@ def _eligible_session(connection, token_hash: str):
         "SELECT revoked_at FROM web_invitations WHERE session_id=%s FOR UPDATE",
         (candidate[0],),
     ).fetchone()
-    if (project is None or not project[0] or member is None or not member[0]
-            or user is None or not user[0]
-            or user[1] not in {'importacao','administracao'}
+    issuer_admin = user is not None and user[0] and user[1] == 'administracao'
+    issuer_member = (
+        member is not None and member[0]
+        and user is not None and user[0]
+        and user[1] in {'importacao', 'administracao'}
+    )
+    if (project is None or not project[0]
+            or not (issuer_admin or issuer_member)
             or invitation is None or invitation[0] is not None):
         raise MissingError
     row = connection.execute(
         """SELECT s.session_id,s.state,s.activated_at,s.expires_at,s.started_at,s.app_version,
                   i.project_id,i.evaluator_issuer,i.evaluator_subject,i.revoked_at,
-                  p.active,m.active,u.active,u.role,s.revoked_at
+                  p.active,COALESCE(m.active, TRUE),u.active,u.role,s.revoked_at
            FROM web_participant_sessions s JOIN web_invitations i USING(session_id)
            JOIN web_projects p USING(project_id)
-           JOIN web_project_members m ON m.project_id=i.project_id
+           LEFT JOIN web_project_members m ON m.project_id=i.project_id
              AND m.issuer=i.evaluator_issuer AND m.subject=i.evaluator_subject
            JOIN app_users u ON (u.issuer,u.subject)=(i.evaluator_issuer,i.evaluator_subject)
            WHERE s.session_id=%s AND s.participant_token_sha256=%s""", (candidate[0], token_hash)

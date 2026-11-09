@@ -78,6 +78,14 @@ def _authorized_projects(
     )
     if user is None or not user["active"] or user["role"] not in allowed_roles:
         raise ForbiddenRegistryError
+    if user["role"] == "administracao":
+        rows = connection.execute(
+            """SELECT project_id
+               FROM web_projects
+               WHERE active
+               ORDER BY created_at, project_id""",
+        ).fetchall()
+        return [row["project_id"] for row in rows]
     rows = connection.execute(
         """SELECT p.project_id
            FROM web_projects p

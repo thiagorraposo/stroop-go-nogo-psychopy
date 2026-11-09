@@ -59,6 +59,7 @@ venv/
 !.env.example
 !.env.production.example
 production-secrets/
+.deploy-hostgator/
 
 # Sistema, editor e temporarios
 .DS_Store

@@ -39,6 +39,12 @@ def provision(database_url: str, username: str, encoded: str, *, recover: bool =
                                    (LOCAL_ISSUER, str(principal)))
                 connection.execute('INSERT INTO web_local_credentials(principal_id,username,password_hash) VALUES (%s,%s,%s)',
                                    (principal, username, encoded))
+                connection.execute("""
+                    INSERT INTO web_project_members (project_id, issuer, subject, active)
+                    SELECT project_id, %s, %s, TRUE
+                    FROM web_projects
+                    ON CONFLICT (project_id, issuer, subject) DO UPDATE SET active=TRUE
+                """, (LOCAL_ISSUER, str(principal)))
                 _event(connection, 'bootstrap', principal)
             else:
                 row = connection.execute('SELECT principal_id FROM web_local_credentials WHERE username=%s FOR UPDATE',
@@ -48,6 +54,12 @@ def provision(database_url: str, username: str, encoded: str, *, recover: bool =
                 principal = row[0]
                 connection.execute("UPDATE app_users SET active=TRUE,role='administracao',updated_at=CURRENT_TIMESTAMP WHERE issuer=%s AND subject=%s",
                                    (LOCAL_ISSUER, str(principal)))
+                connection.execute("""
+                    INSERT INTO web_project_members (project_id, issuer, subject, active)
+                    SELECT project_id, %s, %s, TRUE
+                    FROM web_projects
+                    ON CONFLICT (project_id, issuer, subject) DO UPDATE SET active=TRUE
+                """, (LOCAL_ISSUER, str(principal)))
                 _rotate(connection, principal, encoded)
                 _event(connection, 'recovery', principal)
         return True
