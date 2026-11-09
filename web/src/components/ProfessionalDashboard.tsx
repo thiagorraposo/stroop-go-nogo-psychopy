@@ -827,7 +827,8 @@ export function ProfessionalDashboard({
                           </figure>
 
                           {selectedInstrument === 'stroop_go_nogo_ptbr' && (
-                            <div className="comparison-tables-grid">
+                            <>
+                              <div className="comparison-tables-grid">
                               <figure className="dashboard-chart analytics-card">
                                 <figcaption>Precisão média por visita (%)</figcaption>
                                 <ul className="chart-meter-list">
@@ -866,7 +867,10 @@ export function ProfessionalDashboard({
                                   Avaliações sem acertos não possuem tempo mediano e ficam fora desta distribuição.
                                 </p>
                               </figure>
-                            </div>
+                              </div>
+
+                              <ResearchVisualizations rows={visible} projects={projects} />
+                            </>
                           )}
 
                           {selectedInstrument !== 'stroop_go_nogo_ptbr' && (
