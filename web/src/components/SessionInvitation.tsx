@@ -447,440 +447,470 @@ export function SessionInvitation({
       </p>
 
       {!saved && !unknownCreation && !revoked && (
-        <form onSubmit={event => void create(event)} noValidate className="dashboard-filters">
-          <div className="registry-selector">
-            <label htmlFor="session-patient-search">
-              Buscar paciente cadastrado
-              <input
-                id="session-patient-search"
-                aria-label="Buscar paciente cadastrado"
-                type="search"
-                value={patientSearch}
-                disabled={busy}
-                autoComplete="off"
-                placeholder="Nome ou código PAT-..."
-                onChange={event => setPatientSearch(event.target.value)}
-              />
-            </label>
-            <label htmlFor="session-patient-select">
-              Paciente cadastrado
-              <select
-                id="session-patient-select"
-                aria-label="Paciente cadastrado"
-                value={selectedPatient?.id ?? ''}
-                disabled={busy}
-                onChange={event => {
-                  const found = patients.find(item => item.id === event.target.value) ?? null
-                  selectPatientRecord(found)
-                }}
-              >
-                <option value="">Selecione um paciente ou cadastre novo…</option>
-                {patients.map(item => (
-                  <option key={item.id} value={item.id}>
-                    {item.full_name} ({item.participant_code})
-                    {item.disambiguation_note ? ` — ${item.disambiguation_note}` : ''}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button
-              type="button"
-              className="button secondary"
-              disabled={busy}
-              onClick={() => {
-                setShowNewPatient(prev => !prev)
-                setPatientHomonyms(null)
-              }}
-            >
-              {showNewPatient ? 'Cancelar novo paciente' : 'Cadastrar novo paciente'}
-            </button>
-          </div>
+        <form onSubmit={event => void create(event)} noValidate className="dashboard-filters invitation-stepper-grid">
+          {/* ETAPA 1: VÍNCULO CADASTRAL */}
+          <div className="step-card">
+            <div className="step-card-header">
+              <span className="step-number-badge">1</span>
+              <h4 className="step-card-title">Vínculo Cadastral</h4>
+            </div>
 
-          {showNewPatient && (
-            <div role="group" aria-label="Novo cadastro de paciente" className="inline-registry-box">
-              <label htmlFor="new-patient-full-name">
-                Nome completo do paciente
+            <div className="registry-selector">
+              <label htmlFor="session-patient-search">
+                Buscar paciente cadastrado
                 <input
-                  id="new-patient-full-name"
-                  maxLength={120}
-                  value={newPatientName}
+                  id="session-patient-search"
+                  aria-label="Buscar paciente cadastrado"
+                  type="search"
+                  value={patientSearch}
                   disabled={busy}
                   autoComplete="off"
-                  onChange={event => {
-                    const value = event.target.value
-                    setNewPatientName(value)
-                    if (!newPatientInitialsTouched) {
-                      setNewPatientInitials(deriveInitials(value))
-                    }
-                  }}
+                  placeholder="Nome ou código PAT-..."
+                  onChange={event => setPatientSearch(event.target.value)}
                 />
               </label>
-              <label htmlFor="new-patient-initials">
-                Iniciais do paciente
-                <input
-                  id="new-patient-initials"
-                  maxLength={16}
-                  value={newPatientInitials}
+              <label htmlFor="session-patient-select">
+                Paciente cadastrado
+                <select
+                  id="session-patient-select"
+                  aria-label="Paciente cadastrado"
+                  value={selectedPatient?.id ?? ''}
                   disabled={busy}
-                  autoComplete="off"
                   onChange={event => {
-                    setNewPatientInitialsTouched(true)
-                    setNewPatientInitials(event.target.value.toUpperCase())
+                    const found = patients.find(item => item.id === event.target.value) ?? null
+                    selectPatientRecord(found)
                   }}
-                />
-              </label>
-              <label htmlFor="new-patient-note">
-                Nota de desambiguação (opcional)
-                <input
-                  id="new-patient-note"
-                  maxLength={160}
-                  value={newPatientNote}
-                  disabled={busy}
-                  autoComplete="off"
-                  onChange={event => setNewPatientNote(event.target.value)}
-                />
+                >
+                  <option value="">Selecione um paciente ou cadastre novo…</option>
+                  {patients.map(item => (
+                    <option key={item.id} value={item.id}>
+                      {item.full_name} ({item.participant_code})
+                      {item.disambiguation_note ? ` — ${item.disambiguation_note}` : ''}
+                    </option>
+                  ))}
+                </select>
               </label>
               <button
                 type="button"
-                className="button secondary"
+                className="button secondary button-sm"
                 disabled={busy}
-                onClick={() => void handleCreatePatient(false)}
-              >
-                Salvar paciente
-              </button>
-              {patientHomonyms && patientHomonyms.length > 0 && (
-                <div role="alert" aria-label="Alerta de homônimo de paciente">
-                  <p>
-                    Possível homônimo encontrado para este paciente. Selecione o cadastro existente
-                    ou confirme que se trata de outra pessoa:
-                  </p>
-                  <ul>
-                    {patientHomonyms.map(candidate => (
-                      <li key={candidate.id}>
-                        {candidate.full_name} ({candidate.code})
-                        {candidate.disambiguation_note
-                          ? ` — ${candidate.disambiguation_note}`
-                          : ''}{' '}
-                        <button
-                          type="button"
-                          className="button secondary"
-                          disabled={busy}
-                          onClick={() => {
-                            const existing = patients.find(p => p.id === candidate.id)
-                            if (existing) {
-                              selectPatientRecord(existing)
-                              setShowNewPatient(false)
-                              setPatientHomonyms(null)
-                            }
-                          }}
-                        >
-                          Usar {candidate.code}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                  <button
-                    type="button"
-                    className="button secondary"
-                    disabled={busy}
-                    onClick={() => void handleCreatePatient(true)}
-                  >
-                    Confirmar homônimo e cadastrar paciente
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          <div className="registry-selector">
-            <label htmlFor="session-evaluator-search">
-              Buscar avaliador responsável
-              <input
-                id="session-evaluator-search"
-                aria-label="Buscar avaliador responsável"
-                type="search"
-                value={evaluatorSearch}
-                disabled={busy}
-                autoComplete="off"
-                placeholder="Nome ou código EVA-..."
-                onChange={event => setEvaluatorSearch(event.target.value)}
-              />
-            </label>
-            <label htmlFor="session-evaluator-select">
-              Avaliador responsável
-              <select
-                id="session-evaluator-select"
-                aria-label="Avaliador responsável"
-                value={selectedEvaluator?.id ?? ''}
-                disabled={busy}
-                aria-invalid={!!errors.evaluator}
-                aria-describedby={errors.evaluator ? 'session-evaluator-error' : undefined}
-                onChange={event => {
-                  const found = evaluators.find(item => item.id === event.target.value) ?? null
-                  selectEvaluatorRecord(found)
+                onClick={() => {
+                  setShowNewPatient(prev => !prev)
+                  setPatientHomonyms(null)
                 }}
               >
-                <option value="">Selecione um avaliador ou cadastre novo…</option>
-                {evaluators.map(item => (
-                  <option key={item.id} value={item.id}>
-                    {item.full_name} ({item.evaluator_code})
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button
-              type="button"
-              className="button secondary"
-              disabled={busy}
-              onClick={() => {
-                setShowNewEvaluator(prev => !prev)
-                setEvaluatorHomonyms(null)
-              }}
-            >
-              {showNewEvaluator ? 'Cancelar novo avaliador' : 'Cadastrar novo avaliador'}
-            </button>
-          </div>
-          {errors.evaluator && (
-            <p id="session-evaluator-error" role="alert">
-              {errors.evaluator}
-            </p>
-          )}
+                {showNewPatient ? 'Cancelar novo paciente' : 'Cadastrar novo paciente'}
+              </button>
+            </div>
 
-          {showNewEvaluator && (
-            <div
-              role="group"
-              aria-label="Novo cadastro de avaliador"
-              className="inline-registry-box"
-            >
-              <label htmlFor="new-evaluator-full-name">
-                Nome completo do avaliador
+            {showNewPatient && (
+              <div role="group" aria-label="Novo cadastro de paciente" className="inline-registry-box">
+                <label htmlFor="new-patient-full-name">
+                  Nome completo do paciente
+                  <input
+                    id="new-patient-full-name"
+                    maxLength={120}
+                    value={newPatientName}
+                    disabled={busy}
+                    autoComplete="off"
+                    onChange={event => {
+                      const value = event.target.value
+                      setNewPatientName(value)
+                      if (!newPatientInitialsTouched) {
+                        setNewPatientInitials(deriveInitials(value))
+                      }
+                    }}
+                  />
+                </label>
+                <label htmlFor="new-patient-initials">
+                  Iniciais do paciente
+                  <input
+                    id="new-patient-initials"
+                    maxLength={16}
+                    value={newPatientInitials}
+                    disabled={busy}
+                    autoComplete="off"
+                    onChange={event => {
+                      setNewPatientInitialsTouched(true)
+                      setNewPatientInitials(event.target.value.toUpperCase())
+                    }}
+                  />
+                </label>
+                <label htmlFor="new-patient-note">
+                  Nota de desambiguação (opcional)
+                  <input
+                    id="new-patient-note"
+                    maxLength={160}
+                    value={newPatientNote}
+                    disabled={busy}
+                    autoComplete="off"
+                    onChange={event => setNewPatientNote(event.target.value)}
+                  />
+                </label>
+                <button
+                  type="button"
+                  className="button secondary"
+                  disabled={busy}
+                  onClick={() => void handleCreatePatient(false)}
+                >
+                  Salvar paciente
+                </button>
+                {patientHomonyms && patientHomonyms.length > 0 && (
+                  <div role="alert" aria-label="Alerta de homônimo de paciente" className="homonym-alert">
+                    <p>
+                      Possível homônimo encontrado para este paciente. Selecione o cadastro existente
+                      ou confirme que se trata de outra pessoa:
+                    </p>
+                    <ul className="homonym-list">
+                      {patientHomonyms.map(candidate => (
+                        <li key={candidate.id}>
+                          {candidate.full_name} ({candidate.code})
+                          {candidate.disambiguation_note
+                            ? ` — ${candidate.disambiguation_note}`
+                            : ''}{' '}
+                          <button
+                            type="button"
+                            className="button secondary button-sm"
+                            disabled={busy}
+                            onClick={() => {
+                              const existing = patients.find(p => p.id === candidate.id)
+                              if (existing) {
+                                selectPatientRecord(existing)
+                                setShowNewPatient(false)
+                                setPatientHomonyms(null)
+                              }
+                            }}
+                          >
+                            Usar {candidate.code}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                    <button
+                      type="button"
+                      className="button secondary"
+                      disabled={busy}
+                      onClick={() => void handleCreatePatient(true)}
+                    >
+                      Confirmar homônimo e cadastrar paciente
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="registry-selector" style={{ marginTop: '12px' }}>
+              <label htmlFor="session-evaluator-search">
+                Buscar avaliador responsável
                 <input
-                  id="new-evaluator-full-name"
-                  maxLength={120}
-                  value={newEvaluatorName}
+                  id="session-evaluator-search"
+                  aria-label="Buscar avaliador responsável"
+                  type="search"
+                  value={evaluatorSearch}
                   disabled={busy}
                   autoComplete="off"
-                  onChange={event => {
-                    const value = event.target.value
-                    setNewEvaluatorName(value)
-                    if (!newEvaluatorInitialsTouched) {
-                      setNewEvaluatorInitials(deriveInitials(value))
-                    }
-                  }}
+                  placeholder="Nome ou código EVA-..."
+                  onChange={event => setEvaluatorSearch(event.target.value)}
                 />
               </label>
-              <label htmlFor="new-evaluator-initials">
-                Iniciais do avaliador
-                <input
-                  id="new-evaluator-initials"
-                  maxLength={16}
-                  value={newEvaluatorInitials}
+              <label htmlFor="session-evaluator-select">
+                Avaliador responsável
+                <select
+                  id="session-evaluator-select"
+                  aria-label="Avaliador responsável"
+                  value={selectedEvaluator?.id ?? ''}
                   disabled={busy}
-                  autoComplete="off"
+                  aria-invalid={!!errors.evaluator}
+                  aria-describedby={errors.evaluator ? 'session-evaluator-error' : undefined}
                   onChange={event => {
-                    setNewEvaluatorInitialsTouched(true)
-                    setNewEvaluatorInitials(event.target.value.toUpperCase())
+                    const found = evaluators.find(item => item.id === event.target.value) ?? null
+                    selectEvaluatorRecord(found)
                   }}
-                />
+                >
+                  <option value="">Selecione um avaliador ou cadastre novo…</option>
+                  {evaluators.map(item => (
+                    <option key={item.id} value={item.id}>
+                      {item.full_name} ({item.evaluator_code})
+                    </option>
+                  ))}
+                </select>
               </label>
               <button
                 type="button"
-                className="button secondary"
+                className="button secondary button-sm"
                 disabled={busy}
-                onClick={() => void handleCreateEvaluator(false)}
+                onClick={() => {
+                  setShowNewEvaluator(prev => !prev)
+                  setEvaluatorHomonyms(null)
+                }}
               >
-                Salvar avaliador
+                {showNewEvaluator ? 'Cancelar novo avaliador' : 'Cadastrar novo avaliador'}
               </button>
-              {evaluatorHomonyms && evaluatorHomonyms.length > 0 && (
-                <div role="alert" aria-label="Alerta de homônimo de avaliador">
-                  <p>
-                    Possível homônimo encontrado para este avaliador. Confirme se deseja criar novo
-                    registro:
-                  </p>
-                  <button
-                    type="button"
-                    className="button secondary"
-                    disabled={busy}
-                    onClick={() => void handleCreateEvaluator(true)}
-                  >
-                    Confirmar homônimo e cadastrar avaliador
-                  </button>
-                </div>
-              )}
             </div>
-          )}
+            {errors.evaluator && (
+              <p id="session-evaluator-error" role="alert" className="notice" style={{ margin: '8px 0' }}>
+                {errors.evaluator}
+              </p>
+            )}
 
-          <label htmlFor="session-test-code">
-            Instrumento
-            <select
-              id="session-test-code"
-              value={testCode}
-              disabled={busy}
-              onChange={event => {
-                setTestCode(event.target.value)
-                setReviewing(false)
-              }}
-            >
-              <option value="stroop_go_nogo_ptbr">
-                Stroop Go/No-Go (stroop_go_nogo_ptbr · v0.2.2-web.1)
-              </option>
-            </select>
-          </label>
+            {showNewEvaluator && (
+              <div
+                role="group"
+                aria-label="Novo cadastro de avaliador"
+                className="inline-registry-box"
+              >
+                <label htmlFor="new-evaluator-full-name">
+                  Nome completo do avaliador
+                  <input
+                    id="new-evaluator-full-name"
+                    maxLength={120}
+                    value={newEvaluatorName}
+                    disabled={busy}
+                    autoComplete="off"
+                    onChange={event => {
+                      const value = event.target.value
+                      setNewEvaluatorName(value)
+                      if (!newEvaluatorInitialsTouched) {
+                        setNewEvaluatorInitials(deriveInitials(value))
+                      }
+                    }}
+                  />
+                </label>
+                <label htmlFor="new-evaluator-initials">
+                  Iniciais do avaliador
+                  <input
+                    id="new-evaluator-initials"
+                    maxLength={16}
+                    value={newEvaluatorInitials}
+                    disabled={busy}
+                    autoComplete="off"
+                    onChange={event => {
+                      setNewEvaluatorInitialsTouched(true)
+                      setNewEvaluatorInitials(event.target.value.toUpperCase())
+                    }}
+                  />
+                </label>
+                <button
+                  type="button"
+                  className="button secondary"
+                  disabled={busy}
+                  onClick={() => void handleCreateEvaluator(false)}
+                >
+                  Salvar avaliador
+                </button>
+                {evaluatorHomonyms && evaluatorHomonyms.length > 0 && (
+                  <div role="alert" aria-label="Alerta de homônimo de avaliador" className="homonym-alert">
+                    <p>
+                      Possível homônimo encontrado para este avaliador. Confirme se deseja criar novo
+                      registro:
+                    </p>
+                    <button
+                      type="button"
+                      className="button secondary"
+                      disabled={busy}
+                      onClick={() => void handleCreateEvaluator(true)}
+                    >
+                      Confirmar homônimo e cadastrar avaliador
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
-          <label htmlFor="session-participant">
-            Código do participante
-            <input
-              ref={participantInput}
-              id="session-participant"
-              required
-              maxLength={64}
-              value={selectedPatient ? selectedPatient.participant_code : participant}
-              readOnly={!!selectedPatient}
-              disabled={busy}
-              autoComplete="off"
-              aria-invalid={!!errors.participant}
-              aria-describedby={errors.participant ? 'session-participant-error' : undefined}
-              onChange={event => {
-                if (!selectedPatient) {
-                  setParticipant(event.target.value)
+          {/* ETAPA 2: PARÂMETROS DA SESSÃO */}
+          <div className="step-card">
+            <div className="step-card-header">
+              <span className="step-number-badge">2</span>
+              <h4 className="step-card-title">Parâmetros da Sessão</h4>
+            </div>
+
+            <label htmlFor="session-test-code">
+              Instrumento
+              <select
+                id="session-test-code"
+                value={testCode}
+                disabled={busy}
+                onChange={event => {
+                  setTestCode(event.target.value)
                   setReviewing(false)
-                }
-              }}
-            />
-          </label>
-          {errors.participant && (
-            <p id="session-participant-error" role="alert">
-              {errors.participant}
-            </p>
-          )}
+                }}
+              >
+                <option value="stroop_go_nogo_ptbr">
+                  Stroop Go/No-Go (stroop_go_nogo_ptbr · v0.2.2-web.1)
+                </option>
+              </select>
+            </label>
 
-          <label htmlFor="session-initials">
-            Iniciais na sessão
-            <input
-              id="session-initials"
-              maxLength={16}
-              value={initials}
-              disabled={busy}
-              autoComplete="off"
-              aria-invalid={!!errors.initials}
-              aria-describedby={errors.initials ? 'session-initials-error' : undefined}
-              onChange={event => {
-                setInitials(event.target.value.toUpperCase())
-                setReviewing(false)
-              }}
-            />
-          </label>
-          {errors.initials && (
-            <p id="session-initials-error" role="alert">
-              {errors.initials}
-            </p>
-          )}
+            <label htmlFor="session-participant">
+              Código do participante
+              <input
+                ref={participantInput}
+                id="session-participant"
+                required
+                maxLength={64}
+                value={selectedPatient ? selectedPatient.participant_code : participant}
+                readOnly={!!selectedPatient}
+                disabled={busy}
+                autoComplete="off"
+                aria-invalid={!!errors.participant}
+                aria-describedby={errors.participant ? 'session-participant-error' : undefined}
+                onChange={event => {
+                  if (!selectedPatient) {
+                    setParticipant(event.target.value)
+                    setReviewing(false)
+                  }
+                }}
+              />
+            </label>
+            {errors.participant && (
+              <p id="session-participant-error" role="alert" className="notice" style={{ margin: '8px 0' }}>
+                {errors.participant}
+              </p>
+            )}
 
-          <label htmlFor="session-visit">
-            Visita da sessão
-            <input
-              ref={visitInput}
-              id="session-visit"
-              required
-              maxLength={64}
-              value={visit}
-              disabled={busy}
-              autoComplete="off"
-              aria-invalid={!!errors.visit}
-              aria-describedby={errors.visit ? 'session-visit-error' : undefined}
-              onChange={event => {
-                setVisit(event.target.value)
-                setReviewing(false)
-              }}
-            />
-          </label>
-          {errors.visit && (
-            <p id="session-visit-error" role="alert">
-              {errors.visit}
-            </p>
-          )}
+            <label htmlFor="session-initials">
+              Iniciais na sessão
+              <input
+                id="session-initials"
+                maxLength={16}
+                value={initials}
+                disabled={busy}
+                autoComplete="off"
+                aria-invalid={!!errors.initials}
+                aria-describedby={errors.initials ? 'session-initials-error' : undefined}
+                onChange={event => {
+                  setInitials(event.target.value.toUpperCase())
+                  setReviewing(false)
+                }}
+              />
+            </label>
+            {errors.initials && (
+              <p id="session-initials-error" role="alert" className="notice" style={{ margin: '8px 0' }}>
+                {errors.initials}
+              </p>
+            )}
 
-          <div className="session-actions">
-            <button
-              type="button"
-              className="button secondary"
-              disabled={busy}
-              onClick={handleReview}
-            >
-              Revisar preparação
-            </button>
-            <button className="button primary" disabled={busy} type="submit">
-              {busy ? 'Gerando convite…' : 'Gerar convite'}
-            </button>
+            <label htmlFor="session-visit">
+              Visita da sessão
+              <input
+                ref={visitInput}
+                id="session-visit"
+                required
+                maxLength={64}
+                value={visit}
+                disabled={busy}
+                autoComplete="off"
+                aria-invalid={!!errors.visit}
+                aria-describedby={errors.visit ? 'session-visit-error' : undefined}
+                onChange={event => {
+                  setVisit(event.target.value)
+                  setReviewing(false)
+                }}
+              />
+            </label>
+            {errors.visit && (
+              <p id="session-visit-error" role="alert" className="notice" style={{ margin: '8px 0' }}>
+                {errors.visit}
+              </p>
+            )}
           </div>
 
-          {reviewing && (
-            <div
-              role="region"
-              aria-label="Resumo para conferência"
-              className="preparation-review-card"
-            >
-              <h4>Resumo para conferência</h4>
-              <dl>
-                <div>
-                  <dt>Projeto</dt>
-                  <dd>
-                    {project.code} — {project.name}
-                  </dd>
-                </div>
-                <div>
-                  <dt>Paciente</dt>
-                  <dd>
-                    {selectedPatient
-                      ? `${selectedPatient.full_name} (${selectedPatient.participant_code})`
-                      : participant}
-                  </dd>
-                </div>
-                <div>
-                  <dt>Iniciais</dt>
-                  <dd>{initials || '—'}</dd>
-                </div>
-                <div>
-                  <dt>Avaliador responsável</dt>
-                  <dd>
-                    {selectedEvaluator
-                      ? `${selectedEvaluator.full_name} (${selectedEvaluator.evaluator_code})`
-                      : profile.user_id}
-                  </dd>
-                </div>
-                <div>
-                  <dt>Visita</dt>
-                  <dd>{visit}</dd>
-                </div>
-                <div>
-                  <dt>Instrumento e versão</dt>
-                  <dd>{testCode} · 0.2.2-web.1</dd>
-                </div>
-              </dl>
-              <button
-                type="button"
-                className="button primary"
-                disabled={busy}
-                onClick={() => void issueInvitation()}
-              >
-                {busy ? 'Confirmando…' : 'Confirmar e emitir convite'}
-              </button>
+          {/* ETAPA 3: CONFERÊNCIA E EMISSÃO */}
+          <div className="step-card">
+            <div className="step-card-header">
+              <span className="step-number-badge">3</span>
+              <h4 className="step-card-title">Emissão e Conferência</h4>
+            </div>
+
+            <p className="quiet" style={{ margin: '0 0 12px 0' }}>
+              Confira os parâmetros antes de emitir o convite único. O código gerado terá validade limitada e uso único.
+            </p>
+
+            <div className="session-actions" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 className="button secondary"
                 disabled={busy}
-                onClick={() => setReviewing(false)}
+                onClick={handleReview}
               >
-                Voltar e editar
+                Revisar preparação
+              </button>
+              <button className="button primary" disabled={busy} type="submit">
+                {busy ? 'Gerando convite…' : 'Gerar convite'}
               </button>
             </div>
-          )}
+
+            {reviewing && (
+              <div
+                role="region"
+                aria-label="Resumo para conferência"
+                className="preparation-review-card"
+              >
+                <h4>Resumo para conferência</h4>
+                <dl>
+                  <div>
+                    <dt>Projeto</dt>
+                    <dd>
+                      {project.code} — {project.name}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Paciente</dt>
+                    <dd>
+                      {selectedPatient
+                        ? `${selectedPatient.full_name} (${selectedPatient.participant_code})`
+                        : participant}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Iniciais</dt>
+                    <dd>{initials || '—'}</dd>
+                  </div>
+                  <div>
+                    <dt>Avaliador responsável</dt>
+                    <dd>
+                      {selectedEvaluator
+                        ? `${selectedEvaluator.full_name} (${selectedEvaluator.evaluator_code})`
+                        : profile.user_id}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Visita</dt>
+                    <dd>{visit}</dd>
+                  </div>
+                  <div>
+                    <dt>Instrumento e versão</dt>
+                    <dd>{testCode} · 0.2.2-web.1</dd>
+                  </div>
+                </dl>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    className="button primary"
+                    disabled={busy}
+                    onClick={() => void issueInvitation()}
+                  >
+                    {busy ? 'Confirmando…' : 'Confirmar e emitir convite'}
+                  </button>
+                  <button
+                    type="button"
+                    className="button secondary"
+                    disabled={busy}
+                    onClick={() => setReviewing(false)}
+                  >
+                    Voltar e editar
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </form>
       )}
 
       {saved && (
-        <>
-          <h4>Convite criado</h4>
+        <div className="preparation-review-card" style={{ background: '#f8fafc', borderColor: '#cbd5e1' }}>
+          <h4>Convite criado com sucesso</h4>
           <p>
             Participante: {saved.participant} · Visita: {saved.visit}
           </p>
@@ -895,21 +925,23 @@ export function SessionInvitation({
           <p>Sessão: {saved.invitation.session_id}</p>
           <p>
             Código de uso único:{' '}
-            <output aria-label="Código do convite">{saved.invitation.code}</output>
+            <output aria-label="Código do convite" className="invitation-code-display">{saved.invitation.code}</output>
           </p>
           <p>Expira em: {saved.invitation.expires_at} (UTC). Após o prazo, solicite uma nova sessão.</p>
-          <p>
+          <p className="quiet">
             Entregue o código ao participante por canal apropriado. Ele só aparece agora e será
             apagado ao trocar de projeto, sair ou recarregar. Abrir a prática exige informar o
             convite; o código não é incluído no endereço.
           </p>
-          <a className="button secondary" href="/pratica" target="_blank" rel="noopener noreferrer">
-            Abrir prática em outra aba
-          </a>
-          <button className="button secondary" disabled={busy} onClick={() => void revoke()}>
-            {busy ? 'Revogando…' : 'Revogar convite'}
-          </button>
-        </>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '16px', flexWrap: 'wrap' }}>
+            <a className="button primary" href="/pratica" target="_blank" rel="noopener noreferrer">
+              Abrir prática em outra aba ↗
+            </a>
+            <button className="button secondary button-danger" disabled={busy} onClick={() => void revoke()}>
+              {busy ? 'Revogando…' : 'Revogar convite'}
+            </button>
+          </div>
+        </div>
       )}
 
       {revoked && (
