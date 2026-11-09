@@ -597,24 +597,13 @@ export function ProfessionalDashboard({
             <>
               {renderProjectSelector()}
 
-              {/* Ação rápida de preparação de avaliação integrada à visão geral */}
+              {/* Preparação rápida de convite integrada na visão geral */}
               {currentProject?.active && profile.role !== 'consulta' && (
-                <div className="quick-action-banner" role="region" aria-label="Ação rápida de preparação">
-                  <div className="quick-action-info">
-                    <h3>⚡ Preparar Nova Avaliação</h3>
-                    <p>Emita convites remotos únicos ou inicie uma aplicação presencial imediata para este projeto.</p>
-                  </div>
-                  <button
-                    type="button"
-                    className="button primary"
-                    onClick={() => {
-                      setActiveModule('preparar')
-                      setDetailId('')
-                    }}
-                  >
-                    Ir para Preparar Avaliação →
-                  </button>
-                </div>
+                <SessionInvitation
+                  key={`invitation:${project}`}
+                  project={currentProject}
+                  profile={profile}
+                />
               )}
 
               <ResearchFilters
@@ -658,10 +647,11 @@ export function ProfessionalDashboard({
                   ) : (
                     <>
                       {/* KPIs Executivos da Visão Geral */}
+                      {/* KPIs da Visão Geral (CHG-005 / REQ-REL-004) */}
                       <section className="overview-summary-kpis" aria-label="KPIs da Visão Geral">
                         <div className="kpi-grid">
                           <div className="kpi-box">
-                            <span className="kpi-label">Pacientes cadastrados</span>
+                            <span className="kpi-label">Pacientes cadastrados no projeto</span>
                             <strong className="kpi-value tabular-nums">
                               {registeredPatientsCount !== null ? registeredPatientsCount : '—'}
                             </strong>
@@ -671,20 +661,14 @@ export function ProfessionalDashboard({
                             <strong className="kpi-value tabular-nums">{overviewKpis.byStatus.valid}</strong>
                           </div>
                           <div className="kpi-box">
-                            <span className="kpi-label">Participantes distintos</span>
-                            <strong className="kpi-value tabular-nums">{totals.participants}</strong>
+                            <span className="kpi-label">Avaliações interrompidas / inválidas</span>
+                            <strong className="kpi-value tabular-nums">{overviewKpis.byStatus.invalid}</strong>
                           </div>
                           <div className="kpi-box">
-                            <span className="kpi-label">Precisão média</span>
-                            <strong className="kpi-value tabular-nums">{number(totals.meanAccuracy, 1)}%</strong>
-                          </div>
-                          <div className="kpi-box">
-                            <span className="kpi-label">Precisão mediana</span>
-                            <strong className="kpi-value tabular-nums">{number(totals.medianAccuracy, 1)}%</strong>
-                          </div>
-                          <div className="kpi-box">
-                            <span className="kpi-label">Tempo mediano de RT</span>
-                            <strong className="kpi-value tabular-nums">{number(totals.medianResponseSeconds, 3)} s</strong>
+                            <span className="kpi-label">Avaliadores no recorte</span>
+                            <strong className="kpi-value tabular-nums">
+                              {Object.keys(overviewKpis.byEvaluator).length}
+                            </strong>
                           </div>
                         </div>
                       </section>
@@ -773,11 +757,25 @@ export function ProfessionalDashboard({
                                 <option value="psychopy">PsychoPy local</option>
                               </select>
                             </label>
+                            <button
+                              type="button"
+                              className="button secondary"
+                              disabled={
+                                aggregateBusy ||
+                                !aggregateContext ||
+                                !['stroop_go_nogo_ptbr', 'instrumento_sintetico_demo'].includes(
+                                  selectedInstrument,
+                                )
+                              }
+                              onClick={() => void downloadAggregate()}
+                            >
+                              {aggregateBusy ? 'Preparando arquivo…' : 'Exportar visão filtrada'}
+                            </button>
                           </div>
 
                           <dl className="dashboard-cards">
                             <div>
-                              <dt>Avaliações analisadas</dt>
+                              <dt>Avaliações</dt>
                               <dd className="tabular-nums">{totals.assessments}</dd>
                             </div>
                             <div>
@@ -795,20 +793,38 @@ export function ProfessionalDashboard({
                                   <dd className="tabular-nums">{number(totals.medianAccuracy, 1)}%</dd>
                                 </div>
                                 <div>
-                                  <dt>Mediana dos tempos de reação</dt>
+                                  <dt>Mediana dos tempos por avaliação</dt>
                                   <dd className="tabular-nums">{number(totals.medianResponseSeconds, 3)} s</dd>
                                 </div>
                                 <div>
-                                  <dt>Total de omissões</dt>
+                                  <dt>Omissões</dt>
                                   <dd className="tabular-nums">{totals.omissions}</dd>
                                 </div>
                                 <div>
-                                  <dt>Total de comissões</dt>
+                                  <dt>Comissões</dt>
                                   <dd className="tabular-nums">{totals.commissions}</dd>
                                 </div>
                               </>
                             )}
                           </dl>
+
+                          <figure className="dashboard-chart analytics-card" style={{ margin: '1rem 0' }}>
+                            <figcaption>Avaliações por data de início</figcaption>
+                            <ul className="chart-meter-list">
+                              {dates.map(([day, count]) => (
+                                <li key={day}>
+                                  <span>{day}</span>
+                                  <meter
+                                    min={0}
+                                    max={peak}
+                                    value={count}
+                                    aria-label={`${day}: ${count} avaliações`}
+                                  />
+                                  <strong className="tabular-nums">{count}</strong>
+                                </li>
+                              ))}
+                            </ul>
+                          </figure>
 
                           {selectedInstrument === 'stroop_go_nogo_ptbr' && (
                             <div className="comparison-tables-grid">
@@ -914,82 +930,89 @@ export function ProfessionalDashboard({
                       {/* CONTEÚDO DA ABA 5: REGISTROS E MÉTRICAS */}
                       {analyticsTab === 'tabela' && (
                         <div className="analytics-tab-panel" role="region" aria-label="Painel Registros e Métricas">
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '10px' }}>
-                            <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Tabela de Registros Filtrados ({visible.length})</h3>
-                            <button
-                              type="button"
-                              className="button secondary button-sm"
-                              disabled={
-                                aggregateBusy ||
-                                !aggregateContext ||
-                                !['stroop_go_nogo_ptbr', 'instrumento_sintetico_demo'].includes(
-                                  selectedInstrument,
-                                )
-                              }
-                              onClick={() => void downloadAggregate()}
-                            >
-                              {aggregateBusy ? 'Preparando arquivo…' : 'Exportar visão filtrada (CSV)'}
-                            </button>
-                          </div>
-
-                          {aggregateMessage && <p role="status">{aggregateMessage}</p>}
-
-                          <ResultsTable
-                            rows={visible}
-                            projects={projects}
-                            onDetail={row => {
-                              aggregateIO.current?.abort()
-                              setAggregateBusy(false)
-                              setDetailProject(row.project_id)
-                              setDetailId(row.assessment_id)
-                            }}
-                          />
-
-                          {/* Resumo e Dicionário Descritivo das Métricas Oficiais (em acordeão recolhível) */}
-                          <details className="metrics-dictionary-details analytics-card" style={{ marginTop: '1.5rem' }}>
-                            <summary style={{ cursor: 'pointer', fontWeight: 600, padding: '4px 0' }}>
-                              <span>📖 Resumo Descritivo das Métricas Oficiais (Clique para expandir)</span>
-                            </summary>
-                            <div style={{ marginTop: '1rem' }}>
-                              <h3 id="metrics-dictionary-title" style={{ fontSize: '1rem', margin: '0 0 8px 0' }}>
-                                Resumo Descritivo das Métricas Oficiais
-                              </h3>
-                              <p className="quiet">
-                                Definições conceituais, origens de cálculo e convenção de tratamento de valores nulos
-                                das métricas oficiais Stroop Go/No-Go.
-                              </p>
-                              <div className="table-scroll">
-                                <table aria-label="Definições conceituais e tratamento de nulos">
-                                  <thead>
-                                    <tr>
-                                      <th>Métrica oficial</th>
-                                      <th>Origem da fórmula</th>
-                                      <th>Definição conceitual</th>
-                                      <th>Unidade</th>
-                                      <th>Tratamento de nulos</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {OFFICIAL_METRICS_DICTIONARY.map(m => (
-                                      <tr key={m.code}>
-                                        <td>
-                                          <strong>{m.label}</strong> (<code>{m.code}</code>)
-                                        </td>
-                                        <td>{m.origin}</td>
-                                        <td>{m.definition}</td>
-                                        <td>
-                                          <span className="badge">{m.unit}</span>
-                                        </td>
-                                        <td>{m.nullTreatment}</td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
-                              </div>
-                            </div>
-                          </details>
+                          <p className="quiet" style={{ margin: '0 0 1rem 0' }}>
+                            Visualização detalhada dos registros filtrados e definições conceituais das métricas oficiais.
+                          </p>
                         </div>
                       )}
+
+                      {/* TABELA DE REGISTROS FILTRADOS E DICIONÁRIO DE MÉTRICAS */}
+                      <div className="analytics-results-section" style={{ marginTop: '2rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '10px' }}>
+                          <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Tabela de Registros Filtrados ({visible.length})</h3>
+                          <button
+                            type="button"
+                            className="button secondary button-sm"
+                            disabled={
+                              aggregateBusy ||
+                              !aggregateContext ||
+                              !['stroop_go_nogo_ptbr', 'instrumento_sintetico_demo'].includes(
+                                selectedInstrument,
+                              )
+                            }
+                            onClick={() => void downloadAggregate()}
+                          >
+                            {aggregateBusy ? 'Preparando arquivo…' : 'Exportar CSV dos registros'}
+                          </button>
+                        </div>
+
+                        {aggregateMessage && <p role="status">{aggregateMessage}</p>}
+
+                        <ResultsTable
+                          rows={visible}
+                          projects={projects}
+                          onDetail={row => {
+                            aggregateIO.current?.abort()
+                            setAggregateBusy(false)
+                            setDetailProject(row.project_id)
+                            setDetailId(row.assessment_id)
+                          }}
+                        />
+
+                        {/* Resumo e Dicionário Descritivo das Métricas Oficiais (em acordeão recolhível) */}
+                        <details className="metrics-dictionary-details analytics-card" style={{ marginTop: '1.5rem' }} open={analyticsTab === 'tabela'}>
+                          <summary style={{ cursor: 'pointer', fontWeight: 600, padding: '4px 0' }}>
+                            <span>📖 Resumo Descritivo das Métricas Oficiais (Clique para expandir)</span>
+                          </summary>
+                          <div style={{ marginTop: '1rem' }}>
+                            <h3 id="metrics-dictionary-title" style={{ fontSize: '1rem', margin: '0 0 8px 0' }}>
+                              Resumo Descritivo das Métricas Oficiais
+                            </h3>
+                            <p className="quiet">
+                              Definições conceituais, origens de cálculo e convenção de tratamento de valores nulos
+                              das métricas oficiais Stroop Go/No-Go.
+                            </p>
+                            <div className="table-scroll">
+                              <table aria-label="Definições conceituais e tratamento de nulos">
+                                <thead>
+                                  <tr>
+                                    <th>Métrica oficial</th>
+                                    <th>Origem da fórmula</th>
+                                    <th>Definição conceitual</th>
+                                    <th>Unidade</th>
+                                    <th>Tratamento de nulos</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {OFFICIAL_METRICS_DICTIONARY.map(m => (
+                                    <tr key={m.code}>
+                                      <td>
+                                        <strong>{m.label}</strong> (<code>{m.code}</code>)
+                                      </td>
+                                      <td>{m.origin}</td>
+                                      <td>{m.definition}</td>
+                                      <td>
+                                        <span className="badge">{m.unit}</span>
+                                      </td>
+                                      <td>{m.nullTreatment}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </details>
+                      </div>
                     </>
                   )}
                 </>
