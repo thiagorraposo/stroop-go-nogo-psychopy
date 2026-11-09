@@ -8,7 +8,7 @@ const python = fileURLToPath(new URL('../../../.venv/bin/python', import.meta.ur
 const manageScript = fileURLToPath(new URL('./dashboard-manage.py', import.meta.url))
 type Prepared = { cookie_name: string; token: string; project_id: string }
 
-test('EXP-CSV-01: comprova ausencia de upload CSV na UI e bloqueio 410 no backend integrado', async ({ page, context, request }) => {
+test('EXP-CSV-01: comprova ausencia de upload CSV na UI e bloqueio 410 no backend integrado', async ({ page, context }) => {
   const prepared = JSON.parse(execFileSync(python, [manageScript], {
     input: JSON.stringify({ role: 'administracao' }), encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'],
   })) as Prepared
@@ -27,7 +27,7 @@ test('EXP-CSV-01: comprova ausencia de upload CSV na UI e bloqueio 410 no backen
 
   // 3. Requisicao direta ao endpoint de importacao pelo cliente HTTPS comprova bloqueio 410 Gone
   const operationId = randomUUID()
-  const response = await request.post(`/api/v1/projects/${prepared.project_id}/imports/${operationId}`, {
+  const response = await page.request.post(`/api/v1/projects/${prepared.project_id}/imports/${operationId}`, {
     data: 'project,participant_id\nPROJ,P1\n',
     headers: {
       'Content-Type': 'text/csv; charset=utf-8',
