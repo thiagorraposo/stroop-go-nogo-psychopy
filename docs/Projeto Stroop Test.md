@@ -2768,7 +2768,27 @@ Verificações locais executadas nesta missão documental (`Python 3.12.3`, sem 
 
 ## Retomada
 
-### Retomada vigente — replanejamento operacional e simplificação estrutural (CHG-006), 2026-11-08
+### Retomada vigente — conclusão do marco M7: Integração, compatibilidade histórica e transição (WEB-025 a WEB-028), 2026-11-09
+
+Marco vigente **M7 integralmente concluído com 4 de 4 entregáveis aceitos**
+(`WEB-025`, `WEB-026`, `WEB-027` e `WEB-028` **CONCLUIDAS**).
+Entregue via Pull Request #14 (`feat/m7-transicao-e-compatibilidade-historica`),
+aprovado na CI (`verify`, Run `42559837206`, 24m30s) e integrado à `main` via
+Merge Commit tradicional (`e2bc001`).
+
+Progresso global do projeto: **37/48 entregáveis aceitos (77,1%)**, 11 sem aceite:
+marco **M7 com 4/4 aceitos**, encerrado sem pendências funcionais.
+`WEB-031` permanece **BLOQUEADA** aguardando definição de destino externo.
+
+Próxima ação exata: autorização formal do responsável pelo repositório para início do
+marco **M8 (CI, infraestrutura e preparação operacional: WEB-031 e WEB-032)**,
+especialmente a definição de destino e credenciais de teste para réplica externa (`WEB-031`).
+
+Git da entrega: branch `feat/m7-transicao-e-compatibilidade-historica`, commit `1b7da61`,
+PR #14, Run de CI `42559837206` e Merge Commit tradicional `e2bc001` na `main`.
+Fast-forward local na `main` concluído e confirmado.
+
+### Retomada anterior — replanejamento operacional e simplificação estrutural (CHG-006), 2026-11-08
 
 Replanejamento documental **CHG-006** concluído e validado em escopo estritamente documental. Foram integrados ao planejamento canônico: a consolidação da interface profissional em **3 eixos fundamentais** ([ADR-008](arquitetura/ADR-008-simplificacao-estrutural-e-fluxo-direto-sessao.md)) inspirados no modelo mental do Streamlit (Resultados e Análise Unificada; Aplicação Direta / Nova Avaliação; Gestão Cadastral e Acessos), o formulário sem atrito em etapa única estilo PsychoPy Runner com modalidades duais ("Iniciar Agora neste Dispositivo" presencial e "Gerar Link / QR Code" remoto), a orquestração relacional atômica e transparente (`REQ-SESS-003`) e a preservação metodológica/psicométrica absoluta do motor jsPsych e das 12 métricas oficiais.
 
