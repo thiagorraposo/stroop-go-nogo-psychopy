@@ -56,6 +56,12 @@ Alvo CHG-005 ([ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.
 **Login da equipe (conta local única) → Dashboard → Pacientes / Avaliadores → Preparar avaliação (seleção cadastral, geração automática de IDs e conferência) → Executar teste → Armazenar resultados → Consultar, analisar e exportar CSV.**
 A importação manual de CSV deixa de existir no produto WEB; o CSV é estritamente formato de exportação.
 
+Alvo CHG-006 ([ADR-008](arquitetura/ADR-008-simplificacao-estrutural-e-fluxo-direto-sessao.md)):
+**Login da equipe (conta local única) → Painel unificado em 3 eixos fundamentais:**
+- **Eixo 1 (Resultados e Análise Unificada):** Indicadores executivos (KPIs) + Barra unificada de filtros combinados reativos + Visualizações interativas descritivas + Histórico detalhado de tentativas + Hub de exportação CSV multi-granularidade sobre o recorte ativo;
+- **Eixo 2 (Aplicação Direta / Nova Avaliação):** Formulário em etapa única estilo PsychoPy Runner (Participante + Visita + Projeto) com orquestração relacional atômica e seleção imediata de modalidade: *"Iniciar Agora neste Dispositivo"* (aplicação presencial direta com isolamento seguro pós-teste) ou *"Gerar Link / QR Code"* (aplicação remota/assistida com QR Code dinâmico);
+- **Eixo 3 (Gestão Cadastral e Acessos):** Área secundária para manutenção aprofundada de fichas de pacientes e avaliadores, retificação auditada de vínculos de sessões (`relink`), gerenciamento de usuários locais, projetos e governança da equipe.
+
 O código atual materializa a preparação via convite/sessão, não como resultado
 oficial já criado. M2 deve manter distinta a avaliação planejada da concluída;
 não renomear entidades nem criar cadastro de pessoa sem DEC-01.
@@ -246,3 +252,34 @@ Conforme [ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md) e
 3. **Formulário completo de preparação da avaliação (`WEB-046`):** recupera os campos pertinentes do formulário original do PsychoPy Builder (`project`, `participant_id` automático, `participant_name`, `initials`, `visit`, `evaluator` e `test_code`), com preenchimento por seleção cadastral e etapa de resumo para conferência antes da emissão do convite.
 4. **Retirada da importação CSV do produto (`M7` / `WEB-025`):** dados operacionais são cadastrados e coletados diretamente no sistema; a tela `CsvImportPanel` e o upload CSV pelo usuário são retirados do produto WEB, mantendo módulos internos de ingestão/CLIs isolados para compatibilidade histórica e migração técnica autorizada.
 5. **Reformulação da interface administrativa, filtros e exportação CSV avançada (`M5` / `WEB-017`–`WEB-020`, `WEB-047`):** a área profissional organiza-se em `Visão geral (Dashboard)`, `Pacientes`, `Avaliadores`, `Preparar avaliação`, `Avaliações e histórico`, `Resultados e análises`, `Exportações` e `Administração/configurações`, com catálogo completo de filtros combinados, visualizações interativas descritivas e exportação CSV em múltiplas granularidades (`pacientes`, `avaliacoes`, `tentativas`, `metricas` e `stroop_21_colunas`), sem tocar no motor experimental jsPsych.
+
+## Simplificação estrutural em 3 eixos fundamentais e fluxo direto de avaliação — integração de CHG-006
+
+Conforme estabelecido na [ADR-008](arquitetura/ADR-008-simplificacao-estrutural-e-fluxo-direto-sessao.md) (2026-11-08), a plataforma Stroop Web reorganiza a experiência de uso da equipe clínica e de pesquisa, consolidando os 8 módulos anteriores em **3 eixos fundamentais** e introduzindo o fluxo direto de avaliação em etapa única:
+
+### 1. Modelo Mental Inspirado no Streamlit (3 Eixos de Navegação)
+
+Para eliminar a fragmentação operacional decorrente da dispersão em 8 abas independentes, a interface da equipe (`/equipe`) passa a estruturar-se em:
+
+1. **Eixo 1: Resultados e Análise Unificada (`/equipe/analise` ou visão principal):**
+   - Centraliza em tela única coesa o ciclo completo de análise: KPIs executivos do projeto, catálogo de filtros combinados reativos (`REQ-REL-004`), gráficos interativos longitudinais e por condição Go/No-Go (`REQ-REL-005`), tabela detalhada de tentativas com metadados de proveniência e o hub integrado de exportação CSV multi-granularidade (`REQ-CSV-005`).
+   - Reatividade tipo Streamlit: qualquer ajuste nos filtros atualiza de imediato os gráficos, tabelas e o escopo do download CSV, sem alternância de abas.
+2. **Eixo 2: Aplicação Direta / Nova Avaliação (`/equipe/nova-avaliacao`):**
+   - Fluxo sem fricção inspirado no PsychoPy Runner: um único formulário enxuto para informar Identificação do Participante (busca rápida ou criação transparente pelo nome), Visita (ex.: V1, V2) e Projeto/Avaliador contextual pré-selecionados (`REQ-SESS-001`).
+   - Modalidades duais de disparo imediato (`REQ-SESS-002`):
+     - *"Iniciar Agora neste Dispositivo"*: direciona o navegador local diretamente ao motor psicométrico jsPsych, ocultando o painel da equipe para aplicação presencial no consultório/laboratório. Ao concluir ou interromper o teste, persiste os dados com recibo e bloqueia o retorno aos dados confidenciais de outros pacientes, exigindo confirmação/reautenticação da equipe.
+     - *"Gerar Link / QR Code"*: emite o convite criptograficamente assinado de uso único e renderiza link direto com cópia rápida e QR Code em alta definição para leitura ótica por tablet/celular do participante em aplicação remota ou assistida.
+3. **Eixo 3: Gestão Cadastral e Acessos (`/equipe/gestao`):**
+   - Módulo administrativo secundário reservado à manutenção cadastral aprofundada de pacientes (`web_patients`) e avaliadores (`web_evaluators`), correção auditada de vínculos de sessões (`relink_assessment` e `relink_invitation`), gestão de usuários locais, projetos e trilhas de auditoria (`web_registry_audit_events`), preservando a rotina clínica diária livre de ruído burocrático.
+
+### 2. Orquestração Relacional Transparente
+
+A simplificação da UI não degrada a integridade do modelo relacional PostgreSQL:
+- A cadeia composta pelas entidades `web_patients`, `web_evaluators`, `web_project_participants`, `web_participant_visits`, `web_participant_sessions` e `web_invitations` é preservada integralmente.
+- O backend FastAPI provê orquestração atômica transparente (`REQ-SESS-003`): a submissão do formulário unificado resolve o paciente existente ou provisiona novo registro com código `PAT-...`, assegura o vínculo ao projeto, gera a visita e emite o convite e a sessão em uma única transação de banco.
+- Elimina-se a exigência de cadastramento prévio obrigatório em múltiplas telas isoladas antes de aplicar uma avaliação.
+
+### 3. Preservação Científica e Psicométrica Absoluta
+
+- O motor experimental jsPsych (`web/src/experiment/`), o isolamento monotônico fora do React, a apresentação visual com contorno branco `stroop-web-outline/1.0.0` (`CHG-003`), a paleta de dez cores, o HUD sem precisão agregada e os gates temporais D5 permanecem 100% inalterados.
+- A persistência incremental (`ADR-005` / `WEB-007`), o worker dedicado, a atomicidade e as 12 métricas oficiais Stroop (com tratamento de ausência de RT em omissões) mantêm-se exatamente conforme validados nas etapas anteriores.

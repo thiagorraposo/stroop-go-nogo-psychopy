@@ -20,7 +20,7 @@ O comando de 2026-11-05 autorizou M2, já concluído. Novo `continue o projeto`
 autoriza M3, condicionado às decisões de suas tarefas. Em 2026-11-05, o proprietário
 aprovou DEC-04 no alcance local de engenharia descrito em EV-M3-011; validação
 física/metodológica permanece pendente para M9. Após o aceite de M3, novo `continue o projeto` em 2026-11-06 autorizou M6, já
-concluído. Novo `continue o projeto` em 2026-11-06 concluiu o escopo inicial de M4 (`WEB-013` a `WEB-016`). Em 2026-11-07, a missão documental `CHG-005` ([ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md)) revisou formalmente `DEC-01` e expandiu `M4` (`WEB-045`, `WEB-046`) e `M5` (`WEB-047`), além de atualizar `M5`, `M7`, `M8`, `M9` e `M10`. Em 2026-11-07, instrução explícita do responsável formalizou no workflow do projeto a adoção de Pull Request, Push e Merge Commit tradicional, e autorizou a execução do marco **M5** (`WEB-017` e `WEB-018`). Em 2026-11-08, o PR #4 (`feat/m5-interface-administrativa-react`) entregou a navegação modular e painéis base (`EV-M5-047-NAV`); o PR #5 (`feat/m5-filtros-kpis-administracao`) entregou o catálogo de filtros combinados e administração React (`EV-M5-017/018`); e o PR #6 (`feat/m5-crud-pacientes-avaliadores-vinculos`) foi aprovado na CI (Run `42508601295`) e integrado à `main` via Merge Commit tradicional (`b050e4c`), entregando o CRUD completo de pacientes e avaliadores, histórico longitudinal e correção auditada de vínculos (`EV-M5-047`).
+concluído. Novo `continue o projeto` em 2026-11-06 concluiu o escopo inicial de M4 (`WEB-013` a `WEB-016`). Em 2026-11-07, a missão documental `CHG-005` ([ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md)) revisou formalmente `DEC-01` e expandiu `M4` (`WEB-045`, `WEB-046`) e `M5` (`WEB-047`), além de atualizar `M5`, `M7`, `M8`, `M9` e `M10`. Em 2026-11-07, instrução explícita do responsável formalizou no workflow do projeto a adoção de Pull Request, Push e Merge Commit tradicional, e autorizou a execução do marco **M5** (`WEB-017` e `WEB-018`). Em 2026-11-08, o PR #4 (`feat/m5-interface-administrativa-react`) entregou a navegação modular e painéis base (`EV-M5-047-NAV`); o PR #5 (`feat/m5-filtros-kpis-administracao`) entregou o catálogo de filtros combinados e administração React (`EV-M5-017/018`); o PR #6 (`feat/m5-crud-pacientes-avaliadores-vinculos`) entregou o CRUD completo de pacientes e avaliadores (`EV-M5-047`); o PR #8 (`feat/m5-detalhes-resultados-metricas`) entregou detalhe, métricas e análises descritivas (`EV-M5-019`); e o PR #10 (`feat/m5-exportacoes-csv-filtradas`) entregou as exportações CSV multi-granularidade (`EV-M5-020`), concluindo integralmente o marco M5 (5/5). Em 2026-11-08, a missão documental **CHG-006** ([ADR-008](arquitetura/ADR-008-simplificacao-estrutural-e-fluxo-direto-sessao.md)) formalizou o replanejamento da interface profissional e do pipeline de sessões em 3 eixos fundamentais inspirados no Streamlit e no PsychoPy Runner, preparando a validação de transição em M7.
 
 Uma tarefa CONCLUIDA tem todos critérios, comandos/resultados/data, componente,
 referências de teste e Git. Documento é evidência suficiente apenas para entrega
@@ -1173,6 +1173,7 @@ comprovados. `WEB-045` e `WEB-046` passam a `CONCLUIDA`, encerrando **M4 (6/6)**
 
 - Objetivo: Comprovar capacidades necessárias para dispensar Streamlit na operação final e consolidar a experiência administrativa completa da plataforma (`CHG-005`).
 - Justificativa: Já existe UI base; expandir para os 8 módulos administrativos, CRUD completo de pacientes e avaliadores, catálogo avançado de filtros e exportação CSV multi-granularidade consolida o sistema como fonte operacional única.
+- Alinhamento CHG-006: As capacidades granulares comprovadas nos 5 entregáveis aceitos de M5 constituem os blocos funcionais que passam a ser consolidados nos 3 eixos fundamentais de navegação (Resultados e Análise Unificada; Aplicação Direta / Nova Avaliação; Gestão Cadastral e Acessos) conforme [ADR-008](arquitetura/ADR-008-simplificacao-estrutural-e-fluxo-direto-sessao.md), eliminando a dispersão em abas isoladas.
 - Inclui: Arquitetura de informação em 8 módulos (`Visão geral`, `Pacientes`, `Avaliadores`, `Preparar avaliação`, `Avaliações e histórico`, `Resultados e análises`, `Exportações`, `Administração/configurações`), CRUD administrativo completo de pacientes e avaliadores com histórico longitudinal (`WEB-047`), catálogo completo de filtros combinados (`WEB-017`), contas/projetos/vínculos (`WEB-018`), detalhe/visualizações interativas descritivas (`WEB-019`) e exportação CSV avançada multi-granularidade (`WEB-020`).
 - Exclui: Relatórios clínicos/normativos, novos instrumentos cognitivos não aprovados, alteração do motor experimental jsPsych.
 - Pré-requisitos: M4 integralmente aceito (incluindo `WEB-045` e `WEB-046`) e autorização profissional revalidada em M6.
@@ -1942,7 +1943,7 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 
 - Objetivo: Retirar a importação manual de CSV do produto WEB (`CHG-005`), comprovar compatibilidade histórica de exportação e vínculos legados verificáveis, e preparar a substituição operacional sem retirar legado nem modificar coletas.
 - Justificativa: Dados operacionais passam a ser cadastrados e produzidos diretamente na plataforma WEB; CSV permanece exclusivamente como funcionalidade de exportação para o usuário.
-- Inclui: Retirada de `CsvImportPanel` e de rotas de upload CSV do modo produto (`WEB-025`), roundtrip dos CSVs exportados com pipeline/CLIs (`WEB-026`), vínculo explícito legado e associação verificável de registros pseudonimizados anteriores a cadastros centrais (`WEB-027`), e matriz de cobertura operacional (`WEB-028`).
+- Inclui: Retirada de `CsvImportPanel` e de rotas de upload CSV do modo produto (`WEB-025`), roundtrip dos CSVs exportados com pipeline/CLIs (`WEB-026`), vínculo explícito legado e associação verificável de registros pseudonimizados anteriores a cadastros centrais (`WEB-027`), e matriz de cobertura operacional e paridade do fluxo unificado em 3 eixos (`WEB-028`).
 - Exclui: Remoção física de PsychoPy/Streamlit/CLIs, migração automática por coincidência de nome/código ou acesso a banco de coleta real.
 - Pré-requisitos: M5 e M6 aceitos.
 - Dependências: M5, M6.
@@ -1995,14 +1996,15 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 - Marco: M7. Prioridade: P1. Complexidade: G. Estado: PENDENTE.
 - Dependências: WEB-027.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
-- Critérios de aceite: Matriz Streamlit/React com capacidades requeridas testadas, incluindo o fluxo completo `CHG-005` (cadastros centrais de pacientes e avaliadores, preparação completa sem digitação manual de IDs, execução, dashboard/filtros/visualizações, exportação CSV multi-granularidade e ausência de importação CSV no produto), lacunas tratadas e proprietário aprova transição; Streamlit e CLIs legados permanecem preservados sem remoção física; M7 aceito.
+- Critérios de aceite: Matriz Streamlit/React com capacidades requeridas testadas, incluindo o fluxo completo `CHG-005` e o modelo unificado de 3 eixos `CHG-006` / `ADR-008` (análise unificada com filtros reativos e exportação CSV, aplicação direta em etapa única com modalidades presencial "Iniciar Agora" e remota "Link / QR Code", e gestão cadastral secundária), paridade operacional frente ao Streamlit e ao PsychoPy Runner, lacunas tratadas e proprietário aprova transição; Streamlit e CLIs legados permanecem preservados sem remoção física; M7 aceito.
 - Testes/verificação: `PLANEJADO: revisão de cobertura, E2E-FLOW-01 e regressão CLIs/launchers`. Arquivos citados existem; verificações PLANEJADAS não têm resultado.
 - Evidências: PLANEJADAS; nenhum teste desta tarefa reexecutado nesta fase. Ao executar registrar comando, resultado, data e SHA.
 - Riscos/bloqueios: R08, R10; decisões externas nas dependências/ficha do marco. Dependências pendentes não são falha observada.
-- Referências: requisitos transversais do marco, ADR-004 e ADR-007; [arquitetura](ARQUITETURA_WEB.md).
+- Referências: requisitos transversais do marco, ADR-004, ADR-007 e [ADR-008](arquitetura/ADR-008-simplificacao-estrutural-e-fluxo-direto-sessao.md); [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega: branch/commit/push/CI ainda não aplicáveis; registrar evidência real na execução.
 - CHG-004: Paridade deve comparar capacidades autorizadas Streamlit/React, incluindo login local, logout/sessões e limitação de autoria individual (AUTH-L07). Aprovação do proprietário continua necessária; nenhuma remoção Streamlit autorizada.
 - CHG-005: Comprovar que a plataforma WEB substitui controles externos de cadastro e upload CSV, mantendo CSV exclusivamente como exportação.
+- CHG-006: Comprovar a experiência de uso unificada em 3 eixos e o fluxo direto de sessões (REQ-INT-004, REQ-INT-005, REQ-SESS-001, REQ-SESS-002, REQ-SESS-003) na matriz de transição operacional.
 
 ## M8 — CI, infraestrutura e preparação operacional
 
@@ -2722,9 +2724,64 @@ Verificações locais executadas nesta missão documental (`Python 3.12.3`, sem 
 - `git diff --check`: aprovado sem erros de whitespace ou formatação.
 - Conferência de escopo (`git status --short`): exclusivamente arquivos Markdown sob `docs/` (`10` documentos: `ADR-007` novo e `9` documentos canônicos atualizados); nenhum arquivo de código-fonte, migration SQL, configuração ou teste funcional alterado.
 
+### CHG-006 — Replanejamento operacional e simplificação estrutural em 3 eixos fundamentais e fluxo direto de avaliação
+
+- Data: `2026-11-08`.
+- Origem: instrução explícita do responsável pelo repositório / produto e infraestrutura para replanejar a arquitetura operacional e a experiência de uso da equipe (`CHG-006`), superando a sobrecarga cognitiva e a fragmentação em 8 abas independentes introduzidas em `CHG-005` e viabilizando a aplicação clínica direta e sem atrito no consultório.
+- Diagnóstico do produto:
+  1. O marco M5 concluiu com sucesso todas as capacidades funcionais unitárias (`WEB-017` a `WEB-020` e `WEB-047`), incluindo CRUDs de pacientes e avaliadores, catálogo de filtros combinados, métricas descritivas, gráficos interativos e exportação CSV multi-granularidade.
+  2. A distribuição dessas ferramentas em 8 módulos/abas isolados gerou, contudo, fricção operacional severa: para analisar dados, o pesquisador precisava alternar entre três abas reaplicando filtros; para aplicar uma avaliação presencial no consultório/laboratório, o operador precisava cadastrar o paciente em uma aba, navegar para outra para preparar o convite, copiar o link e executá-lo em janela externa.
+  3. Essa burocracia afasta a solução da agilidade do **Streamlit** (análise reativa em tela única) e da facilidade do **PsychoPy Runner** (diálogo direto de 1 formulário com início imediato no dispositivo).
+- Decisões arquiteturais ([ADR-008](arquitetura/ADR-008-simplificacao-estrutural-e-fluxo-direto-sessao.md)):
+  1. **Redução estrutural para 3 eixos fundamentais:**
+     - **Eixo 1: Resultados e Análise Unificada** (`REQ-INT-005`): unificação em tela única reativa de KPIs executivos, catálogo de filtros combinados (`REQ-REL-004`), visualizações gráficas descritivas (`REQ-REL-005`), tabela completa de tentativas e hub de exportação CSV multi-granularidade (`REQ-CSV-005`).
+     - **Eixo 2: Aplicação Direta / Nova Avaliação** (`REQ-SESS-001`, `REQ-SESS-002`): formulário unificado de 1 etapa (Participante + Visita + Projeto) com seleção imediata de modalidade: *"Iniciar Agora neste Dispositivo"* (aplicação presencial com isolamento seguro pós-teste) ou *"Gerar Link / QR Code"* (aplicação remota/assistida com QR Code dinâmico).
+     - **Eixo 3: Gestão Cadastral e Acessos**: área secundária de governança e retificação auditada (`relink`), fichas detalhadas e controle de contas locais.
+  2. **Orquestração relacional atômica e transparente** (`REQ-SESS-003`): backend e frontend coordenam a resolução de `web_patients`, `web_evaluators`, `web_project_participants`, `web_participant_visits`, `web_participant_sessions` e `web_invitations` em uma única transação, sem necessidade de múltiplos cadastros prévios manuais.
+  3. **Preservação científica e psicométrica estrita**: motor psicométrico jsPsych, estímulos com contorno branco `stroop-web-outline/1.0.0` (`CHG-003`), paleta de dez cores, ausência de precisão no HUD, tempos e gates temporais D5, persistência incremental (`ADR-005`), 12 métricas oficiais e CSV de 21 colunas permanecem 100% inalterados.
+- Requisitos impactados: criação de cinco novos requisitos sequenciais: `REQ-INT-004`, `REQ-INT-005`, `REQ-SESS-001`, `REQ-SESS-002` e `REQ-SESS-003`, totalizando `64` requisitos canônicos na matriz de rastreabilidade. Atualizados impactos em `REQ-AVA-001`, `REQ-AVA-002`, `REQ-AVA-005`, `REQ-REL-004`, `REQ-REL-005` e `REQ-UX-012`.
+- Tarefas e marcos impactados:
+  - M4 e M5: mantêm todos os entregáveis `CONCLUIDA` (6/6 e 5/5 aceitos); nenhuma tarefa é desmarcada. As capacidades já implementadas constituem os blocos construtores dos 3 eixos.
+  - M7: ficha `WEB-028` revisada para incluir a comprovação de paridade operacional e fluidez do novo fluxo frente ao Streamlit e ao PsychoPy Runner.
+  - Progresso global: preservado em **33/48 entregáveis aceitos (68,8%)**.
+- Documentos sincronizados: [Projeto Stroop Test.md](Projeto%20Stroop%20Test.md), [ARQUITETURA_WEB.md](ARQUITETURA_WEB.md), [ADR-008](arquitetura/ADR-008-simplificacao-estrutural-e-fluxo-direto-sessao.md), [REQUISITOS_E_RASTREABILIDADE.md](REQUISITOS_E_RASTREABILIDADE.md) e [REGISTRO_DE_ALTERACOES.md](REGISTRO_DE_ALTERACOES.md).
+
+### EV-CHG-006 — auditoria arquitetural, modelo mental Streamlit/PsychoPy e validação documental, 2026-11-08
+
+#### Matriz compacta de replanejamento funcional CHG-006
+
+| Dimensão da simplificação (`CHG-006`) | Arranjo anterior (`CHG-005`) | Novo arranjo consolidado (`ADR-008`) | Racional e benefício operacional | Requisitos vinculados | Tarefas / Marcos |
+|---|---|---|---|---|---|
+| **Arquitetura de informação da equipe** | 8 módulos dispersos em abas independentes | **3 eixos fundamentais**: Resultados e Análise Unificada; Aplicação Direta; Gestão Cadastral e Acessos | Elimina a sobrecarga cognitiva e alternância constante de contexto | `REQ-INT-004` | `M5` (`WEB-047`, `WEB-017`), `M7` (`WEB-028`) |
+| **Fluxo analítico e extração de dados** | Visão geral, Análises, Histórico e Exportações em abas separadas | **Tela única reativa estilo Streamlit**: KPIs + Filtros reativos + Gráficos + Tentativas + Exportação CSV sobre o mesmo recorte | Fluidez analítica imediata; filtros refletem simultaneamente em KPIs, gráficos e arquivos CSV | `REQ-INT-005`, `REQ-REL-004`, `REQ-REL-005`, `REQ-CSV-005` | `M5` (`WEB-017`, `WEB-019`, `WEB-020`), `M7` (`WEB-028`) |
+| **Preparação e início de avaliação** | Cadastramento prévio obrigatório de paciente, seleção de avaliador e emissão de link em múltiplas etapas | **Formulário de 1 etapa estilo PsychoPy Runner**: Participante + Visita + Projeto em tela limpa com pré-seleção inteligente | Início de teste clínico em menos de 10 segundos no consultório | `REQ-SESS-001`, `REQ-AVA-005` | `M4` (`WEB-046`), `M7` (`WEB-028`) |
+| **Modalidades de aplicação** | Apenas geração de convite por token com URL copiada | **Modalidades duais imediatas**: "Iniciar Agora neste Dispositivo" (presencial) vs "Gerar Link / QR Code" (remoto/assistido) | Atendimento presencial sem fricção com isolamento seguro pós-teste; QR Code dinâmico para smartphones/tablets | `REQ-SESS-002`, `REQ-AVA-001` | `M4` (`WEB-046`, `WEB-013`, `WEB-015`), `M7` (`WEB-028`) |
+| **Orquestração relacional de dados** | Criação manual sequencial de registros nas tabelas relacionais | **Orquestração atômica transparente no backend/frontend**: resolução/criação automática de paciente, visita, convite e sessão em 1 transação | Preserva integralmente o PostgreSQL sem sobrecarregar o operador com passos intermediários | `REQ-SESS-003`, `REQ-PAR-004`, `REQ-AVA-004` | `M4` (`WEB-045`, `WEB-046`), `M7` (`WEB-027`, `WEB-028`) |
+| **Rigor científico e psicométrico** | jsPsych, contorno branco, tempos D5, 12 métricas, persistência incremental | **100% inalterado e preservado**: motor jsPsych, estímulos, HUD, D5, 12 métricas, ADR-005 e CSV de 21 colunas intactos | Garantia de validade metodológica e paridade experimental sem regressão | `REQ-EXP-001`..`003`, `REQ-MET-001`..`003`, `REQ-INT-001`..`003`, `REQ-CSV-001` | `M2`, `M3`, `M4`, `M5`, `M9` |
+
+#### Validação e aceite documental de CHG-006 — 2026-11-08
+
+Verificações locais executadas nesta missão documental (`Python 3.12.3`, sem instalação de pacotes):
+
+- `python3 scripts/verify_web_docs.py`: aprovado; **11 marcos, 48 tarefas, 64 requisitos/matriz, 13 riscos, cinco decisões, 33 aceitos, 88 documentos, 671 links locais e 83 âncoras**, dependências sem ciclos e IDs preservados.
+- `python3 -m unittest tests.test_verify_web_docs -v`: **7/7 aprovados**, sem skips.
+- `python3 scripts/verify_web_ci.py sources`: aprovado (`Secrets: 420 fontes versionadas verificadas; dados/historico fora do escopo`).
+- `git diff --check`: aprovado sem erros de whitespace ou formatação.
+- Conferência de escopo (`git status --short`): exclusivamente arquivos Markdown sob `docs/` (`ADR-008` novo e documentos canônicos atualizados); nenhum arquivo de código-fonte, migration SQL, configuração ou teste funcional alterado.
+
 ## Retomada
 
-### Retomada vigente — conclusão do marco M5 e exportações CSV (WEB-020), 2026-11-08
+### Retomada vigente — replanejamento operacional e simplificação estrutural (CHG-006), 2026-11-08
+
+Replanejamento documental **CHG-006** concluído e validado em escopo estritamente documental. Foram integrados ao planejamento canônico: a consolidação da interface profissional em **3 eixos fundamentais** ([ADR-008](arquitetura/ADR-008-simplificacao-estrutural-e-fluxo-direto-sessao.md)) inspirados no modelo mental do Streamlit (Resultados e Análise Unificada; Aplicação Direta / Nova Avaliação; Gestão Cadastral e Acessos), o formulário sem atrito em etapa única estilo PsychoPy Runner com modalidades duais ("Iniciar Agora neste Dispositivo" presencial e "Gerar Link / QR Code" remoto), a orquestração relacional atômica e transparente (`REQ-SESS-003`) e a preservação metodológica/psicométrica absoluta do motor jsPsych e das 12 métricas oficiais.
+
+Progresso global do projeto: **33/48 entregáveis aceitos (68,8%)**, 15 sem aceite:
+marco **M5 integralmente concluído com 5/5 aceitos**, e escopo de transição de **M7** (`WEB-028`) alinhado à paridade de experiência de uso dos 3 eixos.
+`WEB-031` permanece **BLOQUEADA** aguardando definição de destino externo.
+
+Próxima ação exata: obter aprovação do responsável pelo repositório sobre as decisões da CHG-006 antes de iniciar qualquer implementação de código; com autorização, iniciar o marco **M7 (Migração, paridade e retirada do Streamlit)** ou os refinamentos operacionais correspondentes.
+
+### Retomada anterior — conclusão do marco M5 e exportações CSV (WEB-020), 2026-11-08
 
 Marco vigente **M5 integralmente concluído com 5 de 5 entregáveis aceitos**
 (`WEB-017`, `WEB-018`, `WEB-047`, `WEB-019` e `WEB-020` **CONCLUIDAS**).
