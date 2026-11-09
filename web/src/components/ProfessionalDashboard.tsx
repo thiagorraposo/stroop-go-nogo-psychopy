@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ProfessionalProfile } from '../api/client'
 import { SessionInvitation } from './SessionInvitation'
-import { CsvImportPanel } from './CsvImportPanel'
 import { ResearchFilters } from './ResearchFilters'
 import { ResultsTable } from './ResultsTable'
 import { ResearchVisualizations, GenericInstrumentResults } from './ResearchVisualizations'
@@ -596,15 +595,6 @@ export function ProfessionalDashboard({
           {projects.length > 0 && (
             <>
               {renderProjectSelector()}
-
-              {/* Importação CSV mantida durante a transição M5 até M7 */}
-              {currentProject?.active && profile.role !== 'consulta' && (
-                <CsvImportPanel
-                  project={currentProject}
-                  profile={profile}
-                  onImported={() => setRevision(value => value + 1)}
-                />
-              )}
 
               {/* Preparação rápida de convite integrada na visão geral */}
               {currentProject?.active && profile.role !== 'consulta' && (

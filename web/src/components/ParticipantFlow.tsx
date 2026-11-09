@@ -65,9 +65,18 @@ export function ParticipantFlow({ onBack }: { onBack: () => void }) {
 
   const busy = view.phase === 'invite' && view.busy
   useEffect(() => {
-    if (view.phase === 'invite' && !busy) codeInput.current?.focus({ preventScroll: true })
-    else if (closed || view.phase !== 'preparing' && view.phase !== 'result') panel.current?.focus({ preventScroll: true })
-  }, [view.phase, busy, closed])
+    if (view.phase === 'invite' && !busy) {
+      const params = new URLSearchParams(window.location.search)
+      const urlCode = params.get('convite')
+      if (urlCode && /^[A-Za-z0-9_-]{32,128}$/.test(urlCode)) {
+        void run.redeem(urlCode)
+      } else {
+        codeInput.current?.focus({ preventScroll: true })
+      }
+    } else if (closed || view.phase !== 'preparing' && view.phase !== 'result') {
+      panel.current?.focus({ preventScroll: true })
+    }
+  }, [view.phase, busy, closed, run])
 
   function redeem(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()

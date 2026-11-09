@@ -47,7 +47,11 @@ def execute(value):
             writer = csv.DictWriter(output, fieldnames=list(rows[0])); writer.writeheader(); writer.writerows(rows)
         import_csv(path, database)
     token, _ = fixture_session(subject)
-    return {'cookie_name': PROFESSIONAL_COOKIE, 'token': token, 'project_id': str(project_id),
+    from api.auth import _csrf_token
+    from api.config import APIConfig
+    from common import environment
+    csrf = _csrf_token(APIConfig.from_env(environment()), token)
+    return {'cookie_name': PROFESSIONAL_COOKIE, 'token': token, 'csrf': csrf, 'project_id': str(project_id),
             'subject': subject, 'assessment_id': assessment_id,
             'evaluator_id': opaque_user_id(ISSUER, subject),
             'username': f'synthetic-{UUID(subject).hex}', 'password': PASSWORD}

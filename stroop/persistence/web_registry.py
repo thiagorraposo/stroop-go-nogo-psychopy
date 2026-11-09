@@ -1287,6 +1287,214 @@ def relink_invitation(
         raise PersistenceError from exc
 
 
+def link_legacy_entity(
+    database_url: str,
+    *,
+    entity_type: str,
+    legacy_participant_uuid: UUID | None = None,
+    legacy_evaluator_label: str | None = None,
+    patient_id: UUID | None = None,
+    evaluator_uuid: UUID | None = None,
+    reason_code: str,
+    issuer: str,
+    subject: str,
+) -> dict:
+    if entity_type not in ("patient", "evaluator"):
+        raise InvalidRegistryDataError("entity_type deve ser 'patient' ou 'evaluator'.")
+    if not isinstance(reason_code, str) or not 1 <= len(reason_code.strip()) <= 120:
+        raise InvalidRegistryDataError("reason_code obrigatorio (1 a 120 caracteres).")
+
+    with psycopg.connect(database_url, row_factory=dict_row) as connection:
+        user = connection.execute(
+            "SELECT role, active FROM app_users WHERE issuer = %s AND subject = %s",
+            (issuer, subject),
+        ).fetchone()
+        if user is None or not user["active"] or user["role"] != "administracao":
+            raise ForbiddenRegistryError("Apenas administradores podem vincular entidades legadas.")
+
+        link_id = uuid4()
+        if entity_type == "patient":
+            if legacy_participant_uuid is None or patient_id is None:
+                raise InvalidRegistryDataError("legacy_participant_uuid e patient_id sao obrigatorios.")
+            if legacy_evaluator_label is not None or evaluator_uuid is not None:
+                raise InvalidRegistryDataError("Campos de avaliador nao permitidos para vinculo de paciente.")
+
+            part = connection.execute(
+                "SELECT participant_uuid, project_id, pseudonym FROM web_project_participants WHERE participant_uuid = %s",
+                (legacy_participant_uuid,),
+            ).fetchone()
+            if part is None:
+                raise MissingRegistryError("Participante legado nao encontrado.")
+
+            pat = connection.execute(
+                "SELECT id, participant_code, active FROM web_patients WHERE id = %s",
+                (patient_id,),
+            ).fetchone()
+            if pat is None:
+                raise MissingRegistryError("Paciente central nao encontrado.")
+            if not pat["active"]:
+                raise InvalidRegistryDataError("Paciente inativo nao pode receber vinculo.")
+
+            connection.execute(
+                """INSERT INTO web_legacy_entity_links (
+                       link_id, entity_type, legacy_participant_uuid, patient_id,
+                       reason_code, linked_by_issuer, linked_by_subject, active
+                   ) VALUES (%s, 'patient', %s, %s, %s, %s, %s, TRUE)""",
+                (link_id, legacy_participant_uuid, patient_id, reason_code.strip(), issuer, subject),
+            )
+            connection.execute(
+                "UPDATE web_project_participants SET patient_id = %s WHERE participant_uuid = %s",
+                (patient_id, legacy_participant_uuid),
+            )
+            connection.execute(
+                """INSERT INTO web_registry_audit_events (
+                       entity_type, entity_id, action, actor_issuer, actor_subject, reason_code
+                   ) VALUES ('patient', %s, 'relink', %s, %s, %s)""",
+                (patient_id, issuer, subject, reason_code.strip()),
+            )
+
+            _audit_auth(connection, issuer, subject, "manage_patients")
+            return {
+                "link_id": str(link_id),
+                "entity_type": "patient",
+                "legacy_participant_uuid": str(legacy_participant_uuid),
+                "patient_id": str(patient_id),
+                "reason_code": reason_code.strip(),
+                "active": True,
+            }
+
+        else:  # evaluator
+            if legacy_evaluator_label is None or not legacy_evaluator_label.strip() or evaluator_uuid is None:
+                raise InvalidRegistryDataError("legacy_evaluator_label e evaluator_uuid sao obrigatorios.")
+            if legacy_participant_uuid is not None or patient_id is not None:
+                raise InvalidRegistryDataError("Campos de paciente nao permitidos para vinculo de avaliador.")
+
+            ev = connection.execute(
+                "SELECT id, evaluator_code, active FROM web_evaluators WHERE id = %s",
+                (evaluator_uuid,),
+            ).fetchone()
+            if ev is None:
+                raise MissingRegistryError("Avaliador central nao encontrado.")
+            if not ev["active"]:
+                raise InvalidRegistryDataError("Avaliador inativo nao pode receber vinculo.")
+
+            connection.execute(
+                """INSERT INTO web_legacy_entity_links (
+                       link_id, entity_type, legacy_evaluator_label, evaluator_uuid,
+                       reason_code, linked_by_issuer, linked_by_subject, active
+                   ) VALUES (%s, 'evaluator', %s, %s, %s, %s, %s, TRUE)""",
+                (link_id, legacy_evaluator_label.strip(), evaluator_uuid, reason_code.strip(), issuer, subject),
+            )
+            connection.execute(
+                """INSERT INTO web_registry_audit_events (
+                       entity_type, entity_id, action, actor_issuer, actor_subject, reason_code
+                   ) VALUES ('evaluator', %s, 'relink', %s, %s, %s)""",
+                (evaluator_uuid, issuer, subject, reason_code.strip()),
+            )
+
+            _audit_auth(connection, issuer, subject, "manage_patients")
+            return {
+                "link_id": str(link_id),
+                "entity_type": "evaluator",
+                "legacy_evaluator_label": legacy_evaluator_label.strip(),
+                "evaluator_uuid": str(evaluator_uuid),
+                "reason_code": reason_code.strip(),
+                "active": True,
+            }
+
+
+def deactivate_legacy_entity_link(
+    database_url: str,
+    *,
+    link_id: UUID,
+    reason_code: str,
+    issuer: str,
+    subject: str,
+) -> dict:
+    if not isinstance(reason_code, str) or not 1 <= len(reason_code.strip()) <= 120:
+        raise InvalidRegistryDataError("reason_code obrigatorio (1 a 120 caracteres).")
+
+    with psycopg.connect(database_url, row_factory=dict_row) as connection:
+        user = connection.execute(
+            "SELECT role, active FROM app_users WHERE issuer = %s AND subject = %s",
+            (issuer, subject),
+        ).fetchone()
+        if user is None or not user["active"] or user["role"] != "administracao":
+            raise ForbiddenRegistryError("Apenas administradores podem desativar vinculos legados.")
+
+        link = connection.execute(
+            "SELECT link_id, entity_type, legacy_participant_uuid, legacy_evaluator_label, patient_id, evaluator_uuid, active "
+            "FROM web_legacy_entity_links WHERE link_id = %s FOR UPDATE",
+            (link_id,),
+        ).fetchone()
+        if link is None:
+            raise MissingRegistryError("Vinculo legado nao encontrado.")
+
+        connection.execute(
+            "UPDATE web_legacy_entity_links SET active = FALSE WHERE link_id = %s",
+            (link_id,),
+        )
+
+        if link["entity_type"] == "patient" and link["legacy_participant_uuid"] is not None:
+            connection.execute(
+                "UPDATE web_project_participants SET patient_id = NULL WHERE participant_uuid = %s",
+                (link["legacy_participant_uuid"],),
+            )
+            entity_id = link["patient_id"]
+        else:
+            entity_id = link["evaluator_uuid"]
+
+        connection.execute(
+            """INSERT INTO web_registry_audit_events (
+                   entity_type, entity_id, action, actor_issuer, actor_subject, reason_code
+               ) VALUES (%s, %s, 'deactivate', %s, %s, %s)""",
+            (link["entity_type"], entity_id, issuer, subject, reason_code.strip()),
+        )
+
+        _audit_auth(connection, issuer, subject, "manage_patients")
+        return {
+            "link_id": str(link_id),
+            "deactivated": True,
+            "active": False,
+        }
+
+
+def list_legacy_entity_links(
+    database_url: str,
+    *,
+    issuer: str,
+    subject: str,
+    entity_type: str | None = None,
+    active_only: bool = True,
+) -> list[dict]:
+    with psycopg.connect(database_url, row_factory=dict_row) as connection:
+        user = connection.execute(
+            "SELECT role, active FROM app_users WHERE issuer = %s AND subject = %s",
+            (issuer, subject),
+        ).fetchone()
+        if user is None or not user["active"] or user["role"] not in ("administracao", "consulta"):
+            raise ForbiddenRegistryError
+
+        clauses = []
+        params = []
+        if active_only:
+            clauses.append("active = TRUE")
+        if entity_type is not None:
+            clauses.append("entity_type = %s")
+            params.append(entity_type)
+
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        rows = connection.execute(
+            f"""SELECT link_id, entity_type, legacy_participant_uuid, legacy_evaluator_label,
+                       patient_id, evaluator_uuid, reason_code, linked_by_issuer, linked_by_subject,
+                       to_char(linked_at, 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') AS linked_at, active
+                FROM web_legacy_entity_links {where}
+                ORDER BY linked_at DESC""",
+            tuple(params),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
 __all__ = [
     "DuplicateCandidateError",
     "ForbiddenRegistryError",
@@ -1294,10 +1502,13 @@ __all__ = [
     "PersistenceError",
     "create_evaluator",
     "create_patient",
+    "deactivate_legacy_entity_link",
     "find_duplicate_patients",
     "get_evaluator",
     "get_patient",
+    "link_legacy_entity",
     "list_evaluators",
+    "list_legacy_entity_links",
     "list_patients",
     "relink_assessment",
     "relink_invitation",

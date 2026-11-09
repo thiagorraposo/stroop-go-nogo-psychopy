@@ -50,6 +50,22 @@ class WebCsvImportTests(unittest.TestCase):
         self.path = f'/api/v1/projects/{self.h.project_id}/imports'
         self.assessments_path = f'/api/v1/projects/{self.h.project_id}/assessments'
 
+    def test_modo_produto_bloqueia_rotas_de_importacao_csv_com_410_gone(self):
+        """REQ-CSV-004 / WEB-025: rotas de upload CSV sao bloqueadas no modo produto."""
+        op_id = uuid4()
+        content, _ = self.csv_bytes()
+        response = self.h.importer.post(
+            f'{self.path}/{op_id}',
+            content=content,
+            headers={'Content-Type': 'text/csv; charset=utf-8'}
+        )
+        self.assertEqual(response.status_code, 410, response.text)
+        self.assertEqual(response.json()['error']['code'], 'csv_import_disabled')
+
+        status_response = self.h.importer.get(f'{self.path}/{op_id}')
+        self.assertEqual(status_response.status_code, 410, status_response.text)
+        self.assertEqual(status_response.json()['error']['code'], 'csv_import_disabled')
+
     @staticmethod
     def csv_bytes(assessment_id=None, participant_name='NAO_COLETADO', initials=''):
         with (ROOT / 'tests/fixtures/csv/valido_minimo.csv').open(encoding='utf-8', newline='') as source:
@@ -66,6 +82,7 @@ class WebCsvImportTests(unittest.TestCase):
         return output.getvalue().encode('utf-8'), assessment_id
 
     def upload(self, client, content, operation_id=None):
+        self.h.app.state.config = replace(self.h.app.state.config, enable_legacy_csv_import=True)
         operation_id = operation_id or uuid4()
         response = client.post(f'{self.path}/{operation_id}', content=content,
                                headers={'Content-Type': 'text/csv; charset=utf-8'})

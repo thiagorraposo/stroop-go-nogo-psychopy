@@ -38,6 +38,8 @@ def _database_error() -> APIError:
 async def upload_csv(project_id: UUID, operation_id: UUID, request: Request):
     _reject_query(request)
     actor = _professional_write(request, 'import_csv')
+    if not getattr(request.app.state.config, 'enable_legacy_csv_import', False):
+        raise APIError('csv_import_disabled')
     content_types = request.headers.getlist('content-type')
     if len(content_types) != 1 or not CSV_MEDIA_TYPE.fullmatch(content_types[0]):
         raise APIError('unsupported_media_type')
@@ -70,6 +72,8 @@ async def get_import_status(project_id: UUID, operation_id: UUID, request: Reque
     await request.body()  # Empty-body invariant and request-boundary replay.
     _reject_query(request)
     actor = _professional_read(request, 'import_csv')
+    if not getattr(request.app.state.config, 'enable_legacy_csv_import', False):
+        raise APIError('csv_import_disabled')
     try:
         event = application.status(request.app.state.config.database_url,
                                    operation_id, project_id, actor)

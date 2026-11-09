@@ -4,6 +4,21 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-08 — Conclusão integral do marco M7: Integração, compatibilidade histórica e transição (M7 / WEB-025 a WEB-028)
+
+- **WEB-025 (Retirada de upload CSV no produto):**
+  - Retirado `CsvImportPanel.tsx` e comandos de importação no painel da equipe (`ProfessionalDashboard.tsx`), garantindo que dados operacionais entrem exclusivamente pelo fluxo direto da plataforma.
+  - Bloqueados os endpoints `POST/GET /api/v1/projects/{project_id}/imports/{operation_id}` retornando `410 Gone` no modo produto (`csv_import_disabled`), preservando validadores e ingestão isolados para CLI e testes sintéticos (`EXP-CSV-01`).
+- **WEB-026 (Roundtrip e compatibilidade de exportação):**
+  - Comprovado por fixtures sintéticas o roundtrip do CSV 21 colunas canônico (`stroop_21_colunas` / `serialize_assessment_csv`) com o validador de `scripts/analisar_stroop.py` (0 erros de validação, 12 métricas oficiais calculadas) e com o importador SQLite oficial (`import_csv`), além da persistência íntegra das 5 granularidades avançadas em SQLite (`tests/test_web_multi_export.py`).
+- **WEB-027 (Vínculo explícito e associação de legados):**
+  - Implementado em `stroop/persistence/web_registry.py` e rotas em `api/administration.py` o procedimento administrativo auditado para associação de registros legados (`link_legacy_entity`, `deactivate_legacy_entity_link`, `list_legacy_entity_links`) com `web_legacy_entity_links` e `web_registry_audit_events`.
+  - Comprovado por testes reais no PostgreSQL que a reconciliação é reversível, exige `reason_code` e proíbe terminantemente fusão automática por coincidência textual ou de códigos.
+- **WEB-028 (Revisão de cobertura e paridade Streamlit/PsychoPy):**
+  - Consolidada a matriz de paridade em `docs/operacao/TRANSICAO_WEB.md` e a simplificação em 3 eixos operacionais (`CHG-006` / [ADR-008](arquitetura/ADR-008-simplificacao-estrutural-e-fluxo-direto-sessao.md)): aplicação direta em 1 etapa (presencial e remota), análise reativa em tela única (estilo Streamlit) e exportação multi-granularidade.
+  - Assegurada a preservação física total de launchers (`abrir_dashboard.sh/bat`), CLIs e código Streamlit sem remoção física.
+- Marco M7 integralmente concluído com 4 de 4 entregáveis aceitos (`EV-M7-025..028`). Progresso global avança para 37/48 entregáveis aceitos (77,1%). Próximo marco: M8.
+
 ## 2026-11-08 — Replanejamento operacional, simplificação em 3 eixos e fluxo direto de avaliação (CHG-006 / ADR-008)
 
 - Executada a missão documental de replanejamento **CHG-006** ([ADR-008](arquitetura/ADR-008-simplificacao-estrutural-e-fluxo-direto-sessao.md)):

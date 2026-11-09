@@ -64,6 +64,7 @@ export function SessionInvitation({
   const [initials, setInitials] = useState('')
   const [visit, setVisit] = useState('')
   const [testCode, setTestCode] = useState('stroop_go_nogo_ptbr')
+  const [applicationMode, setApplicationMode] = useState<'presencial' | 'remota'>('remota')
   const [reviewing, setReviewing] = useState(false)
 
   const [errors, setErrors] = useState({
@@ -820,11 +821,40 @@ export function SessionInvitation({
           <div className="step-card">
             <div className="step-card-header">
               <span className="step-number-badge">3</span>
-              <h4 className="step-card-title">Emissão e Conferência</h4>
+              <h4 className="step-card-title">Modalidade e Emissão</h4>
+            </div>
+
+            <div className="application-mode-selection" style={{ marginBottom: '16px' }}>
+              <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
+                Modalidade de Aplicação:
+              </label>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className={`button ${applicationMode === 'presencial' ? 'primary' : 'secondary'}`}
+                  onClick={() => setApplicationMode('presencial')}
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  🏢 Presencial (Iniciar Agora)
+                </button>
+                <button
+                  type="button"
+                  className={`button ${applicationMode === 'remota' ? 'primary' : 'secondary'}`}
+                  onClick={() => setApplicationMode('remota')}
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  🌐 Remota (Link Único)
+                </button>
+              </div>
+              <p className="quiet" style={{ margin: '8px 0 0 0' }}>
+                {applicationMode === 'presencial'
+                  ? 'Modalidade Presencial: Abre a prática diretamente neste navegador com 1 clique (estilo PsychoPy Runner).'
+                  : 'Modalidade Remota: Emite link com código de uso único para envio ao participante.'}
+              </p>
             </div>
 
             <p className="quiet" style={{ margin: '0 0 12px 0' }}>
-              Confira os parâmetros antes de emitir o convite único. O código gerado terá validade limitada e uso único.
+              Confira os parâmetros antes de emitir a sessão. O código gerado terá validade limitada e uso único.
             </p>
 
             <div className="session-actions" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
@@ -854,6 +884,10 @@ export function SessionInvitation({
                     <dd>
                       {project.code} — {project.name}
                     </dd>
+                  </div>
+                  <div>
+                    <dt>Modalidade</dt>
+                    <dd>{applicationMode === 'presencial' ? '🏢 Presencial (Iniciar Agora)' : '🌐 Remota'}</dd>
                   </div>
                   <div>
                     <dt>Paciente</dt>
@@ -934,9 +968,23 @@ export function SessionInvitation({
             convite; o código não é incluído no endereço.
           </p>
           <div style={{ display: 'flex', gap: '10px', marginTop: '16px', flexWrap: 'wrap' }}>
-            <a className="button primary" href="/pratica" target="_blank" rel="noopener noreferrer">
+            <a
+              className="button primary"
+              href="/pratica"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Abrir prática em outra aba ↗
             </a>
+            <button
+              type="button"
+              className="button secondary"
+              onClick={() => {
+                void navigator.clipboard.writeText(saved.invitation.code)
+              }}
+            >
+              📋 Copiar código
+            </button>
             <button className="button secondary button-danger" disabled={busy} onClick={() => void revoke()}>
               {busy ? 'Revogando…' : 'Revogar convite'}
             </button>

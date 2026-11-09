@@ -16,24 +16,18 @@ ficam no [registro da VPS](DEPLOY_WEB_VPS.md), na
 Este guia nao concede homologacao, aceite de implantacao ou liberacao para
 dados reais por sua propria existencia.
 
-## Matriz de recursos e continuidade
+## Matriz de recursos, continuidade e paridade operacional (CHG-006 / ADR-008)
 
-| Necessidade | Caminho WEB implementado | Continuidade e limite |
-|---|---|---|
-| Execucao Stroop Go/No-Go | Tutorial, convite, teclado, pratica e principal no navegador | PsychoPy Builder permanece disponivel; motor WEB tem protocolo e validacao proprios |
-| Preparacao de coleta | Profissional vinculado informa projeto, pseudonimo e visita; emissao/revogacao de convite | Sem conta Google de participante; nao importar identidade civil para a WEB |
-| Confirmacao de resultado | Recibo do servidor, recuperacao e reenvio do mesmo resultado mantido em RAM | Sem retomada de principal, resultado parcial ou armazenamento offline; fechar pagina pode perder envio pendente |
-| Consulta e filtros | Projetos autorizados, periodo, participantes por codigo, visitas, avaliadores tecnicos, versoes, plataformas e instrumento | Consulta completa antes de agregar; restringir filtros quando atingir limites apresentados pela interface |
-| Analise descritiva | Cards Stroop, tabela, detalhe, datas, precisao, RT, erros e evolucao por projeto+participante | Instrumentos separados; sem diagnostico, norma ou comparacao psicometrica |
-| CSV oficial Stroop | Download individual autorizado no detalhe | Tentativas no contrato oficial; nome mascarado/iniciais vazias na WEB; arquivo local original permanece intacto |
-| CSV agregado | Exportacao da visao filtrada, uma linha por avaliacao | Esquema por instrumento; nao serve de entrada ao importador de tentativas |
-| Importacao CSV | Upload autenticado, minimizacao no navegador, validacao e auditoria por operacao | Original fica local; duplicata rejeitada sem sobrescrever; CLIs e importacao local permanecem disponiveis |
-| Historico no mesmo PostgreSQL | Consulta somente apos mapa legado explicitamente autorizado | Nome de projeto coincidente nao concede acesso; nao ha migracao automatica de SQLite ou de outro banco |
-| Historico fora do banco WEB | Importacao explicita de CSV oficial permitido para projeto escolhido | Sem sincronizacao automatica entre bancos; operador deve verificar proveniencia e duplicatas antes de importar |
-| Contas e permissoes | Administracao de identidade Google verificada, perfil, estado, projetos e vinculos | Vinculo e necessario inclusive para admin consultar dados; o ultimo admin ativo e protegido |
-| Dados identificaveis legados | Nomes e iniciais sao mascarados na consulta/exportacao WEB | Campos locais nao sao removidos do CSV ou banco original; nao existe filtro WEB por nome |
-| Outros instrumentos registrados | Consulta de metricas e exportacao agregada; demonstracao sintetica tem visualizacoes proprias | Nao cria tarefa experimental adicional ou interpretacao clinica; nao mistura formulas Stroop com outros instrumentos |
-| Operacao local | Launchers, importadores, diagnostico e Streamlit preservados | Continuam seguindo o backlog e procedimentos legados; coexistencia nao implica copia automatica de novas coletas WEB |
+A transição operacional consolida o fluxo em **três eixos integrados**, superando a fragmentação histórica entre PsychoPy Runner e Dashboard Streamlit:
+
+| Eixo / Necessidade | Caminho WEB implementado (CHG-005 / CHG-006) | Equivalente Legado (PsychoPy / Streamlit) | Continuidade e salvaguardas |
+|---|---|---|---|
+| **Eixo 1: Aplicação direta em 1 etapa** | Preparação rápida com seleção de paciente e avaliador cadastrados; modalidades Presencial ("Iniciar Agora") e Remota (link único de 30 min) | PsychoPy Runner (`stroop_go_nogo_ptbr_lastrun.py`) e formulário manual do Builder | Launchers locais e scripts preservados; motor WEB jsPsych com contorno branco `stroop-web-outline/1.0.0` e tempos D5 |
+| **Eixo 2: Análise reativa em tela única** | Visão geral integrada com KPIs, distribuição de respostas, precisão por visita, filtros reativos combinados e detalhe de tentativas | Dashboard Streamlit (`dashboard/app.py`, `abrir_dashboard.sh/bat`) | Streamlit e CLIs preservados sem exclusão física; paridade analítica descritiva e 12 métricas oficiais |
+| **Eixo 3: Exportação avançada e intercâmbio** | Exportação CSV multi-granularidade (`pacientes`, `avaliacoes`, `tentativas`, `metricas`, `stroop_21_colunas`) com proteção contra formula injection | Exportações locais avulsas de CSV em disco | CSV consolidado exclusivamente como ferramenta de exportação do usuário; upload CSV desativado no produto |
+| **Retirada de upload CSV no produto (WEB-025)** | Endpoints de upload bloqueados no modo produto (`POST/GET /imports` retornando `410 Gone`); dados entram diretamente pelo fluxo WEB | Upload de CSV no painel Streamlit ou na interface prévia | Módulos `stroop/ingestion/` e validadores preservados isoladamente para testes sintéticos e CLIs internos |
+| **Compatibilidade e roundtrip (WEB-026)** | CSV 21 colunas canônico e granularidades avançadas compatíveis em roundtrip com `analisar_stroop.py` e `import_sqlite.py` | Leitura manual de planilhas e scripts soltos | Comprovado por fixtures sintéticas sem leitura de coletas reais |
+| **Vínculo explícito de legados (WEB-027)** | Procedimento administrativo auditado (`web_legacy_entity_links` e `web_registry_audit_events`) para associar registros legados a pacientes e avaliadores | De-para manual em planilhas externas | Proibida qualquer fusão ou reconciliação automática por coincidência textual ou de códigos |
 
 Uso pela equipe e participantes no [guia do usuario](GUIA_DO_USUARIO.md).
 Contratos canonicos: [HTTP](../desenvolvimento/CONTRATO_API_WEB.md),

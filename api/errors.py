@@ -27,6 +27,7 @@ ERRORS = {
     ),
     "invitation_expired": (410, "Convite expirado."),
     "session_expired": (410, "Sessao expirada."),
+    "csv_import_disabled": (410, "Importacao CSV desativada no modo produto (REQ-CSV-004)."),
     "body_too_large": (413, "Corpo da requisicao excede o limite."),
     "unsupported_media_type": (415, "Tipo ou codificacao de conteudo nao suportado."),
     "invalid_request": (422, "Campos da requisicao invalidos."),
