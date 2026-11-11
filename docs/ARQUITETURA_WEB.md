@@ -283,3 +283,47 @@ A simplificação da UI não degrada a integridade do modelo relacional PostgreS
 
 - O motor experimental jsPsych (`web/src/experiment/`), o isolamento monotônico fora do React, a apresentação visual com contorno branco `stroop-web-outline/1.0.0` (`CHG-003`), a paleta de dez cores, o HUD sem precisão agregada e os gates temporais D5 permanecem 100% inalterados.
 - A persistência incremental (`ADR-005` / `WEB-007`), o worker dedicado, a atomicidade e as 12 métricas oficiais Stroop (com tratamento de ausência de RT em omissões) mantêm-se exatamente conforme validados nas etapas anteriores.
+
+## Consolidação profissional antes da candidata — CHG-007
+
+**Alvo planejado (2026-11-11)**, sem mudança de camadas ou recriação do sistema.
+As descrições “atual” e “a implementar” em seções históricas desta arquitetura
+são datadas; para o estado atual consultar exclusivamente o backlog. M6 já aceita
+login local; M4 aceita transporte incremental/cadastro; M5/M7 aceitam capacidades
+granulares. Isso não comprova o shell/fluxo integrado da ADR-008. CHG-005 descreve
+oito módulos anteriores; CHG-006 e seu complemento CHG-007 governam o alvo final.
+CI/PR/merge seguem workflow vigente, não as referências históricas a fluxo sem PR.
+
+React mantém shell de três eixos, componentes compartilhados e estado de consulta
+em `web/src/dashboard/`, consumido pelos painéis existentes de `components/` e
+clientes `api/`. Estado em RAM separa rascunho, aplicada normalizada, geração,
+paginação/detalhe e prévia de exportação. Não guardar resultados/nominais/tokens
+em storage, URL, histórico do browser ou cache persistente. Eventos de logout,
+revogação e contexto novo descartam resultados/requisições antigas.
+
+FastAPI valida transporte/schema fechado e autoriza; `stroop/application/`
+orquestra consulta/extração; `stroop/persistence/` aplica seleção/fingerprint e
+SQL autorizado em transação de leitura consistente; `stroop/domain/` mantém
+métricas e serializadores puros. A seleção de avaliações e suas tentativas é
+compartilhada por agregações, tabela e exportação; não manter filtros divergentes
+em routers/React. Dicionário de indicadores referencia definições oficiais Python.
+Reusar mecanismo de snapshots da consulta agregada como base, estendendo cobertura
+a todos os campos relevantes e prévia avançada; assinatura de metadata sozinha
+não prova igualdade do conjunto. Contrato único no HTTP; UX em UX_DECISIONS.
+
+20 projetos/5.000 avaliações são limites observados da implementação atual,
+não garantia de escala nem autorização para truncar. Futuro: filtrar/agregar no
+servidor e paginar detalhes; testar limites e recusar excedentes explicitamente
+até caminho maior aceito. Medir EXPLAIN/latência/memória com massa sintética antes
+de índices/cache. Cache opcional apenas efêmero por consulta, identidade/escopo,
+versão e fingerprint, descartado/reautorizado; sem serviço distribuído/filas novo.
+Nenhum aumento de teto por remover proteção sem ensaio de capacidade.
+
+Design system administrativo não compartilha lifecycle/DOM/tokens de estímulo
+com jsPsych; estilos sob escopo próprio evitam mudar contorno/HUD/timing. Marca
+Stroop Test Web refere-se ao produto, preservando instrumentos e contratos.
+Biblioteca UI/gráficos futura exige registro de necessidade, alternativas de
+reuso, licença, manutenção, peso medido no bundle e compatibilidade de teclado,
+Vitest/Playwright antes de adoção; nenhuma dependência instalada nesta missão.
+Preservar Streamlit/launchers/CLIs e migrations existentes. Runbooks M10 devem
+retratar a interface final aceita. DEC-03/04/05 e réplica externa continuam gates.

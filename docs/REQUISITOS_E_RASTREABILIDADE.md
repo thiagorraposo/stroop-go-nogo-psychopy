@@ -265,9 +265,11 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 - Justificativa: Agiliza a rotina clínica e investigativa, integrando o funil analítico e reduzindo a alternância de contexto do operador.
 - Prioridade: P0. Estado da especificação: **Confirmado** (CHG-006; ADR-008).
 - Aceite verificável: Interface da equipe organiza todas as capacidades operacionais nos 3 eixos, provê transições acessíveis e fluidas, garante controle de visibilidade conforme perfil e não interfere no isolamento do motor experimental jsPsych (INT-01).
-- Dependências: WEB-047, WEB-017 e pré-requisitos registrados no backlog.
+- Dependências: WEB-049; bases aceitas preservadas no backlog (CHG-007).
 - Restrições conhecidas: Acesso restrito a usuários autenticados da equipe; preservação dos componentes de design system já validados.
 - Origem: Missão de replanejamento documental do proprietário em 2026-11-08 (`CHG-006`).
+
+- Complemento CHG-007: Base WEB-047 e cobertura documental WEB-028 históricas; integração CHG-007 planejada. Aplicação de filtros explícita; URLs sem segredo; aceite/roteiros no contrato HTTP e UX7, sem SLA universal de 10 segundos.
 
 ### REQ-INT-005
 
@@ -275,9 +277,11 @@ sem nova cópia de fórmulas aqui. Modelo e método preservam suas fontes em sub
 - Justificativa: Garante paridade de fluidez e reatividade com o Streamlit, assegurando que o mesmo conjunto filtrado se reflita instantaneamente em métricas, gráficos e downloads.
 - Prioridade: P1. Estado da especificação: **Confirmado** (CHG-006; ADR-008).
 - Aceite verificável: Qualquer alteração nos filtros combinados (paciente, avaliador, visita, projeto, faixas de RT/precisão, condição Go/No-Go) atualiza de forma síncrona KPIs, gráficos, listagem de tentativas e o arquivo gerado pelo hub de exportação CSV, mantendo separação estrita de dados desidentificados vs nominais (DASH-01, EXP-CSV-01).
-- Dependências: WEB-017, WEB-019, WEB-020 e pré-requisitos registrados no backlog.
+- Dependências: WEB-052; bases aceitas preservadas no backlog (CHG-007).
 - Restrições conhecidas: Não exibir escores normativos, diagnósticos clínicos ou percentis não autorizados pelo protocolo científico.
 - Origem: Missão de replanejamento documental do proprietário em 2026-11-08 (`CHG-006`).
+
+- Complemento CHG-007: Base WEB-017/019/020 histórica; integração CHG-007 planejada. Aplicação de filtros explícita; URLs sem segredo; aceite/roteiros no contrato HTTP e UX7, sem SLA universal de 10 segundos.
 
 ## F. Cálculo das métricas
 
@@ -689,7 +693,7 @@ na revisão D3/D4 de 2026-11-05; DEC-04 não aprovada. Especificação visual de
 - Descrição: Sistema visual administrativo, usabilidade de cadastros/preparação e acessibilidade das áreas profissionais.
 - Justificativa: Garantir experiência profissional coesa, legível e acessível nos módulos de Pacientes, Avaliadores, Preparar avaliação, Dashboard, Resultados e Exportações sem interferir no motor experimental.
 - Prioridade: P1. Estado da especificação: **Confirmado** (CHG-005; ADR-007).
-- Aceite verificável: Hierarquia visual consistente entre os 8 módulos administrativos; tabelas pesquisáveis/paginadas com algarismos tabulares; formulários com validação em linha, prevenção de duplicidade e etapa de conferência; estados de loading/vazio/erro explícitos; contraste WCAG AA na área administrativa e navegação completa por teclado com foco visível; zero alteração no motor experimental jsPsych (DASH-01/E2E-FLOW-01).
+- Aceite verificável: Hierarquia histórica dos 8 módulos preservada como base; alvo de três eixos e componentes compartilhados da CHG-007 (REQ-UX-013..016); tabelas pesquisáveis/paginadas com algarismos tabulares; formulários com validação em linha, prevenção de duplicidade e etapa de conferência; estados de loading/vazio/erro explícitos; contraste WCAG AA na área administrativa e navegação completa por teclado com foco visível; zero alteração no motor experimental jsPsych (DASH-01/E2E-FLOW-01).
 - Dependências: WEB-047, WEB-046, WEB-019 e gates do marco no backlog.
 - Restrições conhecidas: Não alterar estímulos, paleta experimental, HUD, contorno branco ou tempos D5.
 - Origem: Missão de replanejamento funcional e UX do proprietário em 2026-11-07 (`CHG-005`, Seção 10); `UX_DECISIONS.md`.
@@ -703,9 +707,11 @@ na revisão D3/D4 de 2026-11-05; DEC-04 não aprovada. Especificação visual de
 - Justificativa: Reduz o tempo de preparação para menos de 10 segundos no consultório, eliminando a navegação obrigatória prévia por telas de cadastro de pacientes.
 - Prioridade: P0. Estado da especificação: **Confirmado** (CHG-006; ADR-008).
 - Aceite verificável: Formulário em etapa única aceita seleção com busca instantânea ou digitação de novo nome, preenche visita, seleciona projeto/avaliador responsável contextual e valida em tempo real sem redirecionamentos intermediários (PREP-02).
-- Dependências: WEB-046, WEB-045 e pré-requisitos registrados no backlog.
+- Dependências: WEB-054; bases aceitas preservadas no backlog (CHG-007).
 - Restrições conhecidas: Manter derivação determinística de iniciais e validação de nomes sem introduzir campos demográficos não autorizados.
 - Origem: Missão de replanejamento documental do proprietário em 2026-11-08 (`CHG-006`).
+
+- Complemento CHG-007: Preparação base WEB-046 aceita; fluxo unificado CHG-006/007 planejado. Aplicação de filtros explícita; URLs sem segredo; aceite/roteiros no contrato HTTP e UX7, sem SLA universal de 10 segundos.
 
 ### REQ-SESS-002
 
@@ -713,9 +719,11 @@ na revisão D3/D4 de 2026-11-05; DEC-04 não aprovada. Especificação visual de
 - Justificativa: Atende simultaneamente à aplicação clínica direta assistida no consultório/laboratório e à coleta remota ou em dispositivo secundário do participante.
 - Prioridade: P0. Estado da especificação: **Confirmado** (CHG-006; ADR-008).
 - Aceite verificável: Modo "Iniciar Agora" oculta o painel da equipe, abre imediatamente a execução experimental no mesmo navegador e, ao término/interrupção com recibo, bloqueia o retorno aos dados confidenciais de outros pacientes exigindo confirmação/credencial da equipe; modo "Gerar Link / QR Code" exibe URL de uso único com botão de cópia e renderiza QR Code dinâmico em alta definição para leitura ótica direta (FLOW-02).
-- Dependências: WEB-046, WEB-013, WEB-015 e pré-requisitos registrados no backlog.
+- Dependências: WEB-054; bases aceitas preservadas no backlog (CHG-007).
 - Restrições conhecidas: Preservar estritamente o motor jsPsych, a apresentação com contorno branco `stroop-web-outline/1.0.0` e os limites temporais D5.
 - Origem: Missão de replanejamento documental do proprietário em 2026-11-08 (`CHG-006`).
+
+- Complemento CHG-007: Convite WEB-013/016/046 aceito; modalidades ADR-008 planejadas. Aplicação de filtros explícita; URLs sem segredo; aceite/roteiros no contrato HTTP e UX7, sem SLA universal de 10 segundos.
 
 ### REQ-SESS-003
 
@@ -723,13 +731,129 @@ na revisão D3/D4 de 2026-11-05; DEC-04 não aprovada. Especificação visual de
 - Justificativa: Elimina a fragmentação do pipeline operacional sem perder a integridade relacional, a auditabilidade e o rigor do modelo de dados PostgreSQL.
 - Prioridade: P0. Estado da especificação: **Confirmado** (CHG-006; ADR-008).
 - Aceite verificável: Submissão do formulário unificado executa resolução idempotente ou criação transacional do paciente, assegura vínculo ao projeto, gera visita e emite convite assinado em uma única requisição HTTP atômica, retornando identificadores estáveis (`PAT-...`, `EVA-...`) e token de sessão (ORQ-01).
-- Dependências: WEB-045, WEB-046 e pré-requisitos registrados no backlog.
+- Dependências: WEB-054; bases aceitas preservadas no backlog (CHG-007).
 - Restrições conhecidas: Não permitir bypass de validações cadastrais de homônimos ou restrições de chave estrangeira no banco.
 - Origem: Missão de replanejamento documental do proprietário em 2026-11-08 (`CHG-006`).
+
+- Complemento CHG-007: Fundação WEB-045/046 aceita; operação atômica alvo planejada. Aplicação de filtros explícita; URLs sem segredo; aceite/roteiros no contrato HTTP e UX7, sem SLA universal de 10 segundos.
+
+## O. Consolidação profissional e integridade da consulta — CHG-007
+
+### REQ-UX-013
+
+- Descrição: Identidade pública Stroop Test Web. Marca coerente no shell, início, equipe, title/metadados e textos/documentação vigentes, preservando nomes científicos, IDs/versões e histórico.
+- Justificativa: Materializar experiência integrada e integridade da CHG-007 antes da candidata, reutilizando a plataforma existente.
+- Prioridade: P1. Estado da especificação: **Confirmado** (direção autorizada CHG-007, implementação PLANEJADA).
+- Aceite verificável: Inventário de ocorrências e testes de título/DOM comprovam substituição pública sem troca de test_code, instruções experimentais ou contratos.
+- Dependências: WEB-048 e dependências/gates da ficha no backlog.
+- Restrições conhecidas: D1–D6, domínio Python/CSV canônico e DEC-03/04/05 preservados; somente dados sintéticos na implementação técnica; nenhum deploy implícito.
+- Origem: Missão de replanejamento do proprietário em 2026-11-11; ADR-008 complementada; UX7 e contrato HTTP CHG-007.
+
+### REQ-UX-014
+
+- Descrição: Design system administrativo compartilhado. Tokens e catálogo de responsabilidades UX7-VIS em componentes reutilizáveis, sem estilos concorrentes por módulo ou dependência estética incidental.
+- Justificativa: Materializar experiência integrada e integridade da CHG-007 antes da candidata, reutilizando a plataforma existente.
+- Prioridade: P1. Estado da especificação: **Confirmado** (direção autorizada CHG-007, implementação PLANEJADA).
+- Aceite verificável: Estados de interação/feedback, tipografia/escala/containers e catálogo completo testados; erros recuperáveis preservam campos; estilos administrativos não mudam estímulos/HUD.
+- Dependências: WEB-048 e dependências/gates da ficha no backlog.
+- Restrições conhecidas: D1–D6, domínio Python/CSV canônico e DEC-03/04/05 preservados; somente dados sintéticos na implementação técnica; nenhum deploy implícito.
+- Origem: Missão de replanejamento do proprietário em 2026-11-11; ADR-008 complementada; UX7 e contrato HTTP CHG-007.
+
+### REQ-UX-015
+
+- Descrição: Sidebar responsiva dos três eixos. Navegação por objetivos ADR-008, desktop expandido/recolhido e drawer móvel, conta/logout previsíveis e contexto preservado.
+- Justificativa: Materializar experiência integrada e integridade da CHG-007 antes da candidata, reutilizando a plataforma existente.
+- Prioridade: P1. Estado da especificação: **Confirmado** (direção autorizada CHG-007, implementação PLANEJADA).
+- Aceite verificável: Três eixos autorizados no primeiro nível; keyboard/focus/voltar/avançar e logout/revogação não expõem dados; overview/histórico/análise/exportação são experiência única.
+- Dependências: WEB-049 e dependências/gates da ficha no backlog.
+- Restrições conhecidas: D1–D6, domínio Python/CSV canônico e DEC-03/04/05 preservados; somente dados sintéticos na implementação técnica; nenhum deploy implícito.
+- Origem: Missão de replanejamento do proprietário em 2026-11-11; ADR-008 complementada; UX7 e contrato HTTP CHG-007.
+
+### REQ-UX-016
+
+- Descrição: Acessibilidade AA e homologação responsiva profissional. WCAG 2.2 AA aplicável à área profissional completa, cinco larguras e zoom 200%, jornadas funcionais e estados reais.
+- Justificativa: Materializar experiência integrada e integridade da CHG-007 antes da candidata, reutilizando a plataforma existente.
+- Prioridade: P0. Estado da especificação: **Confirmado** (direção autorizada CHG-007, implementação PLANEJADA).
+- Aceite verificável: UX7-AA/J1/J2/J3 comprovadas com teclado, foco/leitor de tela, contraste, tabelas equivalentes e sem perda de conteúdo/rolagem global; nenhum aceite só por render/build.
+- Dependências: WEB-055 e dependências/gates da ficha no backlog.
+- Restrições conhecidas: D1–D6, domínio Python/CSV canônico e DEC-03/04/05 preservados; somente dados sintéticos na implementação técnica; nenhum deploy implícito.
+- Origem: Missão de replanejamento do proprietário em 2026-11-11; ADR-008 complementada; UX7 e contrato HTTP CHG-007.
+
+### REQ-REL-006
+
+- Descrição: Consulta aplicada compartilhada e concorrência segura. Um estado normalizado em RAM, rascunho/aplicada, Aplicar explícito, chips e contexto por geração para KPIs/gráficos/tabelas/detalhes/exportação.
+- Justificativa: Materializar experiência integrada e integridade da CHG-007 antes da candidata, reutilizando a plataforma existente.
+- Prioridade: P0. Estado da especificação: **Confirmado** (direção autorizada CHG-007, implementação PLANEJADA).
+- Aceite verificável: Filtro pendente é indicado e bloqueia download; resposta obsoleta/página falha/snapshot expirado/revogação/logout não publica dados no contexto novo; filtros REQ-REL-004 sem cópias independentes.
+- Dependências: WEB-050 e dependências/gates da ficha no backlog.
+- Restrições conhecidas: D1–D6, domínio Python/CSV canônico e DEC-03/04/05 preservados; somente dados sintéticos na implementação técnica; nenhum deploy implícito.
+- Origem: Missão de replanejamento do proprietário em 2026-11-11; ADR-008 complementada; UX7 e contrato HTTP CHG-007.
+
+### REQ-REL-007
+
+- Descrição: Dicionário de indicadores e integridade de agregação. Referenciar as 12 métricas Python e metadados de numerador/denominador/unidade/população/exclusões/nulos/agregação/fonte/versão, sem nova fórmula científica.
+- Justificativa: Materializar experiência integrada e integridade da CHG-007 antes da candidata, reutilizando a plataforma existente.
+- Prioridade: P0. Estado da especificação: **Confirmado** (direção autorizada CHG-007, implementação PLANEJADA).
+- Aceite verificável: Média de avaliações distinta de proporção por tentativas; RT ausente preservado; versões incompatíveis estratificadas; quatro contagens de pacientes e visitas/avaliações/tentativas separadas; repetidas sem inferência independente.
+- Dependências: WEB-051 e dependências/gates da ficha no backlog.
+- Restrições conhecidas: D1–D6, domínio Python/CSV canônico e DEC-03/04/05 preservados; somente dados sintéticos na implementação técnica; nenhum deploy implícito.
+- Origem: Missão de replanejamento do proprietário em 2026-11-11; ADR-008 complementada; UX7 e contrato HTTP CHG-007.
+
+### REQ-REL-008
+
+- Descrição: Exploração multigranular interativa e longitudinal. Níveis autorizado institucional/projeto, instrumento/versão, participante/visita, avaliação/tentativa e tempo/grupos; visuais, drill-down, tabelas e exportação na mesma consulta.
+- Justificativa: Materializar experiência integrada e integridade da CHG-007 antes da candidata, reutilizando a plataforma existente.
+- Prioridade: P1. Estado da especificação: **Confirmado** (direção autorizada CHG-007, implementação PLANEJADA).
+- Aceite verificável: Interações/tabelas UX7-DADOS, distribuição RT/resposta/condição, série por período e longitudinal verificadas com unidades/nulos e identidade correta; escolha de coluna/densidade/página não altera população exportada.
+- Dependências: WEB-052 e dependências/gates da ficha no backlog.
+- Restrições conhecidas: D1–D6, domínio Python/CSV canônico e DEC-03/04/05 preservados; somente dados sintéticos na implementação técnica; nenhum deploy implícito.
+- Origem: Missão de replanejamento do proprietário em 2026-11-11; ADR-008 complementada; UX7 e contrato HTTP CHG-007.
+
+### REQ-REL-009
+
+- Descrição: Volume paginado e completude explícita. Seleção/agregações server-side e paginação estável com teto declarado e medição antes de ampliar; sem infraestrutura nova sem necessidade.
+- Justificativa: Materializar experiência integrada e integridade da CHG-007 antes da candidata, reutilizando a plataforma existente.
+- Prioridade: P0. Estado da especificação: **Confirmado** (direção autorizada CHG-007, implementação PLANEJADA).
+- Aceite verificável: 5.000/5.001 e 20/21 projetos testados; limite/erro não produz parcial como total; fingerprints e cancelamento protegem conjunto; EXPLAIN/latência/memória documentados conforme UX7-PERF.
+- Dependências: WEB-051 e dependências/gates da ficha no backlog.
+- Restrições conhecidas: D1–D6, domínio Python/CSV canônico e DEC-03/04/05 preservados; somente dados sintéticos na implementação técnica; nenhum deploy implícito.
+- Origem: Missão de replanejamento do proprietário em 2026-11-11; ADR-008 complementada; UX7 e contrato HTTP CHG-007.
+
+### REQ-REL-010
+
+- Descrição: Qualidade operacional descritiva auditável. Contagens de RT ausente, proveniência incompleta, interrupção/invalidação, avaliador ausente e divergências de versão/plataforma com base e origem rastreáveis.
+- Justificativa: Materializar experiência integrada e integridade da CHG-007 antes da candidata, reutilizando a plataforma existente.
+- Prioridade: P1. Estado da especificação: **Confirmado** (direção autorizada CHG-007, implementação PLANEJADA).
+- Aceite verificável: Dados operacionais separados de resultados oficiais; nenhum escore clínico ou métrica substitutiva; contagem/base de qualidade confere com fixture e detalhe autorizado.
+- Dependências: WEB-051 e dependências/gates da ficha no backlog.
+- Restrições conhecidas: D1–D6, domínio Python/CSV canônico e DEC-03/04/05 preservados; somente dados sintéticos na implementação técnica; nenhum deploy implícito.
+- Origem: Missão de replanejamento do proprietário em 2026-11-11; ADR-008 complementada; UX7 e contrato HTTP CHG-007.
+
+### REQ-CSV-006
+
+- Descrição: Igualdade da consulta prévia e download. Cinco projeções existentes usam seleção canônica autorizada e token integral; filtros/colunas/modo/versão/projetos e conteúdo vinculados; sem ignorar filtro.
+- Justificativa: Materializar experiência integrada e integridade da CHG-007 antes da candidata, reutilizando a plataforma existente.
+- Prioridade: P0. Estado da especificação: **Confirmado** (direção autorizada CHG-007, implementação PLANEJADA).
+- Aceite verificável: EXPORT7 comprova conjuntos lógicos e cardinalidades por projeção, alteração/expiração conflita, token divergente nega, CSV21 íntegro e filtro parcial recusado; amostra é mesma projeção do arquivo.
+- Dependências: WEB-053 e dependências/gates da ficha no backlog.
+- Restrições conhecidas: D1–D6, domínio Python/CSV canônico e DEC-03/04/05 preservados; somente dados sintéticos na implementação técnica; nenhum deploy implícito.
+- Origem: Missão de replanejamento do proprietário em 2026-11-11; ADR-008 complementada; UX7 e contrato HTTP CHG-007.
+
+### REQ-CSV-007
+
+- Descrição: Privacidade e escopo integral da exportação. Revalidar todos projetos/cadastro/nominal no servidor, deidentified em amostra e arquivo, DEC-03 institucional, reader sem fallback, auditoria segura e proteção de células.
+- Justificativa: Materializar experiência integrada e integridade da CHG-007 antes da candidata, reutilizando a plataforma existente.
+- Prioridade: P0. Estado da especificação: **Confirmado** (direção autorizada CHG-007, implementação PLANEJADA).
+- Aceite verificável: Revogação nega antes do download; pacientes fora de A não exportam; nominal não vaza em amostra/coluna omitida; multi-projeto não reduz escopo silenciosamente; CSV injection e acesso direto negados conforme contrato.
+- Dependências: WEB-053 e dependências/gates da ficha no backlog.
+- Restrições conhecidas: D1–D6, domínio Python/CSV canônico e DEC-03/04/05 preservados; somente dados sintéticos na implementação técnica; nenhum deploy implícito.
+- Origem: Missão de replanejamento do proprietário em 2026-11-11; ADR-008 complementada; UX7 e contrato HTTP CHG-007.
 
 ## Matriz de rastreabilidade
 
 Cada linha é o vínculo principal; relações complementares aparecem nas fichas.
+Componentes citados em linhas PLANEJADAS podem ser caminhos propostos; conferir
+existência antes de executar e reutilizar equivalentes, sem criar arquivo só pelo nome.
 Testes com caminho são existentes; resultados atuais só estão comprovados quando
 a linha aponta para uma evidência datada no backlog. Referências PLANEJADAS são
 verificações ainda sem resultado de aceite; não inventam testes.
@@ -761,8 +885,8 @@ já existe ou participa da regressão geral. WEB-000 é exclusivamente documenta
 | REQ-INT-001 | ADR-004 | M2 | WEB-006 | `stroop/domain/web_results.py, api/results.py` | `tests/test_web_results.py, tests/test_web_sessions.py, tests/test_web_checkpoints.py` | EXECUTADA em WEB-006; EV-M2 no backlog |
 | REQ-INT-002 | ADR-004 | M2 | WEB-007 | `stroop/persistence/web_sessions.py, web_checkpoints.py` | `tests/test_web_checkpoints.py, tests/test_web_sessions.py, tests/test_web_database_provision.py, tests/test_postgres_migrations.py` | EXECUTADA em WEB-007; EV-M2-007/008 no backlog |
 | REQ-INT-003 | ADR-004/005 | M2 | WEB-005 | `ParticipantRun.ts, checkpoint-worker.ts e modelo lógico` | `tests/test_web_checkpoints.py, web/src/transport/checkpoint-queue.test.ts, web/src/participant/ParticipantRun.test.ts, web/e2e/integrated/participant.spec.ts` | Aceite documental em EV-M2-005-R2; receptor/banco em EV-M2, worker/timing em EV-M3-011 e integração de produto aceita em WEB-015/016 (EV-M4-013/016) |
-| REQ-INT-004 | CHG-006; ADR-008 | M5 | WEB-047 | `web/src/components/ProfessionalDashboard.tsx, web/src/components/UnifiedNavigation.tsx` | `web/src/components/ModularNavigation.test.tsx, web/e2e/integrated/dashboard.spec.ts` | PLANEJADO em M5/M7; componentes base aceitos em EV-M5-047-NAV |
-| REQ-INT-005 | CHG-006; ADR-008 | M5 | WEB-017 | `web/src/components/UnifiedAnalyticsPanel.tsx, web/src/dashboard/analysis.ts` | `web/src/components/ResearchFilters.test.tsx, web/src/dashboard/analysis.test.ts, web/e2e/integrated/dashboard.spec.ts` | PLANEJADO em M5/M7; filtros e KPIs aceitos em EV-M5-017/018 |
+| REQ-INT-004 | CHG-006/007; ADR-008 | M8 | WEB-049 | `web/src/components/ProfessionalDashboard.tsx, web/src/components/UnifiedNavigation.tsx` | PLANEJADO: NAV7; sidebar/3 eixos | Base WEB-047 e cobertura documental WEB-028 históricas; integração CHG-007 planejada; consultar backlog |
+| REQ-INT-005 | CHG-006/007; ADR-008 | M8 | WEB-052 | `web/src/components/UnifiedAnalyticsPanel.tsx, web/src/dashboard/analysis.ts` | PLANEJADO: QUERY7/DATA7/ANALYTICS7/EXPORT7 | Base WEB-017/019/020 histórica; integração CHG-007 planejada; consultar backlog |
 | REQ-MET-001 | ADR-004 | M2 | WEB-008 | `stroop/domain/stroop.py, web_results.py` | `tests/test_nucleo_compartilhado.py, tests/test_web_export.py, tests/test_web_checkpoints.py` | EXECUTADA em WEB-008; EV-M2-007/008 no backlog |
 | REQ-MET-002 | ADR-004 | M2 | WEB-008 | `stroop/domain/stroop.py, web/src/dashboard/analysis.ts` | `tests/test_web_results.py, web/src/dashboard/analysis.test.ts` | EXECUTADA em WEB-008; EV-M2-007/008 no backlog |
 | REQ-MET-003 | ADR-004 | M5 | WEB-019 | `web_assessments, api/assessments.py` | `tests/test_web_assessments.py` | PLANEJADA; consultar WEB-019 no backlog |
@@ -800,15 +924,39 @@ já existe ou participa da regressão geral. WEB-000 é exclusivamente documenta
 | REQ-UX-010 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M4 | WEB-015 | `web/src/participant/ParticipantRun.ts, web/src/components/ResultSummary.tsx, api/results.py` | `web/src/participant/ParticipantRun.test.ts, web/src/api/participant.test.ts, web/e2e/integrated/participant.spec.ts, web/e2e/integrated/complete-results.spec.ts` | ACEITO em WEB-015/016; EV-M4-013/016 no backlog |
 | REQ-UX-011 | ADR-004/005; CHG-003; D3/D4 revisadas pelo proprietário | M5 | WEB-019 | `web/src/styles.css, web/src/App.tsx, web/src/components/, web/src/dashboard/` | `PLANEJADO: componentes Vitest, teclado/árvore acessível e E2E M5; cobertura experimental WEB-044` | Cobertura experimental M3 conferida em EV-M3-044; restante e aceite M5 WEB-019 PLANEJADOS |
 | REQ-UX-012 | CHG-005; ADR-007 | M5 | WEB-047 | `web/src/styles.css, web/src/components/ProfessionalDashboard.tsx, web/src/components/PatientsPanel.tsx, web/src/components/EvaluatorsPanel.tsx` | `PLANEJADO: DASH-01 e E2E-FLOW-01 em Vitest e Playwright (teclado, foco, contraste, estados e não regressão experimental) em WEB-047 e WEB-019` | PLANEJADA; consultar WEB-047 e WEB-019 no backlog |
-| REQ-SESS-001 | CHG-006; ADR-008 | M4 | WEB-046 | `web/src/components/DirectSessionLauncher.tsx, web/src/api/sessions.ts` | `web/src/components/SessionInvitation.test.tsx, web/e2e/integrated/invitations.spec.ts` | PLANEJADO em M4/M7; preparação base aceita em EV-M4-045/046 |
-| REQ-SESS-002 | CHG-006; ADR-008 | M4 | WEB-046 | `web/src/components/DirectSessionLauncher.tsx, web/src/components/QrCodeModal.tsx, web/src/App.tsx` | `web/src/components/SessionInvitation.test.tsx, web/e2e/integrated/invitations.spec.ts, web/e2e/integrated/participant.spec.ts` | PLANEJADO em M4/M7; fluxo de convite e participante aceito em EV-M4-013/016 e EV-M4-045/046 |
-| REQ-SESS-003 | CHG-006; ADR-008 | M4 | WEB-045 | `api/sessions.py, stroop/application/web_sessions.py, stroop/persistence/web_registry.py` | `tests/test_web_sessions.py, tests/test_web_patients.py, tests/test_web_evaluators.py` | PLANEJADO em M4/M7; fundação relacional aceita em EV-M4-045/046 |
+| REQ-SESS-001 | CHG-006/007; ADR-008 | M8 | WEB-054 | `web/src/components/DirectSessionLauncher.tsx, web/src/api/sessions.ts` | PLANEJADO: PREP7; UX7-J2 | Preparação base WEB-046 aceita; fluxo unificado CHG-006/007 planejado; consultar backlog |
+| REQ-SESS-002 | CHG-006/007; ADR-008 | M8 | WEB-054 | `web/src/components/DirectSessionLauncher.tsx, web/src/components/QrCodeModal.tsx, web/src/App.tsx` | PLANEJADO: PREP7; isolamento/QR | Convite WEB-013/016/046 aceito; modalidades ADR-008 planejadas; consultar backlog |
+| REQ-SESS-003 | CHG-006/007; ADR-008 | M8 | WEB-054 | `api/sessions.py, stroop/application/web_sessions.py, stroop/persistence/web_registry.py` | PLANEJADO: PREP7; API/PG idempotência/rollback | Fundação WEB-045/046 aceita; operação atômica alvo planejada; consultar backlog |
+
+| REQ-UX-013 | CHG-007; ADR-008 complementada | M8 | WEB-048 | `web/index.html, App.tsx, componentes e docs/` | PLANEJADO: COMP7; Vitest e revisão de referências, conforme VALIDACAO_WEB | PLANEJADA; consultar WEB-048 no backlog |
+| REQ-UX-014 | CHG-007; ADR-008 complementada | M8 | WEB-048 | `web/src/styles.css, web/src/components/` | PLANEJADO: COMP7; Vitest/visual e regressão experimental, conforme VALIDACAO_WEB | PLANEJADA; consultar WEB-048 no backlog |
+| REQ-UX-015 | CHG-007; ADR-008 complementada | M8 | WEB-049 | `App.tsx, ProfessionalDashboard.tsx, navegação` | PLANEJADO: NAV7; Vitest e Playwright Chromium/Firefox, conforme VALIDACAO_WEB | PLANEJADA; consultar WEB-049 no backlog |
+| REQ-UX-016 | CHG-007; ADR-008 complementada | M8 | WEB-055 | `web/src/components/, web/e2e/integrated/` | PLANEJADO: UX7-AA; COMP7/NAV7 e três jornadas, conforme VALIDACAO_WEB | PLANEJADA; consultar WEB-055 no backlog |
+| REQ-REL-006 | CHG-007; ADR-008 complementada | M8 | WEB-050 | `ResearchFilters.tsx, ProfessionalDashboard.tsx, dashboard/, api/` | PLANEJADO: QUERY7; Vitest de estado e Playwright, conforme VALIDACAO_WEB | PLANEJADA; consultar WEB-050 no backlog |
+| REQ-REL-007 | CHG-007; ADR-008 complementada | M8 | WEB-051 | `stroop/domain/, application/, persistence/, api/assessments.py` | PLANEJADO: DATA7; paridade oficial em API/PG sintético, conforme VALIDACAO_WEB | PLANEJADA; consultar WEB-051 no backlog |
+| REQ-REL-008 | CHG-007; ADR-008 complementada | M8 | WEB-052 | `ResearchVisualizations.tsx, InstrumentVisualizations.tsx, ResultsTable.tsx, dashboard/` | PLANEJADO: ANALYTICS7; Vitest e Playwright com tabela equivalente, conforme VALIDACAO_WEB | PLANEJADA; consultar WEB-052 no backlog |
+| REQ-REL-009 | CHG-007; ADR-008 complementada | M8 | WEB-051 | `api/assessments.py, stroop/persistence/web_assessments.py, clientes` | PLANEJADO: DATA7; API/PG sintético e benchmark medido, conforme VALIDACAO_WEB | PLANEJADA; consultar WEB-051 no backlog |
+| REQ-REL-010 | CHG-007; ADR-008 complementada | M8 | WEB-051 | `api/assessments.py, persistência, dashboard/` | PLANEJADO: DATA7/ANALYTICS7; casos legados/parciais sintéticos, conforme VALIDACAO_WEB | PLANEJADA; consultar WEB-051 no backlog |
+| REQ-CSV-006 | CHG-007; ADR-008 complementada | M8 | WEB-053 | `ExportHubPanel.tsx, api/exports.py, stroop/application/, persistence/web_multi_export.py` | PLANEJADO: EXPORT7; API/PG real sintético e Playwright com CSV parseado, conforme VALIDACAO_WEB | PLANEJADA; consultar WEB-053 no backlog |
+| REQ-CSV-007 | CHG-007; ADR-008 complementada | M8 | WEB-053 | `api/exports.py, stroop/persistence/web_multi_export.py, domain/web_multi_export.py` | PLANEJADO: EXPORT7; segurança negativa e roundtrip Python/SQLite, conforme VALIDACAO_WEB | PLANEJADA; consultar WEB-053 no backlog |
 
 Estados de evidência (todos os requisitos, inclusive autenticação local): **PLANEJADO** (critério sem execução), **IMPLEMENTADO**
 (código disponível), **TESTADO** (comandos/resultados/SHA registrados), **ACEITO**
 (todos os critérios conferidos na ficha WEB). Esses rótulos não substituem os
 estados canônicos das tarefas nem dão crédito parcial. Evidência e aceite são
 referências à ficha do backlog; a matriz não mantém um segundo painel.
+
+## Relações complementares CHG-007
+
+A matriz mantém uma linha principal por requisito. REQ-REL-004/005 e
+REQ-CSV-005 preservam a origem/aceite M5; sua extensão integrada é exigida em
+WEB-050/051/052/053, sem declarar regressão funcional de toda a entrega histórica.
+REQ-UX-012 estende-se a WEB-048/049/054/055; REQ-PAR-005/AVA-005 a WEB-054;
+REQ-AUT-002/003 e REQ-AUD-001 à exportação/handoff, REQ-MET-001/002/003 a
+WEB-051/052/055. REQ-UX-016 possui implementação distribuída em WEB-048..054 e
+aceite transversal em WEB-055. REQ-CSV-007 mantém os gates institucionais
+REQ-SEG-002/003 (WEB-033/041), sem os substituir. Testes antigos ou linhas
+PLANEJADAS não equivalem a reexecução nesta missão; consultar evidências do backlog.
 
 ## Controle de mudança
 

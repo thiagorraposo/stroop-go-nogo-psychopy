@@ -257,3 +257,119 @@ WEB-012/034, DEC-03/05, réplica externa WEB-031 ou deploy.
 | DASH-01 arquitetura UX, filtros e análises | REQ-REL-001/002/003/004/005, REQ-MET-001/002/003, REQ-UX-012 | WEB-017, WEB-018, WEB-019, WEB-047 | Navegação administrativa nos 8 módulos (`Visão geral`, `Pacientes`, `Avaliadores`, `Preparar avaliação`, `Avaliações e histórico`, `Resultados e análises`, `Exportações`, `Administração`); KPIs com origem/definição/unidade/nulos explícitos sem normas clínicas; catálogo completo de filtros combinados; gráficos interativos e tabelas acessíveis; teclado/foco/contraste |
 | EXP-CSV-01 exportação avançada e retirada de upload | REQ-CSV-001/002/003/004/005, REQ-SEG-002/003 | WEB-020, WEB-025, WEB-026, WEB-027, WEB-028 | Exportação do subconjunto filtrado nas granularidades `pacientes`, `avaliacoes`, `tentativas`, `metricas` e `stroop_21_colunas`; seleção de colunas; pré-visualização e contagem; modo desidentificado padrão vs. nominal restrito (`403` sem autorização/habilitação `DEC-03`); proteção contra CSV injection; exclusão de parciais/inválidas; remoção de `CsvImportPanel` e endpoints de upload na UI/modo produto; associação legada verificável sem fusão automática |
 | E2E-FLOW-01 fluxo profissional ponta a ponta e não regressão | REQ-EXP-001/002/003, REQ-INT-001/002/003, REQ-UX-001..012 | WEB-046, WEB-019, WEB-020, WEB-028, WEB-035 | Playwright Chromium/Firefox em HTTPS real: `Login local → Dashboard → Cadastrar/selecionar Paciente e Avaliador → Preparar avaliação e conferir resumo → Executar prática e principal no motor jsPsych → Armazenar resultado e recibo → Consultar, filtrar, analisar e exportar CSV`, comprovando zero regressão no motor experimental, estímulos, contorno branco, HUD e gates temporais D5 |
+
+## Homologação profissional integrada — CHG-007
+
+**PLANEJADO**: roteiros para WEB-048..055/M8, rehomologação da candidata em
+WEB-035/M9 e documentação operacional correspondente em M10. Critérios anteriores
+DASH-01 de oito módulos são referência histórica, substituídos operacionalmente
+por três eixos. Nenhum resultado funcional é concedido nesta seção; evidências,
+data/ambiente/SHA/estado ficam apenas no backlog. Reusar fixtures/suítes existentes,
+sem dados identificáveis, .env operacional ou backups. PostgreSQL descartável com
+prefixo `stroop_etapa4_test`, HTTPS/API/grants reais para critérios de integração.
+
+### UX7-AA — acessibilidade e matriz visual
+
+Conformidade alvo: [WCAG 2.2 AA](https://www.w3.org/TR/WCAG22/) em todos os
+processos administrativos, incluindo login, busca, filtros, gráficos, tabelas,
+prévia/download e cadastro/preparação; não implica validação da apresentação
+experimental. Checklist de todos os critérios A/AA aplicáveis por tela/processo,
+com justificativa para não aplicável; ferramenta automática sozinha não concede
+conformidade. Valores mínimos relevantes: texto 4,5:1 (grande 3:1), controles/
+limites necessários 3:1; alvo 24×24 CSS px ou espaçamento equivalente segundo
+2.5.8 (preferir 44×44 em ações principais). Foco visível e não obscurecido,
+navegação lógica por Tab/Shift+Tab/Enter/Escape/setas apropriadas, sem armadilha;
+skip link, landmarks, labels/descrições/erros associados, nome/papel/valor, anúncio
+polite de atualização e assertivo de erro crítico; cor não é único sinal.
+Tooltip por hover/foco, diálogo restaura foco, sidebar recolhida mantém nome.
+Busca/calendário/multisseleção e seleção em gráficos funcionam por teclado ou
+controle equivalente; tabela completa é alternativa para toda informação gráfica.
+Login permite colagem/gerenciador de senha e segue autenticação acessível.
+
+Chromium **e** Firefox: 360, 768, 1024, 1366, 1920 px; em cada largura conferir
+sidebar, filtros abertos/fechados, gráfico/tabela, diálogo e estados vazio/erro/
+loading. Zoom 200% em notebook 1366 e desktop 1920, e reflow equivalente a 320 CSS
+px (inclusive 1280 com zoom 400%) para 1.4.10; texto 200% e espaçamento customizado
+sem perda. Não exigir linha inteira de tabela extensa em 320: scroll localizado,
+com nome e teclado, preservando acesso a todas as colunas/detalhes. Sem scroll
+horizontal global, texto cortado, sobreposição, foco coberto por sticky header ou
+controle fora da viewport. Larguras de 360 não ampliam suporte experimental D1.
+Manual: teclado e leitor de tela disponível com combinação/versão registradas;
+medição de contraste e revisão de cada critério aplicável; ausência de ferramenta
+obrigatória mantém evidência pendente. Comparação visual em ambiente determinístico
+com fixtures, fontes, viewport e estados fixados; baseline futura é revista pelo
+proprietário, sem atualizar screenshot automaticamente para esconder regressão.
+
+### Casos automatizados e negativos
+
+| Grupo | Verificação exigida | Camadas / evidência necessária |
+|---|---|---|
+| COMP7 / NAV7 | Componentes e estados; três eixos, teclado, ativo/recolhido/drawer, preservação e limpeza de contexto | Vitest, typecheck/build; Playwright Chromium/Firefox; revisão visual/teclado UX7-AA |
+| QUERY7 | Rascunho/aplicada/chips/limpar; combinação de todas dimensões; instrumento/versão; respostas fora de ordem/projeto mudado, paginação falha, snapshot expirado, autorização perdida, logout, voltar/avançar | Vitest com promessas controladas e Playwright; assertivas de ausência de dados da geração antiga, não só request.abort |
+| DATA7 | AND/OR e mesmo-trial EXISTS; A/T oficiais separados de sessões; quatro contagens de pacientes; identidade central vs legado; 12 métricas, nulos e compatibilidade | unittest domínio/aplicação, API/PG sintético real; conjunto esperado por IDs e conteúdo, não só total |
+| ANALYTICS7 | Níveis/grupos/períodos/interações/tabela equivalente, longitudinal repetido, unidade/fonte/ausência/denominador e qualidade | Vitest de apresentação sem fórmula científica duplicada; Playwright com dados reais sintéticos da API, drill-down/teclado |
+| EXPORT7 | Cinco projeções, colunas, amostra mascarada, conteúdo/order/unidade/nulos, filtros desconhecidos/inaplicáveis 422, CSV21 completo | API/PG real + Vitest/Playwright HTTPS, parser CSV e roundtrip oficial Python/SQLite; mesmo query/content fingerprint |
+| EXPORT7 concorrência | Alterar filtro/coluna/projeto/modo invalida prévia; mutar valores mantendo IDs/total causa 409; expirar snapshot; adulterar token/identidade, revogar projeto/conta entre prévia/download | API/PG transacional concorrente e E2E negativo; nenhum byte de arquivo liberado quando acesso foi revogado antes da decisão final |
+| EXPORT7 privacidade | Paciente sem vínculo, pseudônimos iguais em projetos, nominal só por papel sem DEC-03, reader ausente, amostra com coluna nominal omitida, auditoria sem termo/linha/token | API/PG real com papéis e projetos sintéticos; deidentified padrão em JSON/CSV; sem fallback writer nem redução silenciosa de projetos |
+| EXPORT7 injection | Texto =/+/−/@, tab/CR/LF, aspas, delimitadores e variantes Unicode; números/RT não adulterados e ausência preservada | Serializador + API/download + parser/consumidores existentes; [OWASP](https://owasp.org/www-community/attacks/CSV_Injection); sem alegação de segurança universal de regravação em planilhas |
+| PREP7 | Busca/homônimos/revisão, idempotência, duplo clique, retry desconhecido, concorrência/rollback; isolamento presencial e QR sem segredo URL | API/PG real + Vitest + Playwright HTTPS; voltar/avançar/BFCache/logout/reautenticação negam retorno não autenticado ao painel |
+| REG7 | jsPsych/prática/principal/lifecycle/D2/checkpoint/recibo, 12 métricas, CSV21, auth/CSRF/projetos/último admin e legado | Suítes existentes focadas e integração da candidata; nenhuma alteração de fórmula/tempo/contrato aceita por teste visual |
+
+### UX7-PERF — capacidade e completude
+
+Ensaiar sinteticamente 0/1/100/5.000/5.001 avaliações e 1/20/21 projetos,
+16 tentativas/avaliação onde Stroop, múltiplas visitas/versões/legados. 5.001 e 21
+são testes negativos de teto, salvo extensão de capacidade formalmente aceita.
+Medir consulta aplicada, agregados, páginas, prévia/download, memória máxima,
+bytes e plano SQL (EXPLAIN) no mesmo hardware/configuração; 20 consultas quentes
+e cinco frias, registrar p50/p95/pico/volume/SO/versões. Não extrapolar para VPS.
+Meta de aceite local: 5.000/20 permitidos com consulta/agregados p95 ≤3 s e
+prévia ≤5 s no ambiente declarado; se não atingir, otimizar seletor/índices ou
+registrar bloqueio/decisão de capacidade **antes** de aceitar, sem trocar limite
+por truncamento. Paginação não busca detalhe por linha (sem N+1); conferir número
+de requisições. Renderização não bloqueia uso do cancelamento/troca de contexto;
+busy aparece até 200 ms após aplicar em fixture local. Cache/índice só após
+medição com necessidade; mudança de schema futura passa revisão aditiva e gates.
+Medição de dashboard não mede latência física do experimento.
+
+### Jornadas reais sintéticas prioritárias
+
+**UX7-J1 — pesquisador consulta, aprofunda e exporta.** Login com dois projetos
+autorizados e terceiro negado; aplicar período, instrumento/versão, participante,
+avaliador/visita e condição/resposta. Conferir counts A/T por fixture conhecida,
+KPIs/gráficos/tabela/unidades; mudar agrupamento e aprofundar participante→visita
+→avaliação→tentativa, voltar preservando recorte. Configurar quatro projeções com
+colunas; prévia deve coincidir em IDs/conteúdo com CSV parseado, respeitando
+cardinalidade. CSV21 com filtro parcial recebe recusa; retirar explicitamente
+filtro, reaplicar e exportar avaliação completa com 21 colunas/roundtrip oficial.
+Tentar mudar coluna/filtro após prévia, simular mutação/revogação/expiração,
+confirmar erro e bloqueio, nunca arquivo divergente. Avaliação sem RT permanece
+sem RT em gráfico/tabela/CSV. Revisão manual do pesquisador com resultado registrado.
+
+**UX7-J2 — avaliador prepara e inicia procedimento.** Perfil autorizado no
+projeto; buscar paciente, distinguir dois homônimos por código/dados mínimos;
+selecionar/cadastrar explicitamente apenas quando autorizado, selecionar avaliador,
+visita/instrumento, conferir resumo e corrigir sem perder dados. Simular duplo
+clique e resposta desconhecida: uma operação, sem convite duplicado. Ensaiar
+presencial com handoff seguro, instruções/prática/principal/recibo em navegador
+suportado e interrupção D2; histórico/cache não abre painel antes de reautenticar.
+Ensaiar modo remoto com código/QR aprovado em RAM e resgate no segundo contexto,
+sem token URL. Conferir vínculos e persistência científica via API/PG, sem alterar
+o motor. Falha operacional não aparece como sucesso nem reinicia principal.
+
+**UX7-J3 — administrador corrige vínculo com auditoria.** Login admin com vínculo
+explícito; Gestão→busca cadastro/histórico; escolher avaliação/convite e destino
+permitido, confirmar motivo/efeito e corrigir pelo procedimento existente;
+conferir vínculo final, evento de auditoria anterior/novo e histórico sem mutar
+trial_results/métricas. Sem permissão/projeto ou alvo inativo deve negar. Reabrir
+análise aplicada, recarregar explicitamente após mudança e verificar resultado
+coerente/fingerprint; exportação com prévia anterior conflita. Rever acesso da
+conta sem confundir autoria técnica com avaliador cadastral. Registrar resultado
+funcional e inspeção manual do administrador.
+
+WEB-055 exige esses roteiros e UX7-AA na SHA integrada; WEB-032 exige pipeline e
+verify da candidata incluindo todos os gates, WEB-035 rehomologa candidato no
+ambiente autorizado. Screenshots, mocks HTTP, testes de render e build não
+substituem arquivo/PG/auditoria/jornada real. Falta de evidência obrigatória
+mantém tarefa aberta. Nominal real, medição física, instituição, VPS e deploy
+exigem as decisões/autorização específicas já previstas.
