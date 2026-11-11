@@ -3085,7 +3085,7 @@ não inferir ausência de problema por falta de reprodução PG nesta missão.
 - Probe sintético isolado acima: assertivas aprovadas; falha inicial de import sem PYTHONPATH corrigida no comando. Nenhuma suite PG, frontend/Vitest/typecheck/build ou Playwright/AA executada nesta missão documental; verificações futuras explicitamente PLANEJADAS.
 - `git diff --check`: aprovado. Inspeção estrutural adicional comparou as 37 fichas CONCLUIDA e todo o registro anterior de CHG à base b5fccbb: conteúdo integral preservado. Primeira tentativa dessa inspeção procurava heading CHG-001 (que é linha histórica de tabela) e falhou no seletor; corrigida para seção de registro, passou sem modificar o histórico.
 - Matriz requisito→tarefa→marco, IDs sequenciais/únicos, grafo e painel conferidos pelo validador; revisão semântica conferiu caminho crítico, gates externos, distinção de população A/T e cardinalidades. Somente oito Markdown canônicos em docs/ alterados. Código/testes/configurações/workflow/AGENTS/ADR-007 intactos; nenhum novo roadmap/arquivo de progresso. Histórico anterior arquivado na base Git imutável, sem fonte concorrente.
-- Git da missão: branch `docs/chg-007-replanejamento-integrado` sobre `b5fccbb`; unidade documental `2d982d7bf7cdd40f7bf9ff9bfc27430cb7d76add`, commit/push com upstream concluídos. [PR #18](https://github.com/thiagorraposo/stroop-test-web/pull/18) aberto para main, somente oito Markdown; auto-merge desabilitado. No fechamento documental, verify aguardando execução/conclusão na SHA final; merge ainda não realizado. Integrar somente após verify aprovado via Merge Commit tradicional com match-head, sem deploy. O SHA do fechamento é consultável por `git log -1 --format=%H --grep='docs(planejamento): registra envio da CHG-007'`; resultado remoto final é consultável no PR/check correspondente, sem autorreferência artificial de commit. Nenhum aceite funcional de WEB-048..055.
+- Git da missão: branch `docs/chg-007-replanejamento-integrado` sobre `b5fccbb`; unidade documental `2d982d7bf7cdd40f7bf9ff9bfc27430cb7d76add`, commit/push com upstream concluídos. [PR #18](https://github.com/thiagorraposo/stroop-test-web/pull/18) aberto para main, somente oito Markdown; auto-merge desabilitado. No fechamento documental, verify aguardando execução/conclusão na SHA final; merge não realizado. **Instrução posterior explícita do proprietário nesta sessão: deixar o PR aberto, sem merge.** Auto-merge permanece desabilitado; CI aprovada não autoriza integração nesta missão. Não executar merge, deploy, tag ou release. O SHA do fechamento é consultável por `git log -1 --format=%H --grep='docs(planejamento): registra envio da CHG-007'`; resultado remoto final é consultável no PR/check correspondente, sem autorreferência artificial de commit. Nenhum aceite funcional de WEB-048..055.
 
 ## Retomada
 
@@ -3107,6 +3107,9 @@ autorização e consistência de CSV antes de aceitar o visual integrado.
 Git/validação documental desta missão: fechamento na seção EV-CHG-007;
 nenhuma implantação/migration/tag/release, implementação ou operação em dados reais.
 Branch inicial/PRs #16/#17 e material local não rastreado preservados.
+Instrução final do proprietário: **manter PR #18 aberto, sem merge**, mesmo se
+verify aprovar. Retomada da implementação depende da autorização posterior já
+indicada; integração deste PR requer nova instrução explícita.
 
 
 ### Retomada anterior — conclusão do marco M7: Integração, compatibilidade histórica e transição (WEB-025 a WEB-028), 2026-11-09
