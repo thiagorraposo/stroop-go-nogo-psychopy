@@ -391,3 +391,159 @@ O painel `Visão geral` apresenta cartões KPI e gráficos descritivos calculado
   - Distribuição de avaliações e erros por projeto, visita e avaliador responsável, sempre acompanhada de tabela acessível equivalente.
 - **Tabelas e listagens:** busca textual com debounce, filtros visíveis como *chips* removíveis, ordenação por coluna, paginação com tamanho configurável, ações contextuais por linha (abrir ficha do paciente, inspecionar detalhe da avaliação, exportar CSV individual de 21 colunas) e estados claros de carregamento (*skeleton*/progresso), lista vazia (*empty state* orientativo) e erro recuperável.
 - **Critérios de sistema visual e acessibilidade (`REQ-UX-012`):** tipografia legível com algarismos tabulares (`font-variant-numeric: tabular-nums`) em códigos, métricas e timestamps; contraste compatível com WCAG AA nas telas administrativas; navegação completa por teclado com `:focus-visible` nítido; modais/etapas de confirmação antes de inativar cadastro, emitir convite ou revogar sessão; responsividade para desktops e notebooks de pesquisa.
+
+## Interface profissional integrada — CHG-007
+
+Direção autorizada pelo proprietário em 2026-11-11; **PLANEJADA**, sem aceite de
+implementação. Complementa CHG-006/ADR-008, substituindo a navegação em oito áreas
+da CHG-005. Backlog, estados, evidências e ordem somente em
+[Projeto Stroop Test](../Projeto%20Stroop%20Test.md). Não se aplica ao motor,
+estímulos, instruções aprovadas, HUD ou protocolo experimental. Referências
+antigas à marca Cores são históricas; marca pública futura: **Stroop Test Web**.
+Nome do instrumento/test_code/versões científicas/CSV não são marca substituível.
+
+### UX7-VIS — identidade e sistema visual
+
+Identidade original tipográfica, sem copiar produtos comerciais: superfície
+clara neutra, texto/estrutura azul-marinho e violeta reservado para ação/seleção;
+cores semânticas de sucesso/alerta/erro com texto/ícone, sem sugerir prognóstico.
+Marca compacta geométrica própria é opcional; nenhum bitmap ou pacote novo é
+necessário. Inventariar cabeçalho, início, área profissional, title dinâmico,
+HTML title/description/metadados existentes, mensagens, navegação compartilhada
+e documentação de uso vigente; manter ocorrências científicas e registros
+históricos com contexto, sem substituição global de “cores”.
+
+Tokens administrativos centralizados e delimitados ao shell (não `experiment`):
+cores de fundo/superfície/texto/muted/borda/ação/foco/seleção e feedback; fonte
+sans-serif de sistema, escala 14/16/18/22/30 px, corpo 16 px e entrelinha 1,5,
+números tabulares; espaço 4/8/12/16/24/32/48 px; borda fina 1 px quando funcional;
+raios 4/8/12 px; elevação 0/1/2 (apenas sobreposição e diálogo); container fluido
+com largura máxima administrativa 1600 px, padding 16–32 px. Breakpoints em
+768 e 1024 px: uma coluna no menor, duas quando comportar, sidebar desktop a
+partir de 1024 (240 px expandida/64 recolhida; drawer abaixo). Validar contraste
+das cores escolhidas no código; valores decorativos não prevalecem sobre AA.
+Texto/labels não encolhem para fazer layout caber. Reserva de altura em métricas,
+loading e gráficos evita saltos ao atualizar; não encadear cartões dentro de
+cartões para separar cada campo. Título, descrição curta, conteúdo e ações têm
+hierarquia; ação primária única por região, secundárias discretas e destrutivas
+rotuladas/confirmadas. Metadados extensos em detalhe progressivo, sempre acessíveis.
+
+Consolidar responsabilidades: Button, IconButton, Input, SearchInput, Select,
+MultiSelect, Combobox, DateRangePicker, Checkbox, Radio, Tabs, Card, MetricCard,
+DataTable, StatusBadge, Tooltip, Dialog, Drawer, Accordion, EmptyState,
+LoadingState, ErrorState, FilterChip, ChartContainer e ExportDialog. Pode haver
+composição/reutilização em vez de arquivo por nome. Cada um documenta variantes,
+label/nome acessível, disabled/loading/erro/foco, API de interação e exemplos
+sintéticos verificáveis. MultiSelect pesquisável substitui select multiple nativo;
+DateRangePicker permite entrada textual rotulada sem exigir gesto em calendário.
+Tooltip funciona por foco e ponteiro; diálogo/drawer gerencia foco, Escape e
+retorno. Não criar padrão particular de botão/tabela/dialog em cada painel.
+
+Estados distintos e mensagens acionáveis: carregamento inicial; atualização de
+consulta; vazio inicial; nenhum resultado para filtros; 401 (entrar novamente);
+403 (acesso revogado, limpar dados); rede (tentar consulta novamente); exportação
+indisponível (motivo e ação); arquivo preparado; aviso administrativo curto;
+confirmação sensível; operação de escrita desconhecida (consultar estado, não
+repetir automaticamente). Erro recuperável conserva campos; logout apaga dados.
+Nunca trocar erro por aviso genérico longo ou sucesso fictício.
+
+### UX7-NAV — três eixos e navegação
+
+Sidebar principal com Resultados e Análise Unificada, Nova Avaliação e Gestão.
+Visão geral/resultados/histórico/exportação tornam-se seções/abas secundárias ou
+detalhes do **mesmo** eixo analítico e da mesma consulta. Gestão contém cadastros,
+projetos/vínculos e contas/operações auditadas já autorizadas; não promete editor
+arbitrário de auditoria ou páginas vazias. Perfil discreto, ações de conta/logout
+no rodapé; ícones coerentes, rótulo e estado ativo independentes de cor. Em modo
+recolhido, nome acessível e tooltip por foco; disabled informa motivo.
+Drawer móvel não cobre conteúdo após fechamento e restaura foco ao acionador.
+Atalho para conteúdo, landmarks, título contextual e breadcrumb só no drill-down.
+Sem foco preso fora de diálogo; aba secundária usa semântica e teclas de tabs.
+Rotas representam destino, nunca filtros nominais/token/credenciais. Consulta,
+ordem e posição persistem apenas em RAM durante transições internas autorizadas;
+voltar/avançar não ressuscita dados após logout/revogação. Reload faz consulta
+nova. Visibilidade segue permissões reais e não substitui autorização do servidor.
+
+### UX7-QUERY — consulta única e explícita
+
+Manter **Aplicar filtros**: edição altera rascunho, não resultados; banner curto
+“Alterações não aplicadas” permite aplicar ou descartar. Remover chip e limpar
+integralmente editam rascunho, com Aplicar visível. Limpar restaura defaults
+explicitados: projeto de preparação autorizado, valid, demais critérios vazios.
+Busca de opções pode usar debounce/cancelamento; consultas pesadas só ao aplicar.
+Projeto de preparação é contexto separado dos projetos da consulta; trocar o
+contexto analítico exige aplicação explícita e invalida detalhe/prévia anteriores.
+Instrumento, versão, plataforma, condições, grupos selecionados em gráficos e
+seleção de registros que restrinja exportação pertencem à consulta aplicada;
+agrupar/ordenar/paginar só apresenta o mesmo conjunto. Alteração por gráfico
+edita rascunho, sem filtro oculto. Não exportar página atual como recorte completo.
+Durante rascunho pendente, bloquear download até aplicar ou descartar; durante
+carregamento não mostrar valores antigos sob título novo. Estado de geração e
+AbortController impedem resposta velha, inclusive após sair/logar ou revogar acesso.
+Falha de página/snapshot invalida todo agregado; amostra parcial é progresso,
+nunca total científico. Contrato de semântica está apenas no HTTP, não duplicado aqui.
+
+### UX7-DADOS — exploração e apresentação científica
+
+Ordem principal: contexto/título → filtros → indicadores → evolução temporal →
+distribuições/comparações → longitudinal → tabela detalhada → exportação contextual.
+Granularidade visual explicitamente selecionada: institucional (somente projetos
+autorizados), projeto, instrumento/versão, participante/visita, avaliação, tentativa.
+Agrupamento por dia/semana/mês, projeto, visita, avaliador, instrumento/versão,
+condição e resposta. Dia UTC e semana ISO segunda→domingo explicitados no eixo;
+formatos pt-BR, fuso/unidade declarados, precisão visual não altera CSV.
+
+Dicionário implementável de indicadores é metadado de apresentação no backend,
+referenciando as 12 definições oficiais no [modelo](../dados/MODELO_DE_DADOS.md)
+e domínio Python; não copiar fórmulas. Cada entrada contém código/nome/definição,
+numerador/denominador (ou não aplicável), unidade, população/exclusões, nulos,
+agregação, fonte e test_code/test_version/protocol_id quando disponíveis. Contagens
+operacionais de cadastros/sessões não são métricas científicas novas. Precisão
+média por avaliação é rotulada como tal; proporção de tentativas usa contagens
+do núcleo/denominador elegível e rótulo diferente. Não substituir uma pela outra.
+RT ausente permanece ausente; histograma usa RT elegível com número de ausentes
+separado, faixas e limites visíveis, sem zero fictício. Não interpolar visita sem
+medida nem calcular inferência de avaliações repetidas como independentes.
+Comparações separam instrumentos/versões/protocolos/plataformas incompatíveis;
+sem regra canônica de compatibilidade, não combinar métricas entre versões.
+
+Distinguir quatro contagens: cadastro central visível autorizado (sem filtro de
+avaliação, rotulado assim), pacientes vinculados a projeto, participantes com
+avaliação oficial válida, participantes do recorte. Deduplicação central só com
+vínculo explícito autorizado por patient_id; legado usa projeto+código, sem
+fundir homônimos/pseudônimos. Participantes, visitas, avaliações e tentativas
+têm rótulos/totais separados. Histórico mantém visitas repetidas e ordenação
+estável data+ID, proveniência ausente identificada e versões visíveis.
+
+Séries temporais de coletas; barras horizontais/verticais por projeto/avaliador;
+distribuição de resposta; Go/No-Go e congruência somente conforme contrato;
+histograma RT; longitudinal por participante/visita e completude. Cada gráfico
+tem tooltip contextual/unidade/n, seleção de período, dimensão/métrica explícita,
+legenda interativa quando remove grupos de forma visível e drill-down para
+avaliação/tentativa. Tabela equivalente acessível, inclusive sem ponteiro.
+Detalhe sempre indica recorte de tentativas versus métricas da avaliação completa;
+não recalcular 12 métricas sobre subconjunto por conveniência visual.
+
+Tabela: sort por coluna com desempate estável, busca contextual explícita,
+paginação/tamanho, seleção autorizada, escolha de colunas/densidade, cabeçalho
+persistente sem cobrir foco, datas/tempos/números uniformes; códigos legíveis e
+identificador completo no detalhe auditável. Scroll horizontal só no container
+de tabela extensa. Qualidade é descritiva/auditável: RT ausente elegível, legado
+sem proveniência, inválidas/interrompidas separadas, avaliador técnico ausente,
+versões/plataformas divergentes; mostrar contagem/base/regra/origem sem escore de
+“qualidade clínica”. Dados operacionais parciais não entram nos resultados oficiais.
+
+### UX7-PREP — operação contextual
+
+Uma tela com identificação/avaliador/parâmetros/modalidade e revisão inline;
+cadastro sob demanda autorizado; busca retorna candidatos mínimos para distinguir
+homônimos, sem fusão/criação ao digitar. Pré-seleções de projeto/avaliador são
+visíveis e corrigíveis; instrumento/visita/iniciais conferidos antes de emitir.
+Modalidades existentes e alvo ADR-008 identificadas sem simular suporte ausente;
+link/QR transporta convite somente por mecanismos aprovados, sem segredo URL.
+Retorno presencial exige isolamento servidor/reautenticação, não só esconder menu.
+Resultado desconhecido pede consultar operação antes de repetir; dupla submissão
+não cria convites/cadastros extras. Gestão confirma alvo/motivo da retificação,
+registra auditoria e permite conferir efeito sem editar resultados científicos.
+D2, prazos, recibo e checkpoint seguem seus contratos. QR não concede suporte a
+motor móvel fora de D1. Nenhum envio de mensagens automático nesta missão/escopo.

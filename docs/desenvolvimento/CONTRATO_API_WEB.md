@@ -945,3 +945,234 @@ Além da exportação individual oficial de 21 colunas (`GET /api/v1/projects/{p
   - Avaliação parcial, abortada, expirada ou invalidada (`valid_for_result = false`) nunca é incluída nas granularidades de resultados oficiais (`avaliacoes`, `tentativas`, `metricas`, `stroop_21_colunas`).
   - Valores ausentes (ex.: RT quando `hits = 0`) são exportados como string vazia `""`, nunca como `0`. Métricas mantêm precisão numérica oficial sem arredondamento destrutivo.
   - Células textuais iniciadas por `=`, `+`, `-`, `@`, `\t` ou `\r` recebem neutralização contra *CSV formula injection* e evento de auditoria de exportação é gravado em `auth_audit_events`.
+
+## Consulta e exportação integradas — alvo CHG-007
+
+**PLANEJADO, ainda não implementado.** Complementa ADR-007/008 e a seção CHG-005;
+não descreve rotas existentes como já corrigidas. Runtime auditado e evidências
+ficam no backlog. `api/exports.py` atual aceita `filters: dict` e token v1 reduzido;
+isso não implementa este contrato. Individual e agregado existentes permanecem
+compatíveis; novos recortes não suportados nunca fazem fallback para exportar tudo.
+
+### Consulta normalizada e seleção
+
+`POST /api/v1/analysis/query` é a operação alvo única de aplicação analítica,
+necessária para não enviar busca nominal em query string. Corpo fechado:
+`{query, grouping, page}`. `query` contém `projects` (1–20 UUID distintos),
+`filters` (catálogo REQ-REL-004, abaixo), `assessment_ids?` (seleção explícita,
+subconjunto validado, máximo 5.000); `grouping` contém `level`
+(`project`, `instrument`, `participant`, `assessment`, `trial`), `dimension`
+(`date`, `project`, `visit`, `evaluator`, `instrument_version`, `condition`, `go_nogo`,
+`response_type`), `time_bucket` (`day`, `week`, `month`, só com date),
+`metric_code?` do catálogo oficial ou contagem operacional identificada;
+`page` contém `size` (1–100, padrão 50), `cursor?` e `sort` do catálogo da consulta
+CHG-005. Institucional é nível project com o conjunto autorizado escolhido,
+não acesso global implícito. Todos os campos estritos, JSON finito, corpo ≤64 KiB;
+excesso é erro, não truncamento. Ordenação inclui assessment_id/trial_number como
+desempate. Datas/agrupamentos em UTC, semana ISO; retorno identifica fuso/unidades.
+
+Fonte do catálogo é **REQ-REL-004 / seção 5 de CHG-005 deste contrato**;
+serialização normaliza aliases existentes (`start_date/end_date` →
+`date_from/date_to`, `participant_id` → código, `psychopy` → plataforma canônica)
+e rejeita aliases contraditórios. IDs cadastrais tipados não são nomes/códigos.
+Multisseleção nas dimensões categoriais (incluindo versões, instrumentos,
+participantes, visitas, avaliadores, plataforma, condição e resposta), até 100
+valores por dimensão; períodos ISO inclusivos convertidos para intervalo UTC
+[início do dia, início do dia seguinte); faixas de precisão em %, RT de entrada
+em ms convertidas na borda, sem mudar unidade oficial persistida. Busca textual
+até 120 caracteres por nome/iniciais somente com autorização cadastral; demais
+perfis só código. Busca nominal não retorna nome nem entra em URL/log/token.
+AND entre dimensões, OR nos valores da mesma dimensão; vazio significa sem
+restrição, salvo `projects` vazio que é inválido. Campos desconhecidos, valor
+inválido, filtro não suportado ou combinação incompatível retornam 422 sanitizado.
+Metadado de capacidade indica dimensões disponíveis por instrumento/versão, sem
+aceitar filtro e ignorá-lo. Não inferir Go/No-Go de congruência: Go/No-Go deriva
+do contrato científico de resposta esperada, congruência de condition.
+
+Seleção formal: **A** = avaliações completas oficiais elegíveis e autorizadas
+que passam critérios de avaliação; **T** = tentativas main dessas avaliações
+que passam critérios de tentativa. Havendo condition/response_type, A inclui
+apenas avaliações com **ao menos uma mesma tentativa** satisfazendo ambos
+(EXISTS com conjunção; não duas tentativas separadas). Critérios de precisão/RT
+selecionam A por métricas oficiais da avaliação completa, nunca recalculadas
+sobre T. Filtros RT ausente usam include_null_rt explícito; ausência não satisfaz
+comparação numérica nem vira zero. Filtro de condição/resposta altera T e inclusão
+em A, sem transformar métrica oficial da avaliação em métrica de subconjunto.
+
+Status padrão valid; status operacionais invalidated/aborted/expired/in_progress
+vêm de sessões/observações segregadas, com totais operacionais próprios e sem
+12 métricas oficiais fictícias. Podem aparecer no histórico/qualidade com
+permissão, porém **não** em A/T ou CSV oficial. Misturar status de resultado e
+operacionais apresenta populações separadas identificadas, nunca soma indistinta.
+Versões/protocolos incompatíveis podem compartilhar contagens operacionais;
+métricas são estratificadas, sem agregação cruzada por padrão. Ausência de regra
+canônica de compatibilidade impede comparação combinada, com motivo visível.
+
+Resposta 200: `{query_id, normalized_query, query_fingerprint, content_fingerprint,
+expires_at, completeness, counts, indicator_definitions, aggregates, items,
+next_cursor, capabilities}`. `query_id` opaco efêmero e contexto apenas em RAM;
+`query_fingerprint` identifica query canônica (inclui seleção e todas dimensões,
+sem agrupamento/página puramente visuais); `content_fingerprint` resume conteúdo
+ordenado relevante de A/T, métricas, status/invalidadores, proveniência e vínculos
+cadastrais usados. Nenhum fingerprint público contém nominal legível. Definições
+referenciam domínio/modelo, sem segunda fórmula. `counts` distingue participantes,
+visitas, avaliações, tentativas; números cadastrais autorizados vêm separados de
+counts do recorte. `completeness` identifica completo/limite/erro: só completo
+habilita agregado/exportação. Não há resposta 200 com 5.000 de 5.001 apresentados
+como universo. Limite inicial de A continua 5.000 e de projetos 20: acima retorna
+422 com motivo fechado de limite e ação de reduzir recorte. Caminho maior só após
+medição, contrato de capacidade e aceite na tarefa correspondente; paginação da
+tabela não limita os agregados ao conteúdo da página.
+
+Cursores vinculam query/identidade/conteúdo e expiração; snapshot alterado ou
+expirado retorna 409, descarta conjunto anterior e exige reaplicação. Não combinar
+páginas de fingerprints distintos. Novo pedido cancela geração anterior no
+cliente; autorização e consistência continuam sendo dever do servidor. Segurança:
+POST de consulta também exige sessão profissional, Origin/CSRF e read DSN sem
+fallback writer, transação READ ONLY. Nenhum retorno nominal por solicitar coluna.
+
+### Projeções CSV sobre a consulta aplicada
+
+Prévia alvo: `POST /api/v1/exports/preview` com corpo fechado
+`{query_id, query_fingerprint, content_fingerprint, granularity, columns,
+identification_mode}`. Servidor resolve e valida a query integral normalizada;
+query_id não é autorização. Metadados de consulta podem ser token assinado ou
+referência opaca em memória efêmera no servidor; **decisão de implementação:
+reusar token assinado existente contendo somente IDs técnicos, fingerprints e
+expiração, sem nominal; busca textual fica em contexto efêmero servidor**.
+Perda desse contexto/restart retorna 409, nunca reconsulta irrestrita. Não é
+necessário cache externo ou tabela persistente de resultados. Compatibilidade de
+clientes antigos: adaptar project_id/filters ao mesmo parser/seletor e exigir
+snapshot/consulta validada; se não for possível, recusar 422 e orientar nova
+consulta/prévia. Não preservar aceitação silenciosa de filters desconhecidos.
+
+| Granularidade | População e cardinalidade obrigatórias |
+|---|---|
+| pacientes | Um cadastro central explicitamente vinculado a A, deduplicado por patient_id autorizado; nunca todos web_patients. Legado sem vínculo não ganha cadastro fictício: mostrar contagem sem cadastro e recusar projeção se a representação seria incompleta. Não unir por nome/código. Projetos de origem permanecem no contexto/manifesto protegido, sem acrescentar coluna ao schema legado inadvertidamente. |
+| avaliacoes | Uma linha por avaliação de A, inclusive quando T é subconjunto; informar que metadados e métricas oficiais referem-se à avaliação completa. |
+| tentativas | Uma linha por tentativa de T, identificada por assessment_id+trial_number; sem prática/observações parciais. |
+| metricas | Uma linha por métrica oficial disponível por avaliação de A, preservando ausência e unidade; sem recomputar em T, sem métricas Stroop fictícias em outros instrumentos. |
+| stroop_21_colunas | Linhas completas main de avaliações Stroop elegíveis de A, mesma ordem/schema/unidades/ausências do exportador canônico individual. Filtros de tentativa (condition/response_type ou seleção parcial de tentativas) são incompatíveis: 422 explícito, orientar tentativas ou retirada consciente do filtro. Exigir todas as 21 colunas na ordem canônica; seleção de colunas continua nas outras quatro projeções. |
+
+Colunas pertencem ao catálogo já existente de cada projeção; validar allowlist e
+permissão antes de consultar/projetar, normalizar ordem canônica e rejeitar lista
+vazia/duplicada/desconhecida, sem “vazia=exportar todas”. UI pode selecionar todas
+explicitamente. `deidentified` padrão também na amostra JSON: nominal não é lido
+pelo papel de consulta desidentificada e nunca volta escondido em sample_rows.
+Não retornar colunas não selecionadas. Códigos/IDs estáveis continuam pessoais
+pseudonimizados, sob autorização; não prometer anonimização.
+
+Prévia responde `{total_rows, counts, columns, applied_criteria, sample_rows,
+export_token, expires_at}`: até cinco linhas, somente campos autorizados,
+mascarados e selecionados, mesma projeção do CSV. `applied_criteria` inclui
+consulta normalizada autorizada para UI, fingerprints, projetos, granularidade,
+modo, versões/protocolos e semântica de população completa/subconjunto; busca
+nominal só retorna ao cliente com permissão e fica fora de logs/manifesto.
+
+Token v2 assinado, domínio próprio, válido por 15 minutos no máximo e nunca
+além da consulta/sessão: vincula principal e versão da sessão/credencial,
+lista completa ordenada de projetos, query_fingerprint, content_fingerprint,
+granularidade, colunas normalizadas, modo, versão do catálogo/serializador e
+expiração. Nenhum resultado/nominal em token decodificável. Permissões não são
+congeladas no token: revalidar no servidor a cada operação.
+
+Download: `POST /api/v1/exports/download` com os mesmos campos da prévia mais
+`export_token`; qualquer diferença invalida seleção, não gera novo arquivo
+silenciosamente. Coluna/filtro/projeto/modo/granularidade mudados na UI removem
+prévia; servidor também nega token divergente com 422. Expiração ou mutação de
+conteúdo entre consulta/prévia/download retorna 409 e exige atualizar consulta e
+prévia; não manter silenciosamente mesmo total com valores/IDs diferentes.
+Recomputar fingerprint de todo conteúdo relevante (não apenas contagem ou IDs),
+incluindo nominal/vínculo quando autorizado e invalidação tardia. Gerar arquivo
+e verificar fingerprint no mesmo snapshot READ ONLY consistente; versão da
+consulta é evidência de consistência, não prova temporal/física.
+
+Autorização de cada projeto e acesso ao cadastro/nominal são revalidados antes de
+consultar e antes de liberar bytes. Serializar decisão de acesso com revogação
+pelas mesmas travas de conta/vínculo do mecanismo existente; se revogação confirmar
+antes da decisão final de download, negar tudo. Buffer limitado ao teto aceito,
+sem streaming liberando dados antes da verificação final. Sem excluir projeto
+revogado e baixar os demais em silêncio. Ausência de read DSN falha fechada.
+401 para sessão inválida; 403 para operação/nominal não autorizados; projeto
+inacessível retorna erro sanitizado conforme anti-enumeração vigente (404), nunca
+arquivo parcial. Garantir testes de revogação de conta e de vínculo concorrentes.
+
+Nominal exige papel/capacidade adequada **e** habilitação institucional DEC-03
+por todos os projetos, conforme WEB-041; administracao isoladamente não basta.
+Positivos só em configuração sintética explícita de teste; não habilitar research
+real nesta entrega. Auditoria de prévia/download (sucesso/negação/conflito) com
+principal, IDs de projeto, fingerprints, granularidade, modo, colunas/quantidade,
+versão e timestamp; sem linhas, nome, termo de busca, token ou credencial.
+
+Retorno CSV mantém `text/csv; charset=utf-8`, Content-Disposition seguro e
+`Cache-Control: no-store`. Nome alvo `stroop-test-web_<granularidade>_<UTC>_<id-curto-aleatorio>.csv`,
+sem nominal/termo de busca; exportadores individual/agregado mantêm nomes/headers
+anteriores para compatibilidade. Manifesto separado opcional na UI: versão,
+filtros não sensíveis (omitir busca/identidades/IDs de participantes), projetos
+por referência autorizada, granularidade, colunas, contagens, fingerprints e UTC;
+sem preâmbulo/colunas extras no CSV21. Se não houver manifesto, prévia já contém
+contexto necessário, sem bloquear entrega por arquivo extra.
+
+Neutralização CSV reutiliza serializador canônico: testar texto perigoso em
+`= + - @`, tab/CR/LF, aspas/delimitadores e variantes Unicode aplicáveis, sem
+alterar números científicos ou ausências. [OWASP CSV Injection](https://owasp.org/www-community/attacks/CSV_Injection)
+é referência de ameaça; nenhuma estratégia promete segurança universal ao salvar
+novamente em qualquer planilha. Alteração do escape canônico exige roundtrip com
+consumidores Python/SQLite e decisão de compatibilidade; não inserir tabs em
+valores numéricos para resolver apresentação. Critérios/testes no plano EXPORT7.
+
+### Preparação direta contextual — alvo CHG-006 materializado pela CHG-007
+
+**PLANEJADO em WEB-054**, não alteração das rotas de participante nem de D2.
+`POST /api/v1/projects/{project_id}/direct-evaluations` com sessão profissional,
+Origin/CSRF, projeto ativo e permissão de preparar sessão. Corpo fechado:
+`{operation_id, patient, evaluator_id, test_code, visit, initials?, mode}`;
+operation_id UUID gerado pelo cliente só em RAM, mode `onsite` ou `remote`.
+`patient` é união exclusiva de `{patient_id}` ou
+`{new: {full_name, initials?, confirm_homonym?}}`; cadastro novo exige permissão
+cadastral e confirmação consciente após candidatos. Reusar validações/limites
+nominais, avaliador ativo, instrumento registrado, visita/iniciais e resumo da
+seção CHG-005; nunca resolver automaticamente por coincidência de nome.
+
+Chave de idempotência é principal+projeto+operation_id, com hash canônico do
+pedido: repetir igual não cria nada; payload divergente retorna 409. Paciente
+novo, vínculo/visita e convite/sessão reservada são confirmados juntos ou sofrem
+rollback integral. Não executar HTTP interno/commits intermediários para simular
+atomicidade. Reusar tabelas/funções existentes; se não houver registro adequado de
+idempotência, evolução aditiva é escopo técnico da WEB-054 com revisão de schema,
+grants e testes sintéticos, sem migration operacional implícita.
+
+201 inicial retorna `{operation_id, invitation_id, session_id, state, expires_at,
+summary, code, public_entry_url}`. summary é o mesmo resumo cadastral autorizado
+da preparação existente; public_entry_url é rota pública sem token/nominal.
+`code` é credencial opaca aprovada, somente RAM e protegida contra logs/cache;
+QR representa código para entrada/resgate aprovado, endereço público é exibido
+separadamente. Não criar URL secreta clicável ou transmissão para serviço de QR.
+Resposta repetida/consulta de estado **não** gera novo código nem guarda código
+plaintext para recuperar: retorna 200 com identificadores/resumo/state e
+`credential_available: false`. Em resultado desconhecido, UI primeiro consulta
+`GET /api/v1/projects/{project_id}/direct-evaluations/{operation_id}` (200 metadata
+protegida, 404 se operação não existente/não autorizada). Se código original se
+perdeu, oferecer revogar convite confirmado pela rota existente e nova emissão
+explicitamente confirmada com novo operation_id; jamais retry criando duplicata.
+
+Onsite tem handoff explícito após revisão por
+`POST /api/v1/projects/{project_id}/direct-evaluations/{operation_id}/handoff`,
+corpo `{code}`, Origin/CSRF profissional válido. Reusar resgate do participante,
+validando mesmo emissor/projeto/operação e código de uso único; na mesma decisão
+transacional encerrar sessão profissional no servidor e emitir cookie da sessão
+participante pelo mecanismo existente. Resposta 200 metadata de ingresso, sem
+resultado/nominal. Credencial profissional apagada no cliente; histórico/BFCache
+não serve dados administrativos com sessão revogada. Falha não pode emitir
+participante mantendo acesso profissional aberto. Nova autenticação é obrigatória
+para voltar à equipe após conclusão/interrupção, sem confirmação visual como
+substituto. Não modificar tempos, política de perda, bootstrap ou prática/main.
+Remote mantém fluxo de resgate aprovado e sessão profissional da equipe, sem
+compartilhar cookie participante. Estado desconhecido de handoff leva à consulta
+segura de sessão existente/novo login, não à retomada do principal.
+
+Erros sanitizados existentes: 401 sessão inválida, 403 operação/cadastro negado,
+404 escopo/operação inacessível, 409 homônimo/idempotência/estado, 422 entrada
+inválida, 503 falha operacional. Nenhuma emissão/cadastro silencioso por digitação,
+nenhum envio automático de convite. Testar corrida de criação, duplo clique,
+rollback, perda de resposta, código consumido, revogação e isolamento real em PG.

@@ -143,3 +143,47 @@ A simplificação da navegação e do pipeline de preparação é estritamente d
 - **Riscos e mitigações:**
   - *Risco de homônimos na criação automática pelo nome:* mitigado pela busca preditiva inteligente no formulário de etapa única, apresentando correspondências existentes com códigos e iniciais antes da submissão;
   - *Retorno acidental do participante ao painel da equipe no modo presencial:* mitigado pela destruição do token efêmero de execução e bloqueio de navegação com exigência de confirmação ou credenciais para reabrir o painel administrativo.
+
+## Complemento autorizado CHG-007 — 2026-11-11
+
+**Direção aceita, implementação PLANEJADA.** A auditoria da CHG-007 distingue
+capacidade granular aceita em M5/M7 de sua integração efetiva: os três eixos,
+consulta/exportação integralmente vinculadas e aplicação direta segura não são
+comprovados pelo aceite histórico. Novas fichas em M8 no backlog materializam a
+intenção desta ADR antes da candidata; nenhuma reabertura/renumeração de M4/M5/M7.
+
+1. Marca pública **Stroop Test Web**, sistema visual profissional delimitado ao
+   shell, sidebar responsiva com três eixos; especificação em
+   [UX7](../experimento/UX_DECISIONS.md#interface-profissional-integrada--chg-007).
+2. “Reativo” nesta ADR passa a significar atualização coerente de todos os
+   consumidores **depois de Aplicar filtros**. Esta precisão substitui atualização
+   imediata a cada tecla: rascunho separado, consulta aplicada única e exportação
+   bloqueada se há alterações pendentes. Preserva fluidez sem consultas pesadas
+   descontroladas. Sem filtro oculto em gráficos ou abas.
+3. Dashboard e exportação partilham parser/seletor autorizado no servidor;
+   domínio científico permanece independente. Token assinado de prévia vincula
+   consulta/colunas/permissões/conteúdo, sem congelar autorização: revogação nega
+   download. Projeções/cardinalidades e conflitos definidos somente no
+   [contrato HTTP](../desenvolvimento/CONTRATO_API_WEB.md#consulta-e-exportação-integradas--alvo-chg-007).
+4. Endpoint direct-evaluations e componentes citados acima são **alvos**, não
+   existência demonstrada. A meta anterior “menos de 10 segundos” é hipótese
+   operacional a medir, sem SLA universal nem início automático da tarefa. Criação
+   cadastral exige confirmação de candidato/homônimo e revisão inline; nunca
+   ocorre ao digitar nome. URL ilustrativa com `?invitation=...` acima fica
+   **rejeitada**: sem credencial/token/nominal na URL, logs ou histórico. Convite
+   opaco é resgatado pelo transporte já aprovado; não introduzir assinatura como
+   novo formato de credencial por esta ADR. QR usa código opaco exibido em RAM
+   para entrada/resgate aprovado, junto ao endereço público sem segredo; não
+   promete deep link secreto ou resgate automático por câmera.
+5. Handoff presencial deve encerrar/inutilizar sessão profissional no servidor
+   antes do participante e exigir reautenticação para abrir equipe novamente;
+   confirmação visual isolada não basta. D2, cookie participante, bootstrap,
+   timers/prática/principal/ACK/recibo permanecem iguais. Se nova modalidade
+   exigir mudança científica, registrar decisão específica antes de executar.
+6. Termos “clínico/psicométrico” e analogias ao Runner/Streamlit desta ADR são
+   motivação histórica de operação. Produto segue educacional/pesquisa
+   exploratória, sem diagnóstico, norma, equivalência ou suporte ampliado.
+
+Não é necessária nova ADR: este complemento define materialização e limites das
+mesmas decisões operacionais; ADR-007 mantém cadastros, segregação nominal e CSV.
+Não modifica workflow, autorização de marcos, DEC-03/04/05 ou produção.

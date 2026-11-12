@@ -4,6 +4,24 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-11 — Replanejamento integrado CHG-007
+
+Missão documental do proprietário integra identidade pública Stroop Test Web,
+design system, sidebar nos três eixos da ADR-008, dashboard multigranular e
+consistência entre consulta aplicada, prévia e CSV. Complemento ADR-008 define
+aplicação explícita de filtros e limites de handoff/QR sem segredo em URL.
+Auditoria dirigida distingue aceites históricos, implementação parcial e alvos
+não materializados; reprodução isolada do router avançado verifica lacunas de
+filtros/token/amostra, sem declarar integração PG ou segurança homologada.
+
+Backlog único recebe CHG-007, WEB-048..055 em M8, riscos e gates de candidata,
+M9 e documentação M10. Matriz recebe requisitos e vínculos futuros; arquitetura,
+UX, contrato HTTP (alvo planejado) e validação especificam fronteiras, semântica
+de recortes/cardinalidades, testes negativos, AA/responsividade e três jornadas.
+Aceites/IDs/fontes científicas/workflow preservados; nenhuma implementação,
+dependência, migration, deploy, dado real, tag ou release nesta missão. Evidências,
+progresso, resultados de validação e Git somente no backlog canônico.
+
 ## 2026-11-08 — Conclusão integral do marco M7: Integração, compatibilidade histórica e transição (M7 / WEB-025 a WEB-028)
 
 - **WEB-025 (Retirada de upload CSV no produto):**
