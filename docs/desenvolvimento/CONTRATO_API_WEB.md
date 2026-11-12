@@ -191,6 +191,23 @@ Valores sao deduplicados/ordenados antes de vincular cursor. `test_code` unico
 preserva o escopo canonico anterior de cursores/snapshots; a multisselecao passa
 a fazer parte desse escopo integralmente, sem criar consultas paralelas.
 
+A listagem também aceita multisseleções `condition` (`congruent`, `incongruent`)
+e `response_type` (`hit`, `omission`, `commission`, `correct_rejection`), com os
+mesmos limites e normalização. Nesta capacidade inicial, exigem `test_code`
+explicitamente restrito a `stroop_go_nogo_ptbr`; instrumento ausente, misto ou
+não suportado retorna 422, sem ignorar critérios. Uma avaliação só entra quando
+existe **uma mesma tentativa main** satisfazendo condição E resposta; seleções
+dentro de cada dimensão são alternativas. Classificação de resposta reutiliza
+`stroop.domain.stroop.expected_outcome`; não depende dos flags redundantes de
+acerto/erro persistidos. Prática não participa. O resumo e o detalhe mantêm as
+métricas oficiais da avaliação completa, sem recalcular sobre o subconjunto.
+Esses filtros integram o vínculo integral de cursor/snapshot. O agregado legado
+`POST /assessments/export` recusa esses dois campos com 422; a interface mantém
+o download agregado desabilitado para esse recorte até o contrato de projeções
+integradas. O download individual explicitamente identificado continua a ser o
+CSV oficial completo daquela avaliação. Essa extensão da listagem não implementa
+o `POST /analysis/query`, suas populações/agregações ou o token v2 abaixo.
+
 O cursor HMAC de avaliacoes e vinculado ao profissional, projeto e filtros
 canonicos e contem fingerprint dos metadados do conjunto autorizado. Cada pagina
 reautoriza o acesso numa transacao READ ONLY/REPEATABLE READ. Alteracao desse

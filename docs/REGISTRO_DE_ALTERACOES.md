@@ -4,6 +4,20 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-11 — Condição e resposta na mesma tentativa (WEB-050)
+
+A consulta aplicada recebe multisseleções pesquisáveis de condição congruente/
+incongruente e das quatro respostas canônicas. A seleção é feita no PostgreSQL
+por uma única tentativa principal, com classificação derivada do domínio Python
+oficial. Retirado o filtro React que usava totais da avaliação como aproximação.
+Métricas da avaliação completa preservadas; prática não participa. Capacidade
+inicial exige instrumento Stroop explícito e exclusivo; recortes não suportados
+e exportação agregada legada com esses campos são recusados. Cursor e snapshot
+vinculam a seleção integral. Testes sintéticos cobrem conjunção, OR, paginação,
+mutação, revogação e fluxo HTTPS nos dois navegadores. Contrato e matriz alinhados;
+evidências, limites e continuidade somente no backlog canônico. Sem alteração de
+paradigma, fórmulas, schema, dependências ou recursos operacionais.
+
 ## 2026-11-11 — Multisseleção de instrumentos na consulta aplicada (WEB-050)
 
 O catálogo React passa a selecionar vários instrumentos com busca, mantendo

@@ -452,6 +452,87 @@ class WebAssessmentsTests(unittest.TestCase):
         self.assertEqual(self.h.consulta.get(self.path, params=params).status_code, 404)
         self.assertEqual(self.h.consulta.post('/api/v1/assessments/export', json=body, headers=headers).status_code, 404)
 
+    def test_query7_condition_response_same_main_trial_and_full_metrics(self):
+        receipt, _ = self.complete()
+        self.legacy()
+        self.link_legacy()
+        baseline = {item['assessment_id']: item['summary'] for item in self.h.consulta.get(self.path).json()['items']}
+        scoped = [('test_code', 'stroop_go_nogo_ptbr')]
+        for condition in ('congruent', 'incongruent'):
+            for response in ('hit', 'omission', 'commission', 'correct_rejection'):
+                with self.subTest(condition=condition, response=response):
+                    # Expected membership comes from the canonical detail, not stored
+                    # correctness/error_type or an independent EXISTS per dimension.
+                    expected = set()
+                    for assessment_id in baseline:
+                        detail = self.h.consulta.get(self.path + '/' + assessment_id).json()
+                        if any(trial['condition'] == condition and trial['error_type'] == response
+                               for trial in detail['trials']):
+                            expected.add(assessment_id)
+                    result = self.h.consulta.get(self.path, params=[*scoped,
+                        ('condition', condition), ('response_type', response)])
+                    self.assertEqual(result.status_code, 200, result.text)
+                    self.assertEqual({item['assessment_id'] for item in result.json()['items']}, expected)
+                    for item in result.json()['items']:
+                        self.assertEqual(item['summary'], baseline[item['assessment_id']])
+        # Congruent trials and commissions coexist in both fixtures, but never
+        # on the same trial. A conjunction of separate EXISTS would leak them.
+        incompatible = self.h.consulta.get(self.path, params=[*scoped,
+            ('condition', 'congruent'), ('response_type', 'commission')])
+        self.assertEqual(incompatible.json()['items'], [])
+        # OR within each dimension, main-only, and domain rules rather than the
+        # denormalized error flag. Main trial metrics stay unchanged.
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute("UPDATE trial_results SET error_type='omission',correct=0 WHERE assessment_id=%s",
+                               (receipt['assessment_id'],))
+        params = [*scoped, ('condition', 'incongruent'), ('condition', 'congruent'),
+                  ('response_type', 'hit'), ('response_type', 'omission'), ('limit', '1')]
+        first = self.h.consulta.get(self.path, params=params)
+        self.assertEqual(first.status_code, 200, first.text)
+        cursor = first.json()['next_cursor']
+        self.assertTrue(cursor)
+        reordered = [*scoped, ('condition', 'congruent'), ('condition', 'incongruent'),
+                     ('response_type', 'omission'), ('response_type', 'hit'), ('cursor', cursor)]
+        second = self.h.consulta.get(self.path, params=reordered)
+        self.assertEqual(second.status_code, 200, second.text)
+        self.assertEqual(len(first.json()['items'] + second.json()['items']), 2)
+        changed = [*scoped, ('response_type', 'commission'), ('cursor', cursor)]
+        self.assertEqual(self.h.consulta.get(self.path, params=changed).status_code, 422)
+        # Late source mutation expires an unchanged query, even with equal count.
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute("UPDATE trial_results SET reaction_time=reaction_time+0.001 WHERE assessment_id=%s AND reaction_time IS NOT NULL",
+                               (receipt['assessment_id'],))
+        self.assertEqual(self.h.consulta.get(self.path, params=reordered).status_code, 409)
+        body = {'projects': [{'project_id': str(self.h.project_id), 'snapshot': first.headers['x-assessment-snapshot']}],
+                'filters': {'test_code': ['stroop_go_nogo_ptbr'], 'condition': ['congruent']},
+                'view': {'test_code': 'stroop_go_nogo_ptbr'}}
+        self.assertEqual(self.h.consulta.post('/api/v1/assessments/export', json=body).status_code, 422)
+        self.h._set_member(self.h.admin, helpers.CONSULTA, False)
+        self.assertEqual(self.h.consulta.get(self.path, params=params).status_code, 404)
+
+    def test_query7_trial_filter_excludes_practice_only_matches(self):
+        receipt, _ = self.complete(no_responses=True)
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute("""INSERT INTO trial_results
+                (assessment_id,block,trial_number,word,ink_color,condition,correct_response,key_pressed,
+                 reaction_time,correct,error_type)
+                VALUES (%s,'practice',1,'AZUL','blue','congruent','space','space',0.5,1,'hit')""",
+                (receipt['assessment_id'],))
+        result = self.h.consulta.get(self.path, params={'test_code': 'stroop_go_nogo_ptbr', 'response_type': 'hit'})
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertEqual(result.json()['items'], [])
+
+    def test_query7_trial_filters_require_explicit_instrument_capability(self):
+        for params in ({'condition': 'congruent'},
+                       {'test_code': 'other', 'response_type': 'hit'},
+                       [('test_code', 'stroop_go_nogo_ptbr'), ('test_code', 'other'), ('condition', 'congruent')],
+                       {'test_code': 'stroop_go_nogo_ptbr', 'condition': 'go'},
+                       {'test_code': 'stroop_go_nogo_ptbr', 'response_type': 'hits'},
+                       [('test_code', 'stroop_go_nogo_ptbr')] + [('response_type', 'hit')] * 101):
+            response = self.h.consulta.get(self.path, params=params)
+            self.assertEqual(response.status_code, 422, response.text)
+        self.assertEqual(self.h.consulta.get(self.path + '/options', params={'condition': 'congruent'}).status_code, 422)
+
     def test_w15a_queries_datas_e_listas_invalidas(self):
         for params in ({'start_date': '2026-02-30'}, {'start_date': '2026-03-01', 'end_date': '2026-02-01'},
                        {'platform': 'mobile'}, {'evaluator_id': 'nome@email'}, {'test_version': ''},

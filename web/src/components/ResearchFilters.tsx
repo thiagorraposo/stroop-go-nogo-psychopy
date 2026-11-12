@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import type { FormEvent } from 'react'
 import { ApiError, apiErrorMessage } from '../api/client'
 import { SearchableMultiSelect } from './SearchableMultiSelect'
@@ -44,6 +44,7 @@ export function ResearchFilters({
   applied?: ResearchQuery
   onChange?(query: ResearchQuery): void
 }) {
+  const validationId = useId()
   const [localDraft, setLocalDraft] = useState(() => defaultQuery(initialProject))
   const [localApplied, setLocalApplied] = useState(() => defaultQuery(initialProject))
   const draft = value ?? localDraft
@@ -124,7 +125,11 @@ export function ResearchFilters({
       setValidation('A data inicial deve ser anterior ou igual à final.')
       return
     }
-    if ([...Object.values(values), instruments].some(items => items.length > 100)) {
+    if ((condition.length || responseType.length) && (instruments.length !== 1 || instruments[0] !== 'stroop_go_nogo_ptbr')) {
+      setValidation('Selecione somente o instrumento Stroop Go/No-Go para filtrar condição ou resposta. Esses filtros exigem uma mesma tentativa principal; as métricas continuam da avaliação completa.')
+      return
+    }
+    if ([...Object.values(values), instruments, condition, responseType].some(items => items.length > 100)) {
       setValidation('Selecione no máximo 100 opções por campo.')
       return
     }
@@ -157,11 +162,11 @@ export function ResearchFilters({
   if (rtRange !== 'all') {
     activeChips.push({ label: `RT: ${rtRange}`, onRemove: () => setAdvanced('rtRange', 'all') })
   }
-  if (condition !== 'all') {
-    activeChips.push({ label: `Condição: ${condition}`, onRemove: () => setAdvanced('condition', 'all') })
+  if (condition.length) {
+    activeChips.push({ label: `Condição: ${condition.join(', ')}`, onRemove: () => setAdvanced('condition', []) })
   }
-  if (responseType !== 'all') {
-    activeChips.push({ label: `Resposta: ${responseType}`, onRemove: () => setAdvanced('responseType', 'all') })
+  if (responseType.length) {
+    activeChips.push({ label: `Resposta: ${responseType.join(', ')}`, onRemove: () => setAdvanced('responseType', []) })
   }
   for (const key of Object.keys(labels) as (keyof typeof labels)[]) {
     if (values[key].length > 0) {
@@ -173,7 +178,7 @@ export function ResearchFilters({
   }
 
   return (
-    <form aria-busy={loading} onSubmit={apply} className="research-filters filter-catalog-card" aria-label="Filtros da consulta">
+    <form aria-busy={loading} onSubmit={apply} className="research-filters filter-catalog-card" aria-label="Filtros da consulta" aria-describedby={validation ? validationId : undefined}>
       <div className="panel-header-section" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: '0.75rem' }}>
         <h3>Filtrar resultados</h3>
         <p className="panel-subtitle">Catálogo unificado de filtros por projeto, dimensões experimentais e métricas.</p>
@@ -302,30 +307,15 @@ export function ResearchFilters({
               <option value="1500msPlus">≥ 1,5 s</option>
             </select>
           </label>
-          <label>
-            Tipo de resposta / erro
-            <select
-              value={responseType}
-              onChange={event => setAdvanced('responseType', event.target.value as AdvancedFilterValues['responseType'])}
-            >
-              <option value="all">Todos os tipos</option>
-              <option value="hits">Com acertos (Hits &gt; 0)</option>
-              <option value="omissions">Com erros de omissão (&gt; 0)</option>
-              <option value="commissions">Com erros de comissão (&gt; 0)</option>
-              <option value="correct_rejections">Com rejeições corretas (&gt; 0)</option>
-            </select>
-          </label>
-          <label>
-            Condição experimental
-            <select
-              value={condition}
-              onChange={event => setAdvanced('condition', event.target.value as AdvancedFilterValues['condition'])}
-            >
-              <option value="all">Todas as condições</option>
-              <option value="go">Apenas blocos com Go</option>
-              <option value="nogo">Apenas blocos com No-Go</option>
-            </select>
-          </label>
+          <SearchableMultiSelect label="Tipo de resposta / erro" value={responseType}
+            onChange={items => setAdvanced('responseType', items as AdvancedFilterValues['responseType'])}
+            options={[{ value: 'hit', label: 'Acerto' }, { value: 'omission', label: 'Erro de omissão' },
+              { value: 'commission', label: 'Erro de comissão' }, { value: 'correct_rejection', label: 'Rejeição correta' }]} />
+          <SearchableMultiSelect label="Condição experimental" value={condition}
+            onChange={items => setAdvanced('condition', items as AdvancedFilterValues['condition'])}
+            options={[{ value: 'congruent', label: 'Congruente' }, { value: 'incongruent', label: 'Incongruente' }]} />
+          <p className="quiet">Condição e resposta devem ocorrer na mesma tentativa principal do Stroop Go/No-Go.
+            As métricas apresentadas referem-se sempre à avaliação completa.</p>
         </div>
 
         {/* GRUPO 4: ORDENAÇÃO E TRATAMENTO */}
@@ -376,7 +366,7 @@ export function ResearchFilters({
         sem atribuir fuso. Máximo de 20 projetos e 5.000 avaliações completas por consulta; restrinja os filtros para
         volumes maiores.
       </p>
-      {validation && <p role="alert">{validation}</p>}
+      {validation && <p id={validationId} role="alert">{validation}</p>}
       {pending && <p role="status">Carregando opções autorizadas…</p>}
       {error && (
         <>

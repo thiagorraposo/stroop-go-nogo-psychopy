@@ -54,7 +54,7 @@ Atualizado em **2026-11-11**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **37 de 56 · 66,1%** | **19** | **M8 em execução (2/12 aceitos)** | Completar WEB-050 (catálogo/contrato e AA); WEB-048 pronta; WEB-031 bloqueada |
+| **37 de 56 · 66,1%** | **19** | **M8 em execução (2/12 aceitos)** | Completar WEB-050 (POST normalizado e AA); WEB-048 pronta; WEB-031 bloqueada |
 
 ```text
 Aceites   █████████████░░░░░░░   66,1%
@@ -2194,8 +2194,9 @@ sem desalinhamento entre linhas Stroop e instrumentos genéricos.
 
 Estado: **EM_ANDAMENTO**, sem novo aceite. Ainda faltam multisseleção completa
 de instrumento/condição/resposta e integração ao contrato alvo normalizado
-(tipos atuais reutilizam o catálogo anterior); filtros avançados ainda usam
-seleção local histórica até WEB-051. Nenhum aceite de população A/T, nova
+(tipos atuais reutilizam o catálogo anterior); busca, status e faixas avançadas ainda usam
+seleção local histórica até WEB-051. Condição/resposta foram migradas para seleção
+no servidor na continuação registrada abaixo; esta descrição inicial é histórica. Nenhum aceite de população A/T, nova
 cardinalidade, fórmula, snapshot/fingerprint servidor ou CSV avançado é alegado.
 Matriz UX7-AA integral (cinco larguras, zoom/reflow, contrastes e revisão com
 leitor de tela) não foi concluída. Verificações de 390 px/zoom 200% e árvores/DOM
@@ -2401,6 +2402,124 @@ HEAD/upstream/`git ls-remote` e PR #19, sem commit artificial de autorreferênci
 O novo `verify` permanece pendente até seu resultado por SHA; não transferir
 os passes locais nem o diagnóstico CSP para aceite de Actions. PR #19 e PR #18
 continuam abertos sem merge, auto-merge desabilitado. Sem deploy/tag/release.
+
+
+#### Continuação — condição/resposta e reflow da consulta, 2026-11-11
+
+Autorização renovada por `continue o projeto`; WEB-050 continua no marco M8 e
+na branch `feat/m8-consulta-aplicada-unica`, base inicial `fc487cb`, alinhada ao
+upstream após fetch. Main/origin/main `b5fccbb`. `.deploy-hostgator/` preexistente
+preservada sem leitura/staging. Proibição específica de integrar PR #18 mantida,
+inclusive pela ancestralidade do PR #19, que continua draft sem merge.
+
+Entrega desta unidade:
+
+- Catálogo pesquisável passa a usar multisseleções de condições congruente/
+  incongruente e respostas canônicas hit/omission/commission/correct_rejection.
+  Rascunho, chips, limpar, descartar e publicação explícita mantêm a mesma
+  geração; normalização ordena/deduplica as duas dimensões. Resumo aplicado
+  identifica ambas. Erro de capacidade é anunciado e associado ao formulário.
+- GET de listagem aceita esses dois campos com allowlists e teto de 100 valores;
+  exige instrumento Stroop explícito/exclusivo, recusando capacidade ausente ou
+  mista com 422. Não cria suporte fictício em outros instrumentos nem nominal
+  em URL. Cursor/snapshot vinculam o recorte integral com reautorização SELECT.
+- PostgreSQL aplica **um único EXISTS main**: condição E resposta devem ocorrer
+  na mesma tentativa, OR dentro de cada campo. Alternativas de classificação
+  derivam de `stroop.domain.stroop.expected_outcome`, sem nova fórmula ou
+  dependência de flags redundantes de acerto/erro. Prática excluída. Hidratação
+  preserva métricas oficiais da avaliação inteira. Removida a aproximação React
+  por totais de Go/No-Go/respostas, que não comprovava a conjunção em tentativa.
+- Agregado legado recusa condição/resposta no servidor (422) e continua
+  desabilitado na UI para esse recorte; não produz arquivo com filtros ignorados.
+  Individual continua explicitamente o CSV oficial completo da avaliação.
+- Corrigido reflow: grade de filtros permite coluna menor que 280 px, controles
+  administrativos não impõem largura intrínseca e cabeçalho profissional quebra
+  linha quando necessário. Seletores delimitados à administração; nenhuma
+  alteração de DOM/tempos/HUD/estímulos do motor. Sem schema, migration,
+  dependência, dados reais, configuração operacional, deploy, tag ou release.
+
+Ambiente observado: Linux `7.0.0-42-generic`, Python 3.12.3, Node 24.15.0,
+npm 11.16.0, Chromium 156.0.8078.4 e Firefox 157.0; dependências existentes.
+PG 17.6 em container próprio `stroop_etapa4_test_m8_trials`, tmpfs, banco
+homônimo, loopback porta efêmera 32770; somente fixtures sintéticas.
+
+Validações desta unidade:
+
+- `npm --prefix web test -- --reporter=dot`: **342/342**, 28 arquivos, sem skips;
+  inclui equivalência de conjuntos, transporte integral, capacidade, seleção
+  preservada na busca e rascunho/aplicação/descarte. `npm --prefix web run build`:
+  TypeScript/Vite aprovados. Aviso de chunk >500 kB preservado (540,27 kB), sem
+  alterar dependência/limite para ocultá-lo.
+- `TEST_DATABASE_URL` exclusivamente no PG descartável acima,
+  `.venv/bin/python scripts/verify_web_ci.py python`: **452/452**, sem skips,
+  159,569 s, exit 0. Inclui três novos casos PG: oito combinações confrontadas
+  com detalhe canônico, OR, mesma tentativa, prática excluída, flags redundantes
+  inconsistentes, métricas completas, cursor reordenado/incompatível, mutação
+  com mesma cardinalidade, exportação recusada, capacidade inválida e revogação.
+  Regressão integral de API/auth/sessões/resultados/domínio/grants/CSV preservada.
+- Em `web/`, `WEB_TEST_PORT=4292 npx playwright test e2e/applied-query.spec.ts
+  e2e/research-filters.spec.ts e2e/aggregate-export.spec.ts e2e/dashboard.spec.ts
+  e2e/complete-results.spec.ts e2e/presentation.spec.ts --workers=2 --trace=off
+  --output=test-results/m8-trial-filters-browser`: **56/56**, 38,8 s, dois
+  navegadores, HTTP double. Campanha anterior à correção CSS; não prova PG.
+- Após CSS, em `web/`, `WEB_TEST_PORT=4293 npx playwright test
+  e2e/research-filters.spec.ts e2e/presentation.spec.ts --workers=2 --trace=off
+  --output=test-results/m8-trial-filters-layout-corrected`: **20/20**, 18,3 s.
+  Inclui cinco larguras 360/768/1024/1366/1920, viewport de reflow 320, ampliação
+  CSS 200% em 1366/1920 e 400% em 1280, foco/seleção e erro associado. Ampliação
+  CSS é evidência automatizada limitada, não revisão manual de zoom nativo.
+  Dez cores/centro/contorno e prática sem precisão regressados nos dois browsers.
+  Quatro screenshots sintéticos de filtros (360 e 1366, por navegador) em
+  diretório ignorado; inspeção visual de Chromium 360 e Firefox 1366 realizada.
+  Não concede revisão visual do proprietário nem conformidade WCAG integral.
+- Em `web/`, `TEST_DATABASE_URL` no banco descartável acima, `npx playwright
+  test --config playwright.integration.config.ts e2e/integrated/trial-filters.spec.ts
+  e2e/integrated/filters.spec.ts e2e/integrated/aggregate-export.spec.ts
+  --output=test-results/m8-trial-filters-https-final`: **8/8**, sem skips, 50,3 s,
+  HTTPS/proxy/React compilado/API/PG/grants reais em Chromium/Firefox. Confere
+  recorte impossível vazio, OR, seleção conservada, métricas completas, contexto
+  aplicado, exportação bloqueada, múltiplos projetos/páginas e revogação.
+  Build final usa CSS `index-Cd1eQ5rm.css` e JS `index-8UK2m2v9.js`.
+- `python3 scripts/verify_web_docs.py`, sete testes do validador e
+  `git diff --check`: aprovados; 11 marcos/56 tarefas/75 requisitos/15 riscos/
+  cinco decisões, 37 aceitos, 90 documentos/727 links/112 âncoras, sem ciclos.
+  Scanner `.venv/bin/python scripts/verify_web_ci.py sources`: **427 fontes
+  versionadas**, sem achados. Auditorias de dependências não reexecutadas
+  localmente; locks intactos. Só artefatos sintéticos ignorados, sem export/coleta
+  versionados. Container descartável próprio removido após os ensaios, sem tocar
+  containers/volumes preexistentes.
+
+Falhas intermediárias preservadas: primeira execução focada PG teve **23 passes
+e um erro** na fixture que tentava gravar error_type fora da constraint. Ajustada
+para valor válido porém incoerente (`omission`), sem alterar constraints/domínio;
+regressão integral acima passou. Primeira matriz de layout falhou **2/2** em 320
+nos dois browsers; diagnóstico Chromium confirmou coluna mínima 280 maior que
+espaço do formulário. Após correção da grade, outra execução falhou **2/2** na
+ampliação CSS 400%; diagnóstico Chromium localizou overflow no cabeçalho público
+profissional. Correção delimitada de flex-wrap e campanha final 20/20, sem remover
+asserções, ocultar overflow global ou reduzir requisitos. Aviso React histórico
+`flushSync` reapareceu em cenários negativos Firefox; na campanha CSS houve
+também `Cannot update ProfessionalAccess while rendering ResultsTable`. Causa
+não comprovada, não suprimida nem declarada resolvida; testes passaram, mas isso
+permanece limite de lifecycle a investigar na homologação integrada.
+
+WEB-050 segue **EM_ANDAMENTO**. Multisseleção de instrumento/condição/resposta
+está materializada, porém ainda faltam integração ao POST normalizado alvo,
+capacidades/agregação integral servidor e UX7-AA completa (revisão critério a
+critério, contraste, espaçamento/estados e leitor de tela efetivamente utilizado).
+Orca 46.1 disponível localmente; sua versão consultada não equivale a ensaio com
+leitor de tela. Não antecipar WEB-051/053 ou aceite integrado. Próxima ação exata:
+materializar contrato normalizado do POST e sua capacidade explícita para os
+recortes restantes, mantendo os gates de WEB-051 e revisão UX7-AA. WEB-048 segue
+independente e PRONTA; WEB-031 bloqueada externamente. Global **37/56**, M8
+**2/12**, sem novo aceite.
+
+Git desta unidade identificável por `git log -1 --format=%H
+--grep='feat(web): filtra condição e resposta na mesma tentativa'`.
+Commit/push/PR/check por SHA no fechamento posterior; não inferir CI de testes
+locais. Na consulta anterior ao novo envio, `verify` de **fc487cb** ainda estava
+IN_PROGRESS na execução 43131698618 (integração HTTPS), sem aprovação atribuída.
+PR #19 draft e PR #18 abertos, sem auto-merge/merge. Nenhum deploy/tag/release.
 
 ### WEB-051 — Consolidar seleção analítica autorizada e agregações no servidor
 
@@ -3340,11 +3459,11 @@ não inferir ausência de problema por falta de reprodução PG nesta missão.
 
 Novo `continue o projeto` autoriza M8 e suas tarefas prontas e sucessoras,
 sem avançar M9 ou autorizar operações externas. WEB-050 EM_ANDAMENTO: núcleo de
-consulta aplicada/cancelamento e multisseleção de instrumentos implementados;
-completar condição/resposta, contrato normalizado e UX7-AA antes do aceite.
+consulta aplicada/cancelamento, multisseleção de instrumentos e condição/resposta
+na mesma tentativa implementados; completar POST normalizado e UX7-AA antes do aceite.
 Evidências e fechamento em EV-M8-050; próximo trabalho exato é completar o
 catálogo/contrato e UX7-AA da ficha, com WEB-048 disponível independentemente.
-Unidades `07473b9` e `7f43295`; evidência atual em EV-M8-050. PR #19 draft aberto,
+Unidades `07473b9`, `7f43295` e continuação de condição/resposta; evidência atual em EV-M8-050. PR #19 draft aberto,
 sem merge; verify anterior b4382e6 falhou no caso CSP Chromium (diagnóstico local
 12/12 não explica a causa). Consultar fechamento atual para push/check por SHA.
 Não integrar indiretamente a ancestralidade do PR #18.

@@ -87,3 +87,44 @@ test('troca de projeto cancela consulta anterior sem reaplicar resposta atrasada
   await expect(page.getByRole('table', { name: 'Avaliações filtradas' })).toContainText('PROJETO_1')
   await expect(page.getByLabel('Participantes (códigos)', { exact: true })).toHaveValues([])
 })
+
+test('multisseleções de condição/resposta mantêm acesso em larguras, zoom e reflow', async ({ page }, info) => {
+  await access(page)
+  await page.route('**/api/v1/projects/*/assessments?*', r => r.fulfill({ json: { items: [row('S1')], next_cursor: null } }))
+  await open(page)
+  const form = page.getByRole('form', { name: 'Filtros da consulta' })
+  const condition = form.getByRole('listbox', { name: 'Condição experimental', exact: true })
+  const response = form.getByRole('listbox', { name: 'Tipo de resposta / erro', exact: true })
+  await condition.selectOption(['congruent', 'incongruent'])
+  await response.selectOption(['hit', 'omission'])
+  await form.getByRole('button', { name: 'Aplicar filtros', exact: true }).click()
+  const error = form.getByRole('alert')
+  await expect(error).toContainText('Selecione somente o instrumento Stroop')
+  expect(await form.getAttribute('aria-describedby')).toBe(await error.getAttribute('id'))
+  for (const width of [360, 768, 1024, 1366, 1920, 320]) {
+    await page.setViewportSize({ width, height: 900 })
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `scroll global em ${width}`).toBe(true)
+    for (const control of [condition, response]) {
+      await control.focus()
+      await expect(control).toBeFocused()
+      const bounds = await control.boundingBox()
+      expect(bounds!.x).toBeGreaterThanOrEqual(0)
+      expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width)
+    }
+    if (width === 360) await form.screenshot({ path: info.outputPath('trial-filters-360.png') })
+  }
+  for (const width of [1366, 1920]) {
+    await page.setViewportSize({ width, height: 1080 })
+    await page.evaluate(() => { document.documentElement.style.zoom = '2' })
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+    await expect(response).toHaveValues(['hit', 'omission'])
+    await page.evaluate(() => { document.documentElement.style.zoom = '' })
+  }
+  await page.setViewportSize({ width: 1280, height: 1080 })
+  await page.evaluate(() => { document.documentElement.style.zoom = '4' })
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await expect(response).toHaveValues(['hit', 'omission'])
+  await page.evaluate(() => { document.documentElement.style.zoom = '' })
+  await page.setViewportSize({ width: 1366, height: 1080 })
+  await form.screenshot({ path: info.outputPath('trial-filters-1366.png') })
+})

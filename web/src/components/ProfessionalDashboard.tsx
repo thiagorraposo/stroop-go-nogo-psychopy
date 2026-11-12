@@ -27,7 +27,7 @@ import {
   summarize,
 } from '../dashboard/analysis'
 import { listPatients } from '../api/patients'
-import { defaultQuery, normalizeQuery, queryKey, supportsLegacyExport } from '../dashboard/query'
+import { defaultQuery, normalizeQuery, queryKey, supportsLegacyExport, assessmentQueryFilters } from '../dashboard/query'
 
 export type AdministrativeModule =
   | 'dashboard'
@@ -238,7 +238,7 @@ export function ProfessionalDashboard({
       try {
         const items: ScopedAssessment[] = []
         const snapshots: ExportContext['projects'] = []
-        const appliedFilters = { ...(query?.filters ?? {}) } as AssessmentOptions
+        const appliedFilters = query ? assessmentQueryFilters(query) : {} as AssessmentOptions
         delete appliedFilters.cursor; delete appliedFilters.limit; delete appliedFilters.signal
         if (selected.length > 20) throw new ApiError('invalid_request', 422)
         for (const projectId of selected) {
@@ -246,7 +246,7 @@ export function ProfessionalDashboard({
           let cursor: string | undefined, projectSnapshot: string | undefined
           let snapshotsComplete = true
           do {
-            const page = await listAssessments(projectId, { ...query?.filters, cursor, limit: 100, signal: io.signal })
+            const page = await listAssessments(projectId, { ...appliedFilters, cursor, limit: 100, signal: io.signal })
             if (page.snapshot) {
               if (projectSnapshot && projectSnapshot !== page.snapshot) throw new ApiError('invalid_response', 200)
               projectSnapshot = page.snapshot
@@ -626,6 +626,8 @@ export function ProfessionalDashboard({
                   {query.advanced?.status && query.advanced.status !== 'valid' ? ` · status: ${query.advanced.status}` : ''}
                   {query.advanced?.accuracyRange && query.advanced.accuracyRange !== 'all' ? ` · precisão: ${query.advanced.accuracyRange}` : ''}
                   {query.advanced?.rtRange && query.advanced.rtRange !== 'all' ? ` · RT: ${query.advanced.rtRange}` : ''}
+                  {query.advanced?.condition.length ? ` · condições: ${query.advanced.condition.join(', ')}` : ''}
+                  {query.advanced?.responseType.length ? ` · respostas: ${query.advanced.responseType.join(', ')}` : ''}
                   .
                 </p>
               )}

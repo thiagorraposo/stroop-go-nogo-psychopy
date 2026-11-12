@@ -246,3 +246,10 @@ kbd { font: inherit; font-size: .9em; border: 1px solid #b7bfca; border-radius: 
 .notice-card p { margin: 0.25rem 0; font-size: 0.95rem; line-height: 1.5; color: #334155; }
 .metrics-dictionary { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0; }
 .badge { display: inline-block; padding: 2px 6px; background: #e2e8f0; border-radius: 4px; font-size: 0.85em; font-weight: 600; }
+
+/* Filtros administrativos: permitir reflow sem largura mínima intrínseca. */
+.research-filters .filter-groups-grid > *,
+.research-filters .filter-group-box,
+.research-filters input,
+.research-filters select { min-width: 0; }
+.page-shell:has(.professional-dashboard) .site-header { flex-wrap: wrap; }

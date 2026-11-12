@@ -23,6 +23,8 @@ export type AssessmentDetail = Assessment & { project_id: string; session_id: st
 export type PageOptions = { cursor?: string; limit?: number; signal?: AbortSignal };
 export type AssessmentFacetOptions = { start_date?: string; end_date?: string; test_code?: string; signal?: AbortSignal };
 export type AssessmentOptions = PageOptions & Omit<AssessmentFacetOptions, 'test_code'> & {
+  condition?: readonly ('congruent' | 'incongruent')[];
+  response_type?: readonly ('hit' | 'omission' | 'commission' | 'correct_rejection')[];
   test_code?: string | readonly string[];
   participant_id?: string | readonly string[]; visit?: string | readonly string[];
   evaluator_id?: readonly string[]; test_version?: readonly string[]; platform?: readonly ('web' | 'psychopy')[];
@@ -157,6 +159,8 @@ export function listProjects(options: PageOptions = {}): Promise<Page<Project>> 
   return json(path('/api/v1/projects', query(options)), (x) => page(x, project), options.signal);
 }
 const filterPatterns = {
+  condition: /^(?:congruent|incongruent)$/,
+  response_type: /^(?:hit|omission|commission|correct_rejection)$/,
   test_code: labelPattern,
   participant_id: /^[^\x00-\x1f\x7f]{1,512}$/, visit: /^[^\x00-\x1f\x7f]{1,512}$/,  evaluator_id: /^[A-Za-z0-9_-]{1,512}$/,
   test_version: /^[A-Za-z0-9_.+-]{1,64}$/, platform: /^(?:web|psychopy)$/,

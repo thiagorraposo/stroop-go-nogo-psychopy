@@ -13,7 +13,7 @@ import psycopg
 from psycopg.rows import dict_row
 
 from stroop.persistence.auth import PersistenceError
-from stroop.domain.stroop import calculate_metrics, expected_outcome
+from stroop.domain.stroop import ALLOWED_CONDITIONS, ALLOWED_KEYS, calculate_metrics, expected_outcome
 
 
 REQUIRED_COLUMNS = {
@@ -156,6 +156,25 @@ def _filters(filters):
         clauses.append('AND a.test_code=ANY(%s)')
         instruments = filters['test_code']
         values.append([instruments] if isinstance(instruments, str) else list(instruments))
+    if filters.get('condition') or filters.get('response_type'):
+        # Resolve outcome categories through the official domain. One EXISTS
+        # requires condition AND response on the SAME main trial; metrics below
+        # continue to hydrate the full assessment.
+        conditions = filters.get('condition') or ALLOWED_CONDITIONS
+        responses = filters.get('response_type')
+        pairs = []
+        for condition in sorted(ALLOWED_CONDITIONS):
+            for key in sorted(ALLOWED_KEYS):
+                outcome = expected_outcome({'condition': condition, 'key_pressed': key})
+                if outcome and condition in conditions and (not responses or outcome[2] in responses):
+                    pairs.append((condition, key))
+        if not pairs:
+            clauses.append('AND FALSE')
+        else:
+            alternatives = " OR ".join("(tr.condition=%s AND COALESCE(tr.key_pressed,'')=%s)" for _ in pairs)
+            clauses.append("AND EXISTS (SELECT 1 FROM trial_results tr WHERE tr.assessment_id=a.assessment_id "
+                           "AND tr.block='main' AND (" + alternatives + '))')
+            values.extend(value for pair in pairs for value in pair)
     return ' '.join(clauses), values
 
 

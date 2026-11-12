@@ -167,3 +167,34 @@ test('QUERY7: editar, remover chip e limpar não aplicam; descartar restaura o r
   expect(applied).toHaveBeenCalledTimes(2)
   expect(applied.mock.lastCall?.[0].advanced.searchText).toBe('')
 })
+
+test('QUERY7: multisseleção de condição/resposta exige capacidade e só publica ao aplicar', async () => {
+  const applied = vi.fn()
+  await act(async () => root.render(<ResearchFilters projects={mockProjects} initialProject={mockProjects[0]!.id} loading={false} onApply={applied} />))
+  const select = async (label: string, values: string[]) => {
+    const labelNode = [...container.querySelectorAll('label')].find(node => node.textContent === label)!
+    const list = container.querySelector<HTMLSelectElement>(`[id="${labelNode.htmlFor}"]`)!
+    await act(async () => {
+      for (const option of list.options) option.selected = values.includes(option.value)
+      list.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+    return list
+  }
+  await select('Condição experimental', ['congruent', 'incongruent'])
+  const list = await select('Tipo de resposta / erro', ['hit', 'omission'])
+  expect(applied).not.toHaveBeenCalled()
+  await act(async () => button('Aplicar filtros').click())
+  expect(container.querySelector('[role="alert"]')?.textContent).toContain('Selecione somente o instrumento Stroop')
+  expect(applied).not.toHaveBeenCalled()
+  await select('Instrumento da consulta', ['stroop_go_nogo_ptbr'])
+  await act(async () => button('Aplicar filtros').click())
+  expect(applied.mock.lastCall?.[0].advanced).toMatchObject({ condition: ['congruent', 'incongruent'], responseType: ['hit', 'omission'] })
+  const search = container.querySelector<HTMLInputElement>(`[aria-controls="${list.id}"]`)!
+  await fill(search, 'comissão')
+  expect([...list.selectedOptions].map(option => option.value)).toEqual(['hit', 'omission'])
+  await act(async () => container.querySelector<HTMLButtonElement>('[aria-label^="Remover filtro Resposta"]')!.click())
+  expect(list.selectedOptions).toHaveLength(0)
+  expect(applied).toHaveBeenCalledTimes(1)
+  await act(async () => button('Descartar alterações').click())
+  expect(list.selectedOptions).toHaveLength(2)
+})

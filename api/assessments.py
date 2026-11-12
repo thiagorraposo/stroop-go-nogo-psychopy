@@ -19,7 +19,11 @@ from stroop.application import web_assessments as application
 
 router = APIRouter(prefix='/api/v1/projects/{project_id}/assessments', tags=['assessments'])
 export_router = APIRouter(prefix='/api/v1/assessments', tags=['assessments'])
-MULTI = frozenset({'participant_id', 'visit', 'evaluator_id', 'test_version', 'platform', 'test_code'})
+MULTI = frozenset({'participant_id', 'visit', 'evaluator_id', 'test_version', 'platform', 'test_code', 'condition', 'response_type'})
+TRIAL_VALUES = {
+    'condition': frozenset({'congruent', 'incongruent'}),
+    'response_type': frozenset({'hit', 'omission', 'commission', 'correct_rejection'}),
+}
 SINGLE = frozenset({'start_date', 'end_date'})
 FILTERS = MULTI | SINGLE
 LABEL = re.compile(r'^[A-Za-z0-9_.-]{1,64}$')
@@ -43,6 +47,8 @@ def _filters(request, *, options=False):
                        r'^[A-Za-z0-9_.+-]{1,64}$' if key == 'test_version' else LABEL.pattern)
             if key in ('participant_id', 'visit'):
                 valid = all(1 <= len(value) <= 512 and value.strip() and not re.search(r'[\x00-\x1f\x7f]', value) for value in values)
+            elif key in TRIAL_VALUES:
+                valid = all(value in TRIAL_VALUES[key] for value in values)
             elif key == 'platform':
                 valid = all(value in ('web', 'psychopy') for value in values)
             else:
@@ -66,6 +72,10 @@ def _filters(request, *, options=False):
             result[key] = values[0]
     if result.get('start_date', '') > result.get('end_date', '9999-12-31'):
         raise APIError('invalid_request')
+    if any(result.get(key) for key in TRIAL_VALUES):
+        # Explicit instrument capability: never silently ignore trial filters.
+        if result.get('test_code') != 'stroop_go_nogo_ptbr':
+            raise APIError('invalid_request')
     return result
 
 
@@ -249,6 +259,9 @@ async def export_assessment_view(request: Request):
         raise APIError('invalid_request')
     projects_raw, filters_raw, view = body['projects'], body['filters'], body['view']
     if not isinstance(projects_raw, list) or not 1 <= len(projects_raw) <= 20 or not isinstance(filters_raw, dict):
+        raise APIError('invalid_request')
+    if set(filters_raw) & TRIAL_VALUES.keys():
+        # Legacy aggregate export has no trial-subset contract.
         raise APIError('invalid_request')
     try:
         filters = {}
