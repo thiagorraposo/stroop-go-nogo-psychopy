@@ -3728,6 +3728,16 @@ não inferir ausência de problema por falta de reprodução PG nesta missão.
 
 ### Retomada vigente — continuidade M8 e consulta POST integrada, 2026-11-12
 
+Encerramento explícito solicitado pelo proprietário após a entrega: encerrar a
+execução sem aguardar CI; deixar o GitHub executar e conferir os resultados em
+outra sessão. Commits `7cc3562` (implementação) e `b10015e` (validação/fechamento)
+enviados, HEAD/upstream/remoto conferidos em b10015e antes deste registro.
+PR #19 permanece draft e sem merge; auto-merge desabilitado. CI final não
+reconsultada neste encerramento, sem alegar aprovação. Na próxima retomada,
+conferir os checks da revisão enviada antes de decidir qualquer integração.
+Este registro será enviado na mesma branch; a CI correspondente segue no GitHub,
+sem monitoramento ou execução local mantida aberta. WEB-031 local preservada.
+
 Novo `continue o projeto` retoma M8 pela WEB-050 e mantém WEB-031 pendente.
 React passou a aplicar/paginar pelo POST único; filtros disponíveis e ordenação
 executados no servidor, com expiração e integridade entre páginas. CSV básico
