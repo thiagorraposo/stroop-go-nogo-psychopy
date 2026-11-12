@@ -2621,6 +2621,23 @@ Entrega identificável por `git log -1 --format=%H
 Conferir SHA/envio/check no fechamento desta unidade e HEAD/upstream/remoto;
 PR #19 continua draft, auto-merge desabilitado e nenhum merge autorizado.
 
+Fechamento desta unidade: entrega **`ee852f11f482af97ef0f4c460e8fcea9547957e3`**,
+11 arquivos da tarefa; push com upstream confirmado por HEAD/upstream/ls-remote
+na mesma SHA. Scanner: **430 fontes versionadas**, sem achados. Foco final de
+contrato/reautorização após ajustar a adulteração do cursor para byte significativo:
+**2/2 aprovados**, 1,642 s; evita dependência dos bits de padding base64 na fixture.
+Container descartável próprio removido após os testes, demais recursos preservados.
+
+[PR #19](https://github.com/thiagorraposo/stroop-test-web/pull/19) atualizado,
+draft, auto-merge desabilitado. `verify` da SHA ee852f1 **IN_PROGRESS** na consulta
+final, execução [43136318278](https://github.com/thiagorraposo/stroop-test-web/actions/runs/43136318278).
+Não é CI aprovada. O fechamento documental posterior recebe seu próprio check;
+consultar o SHA final, sem transferir aprovação local ou de outro commit.
+Nenhum merge, publicação, tag ou release. Registro de fechamento identificável
+por `git log -1 --format=%H
+--grep='docs(web): registra POST analítico validado e continuidade de M8'`;
+confirmar seu envio por HEAD/upstream/remoto, sem commit artificial de autorreferência.
+
 ### WEB-051 — Consolidar seleção analítica autorizada e agregações no servidor
 
 - Marco: M8. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
