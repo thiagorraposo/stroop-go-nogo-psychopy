@@ -456,6 +456,9 @@ print('seeded')
             {'role': 'administracao', 'active': True}, headers)
         self._assert(status == 200 and result['active'] is True)
 
+    def _invitation_fixture(self, headers):
+        return {'participant_id': 'P_SYNTHETIC_W19', 'visit': 'V1'}, 'P_SYNTHETIC_W19'
+
     def _collect_and_query(self):
         admin = self._seed_admin_session()
         self._administration_smoke(admin)
@@ -473,9 +476,10 @@ print('seeded')
             {"active": True}, write_headers,
         )
         self._assert(status == 200 and member["active"] is True)
+        invitation_body, participant_code = self._invitation_fixture(write_headers)
         status, _, invitation = self._json_request(
             "POST", f"/api/v1/projects/{project_id}/invitations",
-            {"participant_id": "P_SYNTHETIC_W19", "visit": "V1"}, write_headers,
+            invitation_body, write_headers,
         )
         self._assert(status == 201 and len(invitation["code"]) >= 40)
 
@@ -566,7 +570,7 @@ print('seeded')
         parsed_csv = list(csv.reader(io.StringIO(csv_body.decode("utf-8"))))
         self._assert(len(parsed_csv) == 17)
         self._assert(len(parsed_csv[0]) == 21 and len(parsed_csv[1]) == 21)
-        self._assert(parsed_csv[1][parsed_csv[0].index("participant_id")] == "P_SYNTHETIC_W19")
+        self._assert(parsed_csv[1][parsed_csv[0].index("participant_id")] == participant_code)
         self._assert(parsed_csv[1][parsed_csv[0].index("participant_name")] == "NAO_COLETADO")
         self._assert(parsed_csv[1][parsed_csv[0].index("initials")] == "")
         return project_id, receipt["assessment_id"], admin, admin_headers

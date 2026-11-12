@@ -2069,13 +2069,146 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 - Dependências: WEB-029; destino externo de teste autorizado se necessário.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Massa sintética restaurada isoladamente, schema/dados/recibo conferidos; réplica+agenda+alerta e retorno de imagem ensaiados, RPO/RTO medidos e limites aceitos.
-- Testes/verificação: `scripts/smoke_web_recovery.py, tests/test_web_backup_replication.py, test_vps_rollback.py`. Restauração positiva/negativa, outage/rollback, réplica SSH local positiva, idempotência, timer real positivo/negativo e alerta aprovados. Ver EV-M8-029/031; réplica externa não ensaiada.
-- Evidências: EV-M8-029/031, 2026-11-06; 11 migrations/uma avaliação/recibo restaurados, 6,305 s backup+restore local. Réplica SSH local/restore aprovados; idade 3,689 s/cópia 0,909 s. Sem comprovação de réplica externa/RPO no destino.
-- Riscos/bloqueios: R08/R09. Ferramenta SSH local preparada/ensaiada sem instalar no host; bloqueio por ferramenta superado. REQ-INF-003 exige réplica externa antes da publicação; destino/conta/chave externos de teste e aceite dos limites operacionais dependem do responsável. Não acessar VPS/backup operacional por inferência; ensaio no mesmo computador não prova falha independente nem RPO/RTO externos. WEB-032 preserva M7 e este gate.
+- Testes/verificação: `scripts/smoke_web_recovery.py`, `scripts/smoke_web_replication.py`, `scripts/smoke_local_auth_restore.py`, `tests/test_web_backup_replication.py`, `tests/test_vps_rollback.py`. EV-M8-031-MINT comprova restauração positiva/negativa, conteúdo em 21 tabelas, cadastros/vínculos/auditoria, SSH local/idempotência/hostkey incorreta, timer com cópia/atraso/indisponibilidade e rollback. Réplica VPS→notebook ainda não ensaiada.
+- Evidências: EV-M8-029/031 histórica preservada; EV-M8-031-MINT, 2026-11-12: receptor Mint instalado, 36 testes locais, 14 migrations/uma avaliação/16 tentativas/12 métricas restauradas. Cópia 2,079 s/118.821 bytes; restore da cópia 9,285 s, exclusivamente locais. Sem RPO/RTO externo comprovado.
+- Riscos/bloqueios: R08/R09. Notebook autorizado como destino temporário e identidade SSH exclusiva preparada. Proprietário/operador deve fornecer host/porta/usuário e fingerprint confiável, aprovar instalação restrita da chave/exportador na VPS e comprovar custódia AES separada. Depois medir ensaio externo e recuperação ponta a ponta. Notebook intermitente não garante RPO 24 h em desligamentos prolongados; RTO 4 h não presumido nem limite dispensado. Procedimento concreto no runbook; nenhuma alteração/conexão à VPS nesta execução. WEB-032 permanece dependente.
 - Referências: REQ-INF-003; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega parcial: branch `test/m6-m8-validacao-isolada`; commit/envio/CI no fechamento desta sessão.
 - CHG-004: Réplica externa independente continua obrigatória; após evolução de schema local, WEB-032 revalida restauração de hashes/sessões com custódia e invalidação de sessões restauradas para não ressuscitar acessos. RPO/RTO externo requer medição e aceite, não conta Google.
 - CHG-005: Como o backup PostgreSQL passará a incluir tabelas cadastrais nominais (`web_patients` e `web_evaluators` da migration `0014`), o ensaio de restauração e réplica criptografada deve comprovar integridade dos cadastros, vínculos e trilhas de auditoria sem expor nomes em logs operacionais.
+
+### EV-M8-031-MINT — receptor temporário e ensaios sintéticos, 2026-11-12
+
+Autorização explícita do proprietário para preparar Linux Mint como receptor,
+automação local e ensaios sintéticos. Exclui modificações na VPS sem nova
+aprovação. A sessão abriu no Ambulatório CPS; localizada a árvore correta do
+Stroop sem alteração naquele repositório. Base `d6d9dbb57310cc517f81e4d6a7d32a0b1fc4f0c3`,
+branch `feat/web031-receptor-mint`; preservados `.deploy-hostgator/`, commits
+preexistentes e proibição de integrar a ancestralidade do PR #18. Sem commit,
+push, PR, merge, deploy ou acesso à VPS nesta entrega. CI não executada para
+esta árvore de trabalho; não transferir resultados remotos de outro SHA.
+
+Após pedido de desfazer e posterior pedido explícito de recuperar na mesma
+data, arquivos e recursos privados foram recuperados de
+`/tmp/stroop-web031-undo-skz33sb2`. Patch integral, instalador, conteúdo da
+release e permissões conferidos; branch original da entrega recriada, timer
+enabled/active e Linger=yes restabelecidos. Origem SSH continua ausente,
+sem acesso à VPS. Ensaios funcionais abaixo são os da execução anterior,
+não reexecutados nesta recuperação. A imagem de teste foi reconstruída com
+camadas em cache: manifesto de runtime
+`sha256:cbb236e086379e678007c78cdb30b33e72bab282c40ba1e593dbd2ec1b84a6e2`
+e configuração idênticos aos originais; a nova atestação mudou o índice da
+tag para `sha256:0fa1ea4db088e76a7602cb4d28051294b827a8eb5b63bbd71437fe34ca59ff1f`.
+O identificador anterior abaixo é evidência histórica da rodada ensaiada.
+
+Receptor instalado pelo `scripts/install_web_backup_receiver.py`, Python 3.12
+do Mint 22.2 com `cryptography` existente, sem instalar pacotes no host:
+
+- Ciphertext em `/home/raposo/.local/share/stroop-web-replica/backups`, 0700;
+  configuração/SSH exclusivos em `/home/raposo/.config/stroop-web-replica`, 0700,
+  chave Ed25519 0600. Chave AES operacional não lida/copiada nem colocada nesse
+  diretório de backups. AES sintética em `synthetic-recovery.key`, na pasta
+  privada de configuração, separada do ciphertext de qualificação.
+- Release local por conteúdo
+  `648beff840f5ccad3a991159a2d9fa3f1344b42696d101e9800681f247045e81`,
+  arquivos 0400/diretórios 0500. Timer `stroop-web-backup-pull.timer`
+  **enabled/active**, agenda horária + até 5 min aleatórios, disparo de startup
+  em 2 min e `Persistent=true`; `Linger=yes` conferido após habilitação.
+  Units aprovadas por `systemd-analyze --user verify`; reinício físico não feito.
+- Serviço com CPUQuota 10%, MemoryMax 128 MiB, Nice 19, IO idle, UMask 0077,
+  NoNewPrivileges e timeout 420 s, sem restauração periódica. Último JSON
+  sanitizado atômico em `status/last-result.json`; journal/exit 1 identificam
+  falha sem canal externo. Status antigo deve ser identificado por `checked_at`.
+- `pull.json` **ausente** e `known_hosts` vazio até verificação da origem;
+  `pull.json.pending` é somente exemplo privado. Disparo real do serviço
+  terminou com `ExecMainStatus=1`, `alert=true`, `status=unavailable`, conforme
+  esperado nesta preparação. Não declarar automação operacional a partir disso.
+
+Comandos de integração, na raiz, usando `--api-image
+stroop-web-api:web031-20261112 --proxy-image stroop-web-proxy:deploy-6196c39`:
+
+1. `.venv/bin/python scripts/smoke_web_replication.py` com esses argumentos e
+   `--synthetic-backup-directory /home/raposo/.local/share/stroop-web-replica/qualification
+   --synthetic-key-file /home/raposo/.config/stroop-web-replica/synthetic-recovery.key`:
+   **passed**. SSH real somente em loopback, chave/hostkey efêmeras, forced
+   command rejeitou shell e hostkey errada foi recusada. SHA-256/bytes exatos,
+   repetição sem novo download/substituição, timers reais de cópia positiva,
+   geração de 25 h (`stale`, saída 1) e servidor parado (`unavailable`, saída 1).
+   Cópia restaurada em PG tmpfs sem portas; nenhum banco existente usado.
+2. `.venv/bin/python scripts/smoke_web_recovery.py` com os mesmos argumentos:
+   **passed**, backup+restore **10,004 s**, conteúdo divergente com mesma
+   contagem rejeitado, recibo desvinculado rejeitado, outage detectado e imagem
+   candidata inválida revertida para a imagem anterior, contagens preservadas.
+3. `.venv/bin/python scripts/smoke_local_auth_restore.py` com os mesmos
+   argumentos: **passed**, snapshot restaurado fechado até recuperação,
+   senha/token antigos recusados e login novo 200; conta/vínculo do projeto,
+   16 tentativas/12 métricas/16 observações/recibo preservados. API restaurada
+   testada por TestClient após recuperação; não confundir com tráfego na VPS.
+
+Comparação origem→restore usa contagem + SHA-256 ordenado do conteúdo em
+**21 tabelas**, inclusive schema_migrations, resultados, hashes/sessões locais,
+cadastros e auditorias. Massa nova contém 14 migrations, um paciente, um
+avaliador, um projeto/membro/participante/visita/convite/sessão/avaliação, 16
+tentativas/observações, 12 métricas, dois eventos cadastrais e sete de auditoria
+profissional. Vínculos paciente/avaliador/convidado e códigos científicos
+conferidos na origem e conteúdo integral preservado no restore. Nenhum nome,
+cookie, hash de credencial ou dado de participante é impresso nos relatórios.
+
+Imagem API construída localmente do código da base com allowlist, sem novos
+locks/migrations: `sha256:46b8ab6b66d693c42a6b7d41c1edda7e3215f17d7473a97b815ae54cfe0f1fbd`.
+Identificação completa é consultável por `docker image inspect
+stroop-web-api:web031-20261112`; proxy preexistente
+`sha256:fad12ab57fae24a7f3da5ebe0eb44d0e188d2e218751b8178da72654f62be366`.
+SSH foi instalado exclusivamente na imagem descartável do harness. Containers,
+volumes, timers transitórios, imagem SSH e chaves efêmeras próprios removidos;
+mantidos somente cliente/timer locais e ciphertext/AES **sintéticos** separados
+para futuro ensaio externo autorizado.
+
+Consumo do cliente medido com `/usr/bin/time`: cópia **2,079 s**, **0,49 s CPU
+usuário + 0,05 s sistema**, pico **25.420 KiB RSS**, payload **118.821 bytes**;
+repetição **1,22 s**, **0,38 + 0,03 s CPU**, **25.224 KiB RSS**, sem novo download
+de ciphertext. Inclui cliente Python/SSH, não soma todos containers Docker;
+overhead de rede SSH não medido. Restore da réplica **9,285 s**; idade pontual
+**6,725 s**, não RPO externo. Ausência de configuração: **0,21 s**, CPU
+**0,17 + 0,02 s**, **21.840 KiB RSS**, sem rede. Não extrapolar fixture para
+volume real: retenção atual verifica hashes locais e seu custo cresce com
+tamanho/número de gerações. Política preservada em 30 gerações recebidas;
+cliente atual consulta só a última geração, sem recompor dias intermediários
+perdidos enquanto desligado. Disco local alocado observado por `du -sk`:
+48 KiB de cliente, 20 KiB de configuração/chaves e 204 KiB de estado,
+ciphertext sintético e proposta para a VPS; **272 KiB** no total, sem somar
+imagens Docker de teste. Diretório de backups operacionais recebidos vazio.
+Ver orçamento máximo de disco no runbook.
+
+Regressão: **36 testes, zero falhas/skips**, com `.venv/bin/python -m unittest
+tests.test_backup_web tests.test_web_backup_replication tests.test_vps_rollback
+tests.test_monitor_web tests.test_hardening_producao.BackupEncryptionTests
+tests.test_hardening_producao.ProductionConfigurationTests -v`. Integração real
+está nos três harnesses, não inferida desses testes unitários. Documentação
+aprovada: 90 documentos/729 links/114 âncoras, grafo sem ciclos; sete testes
+do verificador aprovados sem skips e `git diff --check` limpo. Units validadas
+e `git status --short` revisado; somente arquivos da unidade e o diretório
+preexistente preservado aparecem. Nenhum backup/credencial adicionado ao Git.
+
+Falhas anteriores preservadas: duas tentativas ao montar massa via correção
+posterior de vínculos falharam na asserção de resposta de `relink`; HTTP/corpo
+não registrados. Inspeção indica possível falta de grants UPDATE no runtime
+para essa rota, fora desta unidade; não houve diagnóstico conclusivo nem
+correção de produção. Responsável técnico deve reproduzir isoladamente antes
+de alterar provisionamento/WEB-047. Aceite histórico não reaberto por inferência.
+O harness final cria os vínculos pelo convite cadastral canônico e os verifica,
+sem dispensar integridade para obter passe.
+
+Próxima dependência externa concreta: pacote local de proposta
+`/home/raposo/.local/share/stroop-web-replica/server-proposal/f64df30748913afd14e4e1d3a2d4c5091d8e61b2f1e609d37f3bc457267f6674.tar.gz`,
+com hashes, wrapper de origem exclusivamente sintética e linha de chave SSH
+restrita preparada. **Não enviado/instalado**. Procedimento para aprovação no
+[runbook](operacao/WEB_RECUPERACAO.md#procedimento-proposto-para-aprovação-específica-na-vps).
+Bloqueio/responsável/condição: proprietário deve conferir origem/hostkey e
+aprovar instalação restrita; operador depois mede réplica/restore externos e
+custódia. Intermitência impede garantir 24 h em longos desligamentos; RTO 4 h
+depende de medição ponta a ponta. **WEB-031 permanece BLOQUEADA**, sem dispensa
+de critério, sem conclusão de M8/WEB-032 nem autorização de publicação.
 
 ### WEB-032 — Fechar release candidata e runbooks reproduzíveis
 
@@ -3752,6 +3885,26 @@ Branch reutilizada feat/m8-consulta-aplicada-unica, base d6d9dbb; alterações l
 da WEB-031 preservadas sem staging/commit/envio e .deploy-hostgator/ intacto.
 PR #18 permanece aberto sem merge; PR #19 draft, sem integrar essa ancestralidade.
 Consultar fechamento da evidência para SHA/push/check próprios da entrega.
+
+### Retomada anterior — WEB-031 local autorizada, 2026-11-12
+
+Proprietário autorizou notebook Mint como receptor temporário, configuração
+local e ensaios exclusivamente sintéticos; vedou mudanças na VPS sem aprovação
+específica. Preparação e provas em EV-M8-031-MINT. Timer local habilitado com
+Linger; origem ainda não configurada, alerta esperado de indisponibilidade.
+**WEB-031 BLOQUEADA** por origem/hostkey, instalação SSH restrita a aprovar,
+custódia e medição externas. Notebook intermitente não comprova RPO 24 h;
+RTO 4 h não presumido. Procedimento/pacote concretos prontos para aprovação.
+Não conectar/alterar a VPS nem promover configuração sintética a operacional
+por inferência. Próxima ação dependente: proprietário fornece dados públicos
+da conexão/fingerprint e aprova os passos do runbook; continuar o ensaio
+sintético externo somente após isso. Reinício real do notebook não ensaiado.
+
+Branch `feat/web031-receptor-mint`, base `d6d9dbb`; sem commit/push/PR/CI/merge
+nesta unidade, alterações disponíveis para revisão. Mantidos PR #18 sem merge,
+PR #19 draft e `.deploy-hostgator/`; Ambulatório CPS intacto. WEB-050 conserva
+seu trabalho e próximo passo da retomada anterior; WEB-048 independente.
+37/56 aceitos e M8 2/12 preservados, sem autorização de M9/deploy/dados reais.
 
 ### Retomada anterior — execução M8 autorizada, 2026-11-11
 

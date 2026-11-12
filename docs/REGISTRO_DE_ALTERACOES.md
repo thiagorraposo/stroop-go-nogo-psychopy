@@ -18,6 +18,29 @@ sintética registrados em EV-M8-050 no backlog canônico, com falhas e limites.
 Sem alteração de protocolo/fórmula/migration/dependência ou acesso operacional;
 trabalho local anterior da réplica preservado.
 
+## 2026-11-12 — Receptor Mint e provas sintéticas da WEB-031
+
+Preparado receptor privado com chave SSH exclusiva, cliente instalado em
+release identificada por conteúdo e timer systemd horário, retomada no boot,
+prioridade reduzida e limites de CPU/memória. Último resultado sanitizado
+persistido atomicamente para identificar falhas sem serviço externo. Origem
+SSH não configurada; conexão e qualquer alteração na VPS aguardam os dados e
+a aprovação específica exigida pelo proprietário.
+
+Ensaio de recuperação ampliado para cadastros/vínculos e comparação de conteúdo
+em 21 tabelas. SSH real local, idempotência, hostkey incorreta, timer/alertas,
+restauração positiva/negativa, rollback e recuperação de senha/sessões testados
+exclusivamente em recursos sintéticos descartáveis. Medidas, falhas anteriores,
+limitações do notebook intermitente e condições de continuidade registrados
+em EV-M8-031-MINT no backlog canônico. Nenhuma alteração em dados reais,
+serviços/certificados/bancos operacionais, migrations ou dependências do host.
+
+Na mesma data, a pedido do proprietário, a entrega foi desfeita de forma
+reversível e depois recuperada integralmente da cópia privada. Arquivos,
+release, permissões, branch e timer local conferidos; imagem de teste
+reconstruída por cache com runtime idêntico e nova atestação. Os ensaios
+funcionais anteriores não foram repetidos; nenhuma conexão à VPS ocorreu.
+
 ## 2026-11-11 — Entrada analítica normalizada por POST (WEB-050)
 
 Adicionada entrada fechada de consulta com aliases canônicos, capacidades

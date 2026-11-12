@@ -8,6 +8,7 @@ import base64
 from datetime import datetime, timezone
 import hashlib
 import hmac
+import json
 import os
 from pathlib import Path
 import re
@@ -250,7 +251,32 @@ def verify_checksum(backup: Path) -> None:
         raise BackupError("Checksum do backup nao confere.")
 
 
-def restore_isolated(backup: Path, key_file: Path, *, verify_web: bool = False) -> tuple[int, int]:
+RECOVERY_TABLES = (
+    'schema_migrations', 'assessments', 'assessment_metrics', 'trial_results',
+    'web_assessments', 'web_trial_observations', 'web_patients', 'web_evaluators',
+    'web_registry_audit_events', 'auth_audit_events', 'web_projects',
+    'web_project_members', 'web_project_participants', 'web_participant_visits',
+    'web_invitations', 'web_participant_sessions', 'web_legacy_entity_links',
+    'app_users', 'web_local_credentials', 'web_local_sessions', 'web_local_auth_events',
+)
+
+
+def recovery_snapshot_sql() -> str:
+    """Contagens e SHA-256 de conteudo para comparar fixtures antes/depois.
+
+    Executar somente no ensaio autorizado, nunca no ciclo horario de replica.
+    Ordena hashes de linhas para nao depender da ordem fisica do dump.
+    """
+    parts = [f"""SELECT '{table}' AS name, jsonb_build_object(
+        'count', COUNT(*), 'sha256', encode(sha256(convert_to(
+            COALESCE(string_agg(h, '' ORDER BY h), ''), 'UTF8')), 'hex')) AS value
+        FROM (SELECT encode(sha256(convert_to(to_jsonb(t)::text, 'UTF8')), 'hex') h
+              FROM {table} t) rows""" for table in RECOVERY_TABLES]
+    return "SET TIME ZONE 'UTC'; SELECT jsonb_object_agg(name, value) FROM (" + ' UNION ALL '.join(parts) + ') snapshot;'
+
+
+def restore_isolated(backup: Path, key_file: Path, *, verify_web: bool = False,
+                     expected_snapshot: dict | None = None) -> tuple[int, int]:
     """Restaura em PostgreSQL tmpfs sem portas e sempre remove o ambiente."""
     verify_checksum(backup)
     key = load_key(key_file)
@@ -325,6 +351,7 @@ def restore_isolated(backup: Path, key_file: Path, *, verify_web: bool = False) 
                 "stroop_etapa4_test_restore",
                 "--tuples-only",
                 "--no-align",
+                "--set", "ON_ERROR_STOP=1",
                 "--command",
                 verification_sql,
             ],
@@ -336,6 +363,17 @@ def restore_isolated(backup: Path, key_file: Path, *, verify_web: bool = False) 
         if (len(counts) != (5 if verify_web else 2) or counts[0] < 1 or counts[1] < 0
                 or (verify_web and (counts[2] < 0 or counts[3:] != [0, 0]))):
             raise BackupError("Restauracao isolada sem verificacao estrutural.")
+        if expected_snapshot is not None:
+            snapshot = subprocess.run(
+                compose + ['exec', '-T', 'restore-postgres', 'psql',
+                           '--username', 'stroop_restore', '--dbname', 'stroop_etapa4_test_restore',
+                           '--tuples-only', '--no-align', '--quiet', '--set', 'ON_ERROR_STOP=1',
+                           '--command', recovery_snapshot_sql()],
+                check=True, capture_output=True, text=True,
+            )
+            actual = json.loads(snapshot.stdout)
+            if set(actual) != set(RECOVERY_TABLES) or actual != expected_snapshot:
+                raise BackupError('Restauracao isolada diverge da origem sintetica.')
         return counts[0], counts[1]
     except BackupError:
         raise

@@ -163,6 +163,133 @@ configuração SSH pessoal, destino externo ou backups existentes. O resultado
 local não garante réplica externa, disponibilidade contínua ou RPO/RTO da VPS.
 Evidências/aceite atuais somente no [backlog](../Projeto%20Stroop%20Test.md).
 
+### Receptor temporário Linux Mint
+
+Preparação local explicitamente autorizada em 12/11/2026, sem autorização de
+mudança na VPS. Na raiz do projeto:
+
+```bash
+umask 077
+python3 scripts/install_web_backup_receiver.py
+systemctl --user status stroop-web-backup-pull.timer
+loginctl show-user "$USER" -p Linger
+```
+
+O instalador reutiliza os dois scripts de backup/replicação numa release local
+identificada pelo SHA-256 do conteúdo, com arquivos 0400 e diretórios 0500.
+Não acompanha alterações de branch. Requer Python com `cryptography` já
+disponível; não instala dependências. Units diferentes preexistentes são
+preservadas e exigem revisão antes de atualização. Caminhos locais:
+
+| Recurso | Caminho relativo ao diretório pessoal | Proteção |
+|---|---|---|
+| Ciphertext recebido | `.local/share/stroop-web-replica/backups` | diretório 0700, arquivos 0600 |
+| Configuração e identidade SSH exclusiva | `.config/stroop-web-replica` | diretório 0700, chave 0600 |
+| Identidade pública para aprovação | `.config/stroop-web-replica/id_ed25519.pub` | somente chave pública |
+| Servidor conhecido | `.config/stroop-web-replica/known_hosts` | 0600; preencher após verificar fingerprint por canal confiável |
+| Último resultado sanitizado | `.local/share/stroop-web-replica/status/last-result.json` | 0600; substituído atomicamente, sem histórico crescente |
+
+Sem origem conferida, o instalador prepara apenas `pull.json.pending`; não
+transforma o exemplo em conexão real. A agenda fica habilitada e registra
+`unavailable`, `alert=true`, saída 1 enquanto `pull.json` estiver ausente.
+Isso identifica uma preparação incompleta, não uma réplica funcionando.
+O instalador não lê backups/chaves anteriores nem copia a chave AES ao receptor.
+A chave AES operacional continua em custódia separada; sua disponibilidade e
+recuperação precisam de comprovação própria, sem abrir segredos nesta preparação.
+
+Timer `OnCalendar=hourly`, atraso aleatório até cinco minutos,
+`OnStartupSec=2m` e `Persistent=true`; `loginctl enable-linger` inicia o
+gerenciador de usuário no boot, inclusive antes do login gráfico. A retomada
+de configuração deve ser conferida com `is-enabled`, `list-timers` e `Linger`;
+um reinício real só conta como ensaio quando observado. Não reiniciar o notebook
+do usuário para testar. Nenhum processo pode transferir com o notebook desligado
+ou sem rede; a tentativa sem conectividade falha fechada e será repetida no
+próximo disparo. A agenda não acorda o equipamento nem impede suspensão.
+
+O serviço limita CPU a 10% de um núcleo e memória a 128 MiB, com `Nice=19`,
+IO em classe `idle`, `UMask=0077` e `NoNewPrivileges`. O limite total de 420 s
+cobre os dois comandos SSH, cada um com timeout de 180 s. Nenhum daemon de
+replicação permanece entre disparos e não há restauração no timer. A cada
+execução busca o manifesto da geração mais recente; baixa ciphertext somente
+se ausente. Após desligamento prolongado não recompõe todas as gerações
+intermediárias da origem. Retém até 30 gerações verificadas recebidas;
+30 gerações não significam 30 dias de cobertura se o notebook ficou desligado.
+Cada geração admite até 512 MiB: teto de ciphertext de 15 GiB mais um temporário,
+sidecars e metadados. O tamanho real depende do banco, não da fixture sintética.
+
+Alertas são locais, sem serviços externos:
+
+```bash
+systemctl --user --failed
+journalctl --user -u stroop-web-backup-pull.service -n 10 --no-pager
+cat ~/.local/share/stroop-web-replica/status/last-result.json
+```
+
+`unavailable` indica falha/configuração/origem indisponível; `stale` indica
+backup acima de 24 h. Ambos retornam 1 e `alert=true`; `copied` e
+`already_current` retornam 0. Conferir também `checked_at`: arquivo antigo
+não comprova que o serviço continua executando. O arquivo único não acumula
+dados; o journal usa a política global existente do sistema, sem alterar
+retenção de logs de outros serviços. Não há entrega remota de alerta durante
+desligamento, suspensão ou ausência de internet.
+
+O notebook intermitente não garante RPO de 24 h durante longas ausências.
+Tempo local de restauração não demonstra RTO de 4 h na VPS. Não dispensar
+REQ-INF-003 nem declarar conformidade por um aceite destes limites. Critérios,
+medidas e bloqueios residuais ficam na ficha WEB-031.
+
+### Procedimento proposto para aprovação específica na VPS
+
+**Não executar esta seção sem aprovação posterior do proprietário.** Ela envolve
+criação de arquivos na VPS e inclusão de uma chave em `authorized_keys`, ações
+excluídas da autorização local de 12/11/2026. Primeiro ensaiar exclusivamente
+uma origem sintética separada dos backups operacionais:
+
+1. Conferir host/IP, porta, usuário e fingerprint SHA-256 da hostkey pelo painel
+   confiável do provedor. Obter a chave pública do host e comparar a fingerprint
+   antes de gravar `known_hosts`. `ssh-keyscan` isolado não autentica o servidor.
+   Nenhuma alteração em `/etc/ssh`, certificados, firewall ou contas é prevista.
+2. Com autorização específica, criar diretório privado
+   `/home/raposo/.local/lib/stroop-web-replica-export/REVISAO` com subpastas
+   `deploy` e `scripts`, contendo cópias dos exportador e módulo de backup
+   canônicos, identificadas por hash; não substituir a release operacional.
+   Usar Python já disponível com `cryptography`; se ausente, parar e apresentar
+   nova proposta, sem instalar por inferência.
+3. Criar diretório sintético 0700 separado em
+   `/home/raposo/.local/share/stroop-web-replica-test/source`. Enviar somente
+   ciphertext e sidecar gerados pelo ensaio sintético local; a chave AES de
+   teste fica em diretório distinto no notebook. Não abrir nem enumerar os
+   backups operacionais.
+4. Instalar wrapper 0400 na release exclusiva chamando `export` do exportador
+   canônico com `base=Path('/home/raposo/.local/share/stroop-web-replica-test/source')`
+   e o `SSH_ORIGINAL_COMMAND`, mantendo tratamento fechado de erros. O comando
+   desta chave terá esse diretório como única origem; não ampliar permissões
+   da conta nem conceder novos acessos aos backups operacionais.
+5. Preservar todas as linhas preexistentes de `authorized_keys`; acrescentar
+   somente a identidade pública exclusiva do notebook com esta restrição,
+   em **uma linha**, substituindo `REVISAO` e a chave pública:
+
+   ```text
+   restrict,command="/usr/bin/python3 /home/raposo/.local/lib/stroop-web-replica-export/REVISAO/export-synthetic.py" ssh-ed25519 CHAVE_PUBLICA_EXCLUSIVA stroop-web031-mint-receiver
+   ```
+
+   Preservar diretório SSH 0700 e arquivo 0600, sem relaxar StrictModes.
+   Sem shell, PTY, forwarding, agente, chave AES ou acesso administrativo por
+   essa identidade. Não usar opções de bypass de hostkey.
+6. Preencher `pull.json` 0600 no notebook com os seis campos do contrato e a
+   hostkey verificada. Executar cópia, repetir para comprovar idempotência,
+   conferir SHA-256 e restaurar a cópia sintética em PostgreSQL descartável.
+   Medir transferência/idade/recuperação, provar os dados exigidos e testar
+   o timer. Não parar a VPS para simular indisponibilidade; usar uma origem
+   sintética indisponível no ensaio local.
+7. A passagem da origem sintética para os backups operacionais requer plano
+   e aprovação específicos, incluindo caminho/release de exportação, custódia
+   AES, ausência de leitura de dados reais nos testes, retenção e limitações
+   de disponibilidade. Não é consequência automática do teste positivo.
+
+Revogação futura: mediante solicitação, retirar somente a linha desta chave;
+não reescrever as demais autorizações nem remover backups por inferência.
+
 Registro histórico do primeiro ensaio local: 8 migrations e uma coleta restauradas, integridade de
 16 tentativas/12 metricas e estado concluido verificados; backup/restauracao
 em 7,083 segundos, falha de banco detectada e rollback do candidato com

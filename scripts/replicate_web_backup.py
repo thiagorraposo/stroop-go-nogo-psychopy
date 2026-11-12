@@ -239,15 +239,39 @@ def run_once(values: dict, *, now: datetime | None = None) -> dict:
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', type=Path, required=True)
+    parser.add_argument('--status-file', type=Path,
+                        help='Ultimo resultado sanitizado, em diretorio privado existente')
     options = parser.parse_args(argv)
     try:
         values = load_configuration(options.config)
         report = run_once(values)
     except Exception:
-        print(json.dumps({'status': 'unavailable', 'alert': True, 'error': 'replication_failed'}))
-        return 1
+        report = {'status': 'unavailable', 'alert': True, 'error': 'replication_failed'}
+    if options.status_file is not None:
+        try:
+            save_status(options.status_file, report)
+        except Exception:
+            report = {'status': 'unavailable', 'alert': True, 'error': 'status_write_failed'}
     print(json.dumps(report))
     return int(report['alert'])
+
+
+def save_status(path: Path, report: dict) -> None:
+    """Publica ultimo resultado sem dados/credenciais; nao acumula logs."""
+    if (not path.is_absolute() or path.is_symlink() or path.parent.is_symlink()
+            or not path.parent.is_dir() or path.parent.stat().st_mode & 0o077):
+        raise ReplicationError
+    descriptor, name = tempfile.mkstemp(prefix='.replication-status-', dir=path.parent)
+    temporary = Path(name)
+    try:
+        with os.fdopen(descriptor, 'w') as output:
+            json.dump({**report, 'checked_at': datetime.now(timezone.utc).isoformat()}, output)
+            output.write('\n')
+            output.flush()
+            os.fsync(output.fileno())
+        temporary.replace(path)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 if __name__ == '__main__':
