@@ -2316,6 +2316,92 @@ Fechamento documental identificável por `git log -1 --format=%H
 --grep='docs(web): registra unidade parcial de WEB-050 e PR de revisão'`;
 confirmar envio por HEAD/upstream/remoto, sem commit artificial de autorreferência.
 
+#### Continuação — multisseleção de instrumentos, 2026-11-11
+
+Novo `continue o projeto` mantém o escopo em M8 e retoma WEB-050 na mesma
+branch, inicialmente em `b4382e6`, alinhada ao upstream após fetch. Main e
+origin/main em `b5fccbb`; `.deploy-hostgator/` preexistente preservado sem leitura
+ou staging. PR #19 permanece draft: a proibição de integrar a ancestralidade
+do PR #18 continua vigente e impede merge mesmo se os checks passarem.
+
+Entrega **`7f43295423e994d2bca9684187391a5723c2a95a`**:
+
+- Instrumento passa a listbox múltiplo pesquisável, com selecionados preservados
+  durante busca, chip removível e publicação somente ao aplicar. A identidade
+  local normaliza ordem/duplicatas e torna string única/lista unitária equivalentes.
+- API/listagem e persistência SELECT recebem até 100 instrumentos como OR no
+  mesmo recorte. Não são consultas paralelas nem filtro posterior local.
+  Cursor e snapshot vinculam a seleção completa; reordenação é equivalente,
+  troca de instrumento recusa reaproveitamento. Valores inválidos e excesso
+  retornam 422. Facetas mantêm contrato anterior com instrumento único.
+- CSV agregado recebe a mesma seleção integral e revalida todos os vínculos;
+  clientes antigos com `test_code` string continuam compatíveis. A projeção
+  existente segue por instrumento; a UI não habilita CSV agregado de instrumentos
+  mistos. Sem mudança de fórmulas, 21 colunas, motor, CSS, dependências ou schema.
+
+Verificações locais, ambiente de EV-M8-050 preservado, sem instalações:
+
+- `npm --prefix web test -- --reporter=dot`: **340/340**, 28 arquivos, sem skips;
+  `npm --prefix web run build`: tipos e Vite aprovados, aviso de chunk >500 kB
+  preservado (540,07 kB), CSS mantém `index-mVgr7SNY.css`.
+- `TEST_DATABASE_URL` exclusivamente sintético,
+  `.venv/bin/python -m unittest tests.test_web_assessments -q`: **21/21**, sem
+  skips, em 22,768 s. Inclui união de dois instrumentos, paginação reordenada,
+  recorte/cursor incompatível, snapshot/CSV, compatibilidade string/lista,
+  limites e revogação; demais contratos de consulta regressados.
+- Em `web/`, `WEB_TEST_PORT=4291 npx playwright test
+  e2e/applied-query.spec.ts e2e/research-filters.spec.ts
+  e2e/aggregate-export.spec.ts e2e/dashboard.spec.ts e2e/complete-results.spec.ts
+  --workers=2 --trace=off --output=test-results/m8-multi-instrument`:
+  **50/50**, Chromium/Firefox, 32,2 s; HTTP double, sem alegar integração real.
+- Em `web/`, `TEST_DATABASE_URL` sintético, `npx playwright test
+  --config playwright.integration.config.ts e2e/integrated/complete-results.spec.ts
+  e2e/integrated/filters.spec.ts e2e/integrated/aggregate-export.spec.ts
+  --output=test-results/m8-multi-instrument-https`: **8/8**, Chromium/Firefox,
+  58,5 s; HTTPS/API/PG e grants reais. Confere seis avaliações de dois instrumentos
+  na mesma consulta, rascunho/busca/seleção preservada, separação das tabelas e
+  downloads incompatíveis desabilitados; regressa CSV, múltiplos projetos e
+  revogação. PG 17.6 descartável em tmpfs no container próprio
+  `stroop_etapa4_test_m8_continue`, banco homônimo, loopback porta efêmera 32769.
+- Validador documental, sete testes do validador e `git diff --check` aprovados;
+  scanner de secrets: **426 fontes versionadas**, sem achados. Somente fixtures
+  sintéticas; nenhum dado operacional, secret ou material de deploy lido.
+
+CI anterior conferida nesta sessão: `verify` da SHA **b4382e6** falhou na execução
+[43124371410](https://github.com/thiagorraposo/stroop-test-web/actions/runs/43124371410),
+com **45/46** integrações aprovadas. O caso CSP Chromium não encontrou o estímulo
+principal em 8 s; Python, frontend, auditorias e navegadores isolados passaram
+naquele run. Isso não prova regressão CSP nem explica a causa. Diagnóstico local
+na base b4382e6: `npx playwright test --config playwright.integration.config.ts
+e2e/integrated/security.spec.ts --repeat-each=3
+--output=test-results/m8-csp-diagnostic`: **12/12**, 2,5 min, sem retries/skips,
+nos dois navegadores, com HTTPS/API/PG reais. Nenhum timeout, gate científico,
+CSP ou teste afrouxado; falha remota e ausência de causa comprovada preservadas.
+
+WEB-050 permanece **EM_ANDAMENTO**, sem novo aceite e sem promover WEB-051.
+Esta unidade resolve a multisseleção de instrumentos, mas ainda faltam condição/
+resposta, serialização/integração ao POST normalizado do contrato alvo e UX7-AA
+integral. WEB-048 continua PRONTA, WEB-031 bloqueada externamente; global 37/56,
+M8 2/12.
+
+Regressão integral: `TEST_DATABASE_URL` no banco descartável acima,
+`.venv/bin/python scripts/verify_web_ci.py python`: **449/449**, sem skips,
+141,875 s, exit 0. Inclui API base, auth, sessões, resultados, domínio, grants,
+exportações e migrações sintéticas; não aplica migrações operacionais. O runner
+rejeita skips; mensagens internas de auditoria sintética recusada pertencem aos
+testes negativos do próprio runner, não a uma auditoria de dependências desta
+sessão. Auditoria de dependências não reexecutada localmente (locks intactos).
+Container descartável próprio removido ao final; demais containers preservados.
+
+Fechamento desta continuação: commit funcional `7f43295`; commit documental
+identificável por `git log -1 --format=%H
+--grep='docs(web): registra multisseleção validada e continuidade de M8'`.
+Envio e estado do check da SHA final devem ser conferidos por
+HEAD/upstream/`git ls-remote` e PR #19, sem commit artificial de autorreferência.
+O novo `verify` permanece pendente até seu resultado por SHA; não transferir
+os passes locais nem o diagnóstico CSP para aceite de Actions. PR #19 e PR #18
+continuam abertos sem merge, auto-merge desabilitado. Sem deploy/tag/release.
+
 ### WEB-051 — Consolidar seleção analítica autorizada e agregações no servidor
 
 - Marco: M8. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
@@ -3253,12 +3339,15 @@ não inferir ausência de problema por falta de reprodução PG nesta missão.
 ### Retomada vigente — execução M8 autorizada, 2026-11-11
 
 Novo `continue o projeto` autoriza M8 e suas tarefas prontas e sucessoras,
-sem avançar M9 ou autorizar operações externas. WEB-050 EM_ANDAMENTO: núcleo de consulta aplicada/cancelamento implementado;
-completar catálogo multisseleção e contrato e conferir UX7-AA antes do aceite.
+sem avançar M9 ou autorizar operações externas. WEB-050 EM_ANDAMENTO: núcleo de
+consulta aplicada/cancelamento e multisseleção de instrumentos implementados;
+completar condição/resposta, contrato normalizado e UX7-AA antes do aceite.
 Evidências e fechamento em EV-M8-050; próximo trabalho exato é completar o
 catálogo/contrato e UX7-AA da ficha, com WEB-048 disponível independentemente.
-Unidade `07473b9` enviada e PR #19 draft aberto, sem merge; verify em execução
-na consulta registrada. Não integrar indiretamente a ancestralidade do PR #18.
+Unidades `07473b9` e `7f43295`; evidência atual em EV-M8-050. PR #19 draft aberto,
+sem merge; verify anterior b4382e6 falhou no caso CSP Chromium (diagnóstico local
+12/12 não explica a causa). Consultar fechamento atual para push/check por SHA.
+Não integrar indiretamente a ancestralidade do PR #18.
 WEB-048 permanece PRONTA; WEB-031 BLOQUEADA pelo destino externo/custódia.
 37/56 aceitos preservados; nenhum aceite concedido no início da execução.
 Branch `feat/m8-consulta-aplicada-unica` deriva de `67dfbf7` (CHG-007), pois
