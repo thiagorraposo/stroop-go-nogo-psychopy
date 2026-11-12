@@ -10,6 +10,15 @@ beforeEach(() => { fetchMock = vi.fn<typeof fetch>(); vi.stubGlobal('fetch', fet
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks() })
 
 describe('exportacao agregada manual', () => {
+  it('QUERY7: mantém a seleção completa de instrumentos no corpo vinculado ao snapshot', async () => {
+    fetchMock.mockResolvedValue(new Response('synthetic\r\n', { headers: {
+      'Content-Type': 'text/csv; charset=utf-8',
+      'Content-Disposition': 'attachment; filename="stroop_go_nogo_ptbr_avaliacoes.csv"',
+    } }))
+    const filters = { test_code: ['instrumento_sintetico_demo', 'stroop_go_nogo_ptbr'] }
+    await exportAssessmentView({ ...context, filters }, view, csrf)
+    expect(JSON.parse(String(fetchMock.mock.calls[0]![1]?.body)).filters).toEqual(filters)
+  })
   it('envia filtros e snapshots no corpo protegido e recebe blob com nome fixo', async () => {
     fetchMock.mockResolvedValue(new Response('assessment_id\r\nSINTETICO\r\n', { headers: {
       'Content-Type': 'text/csv; charset=utf-8',

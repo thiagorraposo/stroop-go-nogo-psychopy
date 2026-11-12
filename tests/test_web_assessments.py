@@ -412,10 +412,51 @@ class WebAssessmentsTests(unittest.TestCase):
         self.assertEqual(conflict.status_code, 409, conflict.text)
         self.assertEqual(conflict.json()['error']['code'], 'state_conflict')
 
+    def test_query7_multisselecao_instrumentos_cursor_snapshot_csv_e_revogacao(self):
+        receipt, _ = self.complete()
+        legacy = self.legacy()
+        self.link_legacy()
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute("UPDATE assessments SET test_code='instrumento_sintetico_demo' WHERE assessment_id=%s", (legacy,))
+        stroop = 'stroop_go_nogo_ptbr'
+        demo = 'instrumento_sintetico_demo'
+        params = [('test_code', stroop), ('test_code', demo), ('limit', '1')]
+        first = self.h.consulta.get(self.path, params=params)
+        self.assertEqual(first.status_code, 200, first.text)
+        cursor = first.json()['next_cursor']
+        self.assertTrue(cursor)
+        reordered = [('test_code', demo), ('test_code', stroop), ('cursor', cursor)]
+        second = self.h.consulta.get(self.path, params=reordered)
+        self.assertEqual(second.status_code, 200, second.text)
+        self.assertEqual({item['assessment_id'] for item in first.json()['items'] + second.json()['items']},
+                         {legacy, receipt['assessment_id']})
+        # A cursor cannot be reused for a different instrument selection.
+        self.assertEqual(self.h.consulta.get(self.path, params={'test_code': stroop, 'cursor': cursor}).status_code, 422)
+        body = {'projects': [{'project_id': str(self.h.project_id),
+                              'snapshot': first.headers['x-assessment-snapshot']}],
+                'filters': {'test_code': [demo, stroop]}, 'view': {'test_code': stroop}}
+        headers = {'X-CSRF-Token': self.h.consulta.headers['X-CSRF-Token']}
+        exported = self.h.consulta.post('/api/v1/assessments/export', json=body, headers=headers)
+        self.assertEqual(exported.status_code, 200, exported.text)
+        exported_rows = list(csv.DictReader(io.StringIO(exported.text)))
+        self.assertEqual([item['assessment_id'] for item in exported_rows], [receipt['assessment_id']])
+        body['filters'] = {'test_code': [stroop]}
+        self.assertEqual(self.h.consulta.post('/api/v1/assessments/export', json=body, headers=headers).status_code, 422)
+        # The old single-string client and the new single-item list share scope.
+        single = self.h.consulta.get(self.path, params={'test_code': stroop})
+        body['projects'][0]['snapshot'] = single.headers['x-assessment-snapshot']
+        for value in (stroop, [stroop]):
+            body['filters'] = {'test_code': value}
+            self.assertEqual(self.h.consulta.post('/api/v1/assessments/export', json=body, headers=headers).status_code, 200)
+        self.h._set_member(self.h.admin, helpers.CONSULTA, False)
+        self.assertEqual(self.h.consulta.get(self.path, params=params).status_code, 404)
+        self.assertEqual(self.h.consulta.post('/api/v1/assessments/export', json=body, headers=headers).status_code, 404)
+
     def test_w15a_queries_datas_e_listas_invalidas(self):
         for params in ({'start_date': '2026-02-30'}, {'start_date': '2026-03-01', 'end_date': '2026-02-01'},
                        {'platform': 'mobile'}, {'evaluator_id': 'nome@email'}, {'test_version': ''},
                        {'participant_id': 'P' * 513}, {'visit': '\x00'},
+                       [('test_code', str(i)) for i in range(101)],
                        [('visit', str(i)) for i in range(101)]):
             response = self.h.consulta.get(self.path, params=params)
             self.assertEqual(response.status_code, 422, response.text)
@@ -449,7 +490,7 @@ class WebAssessmentsTests(unittest.TestCase):
         self.assertEqual(self.h.consulta.get(self.path).status_code, 422)
 
     def test_queries_fechadas_credencial_ausente_e_limite(self):
-        for query in ('?limit=0', '?limit=101', '?limit=2&limit=3', '?test_code=a&test_code=b',
+        for query in ('?limit=0', '?limit=101', '?limit=2&limit=3', '?test_code=a&test_code=../invalid',
                       '?cursor=bad', '?participant_id=', '?visit=%20', '?unknown=1'):
             self.assertEqual(self.h.consulta.get(self.path + query).status_code, 422, query)
         self.h.app.state.config = replace(self.h.app.state.config, read_database_url='')

@@ -176,10 +176,9 @@ explicitamente reenvio da mesma copia e UUID, nunca repetir automaticamente.
 A listagem aceita `start_date` e `end_date` em YYYY-MM-DD, ambos inclusivos
 sobre `assessment_date`; inicio posterior ao fim e datas invalidas retornam422.
 A data WEB e o dia UTC do inicio; o legado conserva a data civil registrada,
-sem converter horarios sem fuso. `test_code` seleciona um instrumento por igualdade
-(1–64 caracteres ASCII de codigo). Estes parametros, `limit` e `cursor` sao unicos.
+sem converter horarios sem fuso. Datas, `limit` e `cursor` sao unicos.
 
-`participant_id`, `visit`, `evaluator_id`, `test_version` e `platform` podem se
+`participant_id`, `visit`, `evaluator_id`, `test_version`, `platform` e `test_code` podem se
 repetir ate 100 vezes por campo. Valores do mesmo campo combinam por OU; campos
 diferentes combinam por E. Ausencia significa sem restricao. Codigos/visitas
 historicos de consulta aceitam 1–512 caracteres sem controles ou valor composto
@@ -187,7 +186,10 @@ somente de espacos; nao altera a emissao WEB, que permanece 64 caracteres ASCII.
 usa identificacao tecnica opaca de ate 512 caracteres ASCII seguros;
 `LEGADO_NAO_MAPEADO` seleciona ausencia de identidade tecnica sem divulgar o
 rotulo original. Versoes aceitam 1–64 caracteres ASCII de codigo, incluindo `+`; plataformas
-sao `web` e `psychopy`. Valores sao deduplicados/ordenados antes de vincular cursor.
+sao `web` e `psychopy`. Instrumentos aceitam 1–64 caracteres ASCII de codigo.
+Valores sao deduplicados/ordenados antes de vincular cursor. `test_code` unico
+preserva o escopo canonico anterior de cursores/snapshots; a multisselecao passa
+a fazer parte desse escopo integralmente, sem criar consultas paralelas.
 
 O cursor HMAC de avaliacoes e vinculado ao profissional, projeto e filtros
 canonicos e contem fingerprint dos metadados do conjunto autorizado. Cada pagina
@@ -209,6 +211,9 @@ mantem o token apenas em RAM e exige consistencia entre todas as paginas antes
 de habilitar exportacao. `POST /assessments/export` recebe corpo fechado
 `{projects:[{project_id,snapshot}],filters,view:{test_code,platform?}}`;
 `projects` aceita 1–20 projetos distintos e filtros seguem o contrato acima.
+No corpo de exportacao, `filters.test_code` aceita string unica (compatibilidade)
+ou lista; uma lista com um instrumento normaliza para o mesmo escopo da string.
+Uma selecao diferente nao pode reutilizar o snapshot anterior.
 `view` registra somente `stroop_go_nogo_ptbr` ou `instrumento_sintetico_demo` e,
 opcionalmente, `web`/`psychopy`. A API valida os tokens e, numa unica transacao
 READ ONLY/REPEATABLE READ, reautoriza cada vinculo, reconta ate 5.000 avaliacoes

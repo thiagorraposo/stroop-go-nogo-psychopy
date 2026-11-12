@@ -36,7 +36,7 @@ test('combina datas/listas/instrumento no servidor e limpa pelo teclado', async 
   })
   await open(page)
   await page.getByLabel('Data inicial').fill('2026-10-01'); await page.getByLabel('Data final').fill('2026-10-17')
-  await page.getByLabel('Instrumento da consulta').selectOption('stroop_go_nogo_ptbr')
+  await page.getByRole('listbox', { name: 'Instrumento da consulta', exact: true }).selectOption('stroop_go_nogo_ptbr')
   await page.getByLabel('Participantes (códigos)', { exact: true }).selectOption('P_SINTETICO')
   await page.getByRole('listbox', { name: 'Visitas', exact: true }).selectOption(['V1', 'V2'])
   await page.getByRole('listbox', { name: 'Avaliadores (identificação técnica)', exact: true }).selectOption('LEGADO_NAO_MAPEADO')

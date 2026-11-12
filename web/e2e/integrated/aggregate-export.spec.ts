@@ -76,7 +76,7 @@ test('CSV real corresponde a todas paginas/projetos e filtros; vinculo revogado 
 test('CSV demonstrativo real conserva metricas proprias e nao mistura contagens Stroop', async ({ page, context }) => {
   const prepared = manage('complete-results')
   await open(page, context, prepared)
-  await page.getByRole('combobox', { name: 'Instrumento da consulta', exact: true }).selectOption('instrumento_sintetico_demo')
+  await page.getByRole('listbox', { name: 'Instrumento da consulta', exact: true }).selectOption('instrumento_sintetico_demo')
   await page.getByRole('button', { name: 'Aplicar filtros', exact: true }).click()
   await expect(page.getByRole('table', { name: 'Métricas por instrumento e avaliação' }).locator('tbody tr')).toHaveCount(4)
   const output = await download(page)

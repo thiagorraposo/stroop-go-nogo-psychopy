@@ -153,8 +153,9 @@ def _filters(filters):
             clauses.append(f'AND a.assessment_date {operator} %s')
             values.append(filters[key])
     if filters.get('test_code'):
-        clauses.append('AND a.test_code=%s')
-        values.append(filters['test_code'])
+        clauses.append('AND a.test_code=ANY(%s)')
+        instruments = filters['test_code']
+        values.append([instruments] if isinstance(instruments, str) else list(instruments))
     return ' '.join(clauses), values
 
 

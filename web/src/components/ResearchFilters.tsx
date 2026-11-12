@@ -52,7 +52,7 @@ export function ResearchFilters({
   const selected = draft.projects
   const start = draft.filters.start_date ?? ''
   const end = draft.filters.end_date ?? ''
-  const instrument = draft.filters.test_code ?? ''
+  const instruments = toArray(draft.filters.test_code)
   const values = {
     participant_id: toArray(draft.filters.participant_id),
     visit: toArray(draft.filters.visit),
@@ -65,7 +65,7 @@ export function ResearchFilters({
   const setSelected = (projects: string[]) => update({ ...draft, projects })
   const setStart = (start_date: string) => update({ ...draft, filters: { ...draft.filters, start_date: start_date || undefined } })
   const setEnd = (end_date: string) => update({ ...draft, filters: { ...draft.filters, end_date: end_date || undefined } })
-  const setInstrument = (test_code: string) => update({ ...draft, filters: { ...draft.filters, test_code: test_code || undefined } })
+  const setInstruments = (test_code: string[]) => update({ ...draft, filters: { ...draft.filters, test_code } })
   const setValues = (next: typeof values) => update({ ...draft, filters: { ...draft.filters, ...next,
     platform: next.platform.filter((v): v is 'web' | 'psychopy' => v === 'web' || v === 'psychopy') } })
   const setAdvanced = <K extends keyof AdvancedFilterValues>(key: K, next: AdvancedFilterValues[K]) =>
@@ -124,7 +124,7 @@ export function ResearchFilters({
       setValidation('A data inicial deve ser anterior ou igual à final.')
       return
     }
-    if (Object.values(values).some(items => items.length > 100)) {
+    if ([...Object.values(values), instruments].some(items => items.length > 100)) {
       setValidation('Selecione no máximo 100 opções por campo.')
       return
     }
@@ -145,8 +145,8 @@ export function ResearchFilters({
   if (start || end) {
     activeChips.push({ label: `Período: ${start || '…'} a ${end || '…'}`, onRemove: () => update({ ...draft, filters: { ...draft.filters, start_date: undefined, end_date: undefined } }) })
   }
-  if (instrument) {
-    activeChips.push({ label: `Instrumento: ${instrument}`, onRemove: () => setInstrument('') })
+  if (instruments.length) {
+    activeChips.push({ label: `Instrumentos: ${instruments.join(', ')}`, onRemove: () => setInstruments([]) })
   }
   if (status !== 'valid') {
     activeChips.push({ label: `Status: ${status === 'all' ? 'Todas' : 'Inválidas'}`, onRemove: () => setAdvanced('status', 'valid') })
@@ -233,15 +233,8 @@ export function ResearchFilters({
             Data final
             <input type="date" value={end} onChange={event => setEnd(event.target.value)} />
           </label>
-          <label>
-            Instrumento da consulta
-            <select value={instrument} onChange={event => setInstrument(event.target.value)}>
-              <option value="">Todos</option>
-              {[...new Set([...facets.test_code, ...(instrument ? [instrument] : [])])].map(code => (
-                <option key={code}>{code}</option>
-              ))}
-            </select>
-          </label>
+          <SearchableMultiSelect label="Instrumento da consulta" value={instruments} onChange={setInstruments}
+            options={[...new Set([...facets.test_code, ...instruments])].sort().map(code => ({ value: code, label: code }))} />
         </div>
 
         <details className="advanced-query-filters">

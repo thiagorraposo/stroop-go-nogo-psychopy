@@ -4,6 +4,16 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-11 — Multisseleção de instrumentos na consulta aplicada (WEB-050)
+
+O catálogo React passa a selecionar vários instrumentos com busca, mantendo
+rascunho/aplicada e chips. API e SQL tratam os instrumentos como alternativas
+na mesma consulta, com o recorte completo vinculado a cursor e snapshot.
+O CSV agregado conserva esse vínculo e a projeção por instrumento; clientes
+anteriores com instrumento único permanecem compatíveis. Testes negativos
+cobrem troca de recorte, limite de opções e revogação. Motor, fórmulas, schema
+e dependências preservados. Resultados e limites do aceite no backlog canônico.
+
 ## 2026-11-11 — Consulta aplicada compartilhada (WEB-050)
 
 Autorização posterior de M8 inicia implementação de CHG-007. Consulta e rascunho

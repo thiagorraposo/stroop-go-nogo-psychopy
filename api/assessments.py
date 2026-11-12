@@ -19,20 +19,20 @@ from stroop.application import web_assessments as application
 
 router = APIRouter(prefix='/api/v1/projects/{project_id}/assessments', tags=['assessments'])
 export_router = APIRouter(prefix='/api/v1/assessments', tags=['assessments'])
-MULTI = frozenset({'participant_id', 'visit', 'evaluator_id', 'test_version', 'platform'})
-SINGLE = frozenset({'start_date', 'end_date', 'test_code'})
+MULTI = frozenset({'participant_id', 'visit', 'evaluator_id', 'test_version', 'platform', 'test_code'})
+SINGLE = frozenset({'start_date', 'end_date'})
 FILTERS = MULTI | SINGLE
 LABEL = re.compile(r'^[A-Za-z0-9_.-]{1,64}$')
 
 
 def _filters(request, *, options=False):
-    allowed = SINGLE if options else FILTERS | {'limit', 'cursor'}
+    allowed = SINGLE | {'test_code'} if options else FILTERS | {'limit', 'cursor'}
     if set(request.query_params) - allowed:
         raise APIError('invalid_request')
     result = {}
     for key in request.query_params:
         values = request.query_params.getlist(key)
-        if key not in MULTI and len(values) != 1:
+        if (key not in MULTI or options) and len(values) != 1:
             raise APIError('invalid_request')
         if key in {'cursor', 'limit'}:
             continue
@@ -49,7 +49,9 @@ def _filters(request, *, options=False):
                 valid = all(re.fullmatch(pattern, value) for value in values)
             if not valid:
                 raise APIError('invalid_request')
-            result[key] = sorted(set(values))
+            normalized = sorted(set(values))
+            # Preserve the canonical scope of existing single-instrument snapshots.
+            result[key] = normalized[0] if key == 'test_code' and len(normalized) == 1 else normalized
         elif key in ('start_date', 'end_date'):
             try:
                 if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', values[0]):
@@ -252,7 +254,7 @@ async def export_assessment_view(request: Request):
         filters = {}
         for key, value in filters_raw.items():
             if key in MULTI:
-                if not isinstance(value, list): raise ValueError
+                if not isinstance(value, list) and not (key == 'test_code' and isinstance(value, str)): raise ValueError
                 filters[key] = value
             elif key in SINGLE:
                 filters[key] = value

@@ -20,7 +20,7 @@ test('tabela completa e detalhe preservam Go/No-Go e ausencia de RT sem acertos'
       { metric_code: 'accuracy_no_go_trials', metric_label: 'Precisão No-Go', metric_value: 100, unit: '%' },
       { metric_code: 'response_time', metric_label: 'Tempo de resposta', metric_value: null, unit: 'seconds' }], trials: [] } }))
   await page.goto('/equipe')
-  await page.getByRole('combobox', { name: 'Instrumento da consulta', exact: true }).selectOption(stroop.test_code)
+  await page.getByRole('listbox', { name: 'Instrumento da consulta', exact: true }).selectOption(stroop.test_code)
   await page.getByRole('button', { name: 'Aplicar filtros' }).click()
   const table = page.getByRole('table', { name: 'Avaliações filtradas' })
   await expect(table.locator('tbody tr')).toHaveCount(1)
@@ -37,7 +37,7 @@ test('tabela completa e detalhe preservam Go/No-Go e ausencia de RT sem acertos'
   await expect(detail).toContainText('Legado sem identificação técnica')
   await expect(detail).toContainText('—')
   await page.getByRole('button', { name: 'Fechar detalhe', exact: true }).click()
-  await page.getByRole('combobox', { name: 'Instrumento da consulta', exact: true }).selectOption(demo.test_code)
+  await page.getByRole('listbox', { name: 'Instrumento da consulta', exact: true }).selectOption(demo.test_code)
   await page.getByRole('button', { name: 'Aplicar filtros' }).click()
   await expect(page.getByRole('table', { name: 'Métricas por instrumento e avaliação' })).toContainText('2,500')
   await expect(page.getByRole('table', { name: 'Métricas por instrumento e avaliação' })).toContainText('4')

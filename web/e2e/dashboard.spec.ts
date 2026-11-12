@@ -92,7 +92,7 @@ test('separa instrumento/plataforma e aplica filtros vazios pelo teclado', async
     return route.fulfill({ json: { items: [first, second, generic].filter(row => !query.get('test_code') || row.test_code === query.get('test_code')), next_cursor: null } })
   })
   await page.goto('/equipe'); await expect(card(page, 'Avaliações')).toHaveText('3')
-  await page.getByRole('combobox', { name: 'Instrumento da consulta', exact: true }).selectOption(generic.test_code)
+  await page.getByRole('listbox', { name: 'Instrumento da consulta', exact: true }).selectOption(generic.test_code)
   await page.getByRole('button', { name: 'Aplicar filtros' }).click()
   await expect(card(page, 'Avaliações')).toHaveText('1')
   await expect(page.getByText('Precisão média', { exact: true })).toHaveCount(0)

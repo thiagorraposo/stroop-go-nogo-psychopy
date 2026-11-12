@@ -10,6 +10,10 @@ test('QUERY7: normaliza seleções equivalentes, vazios e transporte sem perder 
   expect(queryKey({ ...second, filters: { ...second.filters, platform: ['web'] } })).not.toBe(key)
   expect(queryKey({ ...second, filters: { ...second.filters, test_version: ['2'] } })).not.toBe(key)
   expect(queryKey({ ...second, filters: { ...second.filters, test_code: 'other' } })).not.toBe(key)
+  expect(queryKey({ projects: ['a'], filters: { test_code: ['b', 'a', 'b'] } }))
+    .toBe(queryKey({ projects: ['a'], filters: { test_code: ['a', 'b'] } }))
+  expect(queryKey({ projects: ['a'], filters: { test_code: 'a' } }))
+    .toBe(queryKey({ projects: ['a'], filters: { test_code: ['a'] } }))
 })
 
 test('QUERY7: qualquer recorte avançado não suportado bloqueia exportação agregada', () => {

@@ -33,12 +33,12 @@ export function defaultQuery(project: string): ResearchQuery {
 /** Remove transporte, vazios e duplicatas; ordena dimensões sem mudar seus valores. */
 export function normalizeQuery(query: ResearchQuery): ResearchQuery {
   const filters: AssessmentOptions = {}
-  for (const key of ['start_date', 'end_date', 'test_code'] as const) {
+  for (const key of ['start_date', 'end_date'] as const) {
     if (query.filters[key]) filters[key] = query.filters[key]
   }
-  for (const key of ['participant_id', 'visit', 'evaluator_id', 'test_version', 'platform'] as const) {
+  for (const key of ['participant_id', 'visit', 'evaluator_id', 'test_version', 'platform', 'test_code'] as const) {
     const raw = query.filters[key]
-    const values = [...new Set(typeof raw === 'string' ? [raw] : raw ?? [])].sort()
+    const values = [...new Set(typeof raw === 'string' ? (raw ? [raw] : []) : raw ?? [])].sort()
     if (values.length) Object.assign(filters, { [key]: values })
   }
   return {
