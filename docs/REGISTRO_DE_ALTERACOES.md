@@ -4,6 +4,20 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-12 — Consulta aplicada React pelo POST analítico
+
+Dashboard migrou a aplicação/paginação para o POST único, com validação de
+contexto completo, descarte de páginas inconsistentes e expiração em RAM.
+Busca por código, faixas de precisão/RT mediano, RT ausente e ordenação agora
+selecionam no servidor usando métricas oficiais da avaliação inteira. CSV
+básico preservado por tokens do mesmo snapshot; recortes novos sem fallback
+para exportar população maior. Estados sem suporte permanecem indisponíveis.
+
+Testes de estado/parser/consumidor, navegador e integração HTTPS/API/PostgreSQL
+sintética registrados em EV-M8-050 no backlog canônico, com falhas e limites.
+Sem alteração de protocolo/fórmula/migration/dependência ou acesso operacional;
+trabalho local anterior da réplica preservado.
+
 ## 2026-11-11 — Entrada analítica normalizada por POST (WEB-050)
 
 Adicionada entrada fechada de consulta com aliases canônicos, capacidades

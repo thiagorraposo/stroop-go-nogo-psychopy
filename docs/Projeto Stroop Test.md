@@ -1,6 +1,6 @@
 # Projeto Stroop Test — backlog canônico da plataforma WEB
 
-Última verificação documental: **2026-11-11**. Missão e limites:
+Última verificação documental: **2026-11-12**. Missão e limites:
 [arquitetura](ARQUITETURA_WEB.md); inventário: [auditoria](AUDITORIA_REPLANEJAMENTO.md);
 especificação: [requisitos e matriz](REQUISITOS_E_RASTREABILIDADE.md).
 Este é o único registro executável de marcos, tarefas, estados, dependências,
@@ -50,11 +50,11 @@ de legados sem merge automático (WEB-027, EV-M7-027), e cobertura operacional e
 
 ## Painel visual de acompanhamento
 
-Atualizado em **2026-11-11**, a partir das fichas deste backlog.
+Atualizado em **2026-11-12**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **37 de 56 · 66,1%** | **19** | **M8 em execução (2/12 aceitos)** | Completar WEB-050 (migração React ao POST e AA); WEB-048 pronta; WEB-031 bloqueada |
+| **37 de 56 · 66,1%** | **19** | **M8 em execução (2/12 aceitos)** | WEB-050: completar catálogo e UX7-AA; WEB-048 pronta; WEB-031 bloqueada |
 
 ```text
 Aceites   █████████████░░░░░░░   66,1%
@@ -2156,8 +2156,8 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 - Segurança e privacidade: servidor revalida perfil e todos os projetos; mesma origem/cookies seguros/CSRF; somente RAM; nenhum nominal/credencial em URL/log/manifesto; deidentified padrão e nominal condicionado a DEC-03/WEB-041. Nenhuma alteração científica por redesign.
 - Testes automatizados exigidos: QUERY7: Vitest de estado puro e consumidor; fake HTTP controlado fora de ordem/projeto/instrumento; Playwright voltar/avançar, erro de paginação, snapshot expirado, revogação e logout; tipos/build.
 - Testes manuais/visuais exigidos: Aplicar filtros combinados, navegar em detalhes e exportação; inspecionar que todos exibem chave/contexto coerentes e nenhuma resposta antiga reaparece após troca rápida de projeto.
-- Evidências: núcleo de consulta aplicada implementado em EV-M8-050, 2026-11-11; ver comandos, falhas intermediárias, evidência real e limites abaixo. Sem aceite integral de WEB-050 ou antecipação dos gates WEB-051/053/055.
-- Riscos/bloqueios: R14: filtros avançados atuais são locais e exportação agregada só aceita subconjunto. Migração server-side em WEB-051 impede aceite integrado antes de sua conclusão.
+- Evidências: núcleo, seleção no servidor e React pelo POST único em EV-M8-050, 2026-11-11/12; ver comandos, falhas intermediárias, evidência real e limites abaixo. Sem aceite integral de WEB-050 ou antecipação dos gates WEB-051/053/055.
+- Riscos/bloqueios: R14: catálogo residual e agregações/CSV v2 ainda exigem capacidades próprias. Busca/faixas/RT ausente e ordenação migrados ao servidor; campos sem suporte são recusados. UX7-AA e integração WEB-051/053/055 permanecem gates próprios.
 - Decisões externas necessárias: Nenhuma: aplicação explícita formalizada como complemento à reatividade da ADR-008.
 - Condições de conclusão: todos os critérios desta ficha e casos aplicáveis de validação comprovados, dependências aceitas, sem skip obrigatório ou divergência silenciosa; atualizar evidência, matriz e painel neste backlog. Nenhum aceite concedido por este planejamento.
 - Referências: CHG-007; [UX](experimento/UX_DECISIONS.md#interface-profissional-integrada--chg-007); [contrato](desenvolvimento/CONTRATO_API_WEB.md#consulta-e-exportação-integradas--alvo-chg-007); [ADR-008](arquitetura/ADR-008-simplificacao-estrutural-e-fluxo-direto-sessao.md).
@@ -2637,6 +2637,121 @@ Nenhum merge, publicação, tag ou release. Registro de fechamento identificáve
 por `git log -1 --format=%H
 --grep='docs(web): registra POST analítico validado e continuidade de M8'`;
 confirmar seu envio por HEAD/upstream/remoto, sem commit artificial de autorreferência.
+
+#### Continuação — React na consulta POST única e seleção no servidor, 2026-11-12
+
+Novo `continue o projeto` autoriza continuidade de M8 deixando WEB-031 pendente.
+Base `d6d9dbb57310cc517f81e4d6a7d32a0b1fc4f0c3`; fetch confirmou main/origin/main
+`b5fccbb` e branch/upstream sem divergência. Reutilizada
+`feat/m8-consulta-aplicada-unica`, inicialmente no mesmo HEAD da branch
+`feat/web031-receptor-mint`. Alterações locais da WEB-031 e `.deploy-hostgator/`
+preservadas; somente hunks desta unidade entram no commit. Nenhum acesso à VPS,
+backup operacional, secret ou dado real. A restrição específica de merge do
+PR #18 continua alcançando a ancestralidade do PR #19.
+
+O dashboard agora aplica e pagina exclusivamente pelo POST analysis/query.
+Busca por substring literal do código do participante, precisão geral, faixas
+de RT mediano, exclusão explícita de RT ausente e ordenação são executadas no
+servidor, sobre métricas oficiais da avaliação completa hidratadas pelo domínio.
+Precisão e RT requerem instrumento Stroop exclusivo; limites inferiores são
+inclusivos, superiores exclusivos. RT nulo não vira zero; include_null_rt=true
+inclui essa população explicitamente, false exclui inclusive sem faixa. Busca
+não lê nome/iniciais e não faz pesquisa nominal, mesmo para administração.
+Status operacionais estão desabilitados na UI e seguem recusados pela API.
+Nenhuma mudança no motor, fórmulas, CSV científico, schema ou dependências.
+
+Cliente normaliza aliases e confere resposta fechada, consulta canônica,
+capacidades, contagens, IDs e metadados comuns entre páginas. Não publica totais
+até concluir todo conjunto. Fingerprint/query_id/prazo divergente, cursor
+repetido, duplicata, falha/limite ou expiração descartam o contexto completo;
+resposta atrasada não substitui outra geração. A expiração local também cancela
+detalhe/downloads e exige reaplicação, sem refresh silencioso. Navegar entre
+análise/histórico/exportação preserva contexto e rascunho somente em RAM.
+O consumidor deixou de aplicar filterAssessments/sortAssessments localmente;
+helpers antigos foram preservados para compatibilidade, sem uso nessa seleção.
+
+CSV básico preservado com legacy_export_context, tokens assinados das fontes de
+resumo obtidas na MESMA transação RO da consulta. Somente dimensões já suportadas
+pelo CSV v1 recebem esse contexto; busca/faixas/tentativas/exclusão de RT/seleção
+explícita não recebem token. Exports=false ainda identifica ausência de prévia/
+download v2. Não buscar snapshots por GET nem retirar filtros para exportar um
+conjunto maior. A rota antiga reautoriza e verifica suas fontes a cada download.
+
+Ambiente: Linux 7.0.0-42-generic, Python 3.12.3, Node 24.15.0/npm 11.16.0,
+Playwright 1.64.1, Chromium 156.0.8078.4/Firefox 157.0. PG 17.6 em container próprio
+`stroop_etapa4_test_m8_client`, tmpfs/porta loopback efêmera 32770, bancos
+`stroop_etapa4_test_m8_client` (HTTPS) e `stroop_etapa4_test_m8_regression` (Python).
+Todos exclusivamente sintéticos. Recursos temporários próprios serão removidos
+após a conferência; não instalar/atualizar pacotes nem acessar produção.
+
+Validações desta unidade:
+
+- `npm --prefix web test -- --reporter=dot`: **356/356**, 29 arquivos, zero skips.
+  Inclui parser fechado, transporte, ausência de fallback, faixas/aliases,
+  expiração e consumidores com respostas que ignoram cancelamento.
+- `npm --prefix web run build`: tipos/Vite aprovados; bundle
+  `index-B6iIW6SI.js`, CSS `index-Cd1eQ5rm.css`. Aviso histórico de chunk >500 kB
+  preservado (544,08 kB), sem mudar limites/dependências para escondê-lo.
+- Em web/, `WEB_TEST_PORT=4289 npx playwright test e2e/applied-query.spec.ts
+  e2e/research-filters.spec.ts e2e/dashboard.spec.ts e2e/aggregate-export.spec.ts
+  e2e/complete-results.spec.ts e2e/invitations.spec.ts e2e/imports.spec.ts
+  --workers=2 --trace=off --output=test-results/m8-post-query`: **78/78**, zero
+  skips, 1,6 min. Doubles HTTP; não são prova de autorização PG. Inclui larguras
+  360/768/1024/1366/1920, reflow 320, zoom 200%/400% nos filtros, sem constituir
+  checklist AA integral. Aviso histórico flushSync em Firefox persiste; também
+  observado aviso de atualização de ProfessionalAccess durante renderização em
+  fixture de sessão. Nenhum foi suprimido ou declarado corrigido nesta unidade.
+- `TEST_DATABASE_URL` no banco sintético de regressão,
+  `.venv/bin/python scripts/verify_web_ci.py python`: **461/461**, zero skips,
+  369,496 s. Resultado da árvore de trabalho com os arquivos locais preexistentes
+  da WEB-031; validação da versão exata enviada tem registro próprio no fechamento.
+- Em web/, `TEST_DATABASE_URL` no banco sintético HTTPS, `npx playwright test
+  --config playwright.integration.config.ts e2e/integrated/analysis-query.spec.ts
+  e2e/integrated/filters.spec.ts e2e/integrated/trial-filters.spec.ts
+  e2e/integrated/dashboard.spec.ts e2e/integrated/complete-results.spec.ts
+  e2e/integrated/aggregate-export.spec.ts
+  --output=test-results/m8-post-query-https-confirmed`: **20/20**, zero skips,
+  3,5 min, Chromium/Firefox. React compilado, HTTPS/proxy/API/PG/grants reais;
+  105 registros, projetos/páginas, alias, recorte misto, busca por código/faixas/
+  RT ausente, mesma tentativa, métricas completas, navegação sem reconsulta,
+  CSRF/revogação e CSV básico confrontados. Sem interceptar respostas.
+- Scanner `.venv/bin/python scripts/verify_web_ci.py sources`: **433 fontes
+  versionadas**, sem achados. Documentação/links/grafo, sete testes do verificador
+  e git diff --check: aprovados na árvore de trabalho; conferência do índice e fechamento abaixo.
+
+Falhas intermediárias preservadas: testes antigos ainda esperavam rejeição de
+patient_search/accuracy_min/include_null_rt no schema; agora verificam capacidades
+atuais e recusas residuais, além de novos casos de fronteira reais. Vitest inicial
+teve 337/342 por mocks GET antigos, seletor de placeholder e prazo sintético 2099
+que excedia timeout do browser; fixtures migradas ao POST e prazo de 15 min,
+342/342 antes dos novos testes e 356/356 na campanha final. Build seguinte recusou
+tipos platform inferidos como string nos doubles novos; fixadas as fixtures com
+literais, sem afrouxar tipos do produto. Primeiro teste de conflito do CSV alterava
+word, fora das fontes do resumo; corrigido para alterar RT que afeta o CSV.
+Foco API/schema final: **4/4**, 7,925 s, sem skips.
+Primeira integração interrompida após identificar espera antiga pelo GET:
+6 passes, timeout em complete-results e preparação de filters interrompida por
+SIGINT (10 não executados). Campanha seguinte teve 18 passes/2 falhas no teste
+novo que procurava a tabela de dashboard dentro de resultados; o módulo usa
+cartão de contagem próprio. Corrigida a assertiva por superfície, preservando
+contagens e exigência de não emitir nova consulta ao navegar. Sem aumentar
+limites/timeouts ou reduzir gates.
+
+Limites: catálogo residual inclui status operacionais, Go/No-Go, precisão Go/No-Go,
+RT médio e IDs cadastrais; campos sem capacidade são recusados, não ignorados.
+Busca nominal depende de seus gates próprios. Limite de 5.000 também vale para
+candidatos antes das faixas métricas: servidor recusa universo maior, não trunca.
+Não há novo dicionário/agregação científica ou exportação v2. Checklist UX7-AA,
+contraste e revisão com leitor de tela ainda não executados integralmente;
+Orca 46.1 disponível não significa revisão realizada. WEB-050 continua
+**EM_ANDAMENTO**, WEB-051 permanece PENDENTE e nenhum aceite é antecipado.
+Global **37/56**, M8 **2/12**. Próxima ação: completar catálogo/capacidades da
+WEB-050 e seu checklist UX7-AA antes do aceite; WEB-048 permanece independente
+PRONTA. WEB-031 segue bloqueada externamente e impede WEB-032; não avançar M9.
+
+Fechamento Git/CI por SHA registrado abaixo após validação. Base d6d9dbb teve
+verify SUCCESS em 2026-11-12 (run 43136417744); não transferir esse resultado à
+entrega nova. PR #19 permanece draft, auto-merge desabilitado e sem merge.
 
 ### WEB-051 — Consolidar seleção analítica autorizada e agregações no servidor
 
@@ -3572,7 +3687,24 @@ não inferir ausência de problema por falta de reprodução PG nesta missão.
 
 ## Retomada
 
-### Retomada vigente — execução M8 autorizada, 2026-11-11
+### Retomada vigente — continuidade M8 e consulta POST integrada, 2026-11-12
+
+Novo `continue o projeto` retoma M8 pela WEB-050 e mantém WEB-031 pendente.
+React passou a aplicar/paginar pelo POST único; filtros disponíveis e ordenação
+executados no servidor, com expiração e integridade entre páginas. CSV básico
+preservado por snapshots da mesma leitura; recortes avançados sem fallback.
+Evidências, comandos, falhas e limites na continuação EV-M8-050 de 2026-11-12.
+WEB-050 EM_ANDAMENTO: completar catálogo residual/capacidades e UX7-AA antes de
+aceitar. WEB-048 continua PRONTA e independente; WEB-031 BLOQUEADA por origem,
+autorização, custódia e medição externas, sem impedir esse ramo. WEB-032 pendente.
+37/56 aceitos, M8 2/12; nenhuma autorização de M9, deploy ou dados reais.
+
+Branch reutilizada feat/m8-consulta-aplicada-unica, base d6d9dbb; alterações locais
+da WEB-031 preservadas sem staging/commit/envio e .deploy-hostgator/ intacto.
+PR #18 permanece aberto sem merge; PR #19 draft, sem integrar essa ancestralidade.
+Consultar fechamento da evidência para SHA/push/check próprios da entrega.
+
+### Retomada anterior — execução M8 autorizada, 2026-11-11
 
 Novo `continue o projeto` autoriza M8 e suas tarefas prontas e sucessoras,
 sem avançar M9 ou autorizar operações externas. WEB-050 EM_ANDAMENTO: núcleo de

@@ -11,23 +11,23 @@ import { ExportHubPanel } from './ExportHubPanel'
 import type { ScopedAssessment } from './ResultsTable'
 import type { ResearchQuery } from './ResearchFilters'
 import { ApiError, apiErrorMessage } from '../api/client'
-import { listProjects, listAssessments, getAssessment, exportAssessment } from '../api/assessments'
-import type { AssessmentDetail, AssessmentOptions, Project } from '../api/assessments'
+import { listProjects, getAssessment, exportAssessment } from '../api/assessments'
+import type { AssessmentDetail, Project } from '../api/assessments'
 import { exportAssessmentView } from '../api/aggregate'
 import type { ExportContext } from '../api/aggregate'
 import {
   accuracyByVisit,
   computeOverviewKPIs,
   countByDate,
-  filterAssessments,
   formatMetric as number,
   OFFICIAL_METRICS_DICTIONARY,
   responseDistribution,
-  sortAssessments,
   summarize,
 } from '../dashboard/analysis'
 import { listPatients } from '../api/patients'
-import { defaultQuery, normalizeQuery, queryKey, supportsLegacyExport, assessmentQueryFilters } from '../dashboard/query'
+import { queryAnalysis, contextKey } from '../api/analysis'
+import type { AnalysisPage } from '../api/analysis'
+import { defaultQuery, normalizeQuery, queryKey, supportsLegacyExport, analysisQueryBody } from '../dashboard/query'
 
 export type AdministrativeModule =
   | 'dashboard'
@@ -121,6 +121,7 @@ export function ProfessionalDashboard({
   const [projectsLoading, setProjectsLoading] = useState(true)
   const [query, setQuery] = useState<ResearchQuery | null>(null)
   const [rows, setRows] = useState<ScopedAssessment[]>([])
+  const [analysisContext, setAnalysisContext] = useState<AnalysisPage | null>(null)
   const [loading, setLoading] = useState(false)
   const [loaded, setLoaded] = useState(0)
   const [error, setError] = useState<string | null>(null)
@@ -153,7 +154,7 @@ export function ProfessionalDashboard({
   function applyQuery(next: ResearchQuery) {
     queryIO.current?.abort(); detailIO.current?.abort()
     downloadIO.current?.abort(); aggregateIO.current?.abort()
-    setRows([]); setAggregateContext(null); setAggregateMessage(null)
+    setRows([]); setAnalysisContext(null); setAggregateContext(null); setAggregateMessage(null)
     setDetail(null); setDetailId(''); setDetailError(null); setDownloadMessage(null)
     setExporting(false); setAggregateBusy(false); setError(null)
     const normalized = normalizeQuery(next)
@@ -164,7 +165,7 @@ export function ProfessionalDashboard({
     if (!(cause instanceof ApiError) || ![401, 403, 409].includes(cause.status)) return
     queryIO.current?.abort(); detailIO.current?.abort()
     downloadIO.current?.abort(); aggregateIO.current?.abort()
-    setRows([]); setLoaded(0); setAggregateContext(null); setDetail(null); setDetailId('')
+    setRows([]); setAnalysisContext(null); setLoaded(0); setAggregateContext(null); setDetail(null); setDetailId('')
     setLoading(false); setExporting(false); setAggregateBusy(false)
     setError('O conjunto não está mais disponível. Atualize a consulta antes de continuar.')
     if ([401, 403].includes(cause.status)) window.dispatchEvent(new Event('stroop-professional-session-ended'))
@@ -226,7 +227,7 @@ export function ProfessionalDashboard({
   // Carrega avaliações conforme projeto e filtros
   useEffect(() => {
     const io = new AbortController()
-    setRows([]); setAggregateContext(null); setAggregateMessage(null); setDetail(null); setDetailId(''); setDetailError(null); setDownloadMessage(null)
+    setRows([]); setAnalysisContext(null); setAggregateContext(null); setAggregateMessage(null); setDetail(null); setDetailId(''); setDetailError(null); setDownloadMessage(null)
     setLoaded(0)
     downloadIO.current?.abort(); setExporting(false)
     aggregateIO.current?.abort(); setAggregateBusy(false)
@@ -237,40 +238,36 @@ export function ProfessionalDashboard({
     void (async () => {
       try {
         const items: ScopedAssessment[] = []
-        const snapshots: ExportContext['projects'] = []
-        const appliedFilters = query ? assessmentQueryFilters(query) : {} as AssessmentOptions
-        delete appliedFilters.cursor; delete appliedFilters.limit; delete appliedFilters.signal
-        if (selected.length > 20) throw new ApiError('invalid_request', 422)
-        for (const projectId of selected) {
-          const cursors = new Set<string>(), ids = new Set<string>()
-          let cursor: string | undefined, projectSnapshot: string | undefined
-          let snapshotsComplete = true
-          do {
-            const page = await listAssessments(projectId, { ...appliedFilters, cursor, limit: 100, signal: io.signal })
-            if (page.snapshot) {
-              if (projectSnapshot && projectSnapshot !== page.snapshot) throw new ApiError('invalid_response', 200)
-              projectSnapshot = page.snapshot
-            } else snapshotsComplete = false
-            for (const item of page.items) {
-              if (ids.has(item.assessment_id)) throw new ApiError('invalid_response', 200)
-              ids.add(item.assessment_id); items.push({ ...item, project_id: projectId })
-              if (items.length > 5000) throw new ApiError('invalid_request', 422)
-            }
-            cursor = page.next_cursor ?? undefined
-            if (cursor && cursors.has(cursor)) throw new ApiError('invalid_response', 200)
-            if (cursor) cursors.add(cursor)
-            if (io.signal.aborted) return
-            setLoaded(items.length)
-          } while (cursor)
-          if (projectSnapshot && snapshotsComplete) snapshots.push({ project_id: projectId, snapshot: projectSnapshot })
-        }
+        const cursors = new Set<string>(), ids = new Set<string>()
+        let cursor: string | undefined, first: AnalysisPage | undefined
+        do {
+          const body = analysisQueryBody(query!, cursor)
+          const page = await queryAnalysis(body, profile.csrf_token, io.signal)
+          if (io.signal.aborted) return
+          if (first && (page.query_id !== first.query_id || page.query_fingerprint !== first.query_fingerprint
+            || page.content_fingerprint !== first.content_fingerprint || page.expires_at !== first.expires_at
+            || contextKey(page.counts) !== contextKey(first.counts)
+            || contextKey(page.aggregates) !== contextKey(first.aggregates)
+            || contextKey(page.legacy_export_context) !== contextKey(first.legacy_export_context))) throw new ApiError('state_conflict', 409)
+          first ??= page
+          for (const item of page.items) {
+            if (ids.has(item.assessment_id)) throw new ApiError('invalid_response', 200)
+            ids.add(item.assessment_id); items.push(item)
+            if (items.length > 5000 || items.length > page.counts.assessments) throw new ApiError('invalid_response', 200)
+          }
+          cursor = page.next_cursor ?? undefined
+          if (cursor && (!page.items.length || cursors.has(cursor))) throw new ApiError('invalid_response', 200)
+          if (cursor) cursors.add(cursor)
+          setLoaded(items.length)
+        } while (cursor)
+        if (items.length !== first!.counts.assessments) throw new ApiError('invalid_response', 200)
         if (!io.signal.aborted) {
-          setRows(items)
-          setAggregateContext(snapshots.length === selected.length ? { projects: snapshots, filters: appliedFilters } : null)
+          setRows(items); setAnalysisContext(first!)
+          setAggregateContext(first!.legacy_export_context)
         }
       } catch (cause) {
         if (!io.signal.aborted) {
-          setRows([]); setLoaded(0); setAggregateContext(null)
+          setRows([]); setAnalysisContext(null); setLoaded(0); setAggregateContext(null)
           if (cause instanceof ApiError && [401, 403].includes(cause.status)) {
             window.dispatchEvent(new Event('stroop-professional-session-ended'))
           }
@@ -288,6 +285,15 @@ export function ProfessionalDashboard({
     })()
     return () => { io.abort(); downloadIO.current?.abort(); aggregateIO.current?.abort() }
   }, [query, revision])
+
+  useEffect(() => {
+    if (!analysisContext) return
+    const expire = () => expireContext(new ApiError('state_conflict', 409))
+    const remaining = Date.parse(analysisContext.expires_at) - Date.now()
+    if (remaining <= 0) { expire(); return }
+    const timer = window.setTimeout(expire, remaining)
+    return () => window.clearTimeout(timer)
+  }, [analysisContext])
 
   // Detalhe individual de avaliação
   useEffect(() => {
@@ -374,13 +380,9 @@ export function ProfessionalDashboard({
 
   const currentProject = projects.find(item => item.id === project) ?? null
 
-  // Aplicação do catálogo avançado de filtros e ordenação determinística (REQ-REL-004)
-  const filteredRows = filterAssessments(rows, query?.advanced)
-  const sortedRows = sortAssessments(
-    filteredRows,
-    query?.advanced?.sortBy ?? 'date',
-    query?.advanced?.sortOrder ?? 'desc',
-  )
+  // O servidor seleciona e ordena o conjunto completo. Consumidores compartilham
+  // a geração publicada somente após validar todas as páginas do mesmo contexto.
+  const sortedRows = rows
 
   const instruments = [...new Set(sortedRows.map(row => row.test_code))].sort()
   const selectedInstrument = instruments.length === 1 ? instruments[0]! : ''

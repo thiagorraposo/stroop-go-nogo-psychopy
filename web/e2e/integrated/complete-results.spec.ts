@@ -28,7 +28,7 @@ test('resultados completos reais preservam unidades, visitas e identidades por p
   await search.fill('')
   const queried = page.waitForResponse(response => {
     const url = new URL(response.url())
-    return url.pathname.endsWith('/assessments') && url.searchParams.getAll('test_code').length === 2
+    return url.pathname.endsWith('/analysis/query') && response.request().postDataJSON().query.filters.test_code?.length === 2
   })
   await page.getByRole('button', { name: 'Aplicar filtros', exact: true }).click()
   expect((await queried).status()).toBe(200)

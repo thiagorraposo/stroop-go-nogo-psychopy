@@ -101,6 +101,8 @@ function assessment(x: unknown, detail = false): Assessment {
     || !Object.entries(x.summary.metrics).every(([k, v]) => nonempty(k) && finite(v))) return invalid();
   return x as unknown as Assessment;
 }
+/** Projeção comum às listagens GET e à consulta analítica POST. */
+export function decodeAssessment(x: unknown): Assessment { return assessment(x); }
 function metric(x: unknown): Metric {
   if (!closed(x, 'metric_code metric_label metric_value unit') || !nonempty(x.metric_code)
     || !nonempty(x.metric_label) || !text(x.unit) || !nullableNumber(x.metric_value)) return invalid();

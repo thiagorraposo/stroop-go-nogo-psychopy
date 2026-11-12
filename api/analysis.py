@@ -35,6 +35,12 @@ class QueryFilters(RequestModel):
     condition: list[Literal['congruent', 'incongruent']] = Field(default_factory=list, max_length=100)
     response_type: list[Literal['hit', 'omission', 'commission', 'correct_rejection']] = Field(default_factory=list, max_length=100)
     status: Literal['valid'] = 'valid'
+    patient_search: str | None = Field(default=None, max_length=120)
+    accuracy_min: float | None = Field(default=None, ge=0, le=100)
+    accuracy_max: float | None = Field(default=None, ge=0, le=100)
+    rt_median_min_ms: float | None = Field(default=None, ge=0)
+    rt_median_max_ms: float | None = Field(default=None, ge=0)
+    include_null_rt: bool = True
 
 
 class QuerySelection(RequestModel):
@@ -52,7 +58,8 @@ class Grouping(RequestModel):
 class QueryPage(RequestModel):
     size: int = Field(default=50, ge=1, le=100)
     cursor: str | None = Field(default=None, pattern=r'^[A-Za-z0-9_-]{1,1024}$')
-    sort: Literal['started_at_desc', 'started_at_asc', 'participant_code_asc', 'visit_asc'] = 'started_at_desc'
+    sort: Literal['started_at_desc', 'started_at_asc', 'participant_code_asc', 'participant_code_desc',
+                  'visit_asc', 'accuracy_asc', 'accuracy_desc', 'response_time_asc', 'response_time_desc'] = 'started_at_desc'
 
 
 class AnalysisRequest(RequestModel):
@@ -71,6 +78,23 @@ def normalize(selection: QuerySelection):
         raise APIError('invalid_request')
     raw = selection.filters.model_dump(exclude_none=True)
     raw.pop('status')
+    advanced = {key: raw.pop(key) for key in ('patient_search', 'accuracy_min', 'accuracy_max',
+                'rt_median_min_ms', 'rt_median_max_ms', 'include_null_rt') if key in raw}
+    if 'patient_search' in advanced:
+        value = advanced['patient_search']
+        if re.search(r'[\x00-\x1f\x7f]', value):
+            raise APIError('invalid_request')
+        value = value.strip().lower()
+        if value:
+            advanced['patient_search'] = value
+        else:
+            advanced.pop('patient_search')
+    for lower, upper in [('accuracy_min', 'accuracy_max'), ('rt_median_min_ms', 'rt_median_max_ms')]:
+        if lower in advanced and upper in advanced and advanced[lower] >= advanced[upper]:
+            raise APIError('invalid_request')
+    metric_filter = any(key in advanced for key in ('accuracy_min', 'accuracy_max', 'rt_median_min_ms', 'rt_median_max_ms')) or not advanced['include_null_rt']
+    if metric_filter and set(raw.get('test_code', [])) != {'stroop_go_nogo_ptbr'}:
+        raise APIError('invalid_request')
     if any(raw.get(key) == '' for key in ('date_from', 'date_to', 'start_date', 'end_date')):
         raise APIError('invalid_request')
     for alias, canonical in [('start_date', 'date_from'), ('end_date', 'date_to'), ('participant_id', 'participant_code')]:
@@ -79,7 +103,7 @@ def normalize(selection: QuerySelection):
             raise APIError('invalid_request')
         if first and not second:
             raw[canonical] = first
-    normalized = {'status': 'valid'}
+    normalized = {'status': 'valid', **advanced}
     legacy = {}
     aliases = {'date_from': 'start_date', 'date_to': 'end_date', 'participant_code': 'participant_id'}
     for key, value in raw.items():
@@ -92,6 +116,8 @@ def normalize(selection: QuerySelection):
     # Não reproduzir regex/allowlists das rotas existentes.
     validation_request = Request({'type': 'http', 'query_string': urlencode(legacy, doseq=True).encode()})
     filters = _filters(validation_request)
+    if advanced.get('patient_search'):
+        filters['patient_search'] = advanced['patient_search']
     query = {'projects': projects, 'filters': normalized}
     if selection.assessment_ids is not None:
         if any(not re.fullmatch(r'[A-Za-z0-9_.-]{1,128}', value) for value in selection.assessment_ids):
@@ -138,20 +164,34 @@ async def analysis_query(request: Request, body: AnalysisRequest):
     except (application.SchemaError, application.PersistenceError):
         raise APIError('service_unavailable') from None
     content = result.pop('content_fingerprint')
+    sources = result.pop('legacy_snapshots')
+    # Ponte de compatibilidade: tokens do CSV v1 vêm do MESMO snapshot RO.
+    # Recortes novos nunca recebem token v1 nem perdem filtros no download.
+    basic = {'date_from', 'date_to', 'participant_code', 'visit', 'evaluator_id',
+             'test_code', 'test_version', 'platform', 'status', 'include_null_rt'}
+    legacy_context = None
+    if (set(query['filters']) <= basic and query['filters']['include_null_rt']
+            and 'assessment_ids' not in query):
+        legacy_context = {'filters': filters, 'projects': [
+            {'project_id': project, 'snapshot': _signed(config, json.dumps(
+                ['assessment-snapshot-v1', project, actor.issuer, actor.subject, filters], sort_keys=True), [source, expires])}
+            for project, source in sources]}
     more = offset + body.page.size < result['counts']['assessments']
     return {
         'query_id': query_id, 'normalized_query': query, 'query_fingerprint': fingerprint,
         'content_fingerprint': content, 'expires_at': datetime.fromtimestamp(expires, timezone.utc).isoformat().replace('+00:00', 'Z'),
-        'completeness': 'complete', **result,
+        'completeness': 'complete', **result, 'legacy_export_context': legacy_context,
         'next_cursor': _signed(config, scope, [query_id, offset + body.page.size, content, expires]) if more else None,
         'indicator_definitions': {'counts': {'kind': 'operational_count', 'population': 'official_assessments_and_main_trials', 'timezone': 'UTC',
                                             'participant_identity': ['project_id', 'participant_code'],
                                             'visit_identity': ['project_id', 'participant_code', 'visit']},
                                   'summary': {'source': 'stroop.domain.stroop.calculate_metrics', 'population': 'complete_assessment', 'rt_unit': 'seconds'}},
-        'capabilities': {'filters': ['date_from', 'date_to', 'participant_code', 'visit', 'evaluator_id', 'test_code', 'test_version', 'platform', 'status'],
+        'capabilities': {'filters': ['date_from', 'date_to', 'participant_code', 'visit', 'evaluator_id', 'test_code', 'test_version', 'platform', 'status',
+                                     'patient_search', 'accuracy_min', 'accuracy_max', 'rt_median_min_ms', 'rt_median_max_ms', 'include_null_rt'],
                          'status': ['valid'], 'trial_filters': {'stroop_go_nogo_ptbr': ['condition', 'response_type']},
                          'grouping': [{'level': 'assessment', 'dimension': 'project'}],
-                         'sort': ['started_at_desc', 'started_at_asc', 'participant_code_asc', 'visit_asc'],
+                         'sort': ['started_at_desc', 'started_at_asc', 'participant_code_asc', 'participant_code_desc', 'visit_asc',
+                                  'accuracy_asc', 'accuracy_desc', 'response_time_asc', 'response_time_desc'],
                          'platform': ['web', 'psychopy_local'], 'max_assessments': 5000, 'max_projects': 20,
                          'exports': False, 'nominal_search': False},
     }

@@ -642,7 +642,7 @@ class WebAssessmentsTests(unittest.TestCase):
         self.assertEqual(result.json()['counts']['trials'], len(matched))
         if matched:
             self.assertEqual(result.json()['items'][0]['summary'], detail['summary'])
-        for filters in ({'patient_search': 'NOME_SINTETICO'}, {'accuracy_min': 50}, {'platform': ['legacy']},
+        for filters in ({'patient_id': 'NOME_SINTETICO'}, {'accuracy_min': 50}, {'platform': ['legacy']},
                         {'condition': ['congruent']}, {'status': 'aborted'},
                         {'participant_id': ['A'], 'participant_code': ['B']},
                         {'date_from': '2026-02-30'}, {'start_date': '2026-01-01', 'date_from': '2026-02-01'}):
@@ -685,6 +685,7 @@ class WebAssessmentsTests(unittest.TestCase):
         self.assertEqual(self.h.consulta.post('/api/v1/analysis/query?unknown=1', json=body).status_code, 422)
         body['query']['projects'].append(str(uuid4()))
         self.assertEqual(self.h.consulta.post('/api/v1/analysis/query', json=body).status_code, 404)
+
         body = self.analysis_body()
         self.h.app.state.config = replace(self.h.app.state.config, read_database_url='')
         self.assertEqual(self.h.consulta.post('/api/v1/analysis/query', json=body).status_code, 503)
@@ -693,3 +694,47 @@ class WebAssessmentsTests(unittest.TestCase):
         self.assertEqual(self.h.admin.put(f'/api/v1/projects/{self.h.project_id}/members/{user_id}',
                                          json={'active': False}).status_code, 200)
         self.assertEqual(self.h.consulta.post('/api/v1/analysis/query', json=body).status_code, 404)
+
+    def test_analysis_metricas_oficiais_limites_rt_nulo_e_busca_codigo(self):
+        measured, _ = self.complete()
+        absent, _ = self.complete(no_responses=True)
+        base = {'test_code': ['stroop_go_nogo_ptbr']}
+        def select(filters, **page):
+            response = self.h.consulta.post('/api/v1/analysis/query', json=self.analysis_body({**base, **filters}, **page))
+            self.assertEqual(response.status_code, 200, response.text)
+            return response.json()
+        for filters, expected in (
+                ({'rt_median_min_ms': 512.25, 'rt_median_max_ms': 513, 'include_null_rt': False}, {measured['assessment_id']}),
+                ({'rt_median_max_ms': 512.25, 'include_null_rt': False}, set()),
+                ({'rt_median_max_ms': 512.25, 'include_null_rt': True}, {absent['assessment_id']}),
+                ({'include_null_rt': False}, {measured['assessment_id']}),
+                ({'accuracy_min': 50, 'accuracy_max': 51}, {measured['assessment_id'], absent['assessment_id']}),
+                ({'accuracy_max': 50}, set()),
+                ({'patient_search': 'p_sintetico'}, {measured['assessment_id'], absent['assessment_id']}),
+                ({'patient_search': 'NOME_SINTETICO_RESTRITO'}, set()),
+                ({'patient_search': '%'}, set())):
+            with self.subTest(filters=filters):
+                result = select(filters)
+                self.assertEqual({item['assessment_id'] for item in result['items']}, expected)
+                self.assertEqual(result['counts']['trials'], len(expected) * 16)
+                self.assertIsNone(result['legacy_export_context'])
+        for sort in ('response_time_asc', 'response_time_desc'):
+            result = select({}, sort=sort)
+            self.assertEqual([item['assessment_id'] for item in result['items']], [measured['assessment_id'], absent['assessment_id']])
+        result = select({'response_type': ['hit'], 'rt_median_min_ms': 512, 'include_null_rt': False})
+        self.assertEqual(result['items'][0]['summary']['total_trials'], 16)
+        self.assertEqual(result['counts']['trials'], measured['summary']['hits'])
+
+    def test_analysis_preserva_exportacao_basica_no_mesmo_snapshot(self):
+        self.complete()
+        response = self.h.consulta.post('/api/v1/analysis/query', json=self.analysis_body()).json()
+        exported = self.h.consulta.post('/api/v1/assessments/export', json={
+            **response['legacy_export_context'], 'view': {'test_code': 'stroop_go_nogo_ptbr'}})
+        self.assertEqual(exported.status_code, 200, exported.text)
+        item = response['items'][0]
+        self.assertIn(item['assessment_id'], exported.text)
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute('UPDATE trial_results SET reaction_time=reaction_time+0.01 WHERE assessment_id=%s AND reaction_time IS NOT NULL',
+                               (item['assessment_id'],))
+        self.assertEqual(self.h.consulta.post('/api/v1/assessments/export', json={
+            **response['legacy_export_context'], 'view': {'test_code': 'stroop_go_nogo_ptbr'}}).status_code, 409)

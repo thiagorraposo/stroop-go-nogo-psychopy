@@ -1,3 +1,4 @@
+import { analysisFixture } from '../src/test/analysis-fixture'
 /** W15C: navegador com HTTP sintetico; suite integrated prova backend real. */
 import { readFile } from 'node:fs/promises'
 import { expect, test } from '@playwright/test'
@@ -8,7 +9,7 @@ const base = `/api/v1/projects/${project}/assessments`
 const endpoint = '**/api/v1/assessments/export'
 const csrf = 's'.repeat(43)
 const assessment = { assessment_id: 'SYNTHETIC_EXPORT', participant_id: 'P_SINTETICO', visit: 'V1', evaluator_id: null,
-  created_at: '2026-10-16T12:00:00Z', started_at: '2026-10-16T12:00:00Z', platform: 'web', test_code: 'stroop_go_nogo_ptbr',
+  created_at: '2026-10-16T12:00:00Z', started_at: '2026-10-16T12:00:00Z', platform: 'web' as const, test_code: 'stroop_go_nogo_ptbr',
   test_version: '1.0', protocol_id: 'synthetic', app_version: '1.0', summary: { accuracy: 75, accuracy_go_trials: 75,
     accuracy_no_go_trials: 75, total_go_trials: 8, total_no_go_trials: 8, response_time_seconds: 0.625,
     total_trials: 16, hits: 6, correct_rejections: 6, omission_errors: 2, commission_errors: 2 } }
@@ -16,7 +17,7 @@ async function access(page: Page, role = 'consulta') {
   await page.route('**/api/v1/auth/me', route => route.fulfill({ json: { user_id: 'synthetic', role, csrf_token: csrf, expires_at: new Date(Date.now() + 3600000).toISOString() } }))
   await page.route('**/api/v1/projects?*', route => route.fulfill({ json: { items: [{ id: project, code: 'SYNTHETIC_EXPORT', name: 'Pesquisa sintetica', active: true, created_at: assessment.created_at }], next_cursor: null } }))
   await page.route(`**${base}/options*`, route => route.fulfill({ json: { participant_id: ['P_SINTETICO'], visit: ['V1'], evaluator_id: [], test_version: ['1.0'], platform: ['web'], test_code: [assessment.test_code] } }))
-  await page.route(`**${base}?*`, route => route.fulfill({ headers: { 'X-Assessment-Snapshot': snapshot }, json: { items: [assessment], next_cursor: null } }))
+  await page.route('**/api/v1/analysis/query', route => route.fulfill({ json: analysisFixture(route.request().postDataJSON(), [assessment], {}, snapshot) }))
   await page.goto('/equipe')
   await expect(page.getByRole('table', { name: 'Avaliações filtradas' }).locator('tbody tr')).toHaveCount(1)
 }

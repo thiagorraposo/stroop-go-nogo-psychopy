@@ -141,6 +141,9 @@ class FacetLimitError(Exception):
 
 def _filters(filters):
     clauses, values = [], []
+    if filters.get('patient_search'):
+        clauses.append('AND position(%s in lower(a.participant_id)) > 0')
+        values.append(filters['patient_search'])
     columns = {'participant_id': 'a.participant_id', 'visit': 'a.visit', 'test_version': 'a.test_version',
                'platform': "COALESCE(wa.platform,'psychopy')",
                'evaluator_id': "COALESCE(CASE WHEN wa.assessment_id IS NULL THEN NULL ELSE a.evaluator END,'LEGADO_NAO_MAPEADO')"}
@@ -512,7 +515,7 @@ def analysis_selection(database_url, projects, issuer, subject, *, filters, asse
             _validate_schema(connection)
             # Reautorizar TODOS antes de ler/popular qualquer resultado.
             if not all(_authorized_project(connection, project, issuer, subject) for project in projects):
-                return False, [], [], None
+                return False, [], [], None, []
             selected, sources = [], []
             for project in projects:
                 base, params = _scoped_query(project, issuer, subject, filters)
@@ -542,6 +545,6 @@ def analysis_selection(database_url, projects, issuer, subject, *, filters, asse
                 WHERE assessment_id=ANY(%s) AND block='main' ORDER BY assessment_id,trial_number''', (ids,)).fetchall() if ids else []
             content = hashlib.sha256(json.dumps([sources, result, trials], sort_keys=True, default=str,
                                                separators=(',', ':')).encode()).hexdigest()
-            return True, result, trials, content
+            return True, result, trials, content, sources
     except psycopg.Error as exc:
         raise PersistenceError from exc

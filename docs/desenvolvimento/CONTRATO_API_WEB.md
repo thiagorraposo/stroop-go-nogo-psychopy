@@ -979,30 +979,61 @@ compatíveis; novos recortes não suportados nunca fazem fallback para exportar 
 
 ### Consulta normalizada e seleção
 
-Implementação inicial de `POST /api/v1/analysis/query` (WEB-050): corpo fechado
+Implementação parcial de `POST /api/v1/analysis/query` (WEB-050): corpo fechado
 conforme estrutura abaixo, somente `grouping={level: assessment, dimension: project}`,
-status `valid`, dimensões categoriais do GET existente, datas, seleção explícita
-e as quatro ordenações por data/código/visita. `participant_code` é a chave
-canônica; `participant_id`, `start_date/end_date` e `psychopy` são aliases de
-entrada. Aliases contraditórios retornam 422. Plataforma de saída canônica é
-`psychopy_local`; `legacy` ainda é recusada por falta de proveniência distinta.
-Condição/resposta requerem seleção explícita e exclusiva de Stroop.
+status `valid`, dimensões categoriais do GET existente, datas e seleção explícita.
+`participant_code` é a chave canônica; `participant_id`, `start_date/end_date` e
+`psychopy` são aliases de entrada. Aliases contraditórios retornam 422. Plataforma
+de saída da consulta canônica é `psychopy_local`; a projeção `items` preserva
+`psychopy` por compatibilidade com detalhe/CSV existentes. `legacy` é recusada
+por falta de proveniência distinta. Condição/resposta, faixas métricas e exclusão
+de RT ausente requerem seleção explícita e exclusiva de Stroop.
 
-Resposta identifica capacidades disponíveis e `exports=false`. `aggregates`
-contém somente contagens operacionais por projeto, sem novas médias científicas.
-Identidade de participante/visita é qualificada por projeto/código, explicitada
-em `indicator_definitions`; não é deduplicação cadastral entre projetos.
-`items` usa a projeção pseudonimizada existente com `project_id` explícito.
-`completeness=complete` só é emitido após conferir todo A/T em uma única transação
-REPEATABLE READ/READ ONLY; erro/limite não publica prefixo parcial. Cursor assinado
-vincula identidade, consulta, ordenação, conteúdo e prazo de 15 minutos. O contexto
-não é persistido; `query_id` ainda não habilita prévia/download.
+Capacidades adicionais: `patient_search` (até 120 caracteres) busca **somente
+substring literal do código do participante**, sem distinção de maiúsculas,
+espaços externos removidos, controles recusados; nomes/iniciais não são lidos,
+mesmo no perfil administrativo. Não é busca nominal autorizada. Precisão:
+`accuracy_min/max` em 0..100; RT: `rt_median_min/max_ms` não negativos e finitos.
+Limites inferiores inclusivos e superiores exclusivos; par invertido/vazio
+retorna 422. Selecionam métricas oficiais da avaliação completa. Com faixa de RT,
+`include_null_rt=true` inclui a população sem RT separadamente da comparação
+numérica; `false` a exclui, inclusive sem faixa. Ausência não vira zero. Estado
+canônico sempre explicita `include_null_rt` (padrão true). Ordenações disponíveis:
+`started_at_asc/desc`, `participant_code_asc/desc`, `visit_asc`,
+`accuracy_asc/desc`, `response_time_asc/desc`; ausentes ao fim em ambas direções,
+desempate estável por projeto/assessment_id. Não cria fórmula científica.
 
-Faixas métricas, busca, IDs cadastrais, estados operacionais, demais agrupamentos,
-ordenações e campos não suportados retornam 422, sem fallback silencioso.
-A interface profissional ainda usa GET e filtros avançados locais históricos;
-migração ao POST, catálogo integral, contexto efêmero de busca e exportação v2
-continuam pendentes em WEB-050/051/052/053. Não há aceite integrado por este recorte.
+Resposta identifica capacidades disponíveis e `exports=false` para o contrato
+v2 de prévia/download. `aggregates` contém somente contagens operacionais por
+projeto. Identidades de participante/visita são qualificadas por projeto/código,
+explicitadas em `indicator_definitions`; não há deduplicação cadastral entre
+projetos. `items` usa a projeção pseudonimizada existente com `project_id`.
+`completeness=complete` só é emitido após conferir todo A/T a partir de uma única
+transação REPEATABLE READ/READ ONLY; erro/limite não publica prefixo parcial.
+O limite de 5.000 aplica-se também aos candidatos antes das faixas métricas
+hidratadas: acima há recusa explícita, exigindo reduzir datas/dimensões/códigos;
+não é truncamento nem caminho de volume maior homologado. Cursor assinado vincula
+identidade, consulta, ordenação, conteúdo e prazo de 15 minutos. O contexto fica
+somente em RAM; `query_id` não habilita prévia/download v2.
+
+Campo transitório adicional `legacy_export_context` é null nos recortes novos
+(busca/faixas/tentativas/exclusão de RT/seleção explícita). Somente para filtros
+básicos aceitos pelo CSV v1 retorna `{projects: [{project_id, snapshot}], filters}`,
+com tokens assinados do **mesmo snapshot de leitura**, identidade, filtros e prazo.
+A rota de CSV existente reautoriza e verifica suas próprias fontes de resumo em
+cada download. Isso preserva exportação básica e não implementa EXPORT7 ou token
+v2. Não buscar snapshots por GET nem retirar filtros para gerar um CSV maior.
+
+O React aplica e pagina pelo POST único; só publica o conjunto depois de conferir
+todas as páginas, IDs, contagens, consulta canônica, fingerprints e prazo iguais.
+Sem fallback GET nem aplicação local dos filtros avançados. Ao expirar, descarta
+resultados/detalhe/downloads e exige reaplicação. Rascunho e navegação mantêm o
+mesmo contexto em RAM. Opções de filtro ainda usam GET autorizado; detalhe e CSV
+individual preservam contratos existentes. Estados operacionais ficam desabilitados
+na UI e continuam recusados na API. Go/No-Go, precisão Go/No-Go, RT médio, IDs
+cadastrais, busca nominal, demais agrupamentos e campos sem capacidade retornam
+422. Catálogo integral, dicionário/agregações, busca nominal e exportação v2 seguem
+nas fichas WEB-050/051/052/053 e nos gates próprios; não há aceite integrado.
 Evidências e limites de execução: EV-M8-050 no backlog canônico.
 
 `POST /api/v1/analysis/query` é a operação alvo única de aplicação analítica,

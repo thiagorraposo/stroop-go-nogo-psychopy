@@ -67,7 +67,7 @@ test('REQ-REL-004: renderiza catalogo completo de filtros combinados e emite que
   })
 
   // Confere existência dos campos avançados
-  const searchInput = container.querySelector('input[placeholder="Ex: PAT-, V1, EVA-..."]') as HTMLInputElement
+  const searchInput = container.querySelector('input[placeholder="Ex: PAT-"]') as HTMLInputElement
   expect(searchInput).not.toBeNull()
 
   const labels = Array.from(container.querySelectorAll('label')).map(l => l.textContent ?? '')

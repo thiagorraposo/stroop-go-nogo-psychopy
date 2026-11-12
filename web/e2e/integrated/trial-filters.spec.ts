@@ -23,7 +23,7 @@ test('condição e resposta selecionam a mesma tentativa e preservam métricas d
   await apply.click()
   await expect(form.getByRole('alert')).toContainText('Selecione somente o instrumento Stroop')
   await form.getByRole('listbox', { name: 'Instrumento da consulta', exact: true }).selectOption('stroop_go_nogo_ptbr')
-  const incompatible = page.waitForResponse(r => new URL(r.url()).pathname.endsWith('/assessments') && r.url().includes('response_type=commission'))
+  const incompatible = page.waitForResponse(r => new URL(r.url()).pathname.endsWith('/analysis/query') && r.request().postDataJSON().query.filters.response_type?.includes('commission'))
   await apply.click()
   expect((await incompatible).status()).toBe(200)
   await expect(page.getByText('Nenhuma avaliação corresponde aos filtros.', { exact: true })).toBeVisible()

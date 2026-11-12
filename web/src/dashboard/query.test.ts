@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { defaultQuery, normalizeQuery, queryKey, supportsLegacyExport, assessmentQueryFilters } from './query'
+import { defaultQuery, normalizeQuery, queryKey, supportsLegacyExport, assessmentQueryFilters, analysisQueryBody } from './query'
 
 test('QUERY7: normaliza seleções equivalentes, vazios e transporte sem perder dimensões', () => {
   const first = { projects: ['b', 'a', 'b'], filters: { participant_id: ['B', 'A', 'A'], visit: [], limit: 1, test_code: '' } }
@@ -40,4 +40,17 @@ test('QUERY7: condição/resposta são conjuntos canônicos e chegam integralmen
   equivalent.advanced!.responseType = ['commission']
   expect(queryKey(equivalent)).not.toBe(queryKey(query))
   expect(supportsLegacyExport(query)).toBe(false)
+})
+
+test('QUERY7: serializa catálogo aplicado sem perder busca/faixas/RT ausente e ordenação', () => {
+  const query = defaultQuery('a')
+  query.filters = { start_date: '2026-11-01', participant_id: ['B', 'A'], platform: ['psychopy'], test_code: ['stroop_go_nogo_ptbr'] }
+  Object.assign(query.advanced!, { searchText: '  PAT-  ', accuracyRange: '50to80', rtRange: '500to1000ms',
+    includeNullRt: false, sortBy: 'response_time', sortOrder: 'asc', condition: ['congruent'], responseType: ['hit'] })
+  expect(analysisQueryBody(query, 'next')).toEqual({
+    query: { projects: ['a'], filters: { date_from: '2026-11-01', participant_code: ['A', 'B'], platform: ['psychopy_local'],
+      test_code: ['stroop_go_nogo_ptbr'], status: 'valid', patient_search: 'pat-', accuracy_min: 50, accuracy_max: 80,
+      rt_median_min_ms: 500, rt_median_max_ms: 1000, include_null_rt: false, condition: ['congruent'], response_type: ['hit'] } },
+    grouping: { level: 'assessment', dimension: 'project' }, page: { size: 100, sort: 'response_time_asc', cursor: 'next' },
+  })
 })

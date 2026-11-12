@@ -125,8 +125,8 @@ export function ResearchFilters({
       setValidation('A data inicial deve ser anterior ou igual à final.')
       return
     }
-    if ((condition.length || responseType.length) && (instruments.length !== 1 || instruments[0] !== 'stroop_go_nogo_ptbr')) {
-      setValidation('Selecione somente o instrumento Stroop Go/No-Go para filtrar condição ou resposta. Esses filtros exigem uma mesma tentativa principal; as métricas continuam da avaliação completa.')
+    if ((condition.length || responseType.length || accuracyRange !== 'all' || rtRange !== 'all' || !includeNullRt) && (instruments.length !== 1 || instruments[0] !== 'stroop_go_nogo_ptbr')) {
+      setValidation('Selecione somente o instrumento Stroop Go/No-Go para filtrar condição, resposta, precisão ou RT. Condição e resposta exigem uma mesma tentativa principal; as métricas continuam da avaliação completa.')
       return
     }
     if ([...Object.values(values), instruments, condition, responseType].some(items => items.length > 100)) {
@@ -265,11 +265,11 @@ export function ResearchFilters({
             <span>3. Critérios & Métricas</span>
           </div>
           <label>
-            Busca textual (paciente/código)
+            Busca por código do participante
             <input
               type="search"
               maxLength={120}
-              placeholder="Ex: PAT-, V1, EVA-..."
+              placeholder="Ex: PAT-"
               value={searchText}
               onChange={event => setAdvanced('searchText', event.target.value)}
             />
@@ -278,8 +278,8 @@ export function ResearchFilters({
             Status da avaliação
             <select value={status} onChange={event => setAdvanced('status', event.target.value as AdvancedFilterValues['status'])}>
               <option value="valid">Oficiais válidas (padrão)</option>
-              <option value="all">Todas as avaliações</option>
-              <option value="invalid">Interrompidas / Invalidadas</option>
+              <option value="all" disabled>Todas as avaliações — indisponível</option>
+              <option value="invalid" disabled>Interrompidas / Invalidadas — indisponível</option>
             </select>
           </label>
           <label>
@@ -290,7 +290,7 @@ export function ResearchFilters({
             >
               <option value="all">Todas as precisões</option>
               <option value="under50">&lt; 50%</option>
-              <option value="50to80">50% a 79%</option>
+              <option value="50to80">50% a &lt; 80%</option>
               <option value="80plus">≥ 80%</option>
             </select>
           </label>

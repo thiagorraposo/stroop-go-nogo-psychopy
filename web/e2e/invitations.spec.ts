@@ -1,3 +1,4 @@
+import { analysisFixture } from '../src/test/analysis-fixture'
 /** Doubles sinteticos; nao substituem o aceite HTTPS/PostgreSQL real. */
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
@@ -13,7 +14,7 @@ async function access(page: Page, role = 'importacao', active = true) {
   const project = { id, code: 'PROJETO_SINTETICO', name: 'Pesquisa sintetica', active, created_at: '2026-10-16T12:00:00Z' }
   await page.route('**/api/v1/projects?*', route => route.fulfill({ json: { items: [project,
     { ...project, id: other, code: 'OUTRO_SINTETICO', active: true }], next_cursor: null } }))
-  await page.route('**/api/v1/projects/*/assessments?*', route => route.fulfill({ json: { items: [], next_cursor: null } }))
+  await page.route('**/api/v1/analysis/query', route => route.fulfill({ json: analysisFixture(route.request().postDataJSON(), []) }))
   await page.route('**/api/v1/patients*', route => route.fulfill({ json: { items: [], total: 0, page: 1, page_size: 50 } }))
   await page.route('**/api/v1/evaluators*', route => route.fulfill({ json: { items: [], total: 0, page: 1, page_size: 50 } }))
   await page.goto('/equipe'); await expect(page.getByLabel('Projeto', { exact: true })).toBeVisible()
