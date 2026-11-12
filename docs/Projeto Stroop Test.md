@@ -54,7 +54,7 @@ Atualizado em **2026-11-11**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **37 de 56 · 66,1%** | **19** | **M8 em execução (2/12 aceitos)** | Completar WEB-050 (POST normalizado e AA); WEB-048 pronta; WEB-031 bloqueada |
+| **37 de 56 · 66,1%** | **19** | **M8 em execução (2/12 aceitos)** | Completar WEB-050 (migração React ao POST e AA); WEB-048 pronta; WEB-031 bloqueada |
 
 ```text
 Aceites   █████████████░░░░░░░   66,1%
@@ -2534,6 +2534,93 @@ conferir envio por HEAD/upstream/remoto, sem commit artificial de autorreferênc
 Worktree final só conserva `.deploy-hostgator/` preexistente fora de escopo.
 Sem deploy/tag/release; estado e próxima ação de WEB-050 preservados acima.
 
+#### Continuação — entrada POST normalizada com capacidades parciais, 2026-11-11
+
+Novo `continue o projeto` mantém autorização em M8. Base `ca8a114`, branch
+`feat/m8-consulta-aplicada-unica`, inicialmente alinhada ao upstream após fetch;
+main/origin/main `b5fccbb`. Material `.deploy-hostgator/` preservado sem leitura
+ou staging. PR #18 aberto sem merge; a mesma restrição alcança PR #19 por
+ancestralidade, independentemente do resultado de CI.
+
+Implementado `POST /api/v1/analysis/query` com RequestModel estrito em todos os
+níveis, Origin/CSRF, sessão profissional e DSN SELECT sem fallback. Normaliza
+aliases de datas/código/plataforma, ordena/deduplica seleções e recusa aliases
+contraditórios. O contexto público inclui consulta canônica, capacidades,
+identificadores, prazo, fingerprints, contagens completas e página. Suporte
+inicial: categorias/datas existentes, status valid, seleção explícita,
+condição/resposta Stroop, quatro ordenações e agrupamento assessment/project
+somente com contagens operacionais. Busca, faixas métricas, status operacionais,
+IDs cadastrais, plataforma legacy sem proveniência própria e demais agrupamentos
+retornam 422 sanitizado. Não são aceitos/ignorados.
+
+A seleção ocorre em uma única transação REPEATABLE READ/READ ONLY: reautoriza
+todos os projetos, limita A a 5.000, aplica seleção explícita antes do limite e
+recusa IDs fora do recorte. Ambiguidade de legado em dois projetos falha fechada.
+Condição/resposta mantém EXISTS na mesma tentativa; T conta somente main que
+passam ambos. Métricas em items continuam da avaliação completa, pelo domínio
+oficial. Participantes/visitas são contados por projeto/código, com definição
+explícita; não é deduplicação cadastral ou união nominal entre projetos.
+Fingerprints incluem conteúdo pseudonimizado relevante, inclusive estímulo;
+cursor assinado vincula identidade, consulta, ordenação, conteúdo e prazo de
+15 minutos. Alteração de mesma cardinalidade/expiração recusa paginação com 409;
+limite/erro nunca produz 200 com prefixo parcial. Sem novo cálculo científico.
+
+**Limites:** o React ainda consome GET e os filtros avançados locais históricos.
+Não há integração ao POST da consulta aplicada na UI, catálogo integral ou
+contexto de busca/exportação v2. A resposta informa exports=false; query_id
+não autoriza downloads. Esta unidade não conclui WEB-050/051 e não concede
+aceite AA ou funcional integrado. Avisos históricos de lifecycle permanecem
+sem diagnóstico; frontend de produto/motor/CSS/bundle preservados.
+
+Ambiente de EV-M8-050 preservado: Linux 7.0.0-42-generic, Python 3.12.3,
+Node 24.15.0/npm 11.16.0, Chromium 156.0.8078.4/Firefox 157.0. PG 17.6 no
+container próprio `stroop_etapa4_test_m8_post`, tmpfs, banco homônimo, porta
+loopback efêmera 32771. Só fixtures sintéticas; sem dependências instaladas,
+schema/migration novos, acesso operacional, deploy, tag ou release.
+
+Validações:
+
+- `TEST_DATABASE_URL` exclusivamente no PG descartável acima,
+  `.venv/bin/python scripts/verify_web_ci.py python`: **456/456**, sem skips,
+  168,138 s, exit 0. Inclui esquema fechado, aliases/capacidades, seleção vazia,
+  subconjunto explícito em universo maior que 5.000, rejeição de 5.001 sem
+  truncamento, paginação, identidade, expiração, conteúdo mutado, projetos
+  inacessíveis/revogação, CSRF e ausência de DSN SELECT. Mensagens de auditoria
+  sintética recusada e pipeline aborted pertencem aos testes negativos; o
+  runner concluiu com todos os testes aprovados.
+- Foco anterior `.venv/bin/python -m unittest tests.test_web_assessments -q`:
+  **27/27**, 37,035 s; teste de normalização puro adicional aprovado. Primeira
+  rodada focada teve **26 passes/um erro** por atributo inexistente no helper
+  de revogação; corrigido para opaque_user_id e PUT real com active=false,
+  sem alterar autorização. Nenhuma falha funcional omitida.
+- `npm --prefix web run build`: tipos e Vite aprovados; bundle de produto
+  idêntico à base (`index-Cd1eQ5rm.css`, `index-8UK2m2v9.js`). Aviso de chunk
+  >500 kB preservado (540,27 kB). Vitest/browser double não reexecutados:
+  nenhum fonte React/runtime experimental mudou.
+- Em `web/`, `TEST_DATABASE_URL` sintético, `npx playwright test --config
+  playwright.integration.config.ts e2e/integrated/analysis-query.spec.ts
+  e2e/integrated/trial-filters.spec.ts
+  --output=test-results/m8-normalized-post-https`: **4/4**, sem skips, 16,7 s.
+  HTTPS/proxy/API/PG/grants reais em Chromium/Firefox; POST executado no browser
+  autenticado, sem interceptação. Confere aliases, métricas completas, T,
+  capacidades, recusa nominal/CSRF, revogação e storage vazio; regressa filtros
+  React existentes. Não comprova migração da UI ao POST ou campanha UX7-AA.
+- Verificação documental, sete testes do validador e diff check aprovados;
+  scanner e Git registrados no fechamento abaixo. Auditorias de dependências
+  não reexecutadas localmente; locks intactos. Artefatos/log temporário de teste
+  somente ignorados ou em /tmp, nenhum export/coleta versionado.
+
+WEB-050 permanece **EM_ANDAMENTO**; global **37/56**, M8 **2/12**. Próxima ação:
+ampliar capacidades de seleção e migrar consumidores React ao POST único,
+eliminando filtros locais históricos com capacidades explícitas e verificando
+UX7-AA; WEB-048 continua PRONTA. WEB-031 bloqueada externamente impede WEB-032,
+sem impedir esse ramo. Nenhum avanço a M9.
+
+Entrega identificável por `git log -1 --format=%H
+--grep='feat(web): adiciona entrada analítica normalizada com capacidades explícitas'`.
+Conferir SHA/envio/check no fechamento desta unidade e HEAD/upstream/remoto;
+PR #19 continua draft, auto-merge desabilitado e nenhum merge autorizado.
+
 ### WEB-051 — Consolidar seleção analítica autorizada e agregações no servidor
 
 - Marco: M8. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
@@ -3473,10 +3560,13 @@ não inferir ausência de problema por falta de reprodução PG nesta missão.
 Novo `continue o projeto` autoriza M8 e suas tarefas prontas e sucessoras,
 sem avançar M9 ou autorizar operações externas. WEB-050 EM_ANDAMENTO: núcleo de
 consulta aplicada/cancelamento, multisseleção de instrumentos e condição/resposta
-na mesma tentativa implementados; completar POST normalizado e UX7-AA antes do aceite.
-Evidências e fechamento em EV-M8-050; próximo trabalho exato é completar o
-catálogo/contrato e UX7-AA da ficha, com WEB-048 disponível independentemente.
-Unidades `07473b9`, `7f43295` e continuação de condição/resposta; evidência atual em EV-M8-050. PR #19 draft aberto,
+na mesma tentativa implementados; entrada POST com capacidades parciais disponível.
+Completar migração React, catálogo integral e UX7-AA antes do aceite.
+Evidências e fechamento em EV-M8-050; próximo trabalho exato é ampliar as
+capacidades do seletor e migrar consumidores React ao POST único, preservando
+rejeição explícita dos recortes sem suporte; completar UX7-AA da ficha.
+WEB-048 continua disponível independentemente.
+Unidades `07473b9`, `7f43295`, condição/resposta e entrada POST normalizada; evidência atual em EV-M8-050. PR #19 draft aberto,
 sem merge; verify anterior b4382e6 falhou no caso CSP Chromium (diagnóstico local
 12/12 não explica a causa). Consultar fechamento atual para push/check por SHA.
 Não integrar indiretamente a ancestralidade do PR #18.

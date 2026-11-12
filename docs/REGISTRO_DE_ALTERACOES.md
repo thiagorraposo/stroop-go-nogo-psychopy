@@ -4,6 +4,16 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-11 — Entrada analítica normalizada por POST (WEB-050)
+
+Adicionada entrada fechada de consulta com aliases canônicos, capacidades
+explícitas, seleção de avaliações e paginação assinada. O seletor reautoriza todos
+os projetos em uma transação somente leitura, distingue avaliações completas de
+tentativas filtradas e preserva o cálculo oficial. Campos sem suporte são
+recusados; não habilita busca nominal ou exportação v2. Adicionados testes de
+contrato, PostgreSQL e HTTPS nos dois navegadores. Contrato e matriz atualizados;
+evidências, limites e continuidade somente no backlog canônico.
+
 ## 2026-11-11 — Condição e resposta na mesma tentativa (WEB-050)
 
 A consulta aplicada recebe multisseleções pesquisáveis de condição congruente/

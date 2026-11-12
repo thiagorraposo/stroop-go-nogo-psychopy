@@ -1,6 +1,7 @@
 """Consulta profissional com projecoes fechadas e exportacao minimizada."""
 from __future__ import annotations
 
+from datetime import datetime
 from uuid import UUID
 
 from stroop.domain.auth import AppUser
@@ -140,3 +141,46 @@ def session_status(database_url, project_id, session_id, actor):
     if item is None:
         raise MissingError
     return item
+
+
+def analysis_query(database_url, actor, *, query, filters, sort, offset, size, snapshot=None):
+    """Projeção de A/T sem combinar métricas oficiais entre instrumentos."""
+    from stroop.domain.stroop import expected_outcome
+    allowed, rows, trials, content = persistence.analysis_selection(
+        database_url, [UUID(project) for project in query['projects']], actor.issuer, actor.subject,
+        filters=filters, assessment_ids=query.get('assessment_ids'))
+    if not allowed:
+        raise MissingError
+    if snapshot is not None and snapshot != content:
+        raise SnapshotConflict
+    selected_trials = []
+    for trial in trials:
+        if filters.get('condition') and trial['condition'] not in filters['condition']:
+            continue
+        if filters.get('response_type'):
+            outcome = expected_outcome({'condition': trial['condition'], 'key_pressed': trial['key_pressed'] or ''})
+            if outcome is None or outcome[2] not in filters['response_type']:
+                continue
+        selected_trials.append(trial)
+    counts = {
+        'participants': len({(str(row['project_id']), row['participant_id']) for row in rows}),
+        'visits': len({(str(row['project_id']), row['participant_id'], row['visit']) for row in rows}),
+        'assessments': len(rows), 'trials': len(selected_trials),
+    }
+    # Desempate estável; nenhuma identidade é unida por nome/código.
+    rows.sort(key=lambda row: (str(row['project_id']), row['assessment_id']))
+    def date_key(row):
+        value = datetime.fromisoformat(persistence.iso_utc(row['started_at']).replace('Z', '+00:00'))
+        # iso_utc normaliza valores com fuso e preserva legado sem fuso.
+        return (value.year, value.month, value.day, value.hour, value.minute, value.second, value.microsecond)
+    key = {'participant_code_asc': lambda row: row['participant_id'],
+           'visit_asc': lambda row: row['visit']}.get(sort, date_key)
+    rows.sort(key=key, reverse=sort == 'started_at_desc')
+    aggregates = []
+    for project in query['projects']:
+        scoped = [row for row in rows if str(row['project_id']) == project]
+        ids = {row['assessment_id'] for row in scoped}
+        aggregates.append({'project_id': project, 'assessments': len(scoped),
+                           'trials': sum(trial['assessment_id'] in ids for trial in selected_trials)})
+    return {'content_fingerprint': content, 'counts': counts, 'aggregates': aggregates,
+            'items': [{**_base(row), 'project_id': str(row['project_id'])} for row in rows[offset:offset + size]]}

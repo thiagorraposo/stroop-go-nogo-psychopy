@@ -970,13 +970,40 @@ Além da exportação individual oficial de 21 colunas (`GET /api/v1/projects/{p
 
 ## Consulta e exportação integradas — alvo CHG-007
 
-**PLANEJADO, ainda não implementado.** Complementa ADR-007/008 e a seção CHG-005;
-não descreve rotas existentes como já corrigidas. Runtime auditado e evidências
+**ALVO PARCIALMENTE IMPLEMENTADO.** Complementa ADR-007/008 e a seção CHG-005;
+o recorte de capacidade implementado está descrito abaixo; o restante continua
+planejado. Não descreve rotas existentes como já corrigidas. Runtime auditado e evidências
 ficam no backlog. `api/exports.py` atual aceita `filters: dict` e token v1 reduzido;
 isso não implementa este contrato. Individual e agregado existentes permanecem
 compatíveis; novos recortes não suportados nunca fazem fallback para exportar tudo.
 
 ### Consulta normalizada e seleção
+
+Implementação inicial de `POST /api/v1/analysis/query` (WEB-050): corpo fechado
+conforme estrutura abaixo, somente `grouping={level: assessment, dimension: project}`,
+status `valid`, dimensões categoriais do GET existente, datas, seleção explícita
+e as quatro ordenações por data/código/visita. `participant_code` é a chave
+canônica; `participant_id`, `start_date/end_date` e `psychopy` são aliases de
+entrada. Aliases contraditórios retornam 422. Plataforma de saída canônica é
+`psychopy_local`; `legacy` ainda é recusada por falta de proveniência distinta.
+Condição/resposta requerem seleção explícita e exclusiva de Stroop.
+
+Resposta identifica capacidades disponíveis e `exports=false`. `aggregates`
+contém somente contagens operacionais por projeto, sem novas médias científicas.
+Identidade de participante/visita é qualificada por projeto/código, explicitada
+em `indicator_definitions`; não é deduplicação cadastral entre projetos.
+`items` usa a projeção pseudonimizada existente com `project_id` explícito.
+`completeness=complete` só é emitido após conferir todo A/T em uma única transação
+REPEATABLE READ/READ ONLY; erro/limite não publica prefixo parcial. Cursor assinado
+vincula identidade, consulta, ordenação, conteúdo e prazo de 15 minutos. O contexto
+não é persistido; `query_id` ainda não habilita prévia/download.
+
+Faixas métricas, busca, IDs cadastrais, estados operacionais, demais agrupamentos,
+ordenações e campos não suportados retornam 422, sem fallback silencioso.
+A interface profissional ainda usa GET e filtros avançados locais históricos;
+migração ao POST, catálogo integral, contexto efêmero de busca e exportação v2
+continuam pendentes em WEB-050/051/052/053. Não há aceite integrado por este recorte.
+Evidências e limites de execução: EV-M8-050 no backlog canônico.
 
 `POST /api/v1/analysis/query` é a operação alvo única de aplicação analítica,
 necessária para não enviar busca nominal em query string. Corpo fechado:

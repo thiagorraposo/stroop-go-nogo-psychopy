@@ -569,6 +569,14 @@ class WebAssessmentsTests(unittest.TestCase):
                     'synthetic-volume',a.imported_at,a.import_status
                 FROM assessments a CROSS JOIN generate_series(1,5000) n WHERE a.assessment_id=%s""", (legacy,))
         self.assertEqual(self.h.consulta.get(self.path).status_code, 422)
+        body = self.analysis_body()
+        response = self.h.consulta.post('/api/v1/analysis/query', json=body)
+        self.assertEqual(response.status_code, 422, response.text)
+        self.assertNotIn('items', response.json())
+        body['query']['assessment_ids'] = [legacy]
+        response = self.h.consulta.post('/api/v1/analysis/query', json=body)
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual(response.json()['counts']['assessments'], 1)
 
     def test_queries_fechadas_credencial_ausente_e_limite(self):
         for query in ('?limit=0', '?limit=101', '?limit=2&limit=3', '?test_code=a&test_code=../invalid',
@@ -586,3 +594,102 @@ class WebAssessmentsTests(unittest.TestCase):
         limited = self.h.consulta.get(self.path)
         self.assertEqual(limited.status_code, 429, limited.text)
         self.assertIn('retry-after', limited.headers)
+
+    def analysis_body(self, filters=None, **page):
+        return {'query': {'projects': [str(self.h.project_id)], 'filters': filters or {}},
+                'grouping': {'level': 'assessment', 'dimension': 'project'}, 'page': page}
+
+    def test_analysis_post_normaliza_aliases_pagina_e_mantem_metricas_completas(self):
+        first, _ = self.complete()
+        second, _ = self.complete()
+        body = self.analysis_body({'test_code': ['stroop_go_nogo_ptbr'], 'platform': ['web']}, size=1)
+        response = self.h.consulta.post('/api/v1/analysis/query', json=body)
+        self.assertEqual(response.status_code, 200, response.text)
+        result = response.json()
+        self.assertEqual(result['counts'], {'participants': 1, 'visits': 1, 'assessments': 2, 'trials': 32})
+        self.assertEqual(len(result['items']), 1)
+        self.assertEqual(result['aggregates'][0]['assessments'], 2)
+        self.assertFalse(result['capabilities']['exports'])
+        self.assertEqual(response.headers['cache-control'], 'no-store')
+        body['page']['cursor'] = result['next_cursor']
+        other = self.h.consulta.post('/api/v1/analysis/query', json=body)
+        self.assertEqual(other.status_code, 200, other.text)
+        last = other.json()
+        self.assertIsNone(last['next_cursor'])
+        self.assertEqual(last['query_id'], result['query_id'])
+        self.assertEqual(last['content_fingerprint'], result['content_fingerprint'])
+        self.assertEqual({item['assessment_id'] for item in result['items'] + last['items']},
+                         {first['assessment_id'], second['assessment_id']})
+        for item in result['items'] + last['items']:
+            detail = self.h.consulta.get(self.path + '/' + item['assessment_id']).json()
+            self.assertEqual(item['summary'], detail['summary'])
+        alias = self.analysis_body({'participant_id': [result['items'][0]['participant_id']]})
+        a = self.h.consulta.post('/api/v1/analysis/query', json=alias).json()
+        alias['query']['filters'] = {'participant_code': [result['items'][0]['participant_id']]}
+        b = self.h.consulta.post('/api/v1/analysis/query', json=alias).json()
+        self.assertEqual(a['query_fingerprint'], b['query_fingerprint'])
+        self.assertEqual(a['normalized_query'], b['normalized_query'])
+
+    def test_analysis_post_selecao_explicita_tentativas_e_capacidade_fechada(self):
+        receipt, _ = self.complete()
+        detail = self.h.consulta.get(self.path + '/' + receipt['assessment_id']).json()
+        body = self.analysis_body({'test_code': ['stroop_go_nogo_ptbr'], 'condition': ['congruent'],
+                                   'response_type': ['hit', 'omission']})
+        result = self.h.consulta.post('/api/v1/analysis/query', json=body)
+        self.assertEqual(result.status_code, 200, result.text)
+        matched = [trial for trial in detail['trials'] if trial['condition'] == 'congruent'
+                   and trial['error_type'] in ('hit', 'omission')]
+        self.assertEqual(result.json()['counts']['trials'], len(matched))
+        if matched:
+            self.assertEqual(result.json()['items'][0]['summary'], detail['summary'])
+        for filters in ({'patient_search': 'NOME_SINTETICO'}, {'accuracy_min': 50}, {'platform': ['legacy']},
+                        {'condition': ['congruent']}, {'status': 'aborted'},
+                        {'participant_id': ['A'], 'participant_code': ['B']},
+                        {'date_from': '2026-02-30'}, {'start_date': '2026-01-01', 'date_from': '2026-02-01'}):
+            with self.subTest(filters=filters):
+                response = self.h.consulta.post('/api/v1/analysis/query', json=self.analysis_body(filters))
+                self.assertEqual(response.status_code, 422, response.text)
+                self.assertNotIn('NOME_SINTETICO', response.text)
+        body = self.analysis_body()
+        body['query']['assessment_ids'] = []
+        response = self.h.consulta.post('/api/v1/analysis/query', json=body)
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual(response.json()['counts']['assessments'], 0)
+        body['query']['assessment_ids'] = [str(uuid4())]
+        self.assertEqual(self.h.consulta.post('/api/v1/analysis/query', json=body).status_code, 409)
+
+    def test_analysis_post_reautoriza_snapshot_expiracao_csrf_e_sem_fallback(self):
+        receipt, participant = self.complete()
+        self.complete()
+        body = self.analysis_body(size=1)
+        initial = self.h.consulta.post('/api/v1/analysis/query', json=body)
+        self.assertEqual(initial.status_code, 200, initial.text)
+        cursor = initial.json()['next_cursor']
+        body['page']['cursor'] = cursor
+        self.assertEqual(self.h.admin.post('/api/v1/analysis/query', json=body).status_code, 422)
+        from datetime import datetime, timedelta, timezone
+        from unittest.mock import patch
+        with patch('api.analysis.datetime') as clock:
+            clock.now.return_value = datetime.now(timezone.utc) + timedelta(minutes=16)
+            self.assertEqual(self.h.consulta.post('/api/v1/analysis/query', json=body).status_code, 409)
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute('UPDATE trial_results SET word=%s WHERE assessment_id=%s AND trial_number=1',
+                               ('SYNTHETIC_CHANGED', receipt['assessment_id']))
+        self.assertEqual(self.h.consulta.post('/api/v1/analysis/query', json=body).status_code, 409)
+        body['page']['cursor'] = ('A' if cursor[0] != 'A' else 'B') + cursor[1:]
+        self.assertEqual(self.h.consulta.post('/api/v1/analysis/query', json=body).status_code, 422)
+        body = self.analysis_body()
+        self.assertEqual(self.h.consulta.post('/api/v1/analysis/query', json=body,
+                                            headers={'X-CSRF-Token': 'invalid'}).status_code, 403)
+        self.assertEqual(participant.post('/api/v1/analysis/query', json=body).status_code, 401)
+        self.assertEqual(self.h.consulta.post('/api/v1/analysis/query?unknown=1', json=body).status_code, 422)
+        body['query']['projects'].append(str(uuid4()))
+        self.assertEqual(self.h.consulta.post('/api/v1/analysis/query', json=body).status_code, 404)
+        body = self.analysis_body()
+        self.h.app.state.config = replace(self.h.app.state.config, read_database_url='')
+        self.assertEqual(self.h.consulta.post('/api/v1/analysis/query', json=body).status_code, 503)
+        self.h.app.state.config = replace(self.h.app.state.config, read_database_url=self.read_url)
+        user_id = helpers.opaque_user_id(helpers.ISSUER, helpers.CONSULTA)
+        self.assertEqual(self.h.admin.put(f'/api/v1/projects/{self.h.project_id}/members/{user_id}',
+                                         json={'active': False}).status_code, 200)
+        self.assertEqual(self.h.consulta.post('/api/v1/analysis/query', json=body).status_code, 404)
