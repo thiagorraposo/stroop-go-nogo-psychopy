@@ -2203,8 +2203,7 @@ existentes são evidência limitada, não conformidade AA. Não avançar WEB-051
 CONCLUIDA por implicação. WEB-048 continua PRONTA; WEB-031 bloqueada externamente.
 
 Ambiente local: Linux 7.0.0-42-generic, Node 24.15.0, npm 11.16.0, Python
-3.12.3; Playwright 1.64.1, Chromium 156.0.8078.4/Firefox (versão nas capturas
-finais). Sem instalar/atualizar dependências, sem CSS experimental, migrations,
+3.12.3; Playwright 1.64.1, Chromium 156.0.8078.4/Firefox 157.0. Sem instalar/atualizar dependências, sem CSS experimental, migrations,
 produção ou acesso a fontes protegidas. PG 17.6 em container **exclusivamente
 sintético** `stroop-m8-query7-synthetic-20261111`, tmpfs e porta efêmera local,
 banco `stroop_etapa4_test_query7`; harness HTTPS existente usa API/grants reais.
@@ -2290,6 +2289,32 @@ alterar ambiente operacional. Artefatos/traces sintéticos somente ignorados ou
 em /tmp; nenhum log/export/coleta versionado. Suíte Python funcional completa e
 auditorias de dependência não reexecutadas localmente (sem alteração backend/locks);
 Actions verify da entrega tem estado próprio, registrado no fechamento Git.
+
+#### Fechamento Git desta unidade
+
+Entrega em **`07473b906f75982cb37f53ee778b33fd99fcdba5`**, branch
+`feat/m8-consulta-aplicada-unica`, push com upstream confirmado por igualdade
+HEAD/upstream/ls-remote. **20 arquivos da tarefa**, sem App (experimento
+revertido), dependências, dados ou material de deploy. Build/tipos e 336 testes
+Vitest reexecutados após o commit, todos aprovados; CSS emitido preserva mesmo
+hash `index-mVgr7SNY.css` e bundle `index-6EHd1uPz.js` da campanha HTTPS final.
+
+[PR #19](https://github.com/thiagorraposo/stroop-test-web/pull/19) **draft aberto**
+para main; auto-merge desabilitado. `verify` em **IN_PROGRESS** na SHA 07473b9
+na consulta desta sessão, execução [43124268881](https://github.com/thiagorraposo/stroop-test-web/actions/runs/43124268881).
+Não é CI aprovada, e o fechamento documental posterior recebe seu próprio check.
+PR #18 conferido aberto em `67dfbf7`, sem auto-merge; nenhum merge por esta
+branch, para não integrar indiretamente sua ancestralidade. Sem deploy/tag/release.
+
+WEB-050 continua **EM_ANDAMENTO**, progresso 37/56 e M8 2/12 preservados.
+Próxima ação técnica: completar catálogo de seleção e serialização normalizada
+conforme contrato alvo, com capacidades/rejeição explícita dos recortes ainda
+não suportados; conferir UX7-AA da ficha antes do aceite. Não declarar WEB-051
+pronta por código parcial. WEB-048 continua independente e PRONTA; WEB-031
+continua bloqueada por recursos/autorização externos, impedindo WEB-032.
+Fechamento documental identificável por `git log -1 --format=%H
+--grep='docs(web): registra unidade parcial de WEB-050 e PR de revisão'`;
+confirmar envio por HEAD/upstream/remoto, sem commit artificial de autorreferência.
 
 ### WEB-051 — Consolidar seleção analítica autorizada e agregações no servidor
 
@@ -3230,8 +3255,10 @@ não inferir ausência de problema por falta de reprodução PG nesta missão.
 Novo `continue o projeto` autoriza M8 e suas tarefas prontas e sucessoras,
 sem avançar M9 ou autorizar operações externas. WEB-050 EM_ANDAMENTO: núcleo de consulta aplicada/cancelamento implementado;
 completar catálogo multisseleção e contrato e conferir UX7-AA antes do aceite.
-Evidências em EV-M8-050; próximo trabalho exato permanece esse fechamento,
-com WEB-048 disponível independentemente dentro de M8.
+Evidências e fechamento em EV-M8-050; próximo trabalho exato é completar o
+catálogo/contrato e UX7-AA da ficha, com WEB-048 disponível independentemente.
+Unidade `07473b9` enviada e PR #19 draft aberto, sem merge; verify em execução
+na consulta registrada. Não integrar indiretamente a ancestralidade do PR #18.
 WEB-048 permanece PRONTA; WEB-031 BLOQUEADA pelo destino externo/custódia.
 37/56 aceitos preservados; nenhum aceite concedido no início da execução.
 Branch `feat/m8-consulta-aplicada-unica` deriva de `67dfbf7` (CHG-007), pois
