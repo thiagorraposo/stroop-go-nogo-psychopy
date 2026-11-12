@@ -2521,6 +2521,19 @@ locais. Na consulta anterior ao novo envio, `verify` de **fc487cb** ainda estava
 IN_PROGRESS na execução 43131698618 (integração HTTPS), sem aprovação atribuída.
 PR #19 draft e PR #18 abertos, sem auto-merge/merge. Nenhum deploy/tag/release.
 
+Fechamento Git da unidade de condição/resposta: entrega funcional/documental em
+**`9c6c9dfb70486ab2d3b37dd9e54d1906746651f1`**, **18 arquivos**, push confirmado
+por HEAD/upstream/ls-remote na mesma SHA. [PR #19](https://github.com/thiagorraposo/stroop-test-web/pull/19)
+permanece draft aberto, descrição atualizada, auto-merge desabilitado; sem merge
+pela restrição do PR #18. `verify` da entrega **QUEUED** na consulta, execução
+[43134541360](https://github.com/thiagorraposo/stroop-test-web/actions/runs/43134541360),
+sem atribuir aprovação. Fechamento documental posterior tem check próprio,
+identificável por `git log -1 --format=%H
+--grep='docs(web): registra seleção por tentativa e limites de M8'`;
+conferir envio por HEAD/upstream/remoto, sem commit artificial de autorreferência.
+Worktree final só conserva `.deploy-hostgator/` preexistente fora de escopo.
+Sem deploy/tag/release; estado e próxima ação de WEB-050 preservados acima.
+
 ### WEB-051 — Consolidar seleção analítica autorizada e agregações no servidor
 
 - Marco: M8. Prioridade: P0. Complexidade: G. Estado: PENDENTE.
