@@ -3899,6 +3899,30 @@ Suíte Python integral via `verify_web_ci.py python`: 473 testes aprovados em
 89 documentos/736 links/114 âncoras, sem ciclos. CI do PR consolidado ainda não
 executada nesta revisão; conferir o SHA final antes do merge.
 
+Continuação da integração: push de `7659bcd5222af82be6bc78c7b4c5fc2df9e28bbc`
+confirmado no upstream, PR #19 pronto para revisão e auto-merge nulo. A execução
+[43328289129](https://github.com/thiagorraposo/stroop-test-web/actions/runs/43328289129)
+aprovou scanner, Python, frontend/build, auditorias e navegadores, mas falhou
+em HTTPS: 50 aprovados e dois timeouts do teste de resultados completos.
+Causa conferida: o redesign alterou o nome acessível do seletor longitudinal.
+Restaurado o rótulo anterior “Participante para evolução”; o teste também
+exercita explicitamente a navegação para a aba de visitas. Primeira tentativa
+local só com navegação continuou esperando o rótulo anterior e foi interrompida;
+após restaurá-lo, os dois testes HTTPS/API/PostgreSQL reais passaram, Chromium
+6,3 s e Firefox 10,2 s (20,4 s total). Nenhuma asserção ou timeout reduzido.
+Vitest reexecutado: 361/361 aprovados; tipos/build aprovados.
+
+CI do merge #18 na main aprovada na execução
+[43327628320](https://github.com/thiagorraposo/stroop-test-web/actions/runs/43327628320).
+A revisão corrigida seguirá no mesmo PR. Resultado final de envio, SHA, check
+e Merge Commit tradicional verificável no
+[PR #19](https://github.com/thiagorraposo/stroop-test-web/pull/19) e na execução
+WEB validada do SHA integrado na main; a falha anterior não foi omitida ou
+substituída por passe de outro SHA. Este registro não antecipa o resultado
+remoto da correção. O fechamento Git é identificável por
+`git log -1 --format=%H --grep='fix(web): preserva rótulo acessível da evolução no redesign'`;
+confirmar HEAD/upstream antes do merge. Não gerar commit de autorreferência.
+
 Progresso permanece 37/56 e M8 2/12. WEB-050 EM_ANDAMENTO (catálogo residual e
 UX7-AA), WEB-048 PRONTA, WEB-031 BLOQUEADA (origem/hostkey, aprovação/custódia e
 medição externa), WEB-032 PENDENTE. Próxima ação desta sessão: concluir testes,

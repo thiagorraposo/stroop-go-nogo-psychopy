@@ -58,6 +58,7 @@ test('resultados completos reais preservam unidades, visitas e identidades por p
   await expect(errors.locator('tbody tr')).toHaveCount(2)
   await expect(errors).toContainText(prepared.codes[0]!)
   await expect(errors).toContainText(prepared.codes[1]!)
+  await page.getByRole('button', { name: /Análises por Visita/ }).click()
   const evolution = page.getByRole('combobox', { name: 'Participante para evolução', exact: true })
   await evolution.selectOption(JSON.stringify([prepared.projects[0], 'P_SINTETICO_W15']))
   const longitudinal = page.getByRole('table', { name: 'Evolução do participante por avaliação' })

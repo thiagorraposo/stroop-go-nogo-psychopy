@@ -148,7 +148,7 @@ export function ResearchVisualizations({ rows, projects, viewMode = 'all' }: Pro
           </div>
           <div className="analytics-participant-select">
             <label>
-              Selecionar participante para investigar:
+              Participante para evolução
               <select value={selected} onChange={event => setChosen(event.target.value)}>
                 {participants.map(([key, row]) => (
                   <option key={key} value={key}>
