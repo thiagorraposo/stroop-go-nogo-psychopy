@@ -12,7 +12,7 @@ async function access(page: Page) {
   await page.route('**/api/v1/projects?*', r => r.fulfill({ json: { items: [first, second].map((id, index) => ({ id, code: `PROJETO_${index}`, name: 'Pesquisa sintetica', active: true, created_at: '2026-10-16T12:00:00Z' })), next_cursor: null } }))
   await page.route('**/api/v1/projects/*/assessments/options*', r => r.fulfill({ json: facets }))
 }
-async function open(page: Page) { await page.goto('/equipe'); await expect(card(page, 'Avaliações')).toHaveText('1') }
+async function open(page: Page) { await page.goto('/equipe'); await expect(card(page, 'Avaliações')).toHaveText('1'); await page.getByText('Filtros avançados e ordenação', { exact: true }).click() }
 async function apply(page: Page) { await page.getByRole('button', { name: 'Aplicar filtros' }).click() }
 
 test('agrega todos projetos/paginas e distingue participantes por projeto', async ({ page }) => {
@@ -22,8 +22,8 @@ test('agrega todos projetos/paginas e distingue participantes por projeto', asyn
     return r.fulfill({ json: { items: [row(multi ? 'S2' : url.searchParams.has('cursor') ? 'S1B' : 'S1')], next_cursor: !multi && url.searchParams.has('participant_id') && !url.searchParams.has('cursor') ? 'next' : null } })
   })
   await open(page)
-  await page.getByLabel('Projetos da consulta').selectOption([first, second])
-  await page.getByLabel('Participantes (códigos)').selectOption('P_SINTETICO'); await apply(page)
+  await page.getByLabel('Projetos da consulta', { exact: true }).selectOption([first, second])
+  await page.getByLabel('Participantes (códigos)', { exact: true }).selectOption('P_SINTETICO'); await apply(page)
   await expect(card(page, 'Avaliações')).toHaveText('3'); await expect(card(page, 'Participantes únicos')).toHaveText('2')
   await expect(page.getByRole('table', { name: 'Avaliações filtradas' }).locator('tbody tr')).toHaveCount(3)
 })
@@ -37,7 +37,7 @@ test('combina datas/listas/instrumento no servidor e limpa pelo teclado', async 
   await open(page)
   await page.getByLabel('Data inicial').fill('2026-10-01'); await page.getByLabel('Data final').fill('2026-10-17')
   await page.getByLabel('Instrumento da consulta').selectOption('stroop_go_nogo_ptbr')
-  await page.getByLabel('Participantes (códigos)').selectOption('P_SINTETICO')
+  await page.getByLabel('Participantes (códigos)', { exact: true }).selectOption('P_SINTETICO')
   await page.getByRole('listbox', { name: 'Visitas', exact: true }).selectOption(['V1', 'V2'])
   await page.getByRole('listbox', { name: 'Avaliadores (identificação técnica)', exact: true }).selectOption('LEGADO_NAO_MAPEADO')
   await page.getByRole('listbox', { name: 'Versões', exact: true }).selectOption('1.0.0'); await page.getByRole('listbox', { name: 'Plataformas', exact: true }).selectOption('web')
@@ -49,6 +49,8 @@ test('combina datas/listas/instrumento no servidor e limpa pelo teclado', async 
   expect(observed?.searchParams.get('evaluator_id')).toBe('LEGADO_NAO_MAPEADO')
   await page.getByRole('button', { name: 'Limpar filtros' }).focus(); await page.keyboard.press('Enter')
   await expect(page.getByLabel('Data inicial')).toHaveValue(''); await expect(page.getByRole('listbox', { name: 'Visitas', exact: true })).toHaveValues([])
+  await expect(page.getByText('Alterações não aplicadas.', { exact: false })).toBeVisible()
+  await apply(page)
   await expect(page.getByText(/^Filtros aplicados:/)).toContainText('sem restrições adicionais')
 })
 
@@ -58,13 +60,13 @@ for (const mode of ['falha projeto', 'cursor repetido', 'limite 5000']) {
     await page.route('**/api/v1/projects/*/assessments?*', r => {
       const url = new URL(r.request().url())
       if (!filtering) return r.fulfill({ json: { items: [row('INITIAL')], next_cursor: null } })
-      if (mode === 'falha projeto' && url.pathname.includes(second)) return r.fulfill({ status: 403, json: { error: { code: 'permission_denied' } } })
+      if (mode === 'falha projeto' && url.pathname.includes(second)) return r.fulfill({ status: 503, json: { error: { code: 'permission_denied' } } })
       const index = Number(url.searchParams.get('cursor')?.replace('c', '') ?? '0')
       const items = mode === 'limite 5000' ? Array.from({ length: 100 }, (_, n) => row(`S_${index}_${n}`)) : [row(`S_${index}`)]
       return r.fulfill({ json: { items, next_cursor: mode === 'falha projeto' ? null : mode === 'cursor repetido' ? 'c1' : `c${index + 1}` } })
     })
     await open(page); filtering = true
-    await page.getByLabel('Projetos da consulta').selectOption([first, second]); await apply(page)
+    await page.getByLabel('Projetos da consulta', { exact: true }).selectOption([first, second]); await apply(page)
     await expect(page.getByRole('alert')).toBeVisible(); await expect(page.locator('.dashboard-cards')).toHaveCount(0)
     await expect(page.getByRole('table', { name: 'Avaliações filtradas' })).toHaveCount(0)
     await expect(page.getByRole('button', { name: 'Atualizar consultas' })).toBeVisible()
@@ -79,9 +81,9 @@ test('troca de projeto cancela consulta anterior sem reaplicar resposta atrasada
     if (url.searchParams.has('participant_id')) { started(); await gate; await r.fulfill({ json: { items: [row('ATRASADA')], next_cursor: null } }).catch(() => undefined); return }
     return r.fulfill({ json: { items: [row(url.pathname.includes(second) ? 'ATUAL' : 'INICIAL')], next_cursor: null } })
   })
-  await open(page); await page.getByLabel('Participantes (códigos)').selectOption('P_SINTETICO'); await apply(page); await received
-  await page.getByLabel('Projeto', { exact: true }).selectOption(second); release()
+  await open(page); await page.getByLabel('Participantes (códigos)', { exact: true }).selectOption('P_SINTETICO'); await apply(page); await received
+  await page.getByLabel('Projetos da consulta', { exact: true }).selectOption(second); await page.getByLabel('Participantes (códigos)', { exact: true }).selectOption([]); await apply(page); release()
   await expect(card(page, 'Avaliações')).toHaveText('1')
   await expect(page.getByRole('table', { name: 'Avaliações filtradas' })).toContainText('PROJETO_1')
-  await expect(page.getByLabel('Participantes (códigos)')).toHaveValues([])
+  await expect(page.getByLabel('Participantes (códigos)', { exact: true })).toHaveValues([])
 })

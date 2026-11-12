@@ -48,6 +48,7 @@ test('filtros combinados entre projetos contam codigos coincidentes e descartam 
   expect(requests.some(url => url.searchParams.has('cursor'))).toBe(true)
   expect(requests.filter(url => url.pathname.endsWith('/assessments/options')).length).toBeGreaterThanOrEqual(2)
 
+  await form.getByText('Filtros avançados e ordenação', { exact: true }).click()
   await form.getByLabel('Data inicial', { exact: true }).fill('2026-10-01')
   await form.getByLabel('Data final', { exact: true }).fill('2026-10-03')
   await expect(form.getByLabel('Instrumento da consulta')).toContainText('stroop_go_nogo_ptbr')
@@ -84,7 +85,7 @@ test('filtros combinados entre projetos contam codigos coincidentes e descartam 
   // A primeira consulta ainda funciona; falha real no segundo projeto invalida tudo.
   manage({ action: 'membership', project_id: prepared.projects[1], subject: prepared.subject, active: false })
   await form.getByRole('button', { name: 'Aplicar filtros', exact: true }).click()
-  await expect(page.getByRole('alert')).toContainText('O recurso solicitado não está disponível.')
+  await expect(page.locator('.professional-dashboard > p[role=alert]')).toHaveText('O recurso solicitado não está disponível.')
   await expect(table).toHaveCount(0)
   await expect(page.locator('.dashboard-cards')).toHaveCount(0)
   manage({ action: 'membership', project_id: prepared.projects[1], subject: prepared.subject, active: true })
@@ -97,5 +98,7 @@ test('filtros combinados entre projetos contam codigos coincidentes e descartam 
   await expect(page.getByText('Nenhuma avaliação corresponde aos filtros.', { exact: true })).toBeVisible()
   await expect(table).toHaveCount(0)
   await form.getByRole('button', { name: 'Limpar filtros', exact: true }).click()
+  await expect(table).toHaveCount(0)
+  await form.getByRole('button', { name: 'Aplicar filtros', exact: true }).click()
   await expect(table.locator('tbody tr')).toHaveCount(102)
 })

@@ -1,26 +1,15 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
-import { apiErrorMessage } from '../api/client'
+import { ApiError, apiErrorMessage } from '../api/client'
+import { SearchableMultiSelect } from './SearchableMultiSelect'
 import { getAssessmentOptions } from '../api/assessments'
-import type { AssessmentFacets, AssessmentOptions, Project } from '../api/assessments'
+import type { AssessmentFacets, Project } from '../api/assessments'
 
-export type AdvancedFilterValues = {
-  searchText: string
-  status: 'valid' | 'all' | 'invalid'
-  accuracyRange: 'all' | 'under50' | '50to80' | '80plus'
-  rtRange: 'all' | 'under500ms' | '500to1000ms' | '1000to1500ms' | '1500msPlus'
-  includeNullRt: boolean
-  condition: 'all' | 'congruent' | 'incongruent' | 'go' | 'nogo'
-  responseType: 'all' | 'hits' | 'omissions' | 'commissions' | 'correct_rejections'
-  sortBy: 'date' | 'participant' | 'accuracy' | 'response_time'
-  sortOrder: 'asc' | 'desc'
-}
+import { defaultQuery, normalizeQuery, queryKey } from '../dashboard/query'
+import type { AdvancedFilterValues, ResearchQuery } from '../dashboard/query'
+export type { AdvancedFilterValues, ResearchQuery } from '../dashboard/query'
 
-export type ResearchQuery = {
-  projects: string[]
-  filters: AssessmentOptions
-  advanced?: AdvancedFilterValues
-}
+const toArray = (v: string | readonly string[] | undefined): string[] => typeof v === 'string' ? [v] : [...v ?? []]
 
 const empty: AssessmentFacets = {
   participant_id: [],
@@ -44,34 +33,44 @@ export function ResearchFilters({
   initialProject,
   loading,
   onApply,
+  value, applied, onChange, refreshKey = 0,
 }: {
   projects: Project[]
   initialProject: string
   loading: boolean
   onApply(query: ResearchQuery): void
+  refreshKey?: number
+  value?: ResearchQuery
+  applied?: ResearchQuery
+  onChange?(query: ResearchQuery): void
 }) {
-  const [selected, setSelected] = useState([initialProject])
-  const [start, setStart] = useState('')
-  const [end, setEnd] = useState('')
-  const [instrument, setInstrument] = useState('')
-  const [values, setValues] = useState<Record<keyof typeof labels, string[]>>({
-    participant_id: [],
-    visit: [],
-    evaluator_id: [],
-    test_version: [],
-    platform: [],
-  })
-
-  // Catálogo avançado de filtros combinados (REQ-REL-004)
-  const [searchText, setSearchText] = useState('')
-  const [status, setStatus] = useState<AdvancedFilterValues['status']>('valid')
-  const [accuracyRange, setAccuracyRange] = useState<AdvancedFilterValues['accuracyRange']>('all')
-  const [rtRange, setRtRange] = useState<AdvancedFilterValues['rtRange']>('all')
-  const [includeNullRt, setIncludeNullRt] = useState(true)
-  const [condition, setCondition] = useState<AdvancedFilterValues['condition']>('all')
-  const [responseType, setResponseType] = useState<AdvancedFilterValues['responseType']>('all')
-  const [sortBy, setSortBy] = useState<AdvancedFilterValues['sortBy']>('date')
-  const [sortOrder, setSortOrder] = useState<AdvancedFilterValues['sortOrder']>('desc')
+  const [localDraft, setLocalDraft] = useState(() => defaultQuery(initialProject))
+  const [localApplied, setLocalApplied] = useState(() => defaultQuery(initialProject))
+  const draft = value ?? localDraft
+  const appliedQuery = applied ?? localApplied
+  const update = (next: ResearchQuery) => { setLocalDraft(next); onChange?.(next) }
+  const selected = draft.projects
+  const start = draft.filters.start_date ?? ''
+  const end = draft.filters.end_date ?? ''
+  const instrument = draft.filters.test_code ?? ''
+  const values = {
+    participant_id: toArray(draft.filters.participant_id),
+    visit: toArray(draft.filters.visit),
+    evaluator_id: toArray(draft.filters.evaluator_id),
+    test_version: toArray(draft.filters.test_version),
+    platform: toArray(draft.filters.platform),
+  }
+  const advanced = { ...defaultQuery(initialProject).advanced!, ...draft.advanced }
+  const { searchText, status, accuracyRange, rtRange, includeNullRt, condition, responseType, sortBy, sortOrder } = advanced
+  const setSelected = (projects: string[]) => update({ ...draft, projects })
+  const setStart = (start_date: string) => update({ ...draft, filters: { ...draft.filters, start_date: start_date || undefined } })
+  const setEnd = (end_date: string) => update({ ...draft, filters: { ...draft.filters, end_date: end_date || undefined } })
+  const setInstrument = (test_code: string) => update({ ...draft, filters: { ...draft.filters, test_code: test_code || undefined } })
+  const setValues = (next: typeof values) => update({ ...draft, filters: { ...draft.filters, ...next,
+    platform: next.platform.filter((v): v is 'web' | 'psychopy' => v === 'web' || v === 'psychopy') } })
+  const setAdvanced = <K extends keyof AdvancedFilterValues>(key: K, next: AdvancedFilterValues[K]) =>
+    update({ ...draft, advanced: { ...advanced, [key]: next } })
+  const dirty = queryKey(draft) !== queryKey(appliedQuery)
 
   const [facets, setFacets] = useState(empty)
   const [error, setError] = useState<string | null>(null)
@@ -95,7 +94,6 @@ export function ResearchFilters({
           const page = await getAssessmentOptions(id, {
             start_date: start || undefined,
             end_date: end || undefined,
-            test_code: instrument || undefined,
             signal: io.signal,
           })
           for (const key of Object.keys(empty) as (keyof AssessmentFacets)[]) {
@@ -104,13 +102,16 @@ export function ResearchFilters({
         }
         if (!io.signal.aborted) setFacets(merged)
       } catch (cause) {
-        if (!io.signal.aborted) setError(apiErrorMessage(cause))
+        if (!io.signal.aborted) {
+          setError(apiErrorMessage(cause))
+          if (cause instanceof ApiError && [401, 403].includes(cause.status)) window.dispatchEvent(new Event('stroop-professional-session-ended'))
+        }
       } finally {
         if (!io.signal.aborted) setPending(false)
       }
     })()
     return () => io.abort()
-  }, [selected, start, end, instrument, revision])
+  }, [selected, start, end, revision, refreshKey])
 
   function apply(event?: FormEvent) {
     event?.preventDefault()
@@ -127,72 +128,40 @@ export function ResearchFilters({
       setValidation('Selecione no máximo 100 opções por campo.')
       return
     }
-    onApply({
-      projects: [...selected],
-      filters: {
-        ...values,
-        platform: values.platform.filter((value): value is 'web' | 'psychopy' => value === 'web' || value === 'psychopy'),
-        start_date: start || undefined,
-        end_date: end || undefined,
-        test_code: instrument || undefined,
-      },
-      advanced: {
-        searchText,
-        status,
-        accuracyRange,
-        rtRange,
-        includeNullRt,
-        condition,
-        responseType,
-        sortBy,
-        sortOrder,
-      },
-    })
+    const next = normalizeQuery(draft)
+    setLocalApplied(next)
+    onApply(next)
   }
 
   function clear() {
     setValidation(null)
-    setSelected([initialProject])
-    setStart('')
-    setEnd('')
-    setInstrument('')
-    setValues({ participant_id: [], visit: [], evaluator_id: [], test_version: [], platform: [] })
-    setSearchText('')
-    setStatus('valid')
-    setAccuracyRange('all')
-    setRtRange('all')
-    setIncludeNullRt(true)
-    setCondition('all')
-    setResponseType('all')
-    setSortBy('date')
-    setSortOrder('desc')
-    onApply({ projects: [initialProject], filters: {} })
+    update(defaultQuery(initialProject))
   }
 
   const activeChips: { label: string; onRemove: () => void }[] = []
   if (searchText) {
-    activeChips.push({ label: `Busca: "${searchText}"`, onRemove: () => setSearchText('') })
+    activeChips.push({ label: `Busca: "${searchText}"`, onRemove: () => setAdvanced('searchText', '') })
   }
   if (start || end) {
-    activeChips.push({ label: `Período: ${start || '…'} a ${end || '…'}`, onRemove: () => { setStart(''); setEnd('') } })
+    activeChips.push({ label: `Período: ${start || '…'} a ${end || '…'}`, onRemove: () => update({ ...draft, filters: { ...draft.filters, start_date: undefined, end_date: undefined } }) })
   }
   if (instrument) {
     activeChips.push({ label: `Instrumento: ${instrument}`, onRemove: () => setInstrument('') })
   }
   if (status !== 'valid') {
-    activeChips.push({ label: `Status: ${status === 'all' ? 'Todas' : 'Inválidas'}`, onRemove: () => setStatus('valid') })
+    activeChips.push({ label: `Status: ${status === 'all' ? 'Todas' : 'Inválidas'}`, onRemove: () => setAdvanced('status', 'valid') })
   }
   if (accuracyRange !== 'all') {
-    activeChips.push({ label: `Precisão: ${accuracyRange}`, onRemove: () => setAccuracyRange('all') })
+    activeChips.push({ label: `Precisão: ${accuracyRange}`, onRemove: () => setAdvanced('accuracyRange', 'all') })
   }
   if (rtRange !== 'all') {
-    activeChips.push({ label: `RT: ${rtRange}`, onRemove: () => setRtRange('all') })
+    activeChips.push({ label: `RT: ${rtRange}`, onRemove: () => setAdvanced('rtRange', 'all') })
   }
   if (condition !== 'all') {
-    activeChips.push({ label: `Condição: ${condition}`, onRemove: () => setCondition('all') })
+    activeChips.push({ label: `Condição: ${condition}`, onRemove: () => setAdvanced('condition', 'all') })
   }
   if (responseType !== 'all') {
-    activeChips.push({ label: `Resposta: ${responseType}`, onRemove: () => setResponseType('all') })
+    activeChips.push({ label: `Resposta: ${responseType}`, onRemove: () => setAdvanced('responseType', 'all') })
   }
   for (const key of Object.keys(labels) as (keyof typeof labels)[]) {
     if (values[key].length > 0) {
@@ -204,7 +173,7 @@ export function ResearchFilters({
   }
 
   return (
-    <form onSubmit={apply} className="research-filters filter-catalog-card" aria-label="Filtros da consulta">
+    <form aria-busy={loading} onSubmit={apply} className="research-filters filter-catalog-card" aria-label="Filtros da consulta">
       <div className="panel-header-section" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: '0.75rem' }}>
         <h3>Filtrar resultados</h3>
         <p className="panel-subtitle">Catálogo unificado de filtros por projeto, dimensões experimentais e métricas.</p>
@@ -228,8 +197,8 @@ export function ResearchFilters({
       </details>
 
       {activeChips.length > 0 && (
-        <div className="active-filters-bar" aria-label="Filtros ativos">
-          <span className="active-filters-label">Filtros ativos ({activeChips.length}):</span>
+        <div className="active-filters-bar" aria-label="Filtros do rascunho">
+          <span className="active-filters-label">Filtros do rascunho ({activeChips.length}):</span>
           {activeChips.map((chip, idx) => (
             <span key={idx} className="filter-chip">
               {chip.label}
@@ -254,21 +223,8 @@ export function ResearchFilters({
             <span>📅</span>
             <span>1. Escopo e Período</span>
           </div>
-          <label className="project-filter">
-            Projetos da consulta
-            <select
-              multiple
-              value={selected}
-              onChange={event => setSelected([...event.target.selectedOptions].map(option => option.value))}
-            >
-              {projects.map(project => (
-                <option key={project.id} value={project.id} title={`${project.code} — ${project.name}`}>
-                  {project.code}
-                  {project.active ? '' : ' (inativo)'}
-                </option>
-              ))}
-            </select>
-          </label>
+          <SearchableMultiSelect label="Projetos da consulta" value={selected} onChange={setSelected}
+            options={projects.map(project => ({ value: project.id, label: `${project.code}${project.active ? '' : ' (inativo)'}` }))} />
           <label>
             Data inicial
             <input type="date" value={start} onChange={event => setStart(event.target.value)} />
@@ -280,7 +236,7 @@ export function ResearchFilters({
           <label>
             Instrumento da consulta
             <select value={instrument} onChange={event => setInstrument(event.target.value)}>
-              <option value="">Todos (exibir um por vez)</option>
+              <option value="">Todos</option>
               {[...new Set([...facets.test_code, ...(instrument ? [instrument] : [])])].map(code => (
                 <option key={code}>{code}</option>
               ))}
@@ -288,6 +244,8 @@ export function ResearchFilters({
           </label>
         </div>
 
+        <details className="advanced-query-filters">
+          <summary>Filtros avançados e ordenação</summary>
         {/* GRUPO 2: DIMENSÕES EXPERIMENTAIS */}
         <div className="filter-group-box">
           <div className="filter-group-legend">
@@ -295,22 +253,10 @@ export function ResearchFilters({
             <span>2. Dimensões Experimentais</span>
           </div>
           {(Object.keys(labels) as (keyof typeof labels)[]).map(key => (
-            <label key={key}>
-              {labels[key]}
-              <select
-                multiple
-                value={values[key]}
-                onChange={event => setValues({ ...values, [key]: [...event.target.selectedOptions].map(option => option.value) })}
-              >
-                {[...new Set([...facets[key], ...values[key]])].sort().map(value => (
-                  <option key={value} value={value} title={value}>
-                    {value === 'LEGADO_NAO_MAPEADO' && key === 'evaluator_id'
-                      ? 'Legado sem identificação técnica'
-                      : value}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <SearchableMultiSelect key={key} label={labels[key]} value={values[key]}
+              onChange={items => setValues({ ...values, [key]: items })}
+              options={[...new Set([...facets[key], ...values[key]])].sort().map(value => ({ value,
+                label: value === 'LEGADO_NAO_MAPEADO' && key === 'evaluator_id' ? 'Legado sem identificação técnica' : value }))} />
           ))}
         </div>
 
@@ -324,14 +270,15 @@ export function ResearchFilters({
             Busca textual (paciente/código)
             <input
               type="search"
+              maxLength={120}
               placeholder="Ex: PAT-, V1, EVA-..."
               value={searchText}
-              onChange={event => setSearchText(event.target.value)}
+              onChange={event => setAdvanced('searchText', event.target.value)}
             />
           </label>
           <label>
             Status da avaliação
-            <select value={status} onChange={event => setStatus(event.target.value as AdvancedFilterValues['status'])}>
+            <select value={status} onChange={event => setAdvanced('status', event.target.value as AdvancedFilterValues['status'])}>
               <option value="valid">Oficiais válidas (padrão)</option>
               <option value="all">Todas as avaliações</option>
               <option value="invalid">Interrompidas / Invalidadas</option>
@@ -341,7 +288,7 @@ export function ResearchFilters({
             Faixa de precisão
             <select
               value={accuracyRange}
-              onChange={event => setAccuracyRange(event.target.value as AdvancedFilterValues['accuracyRange'])}
+              onChange={event => setAdvanced('accuracyRange', event.target.value as AdvancedFilterValues['accuracyRange'])}
             >
               <option value="all">Todas as precisões</option>
               <option value="under50">&lt; 50%</option>
@@ -353,7 +300,7 @@ export function ResearchFilters({
             Faixa de tempo de reação (RT)
             <select
               value={rtRange}
-              onChange={event => setRtRange(event.target.value as AdvancedFilterValues['rtRange'])}
+              onChange={event => setAdvanced('rtRange', event.target.value as AdvancedFilterValues['rtRange'])}
             >
               <option value="all">Todos os tempos</option>
               <option value="under500ms">&lt; 0,5 s</option>
@@ -366,7 +313,7 @@ export function ResearchFilters({
             Tipo de resposta / erro
             <select
               value={responseType}
-              onChange={event => setResponseType(event.target.value as AdvancedFilterValues['responseType'])}
+              onChange={event => setAdvanced('responseType', event.target.value as AdvancedFilterValues['responseType'])}
             >
               <option value="all">Todos os tipos</option>
               <option value="hits">Com acertos (Hits &gt; 0)</option>
@@ -379,7 +326,7 @@ export function ResearchFilters({
             Condição experimental
             <select
               value={condition}
-              onChange={event => setCondition(event.target.value as AdvancedFilterValues['condition'])}
+              onChange={event => setAdvanced('condition', event.target.value as AdvancedFilterValues['condition'])}
             >
               <option value="all">Todas as condições</option>
               <option value="go">Apenas blocos com Go</option>
@@ -398,7 +345,7 @@ export function ResearchFilters({
             Critério de ordenação
             <select
               value={sortBy}
-              onChange={event => setSortBy(event.target.value as AdvancedFilterValues['sortBy'])}
+              onChange={event => setAdvanced('sortBy', event.target.value as AdvancedFilterValues['sortBy'])}
             >
               <option value="date">Data de início</option>
               <option value="participant">Participante (código)</option>
@@ -410,7 +357,7 @@ export function ResearchFilters({
             Direção da ordenação
             <select
               value={sortOrder}
-              onChange={event => setSortOrder(event.target.value as AdvancedFilterValues['sortOrder'])}
+              onChange={event => setAdvanced('sortOrder', event.target.value as AdvancedFilterValues['sortOrder'])}
             >
               <option value="desc">Decrescente (mais recente / maior)</option>
               <option value="asc">Crescente (mais antigo / menor)</option>
@@ -421,13 +368,14 @@ export function ResearchFilters({
               <input
                 type="checkbox"
                 checked={includeNullRt}
-                onChange={event => setIncludeNullRt(event.target.checked)}
+                onChange={event => setAdvanced('includeNullRt', event.target.checked)}
                 style={{ width: 'auto', marginTop: '2px' }}
               />
               <span>Tratamento explícito de RT ausente: incluir avaliações sem acertos (RT mediano ausente)</span>
             </label>
           </div>
         </div>
+        </details>
       </div>
 
       <p className="quiet">
@@ -445,8 +393,9 @@ export function ResearchFilters({
           </button>
         </>
       )}
+      {dirty && <p role="status">Alterações não aplicadas. Aplique ou descarte para habilitar downloads.</p>}
       <div className="filter-form-actions" style={{ display: 'flex', gap: '10px', alignItems: 'center', marginTop: '1.25rem', flexWrap: 'wrap' }}>
-        <button className="button primary" type="submit" disabled={loading || pending || !!error}>
+        <button className="button primary" type="submit">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
           </svg>
@@ -455,6 +404,7 @@ export function ResearchFilters({
         <button className="button secondary" type="button" onClick={clear}>
           Limpar filtros
         </button>
+        {dirty && <button className="button secondary" type="button" onClick={() => update(appliedQuery)}>Descartar alterações</button>}
       </div>
     </form>
   )

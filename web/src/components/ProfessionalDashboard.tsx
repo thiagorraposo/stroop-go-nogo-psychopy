@@ -27,6 +27,7 @@ import {
   summarize,
 } from '../dashboard/analysis'
 import { listPatients } from '../api/patients'
+import { defaultQuery, normalizeQuery, queryKey, supportsLegacyExport } from '../dashboard/query'
 
 export type AdministrativeModule =
   | 'dashboard'
@@ -124,8 +125,8 @@ export function ProfessionalDashboard({
   const [loaded, setLoaded] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [revision, setRevision] = useState(0)
-  const [instrument, setInstrument] = useState('')
-  const [platform, setPlatform] = useState('')
+  const [draft, setDraft] = useState<ResearchQuery | null>(null)
+  const [generation, setGeneration] = useState(0)
   const [detail, setDetail] = useState<AssessmentDetail | null>(null)
   const [detailId, setDetailId] = useState('')
   const [detailProject, setDetailProject] = useState('')
@@ -137,11 +138,43 @@ export function ProfessionalDashboard({
   const [aggregateMessage, setAggregateMessage] = useState<string | null>(null)
   const [registeredPatientsCount, setRegisteredPatientsCount] = useState<number | null>(null)
 
+  const queryIO = useRef<AbortController | null>(null)
+  const detailIO = useRef<AbortController | null>(null)
+  const dirty = !!draft && !!query && queryKey(draft) !== queryKey(query)
+  const analyticModule = ['dashboard', 'historico', 'resultados', 'exportacoes'].includes(activeModule)
+
+  function editQuery(next: ResearchQuery) {
+    downloadIO.current?.abort(); aggregateIO.current?.abort()
+    setExporting(false); setAggregateBusy(false)
+    setDownloadMessage(null); setAggregateMessage(null)
+    setDraft(next)
+  }
+
+  function applyQuery(next: ResearchQuery) {
+    queryIO.current?.abort(); detailIO.current?.abort()
+    downloadIO.current?.abort(); aggregateIO.current?.abort()
+    setRows([]); setAggregateContext(null); setAggregateMessage(null)
+    setDetail(null); setDetailId(''); setDetailError(null); setDownloadMessage(null)
+    setExporting(false); setAggregateBusy(false); setError(null)
+    const normalized = normalizeQuery(next)
+    setDraft(normalized); setQuery(normalized); setGeneration(n => n + 1)
+  }
+
+  function expireContext(cause: unknown) {
+    if (!(cause instanceof ApiError) || ![401, 403, 409].includes(cause.status)) return
+    queryIO.current?.abort(); detailIO.current?.abort()
+    downloadIO.current?.abort(); aggregateIO.current?.abort()
+    setRows([]); setLoaded(0); setAggregateContext(null); setDetail(null); setDetailId('')
+    setLoading(false); setExporting(false); setAggregateBusy(false)
+    setError('O conjunto não está mais disponível. Atualize a consulta antes de continuar.')
+    if ([401, 403].includes(cause.status)) window.dispatchEvent(new Event('stroop-professional-session-ended'))
+  }
+
   const detailPanel = useRef<HTMLElement>(null)
   const downloadIO = useRef<AbortController | null>(null)
   const aggregateIO = useRef<AbortController | null>(null)
 
-  // Carrega contagem de pacientes cadastrados no projeto atual para os KPIs
+  // Contagem cadastral autorizada, distinta dos pacientes presentes no recorte.
   useEffect(() => {
     if (!project) {
       setRegisteredPatientsCount(null)
@@ -178,7 +211,8 @@ export function ProfessionalDashboard({
         } while (cursor)
         if (!io.signal.aborted) {
           setProjects(items)
-          setProject(items[0]?.id ?? '')
+          setProject(current => current && items.some(item => item.id === current) ? current : items[0]?.id ?? '')
+          if (!query && items[0]) applyQuery(defaultQuery(items[0].id))
         }
       } catch (cause) {
         if (!io.signal.aborted) setError(apiErrorMessage(cause))
@@ -193,10 +227,11 @@ export function ProfessionalDashboard({
   useEffect(() => {
     const io = new AbortController()
     setRows([]); setAggregateContext(null); setAggregateMessage(null); setDetail(null); setDetailId(''); setDetailError(null); setDownloadMessage(null)
-    setInstrument(''); setPlatform(''); setLoaded(0)
+    setLoaded(0)
     downloadIO.current?.abort(); setExporting(false)
     aggregateIO.current?.abort(); setAggregateBusy(false)
-    const selected = query?.projects ?? (project ? [project] : [])
+    queryIO.current = io
+    const selected = query?.projects ?? []
     if (!selected.length) { setLoading(false); return () => io.abort() }
     setLoading(true); setError(null)
     void (async () => {
@@ -235,7 +270,10 @@ export function ProfessionalDashboard({
         }
       } catch (cause) {
         if (!io.signal.aborted) {
-          setRows([])
+          setRows([]); setLoaded(0); setAggregateContext(null)
+          if (cause instanceof ApiError && [401, 403].includes(cause.status)) {
+            window.dispatchEvent(new Event('stroop-professional-session-ended'))
+          }
           setError(
             cause instanceof ApiError && cause.status === 422
               ? 'A consulta não pôde ser concluída com estes filtros. Restrinja o período ou os projetos (até 5.000 avaliações); nenhum total parcial foi exibido.'
@@ -249,31 +287,32 @@ export function ProfessionalDashboard({
       }
     })()
     return () => { io.abort(); downloadIO.current?.abort(); aggregateIO.current?.abort() }
-  }, [project, query, revision])
+  }, [query, revision])
 
   // Detalhe individual de avaliação
   useEffect(() => {
     const io = new AbortController()
+    detailIO.current = io
     setDetail(null); setDetailError(null); setDownloadMessage(null)
     downloadIO.current?.abort(); setExporting(false)
-    if (detailId) void getAssessment(detailProject, detailId, io.signal).then(value => {
+    if (detailId && rows.some(row => row.project_id === detailProject && row.assessment_id === detailId)) void getAssessment(detailProject, detailId, io.signal).then(value => {
       if (!io.signal.aborted) setDetail(value)
-    }, cause => { if (!io.signal.aborted) setDetailError(apiErrorMessage(cause)) })
+    }, cause => { if (!io.signal.aborted) { setDetailError(apiErrorMessage(cause)); expireContext(cause) } })
     return () => io.abort()
-  }, [detailProject, detailId])
+  }, [detailProject, detailId, rows])
 
   useEffect(() => { if (detail) detailPanel.current?.focus() }, [detail])
   useEffect(() => () => downloadIO.current?.abort(), [])
   useEffect(() => () => aggregateIO.current?.abort(), [])
 
   async function downloadAggregate() {
-    if (!aggregateContext || aggregateBusy || !['stroop_go_nogo_ptbr', 'instrumento_sintetico_demo'].includes(selectedInstrument)) return
+    if (dirty || !query || !supportsLegacyExport(query) || !aggregateContext || aggregateBusy || !['stroop_go_nogo_ptbr', 'instrumento_sintetico_demo'].includes(selectedInstrument)) return
     const io = new AbortController(); aggregateIO.current = io
     setAggregateBusy(true); setAggregateMessage(null)
     try {
       const result = await exportAssessmentView(
         aggregateContext,
-        { test_code: selectedInstrument, ...(platform ? { platform: platform as 'web' | 'psychopy' } : {}) },
+        { test_code: selectedInstrument },
         profile.csrf_token,
         io.signal,
       )
@@ -292,6 +331,7 @@ export function ProfessionalDashboard({
       setAggregateMessage('Arquivo agregado preparado para download.')
     } catch (cause) {
       if (!io.signal.aborted) {
+        expireContext(cause)
         setAggregateMessage(
           cause instanceof ApiError && cause.status === 409
             ? 'Os dados mudaram desde a consulta. Atualize os filtros para recarregar todas as páginas antes de exportar.'
@@ -304,7 +344,7 @@ export function ProfessionalDashboard({
   }
 
   async function download() {
-    if (!detail || exporting) return
+    if (!detail || exporting || dirty || loading || error) return
     const io = new AbortController(); downloadIO.current = io
     setExporting(true); setDownloadMessage(null)
     try {
@@ -323,7 +363,10 @@ export function ProfessionalDashboard({
       }
       setDownloadMessage('Arquivo preparado para download.')
     } catch (cause) {
-      if (!io.signal.aborted) setDownloadMessage(apiErrorMessage(cause))
+      if (!io.signal.aborted) {
+        setDownloadMessage(apiErrorMessage(cause))
+        expireContext(cause)
+      }
     } finally {
       if (!io.signal.aborted) setExporting(false)
     }
@@ -340,10 +383,8 @@ export function ProfessionalDashboard({
   )
 
   const instruments = [...new Set(sortedRows.map(row => row.test_code))].sort()
-  const selectedInstrument = instrument || instruments[0] || ''
-  const visible = sortedRows.filter(
-    row => row.test_code === selectedInstrument && (!platform || row.platform === platform),
-  )
+  const selectedInstrument = instruments.length === 1 ? instruments[0]! : ''
+  const visible = sortedRows
   const totals = summarize(visible)
   const dates = countByDate(visible)
   const peak = Math.max(1, ...dates.map(([, count]) => count))
@@ -452,7 +493,7 @@ export function ProfessionalDashboard({
           </div>
         )}
         {detail.test_code === 'stroop_go_nogo_ptbr' && (
-          <button className="button primary" disabled={exporting} onClick={() => void download()}>
+          <button className="button primary" disabled={exporting || dirty || loading || !!error} onClick={() => void download()}>
             {exporting ? 'Preparando arquivo…' : 'Exportar CSV oficial'}
           </button>
         )}
@@ -567,58 +608,10 @@ export function ProfessionalDashboard({
         )}
       </nav>
 
-      {/* MÓDULO 1: VISÃO GERAL (DASHBOARD) */}
-      {activeModule === 'dashboard' && (
-        <>
-          <div className="panel-header-section">
-            <h2>Resultados da pesquisa</h2>
-            <p className="panel-subtitle">Visão consolidada de avaliações, métricas psicométricas e tendências operacionais.</p>
-          </div>
-          <div className="notice notice-disclaimer">
-            <span aria-hidden="true">ℹ️</span>
-            <span>Resultados descritivos. Este painel não representa avaliação clínica ou diagnóstico.</span>
-          </div>
-
-          {projectsLoading && <p role="status">Carregando projetos…</p>}
-          {error && (
-            <>
-              <p role="alert">{error}</p>
-              <button className="button secondary" onClick={() => setRevision(value => value + 1)}>
-                Atualizar consultas
-              </button>
-            </>
-          )}
-          {!projectsLoading && !projects.length && !error && (
-            <p role="status">Nenhum projeto disponível para sua conta.</p>
-          )}
-
-          {projects.length > 0 && (
-            <>
-              {renderProjectSelector()}
-
-              {/* Preparação rápida de convite integrada na visão geral */}
-              {currentProject?.active && profile.role !== 'consulta' && (
-                <SessionInvitation
-                  key={`invitation:${project}`}
-                  project={currentProject}
-                  profile={profile}
-                />
-              )}
-
-              <ResearchFilters
-                key={`filters:${project}`}
-                projects={projects}
-                initialProject={project}
-                loading={loading}
-                onApply={value => {
-                  aggregateIO.current?.abort()
-                  setAggregateContext(null)
-                  setAggregateBusy(false)
-                  setRows([])
-                  setQuery(value)
-                }}
-              />
-
+      {projects.length > 0 && query && draft && <div hidden={!analyticModule}>
+        <ResearchFilters projects={projects} initialProject={project} loading={loading}
+          value={draft} applied={query} refreshKey={revision} onChange={editQuery} onApply={applyQuery} />
+        <p className="quiet" role="status">Consulta aplicada {generation}. {loading ? 'Carregando conjunto completo…' : error ? 'Conjunto indisponível; atualize a consulta.' : 'Consulta carregada.'}</p>
               {query && (
                 <p className="quiet active-filters-bar" role="status">
                   Filtros aplicados: {query.projects.length} projeto(s);{' '}
@@ -637,6 +630,52 @@ export function ProfessionalDashboard({
                 </p>
               )}
 
+
+        {instruments.length > 1 && <p role="status">Há instrumentos diferentes no recorte. Aplique um instrumento para comparar métricas ou exportar a visão filtrada.</p>}
+        {query && !supportsLegacyExport(query) && <p role="status">A exportação deste recorte ainda não está disponível. Os filtros avançados foram preservados; nenhum arquivo sem esses filtros será gerado.</p>}
+      </div>}
+
+      {analyticModule && error && <>
+        <p role="alert">{error}</p>
+        <button className="button secondary" onClick={() => setRevision(value => value + 1)}>Atualizar consultas</button>
+      </>}
+      {/* MÓDULO 1: VISÃO GERAL (DASHBOARD) */}
+      {activeModule === 'dashboard' && (
+        <>
+          <div className="panel-header-section">
+            <h2>Resultados da pesquisa</h2>
+            <p className="panel-subtitle">Visão consolidada de avaliações, métricas psicométricas e tendências operacionais.</p>
+          </div>
+          <div className="notice notice-disclaimer">
+            <span aria-hidden="true">ℹ️</span>
+            <span>Resultados descritivos. Este painel não representa avaliação clínica ou diagnóstico.</span>
+          </div>
+
+          {projectsLoading && <p role="status">Carregando projetos…</p>}
+
+          {!projectsLoading && !projects.length && !error && (
+            <p role="status">Nenhum projeto disponível para sua conta.</p>
+          )}
+
+          {projects.length > 0 && (
+            <>
+
+
+              {<>
+                <p className="quiet">Projeto de preparação: este contexto não altera a consulta aplicada.</p>
+                {renderProjectSelector()}
+              </>}
+              {/* Preparação rápida de convite integrada na visão geral */}
+              {currentProject?.active && profile.role !== 'consulta' && (
+                <SessionInvitation
+                  key={`invitation:${project}`}
+                  project={currentProject}
+                  profile={profile}
+                />
+              )}
+
+
+
               {loading && <p role="status">Carregando avaliações… {loaded} recebidas.</p>}
 
               {!loading && !error && (
@@ -649,7 +688,7 @@ export function ProfessionalDashboard({
                       <section className="overview-summary-kpis" aria-label="KPIs da Visão Geral">
                         <div className="kpi-grid">
                           <div className="kpi-box">
-                            <span className="kpi-label">Pacientes cadastrados no projeto</span>
+                            <span className="kpi-label">Pacientes cadastrados acessíveis</span>
                             <strong className="kpi-value tabular-nums">
                               {registeredPatientsCount !== null ? registeredPatientsCount : '—'}
                             </strong>
@@ -671,48 +710,13 @@ export function ProfessionalDashboard({
                         </div>
                       </section>
 
-                      <div className="dashboard-filters">
-                        <label>
-                          Instrumento
-                          <select
-                            value={selectedInstrument}
-                            onChange={event => {
-                              aggregateIO.current?.abort()
-                              setAggregateBusy(false)
-                              setAggregateMessage(null)
-                              setInstrument(event.target.value)
-                              setDetailId('')
-                            }}
-                          >
-                            {instruments.map(code => (
-                              <option key={code}>{code}</option>
-                            ))}
-                          </select>
-                        </label>
-                        <label>
-                          Plataforma
-                          <select
-                            value={platform}
-                            onChange={event => {
-                              aggregateIO.current?.abort()
-                              setAggregateBusy(false)
-                              setAggregateMessage(null)
-                              setPlatform(event.target.value)
-                              setDetailId('')
-                            }}
-                          >
-                            <option value="">Todas</option>
-                            <option value="web">WEB</option>
-                            <option value="psychopy">PsychoPy local</option>
-                          </select>
-                        </label>
-                      </div>
+
 
                       <button
                         type="button"
                         className="button secondary"
                         disabled={
-                          aggregateBusy ||
+                          dirty || loading || !!error || !query || !supportsLegacyExport(query) || aggregateBusy ||
                           !aggregateContext ||
                           !['stroop_go_nogo_ptbr', 'instrumento_sintetico_demo'].includes(
                             selectedInstrument,
@@ -942,46 +946,17 @@ export function ProfessionalDashboard({
             </p>
           </div>
 
-          {renderProjectSelector()}
 
-          <div className="dashboard-filters">
-            <label>
-              Instrumento
-              <select
-                value={selectedInstrument}
-                onChange={event => {
-                  setInstrument(event.target.value)
-                  setDetailId('')
-                }}
-              >
-                {instruments.map(code => (
-                  <option key={code}>{code}</option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Plataforma
-              <select
-                value={platform}
-                onChange={event => {
-                  setPlatform(event.target.value)
-                  setDetailId('')
-                }}
-              >
-                <option value="">Todas</option>
-                <option value="web">WEB</option>
-                <option value="psychopy">PsychoPy local</option>
-              </select>
-            </label>
-          </div>
+
+
 
           {loading && <p role="status">Carregando histórico de avaliações…</p>}
 
-          {!loading && !rows.length && (
+          {!loading && !error && !rows.length && (
             <p role="status">Nenhuma avaliação encontrada para este projeto.</p>
           )}
 
-          {!loading && rows.length > 0 && (
+          {!loading && !error && rows.length > 0 && (
             <ResultsTable
               rows={visible}
               projects={projects}
@@ -999,7 +974,7 @@ export function ProfessionalDashboard({
       )}
 
       {/* MÓDULO 6: RESULTADOS E ANÁLISES (WEB-019) */}
-      {activeModule === 'resultados' && (
+      {activeModule === 'resultados' && !loading && !error && (
         <section aria-label="Módulo Resultados e análises">
           <div className="panel-header-section">
             <h2>Resultados e análises</h2>
@@ -1010,18 +985,9 @@ export function ProfessionalDashboard({
             <span>Visualizações descritivas e análises de pesquisa (REQ-REL-005). Não constitui avaliação clínica.</span>
           </div>
 
-          {renderProjectSelector()}
 
-          <ResearchFilters
-            key={`analytics-filters:${project}`}
-            projects={projects}
-            initialProject={project}
-            loading={loading}
-            onApply={value => {
-              setRows([])
-              setQuery(value)
-            }}
-          />
+
+
 
           <dl className="dashboard-cards">
             <div>
@@ -1063,8 +1029,11 @@ export function ProfessionalDashboard({
       {/* MÓDULO 7: EXPORTAÇÕES (WEB-020) */}
       {activeModule === 'exportacoes' && (
         <section aria-label="Módulo Exportações" className="export-hub-panel">
-          {renderProjectSelector()}
-          <ExportHubPanel profile={profile} project={currentProject} />
+
+          <p role="status">A exportação avançada do recorte aplicado ainda não está disponível. Use a visão filtrada na Visão geral quando habilitada.</p>
+          <fieldset disabled><legend>Exportação avançada indisponível para este recorte</legend>
+            <ExportHubPanel profile={profile} project={currentProject} />
+          </fieldset>
         </section>
       )}
 

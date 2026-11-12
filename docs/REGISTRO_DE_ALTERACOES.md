@@ -4,6 +4,22 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-11 — Consulta aplicada compartilhada (WEB-050)
+
+Autorização posterior de M8 inicia implementação de CHG-007. Consulta e rascunho
+em RAM passam a ser compartilhados entre os módulos analíticos; limpar/remover
+chips exige Aplicar, com descarte explícito. Instrumento/versão/plataforma
+pertencem ao mesmo recorte. Cancelamento impede respostas e downloads antigos;
+falhas invalidam o conjunto completo. Multisseleção ganha busca de opções e
+filtros avançados ficam sob expansão. Projeto de preparação mantém contexto
+separado. Exportação agregada recusa filtros avançados não suportados e a UI
+avançada fica desabilitada até vínculo servidor/seleção em WEB-051/053.
+
+Sem novo payload/endpoint, fórmula, dependência, migration ou CSS experimental.
+Testes de estado/consumidor e jornadas existentes acompanham a nova aplicação
+explícita; evidências, aceite, limites e Git somente no backlog canônico.
+PR documental #18 preservado aberto sem merge; nenhum deploy decorrente.
+
 ## 2026-11-11 — Replanejamento integrado CHG-007
 
 Missão documental do proprietário integra identidade pública Stroop Test Web,
