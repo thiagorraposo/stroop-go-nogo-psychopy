@@ -2749,9 +2749,48 @@ Global **37/56**, M8 **2/12**. Próxima ação: completar catálogo/capacidades 
 WEB-050 e seu checklist UX7-AA antes do aceite; WEB-048 permanece independente
 PRONTA. WEB-031 segue bloqueada externamente e impede WEB-032; não avançar M9.
 
-Fechamento Git/CI por SHA registrado abaixo após validação. Base d6d9dbb teve
-verify SUCCESS em 2026-11-12 (run 43136417744); não transferir esse resultado à
-entrega nova. PR #19 permanece draft, auto-merge desabilitado e sem merge.
+#### Fechamento Git e conferência da entrega isolada — 2026-11-12
+
+Entrega **`7cc3562e4daef7220000b160121105bba45a509c`**, 32 arquivos, na branch
+`feat/m8-consulta-aplicada-unica`; push com upstream confirmado por igualdade
+HEAD/upstream/ls-remote. Nenhum arquivo/hunk da WEB-031, material de deploy,
+backup, credencial ou coleta entrou no commit. A evidência local anterior da
+WEB-031 permanece na árvore de trabalho; somente as atualizações desta unidade
+foram extraídas para o índice nos documentos compartilhados.
+
+Conferência adicional em checkout separado, exatamente **7cc3562**, sem os
+arquivos alterados da WEB-031: `TEST_DATABASE_URL` no banco descartável de
+regressão, `.venv/bin/python scripts/verify_web_ci.py python`: **459/459**,
+zero falhas/skips, **356,455 s**. Os **461/461** acima pertencem à árvore com
+trabalho preexistente; não são a contagem desse commit. Documentação do checkout:
+**88 documentos/727 links/112 âncoras**, sete testes do validador aprovados,
+diff check limpo. No índice antes do commit, catálogo/links também conferidos
+por leitura dos blobs indexados; a árvore com material local adicional contou
+90 documentos/729 links/114 âncoras, sem transferir esses arquivos à entrega.
+Fontes api/stroop/web e os testes desta unidade permaneceram idênticos ao commit
+após os testes frontend/HTTPS. Capturas sintéticas de filtros em Chromium 360 e
+Firefox 1366 inspecionadas; não equivalem ao checklist AA integral. Nenhuma
+baseline visual atualizada para esconder achado.
+
+Container PG, seus dois bancos sintéticos e checkout temporário próprios
+removidos após a validação. Cliente/timer/arquivos locais da WEB-031 e demais
+recursos preexistentes preservados. Sem deploy, tag, release, dados reais ou M9.
+
+[PR #19](https://github.com/thiagorraposo/stroop-test-web/pull/19) atualizado,
+**draft aberto**, auto-merge desabilitado. `verify` de **7cc3562** estava
+**IN_PROGRESS** na consulta de fechamento, execução
+[43300961985](https://github.com/thiagorraposo/stroop-test-web/actions/runs/43300961985).
+Não é CI aprovada. O commit documental de fechamento recebe check próprio;
+consultar o SHA final sem transferir aprovação de outra revisão. PR #18 continua
+aberto sem merge; sua ancestralidade não foi integrada indiretamente. A base
+d6d9dbb teve verify SUCCESS (run 43136417744), preservado apenas historicamente.
+
+Registro de fechamento identificável por `git log -1 --format=%H
+--grep='docs(web): registra validação isolada da consulta POST'`; confirmar
+HEAD/upstream/remoto sem commit artificial de autorreferência. WEB-050 segue
+EM_ANDAMENTO, global 37/56 e M8 2/12. Próxima ação funcional preservada: catálogo
+residual/capacidades e UX7-AA antes do aceite; WEB-048 independente PRONTA e
+WEB-031 BLOQUEADA externamente.
 
 ### WEB-051 — Consolidar seleção analítica autorizada e agregações no servidor
 
