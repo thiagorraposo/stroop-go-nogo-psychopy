@@ -1,0 +1,128 @@
+name: Deploy VPS HostGator
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: 'SHA exato do commit na branch main a implantar (40 caracteres hexadecimais; deixe em branco para HEAD da main)'
+        required: false
+        default: ''
+      dry_run:
+        description: 'Modo simulação (dry-run): valida SHA, CI, SSH e pré-requisitos sem alterar a VPS'
+        type: boolean
+        required: true
+        default: false
+      skip_ci_check:
+        description: 'Ignorar verificação de CI (NÃO RECOMENDADO - apenas emergência operacional com justificativa)'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: read
+  checks: read
+  actions: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Implantação controlada na VPS HostGator
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment:
+      name: production
+      url: https://strooptest.thiagorraposo.dev
+
+    steps:
+      - name: Checkout somente leitura
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/data/
+            !/database/
+            !/production-secrets/
+            !**/.env*
+            /.env.example
+            /.env.production.example
+
+      - name: Configurar Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12.3'
+
+      - name: Validar SHA e aprovação na CI
+        id: validate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMIT_INPUT: ${{ inputs.commit_sha }}
+          SKIP_CI: ${{ inputs.skip_ci_check }}
+        run: |
+          EXTRA_ARGS=""
+          if [ "$SKIP_CI" = "true" ]; then
+            EXTRA_ARGS="--skip-ci-check"
+          fi
+          python3 scripts/deploy_vps.py validate \
+            --commit "${COMMIT_INPUT:-HEAD}" \
+            --token "$GITHUB_TOKEN" \
+            $EXTRA_ARGS
+
+      - name: Preparar chaves SSH seguras
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.HOSTGATOR_SSH_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.HOSTGATOR_KNOWN_HOSTS }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          if [ -n "$SSH_KNOWN_HOSTS" ]; then
+            printf "%s\n" "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+            chmod 644 ~/.ssh/known_hosts
+          fi
+          if [ -n "$SSH_PRIVATE_KEY" ]; then
+            printf "%s\n" "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+            chmod 600 ~/.ssh/id_ed25519
+          fi
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "Ambiente SSH configurado para modo simulação."
+          fi
+
+      - name: Executar deploy ou simulação (dry-run)
+        env:
+          SSH_HOST: ${{ secrets.HOSTGATOR_SSH_HOST || '108.174.145.177' }}
+          SSH_PORT: ${{ secrets.HOSTGATOR_SSH_PORT || '22022' }}
+          SSH_USER: ${{ secrets.HOSTGATOR_SSH_USER || 'raposo' }}
+          COMMIT_SHA: ${{ steps.validate.outputs.commit_sha }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          SKIP_CI: ${{ inputs.skip_ci_check }}
+        run: |
+          EXTRA_ARGS=""
+          if [ "$DRY_RUN" = "true" ]; then
+            EXTRA_ARGS="$EXTRA_ARGS --dry-run"
+          fi
+          if [ "$SKIP_CI" = "true" ]; then
+            EXTRA_ARGS="$EXTRA_ARGS --skip-ci-check"
+          fi
+          KEY_ARG=""
+          if [ -f ~/.ssh/id_ed25519 ]; then
+            KEY_ARG="--ssh-key-file ~/.ssh/id_ed25519"
+          fi
+          HOSTS_ARG=""
+          if [ -f ~/.ssh/known_hosts ]; then
+            HOSTS_ARG="--known-hosts-file ~/.ssh/known_hosts"
+          fi
+
+          python3 scripts/deploy_vps.py deploy \
+            --commit "${COMMIT_SHA:-HEAD}" \
+            --ssh-host "$SSH_HOST" \
+            --ssh-port "$SSH_PORT" \
+            --ssh-user "$SSH_USER" \
+            $KEY_ARG \
+            $HOSTS_ARG \
+            $EXTRA_ARGS

@@ -3859,7 +3859,54 @@ não inferir ausência de problema por falta de reprodução PG nesta missão.
 
 ## Retomada
 
-### Retomada vigente — continuidade M8 e consulta POST integrada, 2026-11-12
+### Retomada vigente — integração GitHub Flow das pendências, 2026-11-12
+
+Solicitação explícita do proprietário: executar o GitHub Flow completo até o
+merge na main de todas as entregas pendentes. Esta autorização substitui as
+orientações anteriores de manter PR #18 aberto e PR #19 draft, sem antecipar
+aceites funcionais, M9 ou deploy. PR #18 integrado por Merge Commit tradicional
+`19c22286de7e4dbc3171e36c5d6b44475eca7e88`, após verify aprovado na revisão
+`67dfbf7`. Auto-merge permanece desabilitado.
+
+Branch de integração reutilizada `feat/m8-consulta-aplicada-unica`. Preparação
+local WEB-031 versionada em `469e2cf`, após 43 testes de backup/replicação/
+monitoramento/configuração/documentação aprovados sem skips, documentação
+válida e scanner de 434 fontes aprovado. Evidências anteriores da WEB-031
+permanecem históricas; instalador/timer não foram executados nesta sessão.
+`.deploy-hostgator/` preservado e ignorado, fora do staging e do envio por ser
+material operacional local. Nenhum dado, backup ou credencial versionado.
+
+PR #19 consolida os commits originais dos PRs #16/#17 por merge normal, além
+da consulta POST e da preparação WEB-031. Conflitos no dashboard resolvidos
+mantendo filtros/aplicação/CSV do POST e as visualizações do redesign.
+Conflito no backlog preserva os registros anteriores como históricos.
+Revisão encontrou no #17 dispensa de vínculo por projeto para administradores
+e concessão automática a todos os projetos no bootstrap/recovery; essas
+alterações foram retiradas da árvore integrada conforme a fronteira canônica
+de acesso por projeto. Teste negativo comprova recusa de cadastro/listagem
+sem vínculo, inclusive para administrador. A falha anterior do #17 em
+`test_upgrade_preserva_identidades_e_vinculos_historicos` fica registrada;
+o teste original permanece integral, sem afrouxar sua asserção.
+
+Validação local da integração: 361 testes Vitest, tipos/build e 11 testes de
+deploy/rollback sintéticos aprovados. Build mantém aviso de bundle acima de
+500 kB. Primeira rodada focada Chromium/Firefox: 70 aprovados e duas falhas
+de reflow. Corrigidas colunas mínimas dos gráficos/cartões sem ocultar conteúdo;
+reexecução dos dois casos em 320px e zoom 400% aprovada nos dois navegadores.
+Suíte Python integral via `verify_web_ci.py python`: 473 testes aprovados em
+179,327 s, sem falhas/skips, com PostgreSQL 17.6 descartável
+`stroop_etapa4_test_flow`. Scanner final: 441 fontes aprovadas. Documentação:
+89 documentos/736 links/114 âncoras, sem ciclos. CI do PR consolidado ainda não
+executada nesta revisão; conferir o SHA final antes do merge.
+
+Progresso permanece 37/56 e M8 2/12. WEB-050 EM_ANDAMENTO (catálogo residual e
+UX7-AA), WEB-048 PRONTA, WEB-031 BLOQUEADA (origem/hostkey, aprovação/custódia e
+medição externa), WEB-032 PENDENTE. Próxima ação desta sessão: concluir testes,
+enviar integração, aguardar verify e fazer merge tradicional; depois main
+local por fast-forward. Próxima implementação segue essas fichas mediante
+continuidade autorizada; nenhuma operação na VPS decorre desta integração.
+
+### Retomada anterior — continuidade M8 e consulta POST integrada, 2026-11-12
 
 Encerramento explícito solicitado pelo proprietário após a entrega: encerrar a
 execução sem aguardar CI; deixar o GitHub executar e conferir os resultados em
@@ -3951,6 +3998,34 @@ Instrução final do proprietário: **manter PR #18 aberto, sem merge**, mesmo s
 verify aprovar. Retomada da implementação depende da autorização posterior já
 indicada; integração deste PR requer nova instrução explícita.
 
+### Retomada anterior — implementação de mecanismos de deploy controlado na VPS HostGator (GitHub Flow), 2026-11-09
+
+Implementação e documentação dos mecanismos de implantação para a VPS HostGator (`strooptest.thiagorraposo.dev`),
+integrados ao GitHub Flow adotado pelo projeto Stroop:
+**Branch → Commit → Push → Pull Request → CI verify → Merge Commit na main → Deploy controlado**.
+
+Entregáveis técnicos implementados:
+1. **Pipeline de Deploy no GitHub Actions:** workflow [deploy.yml](../.github/workflows/deploy.yml) protegido
+   pelo Environment `production`, acionado exclusivamente sob demanda (`workflow_dispatch`), sem duplicar os testes da CI
+   (`web.yml`) e sem gatilho automático pós-merge.
+2. **Utilitário Canônico de Deploy e Validação:** script [`scripts/deploy_vps.py`](../scripts/deploy_vps.py) com subcomandos
+   `validate`, `deploy`, `rollback` e `healthcheck`. Valida o SHA exato de 40 dígitos, confirma se o commit pertence à `main`
+   e se o check `verify` foi aprovado com sucesso na CI do GitHub antes de autorizar qualquer operação. Suporta modo simulação
+   (`--dry-run`), snapshot pré-deploy, atualização atômica de symlink e rollback automático em falha de healthcheck.
+3. **Mecanismo de Rollback da Aplicação WEB:** script [`deploy/vps-web-rollback.sh`](../deploy/vps-web-rollback.sh) para reversão
+   rápida de release (RTO < 30s) na VPS, preservando integralmente o PostgreSQL, volumes persistentes, certificados e secrets.
+4. **Documentação Operacional Canônica:** atualização completa de [DEPLOY_WEB_VPS](operacao/DEPLOY_WEB_VPS.md), detalhando a
+   configuração de Secrets e proteção do Environment `production`, execução manual de deploy, verificação de SHA, investigação
+   de falhas e critérios técnicos/metodológicos para habilitar Continuous Deployment no futuro.
+
+Progresso global do projeto: **37/48 entregáveis aceitos (77,1%)**, 11 sem aceite.
+Os marcos **M8** (2/4 aceitos, `WEB-031` bloqueada, `WEB-032` pendente), **M9** (0/4) e **M10** (0/5) permanecem estritamente
+preservados com seus estados e critérios originais. A implantação de releases em ambiente de produção permanece reservada ao marco M10.
+
+Próxima ação exata: aprovação do Pull Request da branch `feat/deploy-vps-github-flow`, merge via Merge Commit tradicional na `main`,
+e posterior autorização formal do responsável pelo repositório para início das tarefas pendentes de **M8** (`WEB-031` e `WEB-032`).
+
+Git da entrega: branch `feat/deploy-vps-github-flow`.
 
 ### Retomada anterior — conclusão do marco M7: Integração, compatibilidade histórica e transição (WEB-025 a WEB-028), 2026-11-09
 
@@ -4933,7 +5008,7 @@ Escopo: nove documentos Markdown; nenhuma suite funcional reexecutada.
 CI da branch consultada: nenhuma execução; não equivale a aprovação funcional.
 Sem PR, merge, deploy, instalação, migration ou acesso a dados reais.
 
-Checkout de desenvolvimento: `/home/raposo/Projetos/experimentos-psicopy/stroop-cognifit`.
+Checkout de desenvolvimento: `/home/raposo/Projetos/experimentos-psicopy/stroop-test-web`.
 Worktree sintética M1 `/tmp/stroop-m1-baseline-20261104` preservada em HEAD
 destacada; não repetir baseline global sem divergência concreta.
 

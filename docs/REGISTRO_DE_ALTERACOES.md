@@ -4,6 +4,17 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-12 — Consolidação das entregas pendentes pelo GitHub Flow
+
+Solicitação explícita de integrar as pendências à main por Merge Commit
+tradicional. Consolidados redesign, mecanismos manuais de deploy, consulta
+POST e preparação de réplica, preservando os commits originais. Resolvidos
+conflitos de apresentação/consulta e preservado o acesso por vínculo de
+projeto, inclusive para administradores. Corrigido reflow dos gráficos em
+telas estreitas/zoom sem reduzir verificações existentes. Resultados por SHA,
+PRs, CI, limites e continuidade registrados somente no backlog canônico.
+Nenhum deploy, configuração operacional ou aceite funcional novo implícito.
+
 ## 2026-11-12 — Consulta aplicada React pelo POST analítico
 
 Dashboard migrou a aplicação/paginação para o POST único, com validação de

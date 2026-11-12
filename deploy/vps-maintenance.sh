@@ -28,5 +28,8 @@ case "${1:-}" in
     exec python3 "$runtime/current/scripts/backup_postgres.py" restore-test --verify-web \
       --key-file "$state/keys/web-backup.key" --backup "$latest" >> "$log" 2>&1
     ;;
-  *) printf '%s\n' 'Use monitor, backup ou restore-check.' >&2; exit 2 ;;
+  web-rollback)
+    exec /bin/sh "$runtime/current/deploy/vps-web-rollback.sh" "${2:-}" >> "$log" 2>&1
+    ;;
+  *) printf '%s\n' 'Use monitor, backup, restore-check ou web-rollback.' >&2; exit 2 ;;
 esac
