@@ -14,12 +14,31 @@ test('resultados completos reais preservam unidades, visitas e identidades por p
   const detailRequests: string[] = []
   page.on('request', request => { if (/\/assessments\/[^/?]+(?:\?|$)/.test(request.url()) && !request.url().includes('/options')) detailRequests.push(request.url()) })
   await page.goto('/equipe')
-  await page.getByRole('combobox', { name: 'Projeto', exact: true }).selectOption(prepared.projects[0]!)
   await page.getByRole('listbox', { name: 'Projetos da consulta', exact: true }).selectOption(prepared.projects)
   await page.getByRole('button', { name: 'Aplicar filtros', exact: true }).click()
-  // A demonstracao tambem esta no conjunto, mas um instrumento por vez.
-  await page.getByRole('combobox', { name: 'Instrumento', exact: true }).selectOption('stroop_go_nogo_ptbr')
   const table = page.getByRole('table', { name: 'Avaliações filtradas' })
+  await expect(table.locator('tbody tr')).toHaveCount(6)
+  const instruments = page.getByRole('listbox', { name: 'Instrumento da consulta', exact: true })
+  const selected = ['instrumento_sintetico_demo', 'stroop_go_nogo_ptbr']
+  await instruments.selectOption(selected)
+  await expect(page.getByText('Alterações não aplicadas.', { exact: false })).toBeVisible()
+  const search = page.getByRole('searchbox', { name: 'Buscar opções de instrumento da consulta', exact: true })
+  await search.fill('SEM_CORRESPONDENCIA')
+  await expect(instruments).toHaveValues(selected)
+  await search.fill('')
+  const queried = page.waitForResponse(response => {
+    const url = new URL(response.url())
+    return url.pathname.endsWith('/analysis/query') && response.request().postDataJSON().query.filters.test_code?.length === 2
+  })
+  await page.getByRole('button', { name: 'Aplicar filtros', exact: true }).click()
+  expect((await queried).status()).toBe(200)
+  await expect(table.locator('tbody tr')).toHaveCount(6)
+  await expect(table).toContainText('instrumento_sintetico_demo')
+  await expect(table).toContainText('stroop_go_nogo_ptbr')
+  await expect(page.getByRole('button', { name: 'Exportar visão filtrada', exact: true })).toBeDisabled()
+  // Métricas científicas continuam separadas por instrumento.
+  await page.getByRole('listbox', { name: 'Instrumento da consulta', exact: true }).selectOption('stroop_go_nogo_ptbr')
+  await page.getByRole('button', { name: 'Aplicar filtros', exact: true }).click()
   await expect(table.locator('tbody tr')).toHaveCount(4)
   for (const label of ['Avaliador', 'Precisão Go (%)', 'Precisão No-Go (%)', 'Omissões', 'Comissões', 'Acertos', 'Rejeições corretas']) {
     await expect(table.getByRole('columnheader', { name: label, exact: true })).toBeVisible()
@@ -39,6 +58,7 @@ test('resultados completos reais preservam unidades, visitas e identidades por p
   await expect(errors.locator('tbody tr')).toHaveCount(2)
   await expect(errors).toContainText(prepared.codes[0]!)
   await expect(errors).toContainText(prepared.codes[1]!)
+  await page.getByRole('button', { name: /Análises por Visita/ }).click()
   const evolution = page.getByRole('combobox', { name: 'Participante para evolução', exact: true })
   await evolution.selectOption(JSON.stringify([prepared.projects[0], 'P_SINTETICO_W15']))
   const longitudinal = page.getByRole('table', { name: 'Evolução do participante por avaliação' })
@@ -68,7 +88,8 @@ test('resultados completos reais preservam unidades, visitas e identidades por p
     total_go_trials: 8, total_no_go_trials: 8, hits: 0, omission_errors: 8, commission_errors: 0, correct_rejections: 8, response_time_seconds: null })
   await expect(page.getByRole('main')).not.toContainText('NOME_SINTETICO_RESTRITO')
   await page.getByRole('button', { name: 'Fechar detalhe', exact: true }).click()
-  await page.getByRole('combobox', { name: 'Instrumento', exact: true }).selectOption('instrumento_sintetico_demo')
+  await page.getByRole('listbox', { name: 'Instrumento da consulta', exact: true }).selectOption('instrumento_sintetico_demo')
+  await page.getByRole('button', { name: 'Aplicar filtros', exact: true }).click()
   const generic = page.getByRole('region', { name: 'Resultados por instrumento' })
   await expect(generic.getByRole('heading', { name: 'Demonstração sintética' })).toBeVisible()
   const metrics = generic.getByRole('table', { name: 'Métricas por instrumento e avaliação' })

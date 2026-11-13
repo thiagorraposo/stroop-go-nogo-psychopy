@@ -28,7 +28,7 @@ beforeEach(() => {
   fetchMock = vi.fn<typeof fetch>()
   vi.stubGlobal('fetch', fetchMock)
 
-  fetchMock.mockResolvedValue(
+  fetchMock.mockImplementation(async () =>
     new Response(
       JSON.stringify({
         participant_id: ['P_001', 'P_002'],
@@ -67,7 +67,7 @@ test('REQ-REL-004: renderiza catalogo completo de filtros combinados e emite que
   })
 
   // Confere existência dos campos avançados
-  const searchInput = container.querySelector('input[type="search"]') as HTMLInputElement
+  const searchInput = container.querySelector('input[placeholder="Ex: PAT-"]') as HTMLInputElement
   expect(searchInput).not.toBeNull()
 
   const labels = Array.from(container.querySelectorAll('label')).map(l => l.textContent ?? '')
@@ -103,7 +103,7 @@ test('REQ-REL-004: renderiza catalogo completo de filtros combinados e emite que
   expect(appliedQuery!.advanced?.sortOrder).toBe('desc')
 })
 
-test('REQ-REL-004: botao Limpar filtros reseta todos os campos avancados para o padrao', async () => {
+test('QUERY7: limpar edita rascunho e exige aplicar para publicar defaults', async () => {
   let appliedQuery: ResearchQuery | null = null
 
   await act(async () => {
@@ -126,7 +126,75 @@ test('REQ-REL-004: botao Limpar filtros reseta todos os campos avancados para o 
     clearBtn!.click()
   })
 
+  expect(appliedQuery).toBeNull()
+  await act(async () => {
+    container.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+  })
   expect(appliedQuery).not.toBeNull()
   expect(appliedQuery!.projects).toEqual([mockProjects[0]!.id])
   expect(appliedQuery!.filters).toEqual({})
+})
+
+function button(name: string) {
+  return [...container.querySelectorAll('button')].find(b => b.textContent?.trim() === name)!
+}
+async function fill(input: HTMLInputElement, value: string) {
+  await act(async () => {
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(input, value)
+    input.dispatchEvent(new Event('input', { bubbles: true }))
+  })
+}
+
+test('QUERY7: editar, remover chip e limpar não aplicam; descartar restaura o recorte aplicado', async () => {
+  const applied = vi.fn()
+  await act(async () => root.render(<ResearchFilters projects={mockProjects} initialProject={mockProjects[0]!.id} loading={false} onApply={applied} />))
+  const input = container.querySelector('input[placeholder]') as HTMLInputElement
+  await fill(input, 'PAT-2026')
+  expect(container.textContent).toContain('Alterações não aplicadas')
+  expect(applied).not.toHaveBeenCalled()
+  await act(async () => button('Aplicar filtros').click())
+  expect(applied).toHaveBeenCalledTimes(1)
+  expect(container.textContent).not.toContain('Alterações não aplicadas')
+  await act(async () => container.querySelector<HTMLButtonElement>('[aria-label^="Remover filtro Busca"]')!.click())
+  expect(input.value).toBe('')
+  expect(applied).toHaveBeenCalledTimes(1)
+  await act(async () => button('Descartar alterações').click())
+  expect(input.value).toBe('PAT-2026')
+  await act(async () => button('Limpar filtros').click())
+  expect(container.textContent).toContain('Alterações não aplicadas')
+  expect(applied).toHaveBeenCalledTimes(1)
+  await act(async () => button('Aplicar filtros').click())
+  expect(applied).toHaveBeenCalledTimes(2)
+  expect(applied.mock.lastCall?.[0].advanced.searchText).toBe('')
+})
+
+test('QUERY7: multisseleção de condição/resposta exige capacidade e só publica ao aplicar', async () => {
+  const applied = vi.fn()
+  await act(async () => root.render(<ResearchFilters projects={mockProjects} initialProject={mockProjects[0]!.id} loading={false} onApply={applied} />))
+  const select = async (label: string, values: string[]) => {
+    const labelNode = [...container.querySelectorAll('label')].find(node => node.textContent === label)!
+    const list = container.querySelector<HTMLSelectElement>(`[id="${labelNode.htmlFor}"]`)!
+    await act(async () => {
+      for (const option of list.options) option.selected = values.includes(option.value)
+      list.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+    return list
+  }
+  await select('Condição experimental', ['congruent', 'incongruent'])
+  const list = await select('Tipo de resposta / erro', ['hit', 'omission'])
+  expect(applied).not.toHaveBeenCalled()
+  await act(async () => button('Aplicar filtros').click())
+  expect(container.querySelector('[role="alert"]')?.textContent).toContain('Selecione somente o instrumento Stroop')
+  expect(applied).not.toHaveBeenCalled()
+  await select('Instrumento da consulta', ['stroop_go_nogo_ptbr'])
+  await act(async () => button('Aplicar filtros').click())
+  expect(applied.mock.lastCall?.[0].advanced).toMatchObject({ condition: ['congruent', 'incongruent'], responseType: ['hit', 'omission'] })
+  const search = container.querySelector<HTMLInputElement>(`[aria-controls="${list.id}"]`)!
+  await fill(search, 'comissão')
+  expect([...list.selectedOptions].map(option => option.value)).toEqual(['hit', 'omission'])
+  await act(async () => container.querySelector<HTMLButtonElement>('[aria-label^="Remover filtro Resposta"]')!.click())
+  expect(list.selectedOptions).toHaveLength(0)
+  expect(applied).toHaveBeenCalledTimes(1)
+  await act(async () => button('Descartar alterações').click())
+  expect(list.selectedOptions).toHaveLength(2)
 })

@@ -1,6 +1,6 @@
 # Projeto Stroop Test — backlog canônico da plataforma WEB
 
-Última verificação documental: **2026-11-11**. Missão e limites:
+Última verificação documental: **2026-11-12**. Missão e limites:
 [arquitetura](ARQUITETURA_WEB.md); inventário: [auditoria](AUDITORIA_REPLANEJAMENTO.md);
 especificação: [requisitos e matriz](REQUISITOS_E_RASTREABILIDADE.md).
 Este é o único registro executável de marcos, tarefas, estados, dependências,
@@ -21,6 +21,8 @@ autoriza M3, condicionado às decisões de suas tarefas. Em 2026-11-05, o propri
 aprovou DEC-04 no alcance local de engenharia descrito em EV-M3-011; validação
 física/metodológica permanece pendente para M9. Após o aceite de M3, novo `continue o projeto` em 2026-11-06 autorizou M6, já
 concluído. Novo `continue o projeto` em 2026-11-06 concluiu o escopo inicial de M4 (`WEB-013` a `WEB-016`). Em 2026-11-07, a missão documental `CHG-005` ([ADR-007](arquitetura/ADR-007-cadastros-centrais-e-exportacao-csv.md)) revisou formalmente `DEC-01` e expandiu `M4` (`WEB-045`, `WEB-046`) e `M5` (`WEB-047`), além de atualizar `M5`, `M7`, `M8`, `M9` e `M10`. Em 2026-11-07, instrução explícita do responsável formalizou no workflow do projeto a adoção de Pull Request, Push e Merge Commit tradicional, e autorizou a execução do marco **M5** (`WEB-017` e `WEB-018`). Em 2026-11-08, o PR #4 (`feat/m5-interface-administrativa-react`) entregou a navegação modular e painéis base (`EV-M5-047-NAV`); o PR #5 (`feat/m5-filtros-kpis-administracao`) entregou o catálogo de filtros combinados e administração React (`EV-M5-017/018`); o PR #6 (`feat/m5-crud-pacientes-avaliadores-vinculos`) entregou o CRUD completo de pacientes e avaliadores (`EV-M5-047`); o PR #8 (`feat/m5-detalhes-resultados-metricas`) entregou detalhe, métricas e análises descritivas (`EV-M5-019`); e o PR #10 (`feat/m5-exportacoes-csv-filtradas`) entregou as exportações CSV multi-granularidade (`EV-M5-020`), concluindo integralmente o marco M5 (5/5). Em 2026-11-08, a missão documental **CHG-006** ([ADR-008](arquitetura/ADR-008-simplificacao-estrutural-e-fluxo-direto-sessao.md)) formalizou o replanejamento da interface profissional e do pipeline de sessões em 3 eixos fundamentais inspirados no Streamlit e no PsychoPy Runner, preparando a validação de transição em M7.
+
+Em 2026-11-11, novo `continue o projeto` autoriza M8 e suas tarefas prontas e sucessoras, preservando a proibição específica de merge do PR #18 e os gates externos de WEB-031.
 
 Uma tarefa CONCLUIDA tem todos critérios, comandos/resultados/data, componente,
 referências de teste e Git. Documento é evidência suficiente apenas para entrega
@@ -48,11 +50,11 @@ de legados sem merge automático (WEB-027, EV-M7-027), e cobertura operacional e
 
 ## Painel visual de acompanhamento
 
-Atualizado em **2026-11-11**, a partir das fichas deste backlog.
+Atualizado em **2026-11-12**, a partir das fichas deste backlog.
 
 | Entregáveis aceitos | Ainda sem aceite | Marco autorizado | Próxima ação |
 |---|---|---|---|
-| **37 de 56 · 66,1%** | **19** | **M7 concluído (4/4 aceitos)** | Aguardar `continue o projeto` para M8; iniciar WEB-048 e WEB-050; WEB-031 segue bloqueada |
+| **37 de 56 · 66,1%** | **19** | **M8 em execução (2/12 aceitos)** | WEB-050: completar catálogo e UX7-AA; WEB-048 pronta; WEB-031 bloqueada |
 
 ```text
 Aceites   █████████████░░░░░░░   66,1%
@@ -129,7 +131,12 @@ Clique no ID para conferir critérios, evidências e limites do aceite.
 
 ### Foco do marco atual
 
-`M7` está **4/4 concluído** (`EV-M7-025`, `EV-M7-026`, `EV-M7-027` e `EV-M7-028`). O marco autorizado pelo comando `continue o projeto` de 2026-11-08 é **M7 — Integração, compatibilidade histórica e transição**, **concluído integralmente com 4 de 4 entregáveis aceitos**. O próximo marco a ser autorizado é **M8 — CI, infraestrutura e preparação operacional** (CHG-007: WEB-048..055 antes da candidata WEB-032; WEB-031 preservada).
+Novo `continue o projeto` de **2026-11-11** autoriza **M8 — CI, infraestrutura e
+preparação operacional**, com 2/12 aceitos. WEB-050 está EM_ANDAMENTO; WEB-048
+PRONTA. A preparação de WEB-031 continua bloqueada por destino externo/custódia
+não autorizados; isso impede WEB-032 e o encerramento de M8, sem bloquear
+CHG-007 independente. M7 permanece integralmente aceito (4/4). PR #18 deve
+permanecer aberto sem merge, inclusive por ancestralidade de outra branch.
 
 | ✅ Aceito | ✅ Aceito | ✅ Aceito | ✅ Aceito |
 |---|---|---|---|
@@ -2062,13 +2069,146 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 - Dependências: WEB-029; destino externo de teste autorizado se necessário.
 - Responsável: Codex na execução; responsável do produto/metodológico nas aprovações externas indicadas.
 - Critérios de aceite: Massa sintética restaurada isoladamente, schema/dados/recibo conferidos; réplica+agenda+alerta e retorno de imagem ensaiados, RPO/RTO medidos e limites aceitos.
-- Testes/verificação: `scripts/smoke_web_recovery.py, tests/test_web_backup_replication.py, test_vps_rollback.py`. Restauração positiva/negativa, outage/rollback, réplica SSH local positiva, idempotência, timer real positivo/negativo e alerta aprovados. Ver EV-M8-029/031; réplica externa não ensaiada.
-- Evidências: EV-M8-029/031, 2026-11-06; 11 migrations/uma avaliação/recibo restaurados, 6,305 s backup+restore local. Réplica SSH local/restore aprovados; idade 3,689 s/cópia 0,909 s. Sem comprovação de réplica externa/RPO no destino.
-- Riscos/bloqueios: R08/R09. Ferramenta SSH local preparada/ensaiada sem instalar no host; bloqueio por ferramenta superado. REQ-INF-003 exige réplica externa antes da publicação; destino/conta/chave externos de teste e aceite dos limites operacionais dependem do responsável. Não acessar VPS/backup operacional por inferência; ensaio no mesmo computador não prova falha independente nem RPO/RTO externos. WEB-032 preserva M7 e este gate.
+- Testes/verificação: `scripts/smoke_web_recovery.py`, `scripts/smoke_web_replication.py`, `scripts/smoke_local_auth_restore.py`, `tests/test_web_backup_replication.py`, `tests/test_vps_rollback.py`. EV-M8-031-MINT comprova restauração positiva/negativa, conteúdo em 21 tabelas, cadastros/vínculos/auditoria, SSH local/idempotência/hostkey incorreta, timer com cópia/atraso/indisponibilidade e rollback. Réplica VPS→notebook ainda não ensaiada.
+- Evidências: EV-M8-029/031 histórica preservada; EV-M8-031-MINT, 2026-11-12: receptor Mint instalado, 36 testes locais, 14 migrations/uma avaliação/16 tentativas/12 métricas restauradas. Cópia 2,079 s/118.821 bytes; restore da cópia 9,285 s, exclusivamente locais. Sem RPO/RTO externo comprovado.
+- Riscos/bloqueios: R08/R09. Notebook autorizado como destino temporário e identidade SSH exclusiva preparada. Proprietário/operador deve fornecer host/porta/usuário e fingerprint confiável, aprovar instalação restrita da chave/exportador na VPS e comprovar custódia AES separada. Depois medir ensaio externo e recuperação ponta a ponta. Notebook intermitente não garante RPO 24 h em desligamentos prolongados; RTO 4 h não presumido nem limite dispensado. Procedimento concreto no runbook; nenhuma alteração/conexão à VPS nesta execução. WEB-032 permanece dependente.
 - Referências: REQ-INF-003; [arquitetura](ARQUITETURA_WEB.md).
 - Git da entrega parcial: branch `test/m6-m8-validacao-isolada`; commit/envio/CI no fechamento desta sessão.
 - CHG-004: Réplica externa independente continua obrigatória; após evolução de schema local, WEB-032 revalida restauração de hashes/sessões com custódia e invalidação de sessões restauradas para não ressuscitar acessos. RPO/RTO externo requer medição e aceite, não conta Google.
 - CHG-005: Como o backup PostgreSQL passará a incluir tabelas cadastrais nominais (`web_patients` e `web_evaluators` da migration `0014`), o ensaio de restauração e réplica criptografada deve comprovar integridade dos cadastros, vínculos e trilhas de auditoria sem expor nomes em logs operacionais.
+
+### EV-M8-031-MINT — receptor temporário e ensaios sintéticos, 2026-11-12
+
+Autorização explícita do proprietário para preparar Linux Mint como receptor,
+automação local e ensaios sintéticos. Exclui modificações na VPS sem nova
+aprovação. A sessão abriu no Ambulatório CPS; localizada a árvore correta do
+Stroop sem alteração naquele repositório. Base `d6d9dbb57310cc517f81e4d6a7d32a0b1fc4f0c3`,
+branch `feat/web031-receptor-mint`; preservados `.deploy-hostgator/`, commits
+preexistentes e proibição de integrar a ancestralidade do PR #18. Sem commit,
+push, PR, merge, deploy ou acesso à VPS nesta entrega. CI não executada para
+esta árvore de trabalho; não transferir resultados remotos de outro SHA.
+
+Após pedido de desfazer e posterior pedido explícito de recuperar na mesma
+data, arquivos e recursos privados foram recuperados de
+`/tmp/stroop-web031-undo-skz33sb2`. Patch integral, instalador, conteúdo da
+release e permissões conferidos; branch original da entrega recriada, timer
+enabled/active e Linger=yes restabelecidos. Origem SSH continua ausente,
+sem acesso à VPS. Ensaios funcionais abaixo são os da execução anterior,
+não reexecutados nesta recuperação. A imagem de teste foi reconstruída com
+camadas em cache: manifesto de runtime
+`sha256:cbb236e086379e678007c78cdb30b33e72bab282c40ba1e593dbd2ec1b84a6e2`
+e configuração idênticos aos originais; a nova atestação mudou o índice da
+tag para `sha256:0fa1ea4db088e76a7602cb4d28051294b827a8eb5b63bbd71437fe34ca59ff1f`.
+O identificador anterior abaixo é evidência histórica da rodada ensaiada.
+
+Receptor instalado pelo `scripts/install_web_backup_receiver.py`, Python 3.12
+do Mint 22.2 com `cryptography` existente, sem instalar pacotes no host:
+
+- Ciphertext em `/home/raposo/.local/share/stroop-web-replica/backups`, 0700;
+  configuração/SSH exclusivos em `/home/raposo/.config/stroop-web-replica`, 0700,
+  chave Ed25519 0600. Chave AES operacional não lida/copiada nem colocada nesse
+  diretório de backups. AES sintética em `synthetic-recovery.key`, na pasta
+  privada de configuração, separada do ciphertext de qualificação.
+- Release local por conteúdo
+  `648beff840f5ccad3a991159a2d9fa3f1344b42696d101e9800681f247045e81`,
+  arquivos 0400/diretórios 0500. Timer `stroop-web-backup-pull.timer`
+  **enabled/active**, agenda horária + até 5 min aleatórios, disparo de startup
+  em 2 min e `Persistent=true`; `Linger=yes` conferido após habilitação.
+  Units aprovadas por `systemd-analyze --user verify`; reinício físico não feito.
+- Serviço com CPUQuota 10%, MemoryMax 128 MiB, Nice 19, IO idle, UMask 0077,
+  NoNewPrivileges e timeout 420 s, sem restauração periódica. Último JSON
+  sanitizado atômico em `status/last-result.json`; journal/exit 1 identificam
+  falha sem canal externo. Status antigo deve ser identificado por `checked_at`.
+- `pull.json` **ausente** e `known_hosts` vazio até verificação da origem;
+  `pull.json.pending` é somente exemplo privado. Disparo real do serviço
+  terminou com `ExecMainStatus=1`, `alert=true`, `status=unavailable`, conforme
+  esperado nesta preparação. Não declarar automação operacional a partir disso.
+
+Comandos de integração, na raiz, usando `--api-image
+stroop-web-api:web031-20261112 --proxy-image stroop-web-proxy:deploy-6196c39`:
+
+1. `.venv/bin/python scripts/smoke_web_replication.py` com esses argumentos e
+   `--synthetic-backup-directory /home/raposo/.local/share/stroop-web-replica/qualification
+   --synthetic-key-file /home/raposo/.config/stroop-web-replica/synthetic-recovery.key`:
+   **passed**. SSH real somente em loopback, chave/hostkey efêmeras, forced
+   command rejeitou shell e hostkey errada foi recusada. SHA-256/bytes exatos,
+   repetição sem novo download/substituição, timers reais de cópia positiva,
+   geração de 25 h (`stale`, saída 1) e servidor parado (`unavailable`, saída 1).
+   Cópia restaurada em PG tmpfs sem portas; nenhum banco existente usado.
+2. `.venv/bin/python scripts/smoke_web_recovery.py` com os mesmos argumentos:
+   **passed**, backup+restore **10,004 s**, conteúdo divergente com mesma
+   contagem rejeitado, recibo desvinculado rejeitado, outage detectado e imagem
+   candidata inválida revertida para a imagem anterior, contagens preservadas.
+3. `.venv/bin/python scripts/smoke_local_auth_restore.py` com os mesmos
+   argumentos: **passed**, snapshot restaurado fechado até recuperação,
+   senha/token antigos recusados e login novo 200; conta/vínculo do projeto,
+   16 tentativas/12 métricas/16 observações/recibo preservados. API restaurada
+   testada por TestClient após recuperação; não confundir com tráfego na VPS.
+
+Comparação origem→restore usa contagem + SHA-256 ordenado do conteúdo em
+**21 tabelas**, inclusive schema_migrations, resultados, hashes/sessões locais,
+cadastros e auditorias. Massa nova contém 14 migrations, um paciente, um
+avaliador, um projeto/membro/participante/visita/convite/sessão/avaliação, 16
+tentativas/observações, 12 métricas, dois eventos cadastrais e sete de auditoria
+profissional. Vínculos paciente/avaliador/convidado e códigos científicos
+conferidos na origem e conteúdo integral preservado no restore. Nenhum nome,
+cookie, hash de credencial ou dado de participante é impresso nos relatórios.
+
+Imagem API construída localmente do código da base com allowlist, sem novos
+locks/migrations: `sha256:46b8ab6b66d693c42a6b7d41c1edda7e3215f17d7473a97b815ae54cfe0f1fbd`.
+Identificação completa é consultável por `docker image inspect
+stroop-web-api:web031-20261112`; proxy preexistente
+`sha256:fad12ab57fae24a7f3da5ebe0eb44d0e188d2e218751b8178da72654f62be366`.
+SSH foi instalado exclusivamente na imagem descartável do harness. Containers,
+volumes, timers transitórios, imagem SSH e chaves efêmeras próprios removidos;
+mantidos somente cliente/timer locais e ciphertext/AES **sintéticos** separados
+para futuro ensaio externo autorizado.
+
+Consumo do cliente medido com `/usr/bin/time`: cópia **2,079 s**, **0,49 s CPU
+usuário + 0,05 s sistema**, pico **25.420 KiB RSS**, payload **118.821 bytes**;
+repetição **1,22 s**, **0,38 + 0,03 s CPU**, **25.224 KiB RSS**, sem novo download
+de ciphertext. Inclui cliente Python/SSH, não soma todos containers Docker;
+overhead de rede SSH não medido. Restore da réplica **9,285 s**; idade pontual
+**6,725 s**, não RPO externo. Ausência de configuração: **0,21 s**, CPU
+**0,17 + 0,02 s**, **21.840 KiB RSS**, sem rede. Não extrapolar fixture para
+volume real: retenção atual verifica hashes locais e seu custo cresce com
+tamanho/número de gerações. Política preservada em 30 gerações recebidas;
+cliente atual consulta só a última geração, sem recompor dias intermediários
+perdidos enquanto desligado. Disco local alocado observado por `du -sk`:
+48 KiB de cliente, 20 KiB de configuração/chaves e 204 KiB de estado,
+ciphertext sintético e proposta para a VPS; **272 KiB** no total, sem somar
+imagens Docker de teste. Diretório de backups operacionais recebidos vazio.
+Ver orçamento máximo de disco no runbook.
+
+Regressão: **36 testes, zero falhas/skips**, com `.venv/bin/python -m unittest
+tests.test_backup_web tests.test_web_backup_replication tests.test_vps_rollback
+tests.test_monitor_web tests.test_hardening_producao.BackupEncryptionTests
+tests.test_hardening_producao.ProductionConfigurationTests -v`. Integração real
+está nos três harnesses, não inferida desses testes unitários. Documentação
+aprovada: 90 documentos/729 links/114 âncoras, grafo sem ciclos; sete testes
+do verificador aprovados sem skips e `git diff --check` limpo. Units validadas
+e `git status --short` revisado; somente arquivos da unidade e o diretório
+preexistente preservado aparecem. Nenhum backup/credencial adicionado ao Git.
+
+Falhas anteriores preservadas: duas tentativas ao montar massa via correção
+posterior de vínculos falharam na asserção de resposta de `relink`; HTTP/corpo
+não registrados. Inspeção indica possível falta de grants UPDATE no runtime
+para essa rota, fora desta unidade; não houve diagnóstico conclusivo nem
+correção de produção. Responsável técnico deve reproduzir isoladamente antes
+de alterar provisionamento/WEB-047. Aceite histórico não reaberto por inferência.
+O harness final cria os vínculos pelo convite cadastral canônico e os verifica,
+sem dispensar integridade para obter passe.
+
+Próxima dependência externa concreta: pacote local de proposta
+`/home/raposo/.local/share/stroop-web-replica/server-proposal/f64df30748913afd14e4e1d3a2d4c5091d8e61b2f1e609d37f3bc457267f6674.tar.gz`,
+com hashes, wrapper de origem exclusivamente sintética e linha de chave SSH
+restrita preparada. **Não enviado/instalado**. Procedimento para aprovação no
+[runbook](operacao/WEB_RECUPERACAO.md#procedimento-proposto-para-aprovação-específica-na-vps).
+Bloqueio/responsável/condição: proprietário deve conferir origem/hostkey e
+aprovar instalação restrita; operador depois mede réplica/restore externos e
+custódia. Intermitência impede garantir 24 h em longos desligamentos; RTO 4 h
+depende de medição ponta a ponta. **WEB-031 permanece BLOQUEADA**, sem dispensa
+de critério, sem conclusão de M8/WEB-032 nem autorização de publicação.
 
 ### WEB-032 — Fechar release candidata e runbooks reproduzíveis
 
@@ -2134,7 +2274,7 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 
 ### WEB-050 — Unificar estado aplicado de consulta e descartar respostas obsoletas
 
-- Marco: M8. Prioridade: P0. Complexidade: G. Estado: PRONTA.
+- Marco: M8. Prioridade: P0. Complexidade: G. Estado: EM_ANDAMENTO.
 - Responsável: Codex na implementação e testes; proprietário no aceite de produto e decisões externas; operador somente em ação especificamente autorizada.
 - Justificativa: Impedir que KPIs, gráficos, histórico e exportação representem consultas distintas.
 - Inclui: Objeto de consulta normalizado, rascunho/aplicada, Aplicar explícito, chips/remover/limpar, dimensões REQ-REL-004, seleção de instrumento/versão/plataforma incorporada; geração de consulta e cancelamento; contexto único para todos os consumidores.
@@ -2149,11 +2289,641 @@ no fechamento desta sessão; hash do próprio registro consultável no Git.
 - Segurança e privacidade: servidor revalida perfil e todos os projetos; mesma origem/cookies seguros/CSRF; somente RAM; nenhum nominal/credencial em URL/log/manifesto; deidentified padrão e nominal condicionado a DEC-03/WEB-041. Nenhuma alteração científica por redesign.
 - Testes automatizados exigidos: QUERY7: Vitest de estado puro e consumidor; fake HTTP controlado fora de ordem/projeto/instrumento; Playwright voltar/avançar, erro de paginação, snapshot expirado, revogação e logout; tipos/build.
 - Testes manuais/visuais exigidos: Aplicar filtros combinados, navegar em detalhes e exportação; inspecionar que todos exibem chave/contexto coerentes e nenhuma resposta antiga reaparece após troca rápida de projeto.
-- Evidências: PLANEJADAS. Exigir data/SHA, comandos/resultados/ambiente e casos com dados inequivocamente sintéticos; confrontar cada critério, vínculos e contratos; screenshots não substituem comportamento. Registrar branch/commits/push/PR/verify/merge reais na execução.
-- Riscos/bloqueios: R14: filtros avançados atuais são locais e exportação agregada só aceita subconjunto. Migração server-side em WEB-051 impede aceite integrado antes de sua conclusão.
+- Evidências: núcleo, seleção no servidor e React pelo POST único em EV-M8-050, 2026-11-11/12; ver comandos, falhas intermediárias, evidência real e limites abaixo. Sem aceite integral de WEB-050 ou antecipação dos gates WEB-051/053/055.
+- Riscos/bloqueios: R14: catálogo residual e agregações/CSV v2 ainda exigem capacidades próprias. Busca/faixas/RT ausente e ordenação migrados ao servidor; campos sem suporte são recusados. UX7-AA e integração WEB-051/053/055 permanecem gates próprios.
 - Decisões externas necessárias: Nenhuma: aplicação explícita formalizada como complemento à reatividade da ADR-008.
 - Condições de conclusão: todos os critérios desta ficha e casos aplicáveis de validação comprovados, dependências aceitas, sem skip obrigatório ou divergência silenciosa; atualizar evidência, matriz e painel neste backlog. Nenhum aceite concedido por este planejamento.
 - Referências: CHG-007; [UX](experimento/UX_DECISIONS.md#interface-profissional-integrada--chg-007); [contrato](desenvolvimento/CONTRATO_API_WEB.md#consulta-e-exportação-integradas--alvo-chg-007); [ADR-008](arquitetura/ADR-008-simplificacao-estrutural-e-fluxo-direto-sessao.md).
+
+### EV-M8-050 — núcleo da consulta aplicada compartilhada, 2026-11-11
+
+Execução posterior de M8 autorizada pelo responsável com `continue o projeto`.
+Unidade técnica: `dashboard/query.ts` normaliza dimensões, defaults e identidade
+local (não é fingerprint de conteúdo/autorização); formulário único controlado
+em RAM mantém rascunho/aplicada entre visão geral, histórico, análises e
+exportação. Aplicar publica uma geração e cancela lista/detalhe/downloads
+anteriores; chips/limpar somente editam, descartar restaura a consulta aplicada.
+Instrumento/versão/plataforma não têm seletores paralelos de efeito imediato.
+Projeto de preparação é independente da consulta analítica; nenhum storage/URL.
+
+Busca em multisseleções mantém selecionados visíveis. Catálogo de instrumentos
+é obtido sem restringi-lo ao instrumento aplicado, permitindo troca direta;
+opções são autorizadas pelo mesmo endpoint. Carregamento/erro das opções não
+substitui validação/autorização da consulta no servidor, nem impede reaplicar
+um recorte conhecido; atualização da consulta também atualiza opções. Página
+com erro/cursor repetido/mais de 5.000/snapshot inconsistente não publica totais
+parciais. HTTP 401/403 nas consultas encerra a visualização profissional;
+409 em detalhe/download invalida o conjunto. Revogação mascarada como 404
+continua negada pelo servidor, conforme integrações existentes.
+
+Caminho agregado existente só é habilitado com snapshot completo e filtros
+básicos suportados; edição pendente cancela download, e qualquer filtro avançado
+não suportado impede CSV sem o recorte. UI da exportação avançada permanece
+**desabilitada** no dashboard até vínculo de seleção/token no servidor em
+WEB-051/053; código/backend das exportações anteriores preservado. Isso é uma
+restrição temporária explícita de integridade, não aceite de EXPORT7.
+Tabela mista identifica instrumento e apresenta somente colunas comuns,
+sem desalinhamento entre linhas Stroop e instrumentos genéricos.
+
+Estado: **EM_ANDAMENTO**, sem novo aceite. Ainda faltam multisseleção completa
+de instrumento/condição/resposta e integração ao contrato alvo normalizado
+(tipos atuais reutilizam o catálogo anterior); busca, status e faixas avançadas ainda usam
+seleção local histórica até WEB-051. Condição/resposta foram migradas para seleção
+no servidor na continuação registrada abaixo; esta descrição inicial é histórica. Nenhum aceite de população A/T, nova
+cardinalidade, fórmula, snapshot/fingerprint servidor ou CSV avançado é alegado.
+Matriz UX7-AA integral (cinco larguras, zoom/reflow, contrastes e revisão com
+leitor de tela) não foi concluída. Verificações de 390 px/zoom 200% e árvores/DOM
+existentes são evidência limitada, não conformidade AA. Não avançar WEB-051 como
+CONCLUIDA por implicação. WEB-048 continua PRONTA; WEB-031 bloqueada externamente.
+
+Ambiente local: Linux 7.0.0-42-generic, Node 24.15.0, npm 11.16.0, Python
+3.12.3; Playwright 1.64.1, Chromium 156.0.8078.4/Firefox 157.0. Sem instalar/atualizar dependências, sem CSS experimental, migrations,
+produção ou acesso a fontes protegidas. PG 17.6 em container **exclusivamente
+sintético** `stroop-m8-query7-synthetic-20261111`, tmpfs e porta efêmera local,
+banco `stroop_etapa4_test_query7`; harness HTTPS existente usa API/grants reais.
+
+Validação e Git: resultados finais registrados no fechamento desta evidência;
+branch `feat/m8-consulta-aplicada-unica`, base `67dfbf7`. PR #18 aberto sem
+merge (verify histórico aprovado em `67dfbf7`, não transferido à nova entrega),
+auto-merge desabilitado. A branch contém ancestralidade documental desse PR;
+não integrar à main por outra via enquanto a instrução específica vigorar.
+Material `.deploy-hostgator/`, PRs #16/#17 e main preservados.
+
+#### Validação local desta unidade
+
+- `npm --prefix web test -- --reporter=dot`: **336/336**, 28 arquivos, sem
+  skips; inclui duas verificações puras de normalização/exportação, quatro
+  casos de consumidor com promessas que ignoram cancelamento e formulário.
+- `npm --prefix web run build`: TypeScript e Vite aprovados; mantém aviso de
+  chunk JS acima de 500 kB (540,15–540,17 kB conforme build). Sem alteração de
+  dependências/limite para esconder o aviso.
+- Em `web/`: `WEB_TEST_PORT=4289 npx playwright test
+  e2e/applied-query.spec.ts e2e/research-filters.spec.ts
+  e2e/aggregate-export.spec.ts e2e/dashboard.spec.ts
+  e2e/complete-results.spec.ts e2e/invitations.spec.ts
+  e2e/presentation.spec.ts --workers=2 --trace=off
+  --output=test-results/query7-final`: **76/76**, Chromium 156.0.8078.4 e Firefox
+  157.0. Inclui dez cores/centro/HUD, teclado, consultas fora de ordem,
+  rascunho/aplicada, expiração, logout e voltar/avançar após encerramento.
+  API double HTTP local; não prova autorização PG. Houve aviso React de
+  `flushSync` no encerramento durante lifecycle em uma fixture negativa Firefox.
+  Experimento local separou o handler de sessão encerrada do pagehide, mas a
+  regressão adicional manteve o aviso: tentativa revertida integralmente, App
+  permanece idêntico à base. Causa do aviso não determinada; nenhum teste
+  funcional falhou por ele. Não foi suprimido nem considerado resolvido.
+- Em `web/`, `TEST_DATABASE_URL` aponta somente para o banco descartável acima:
+  `npx playwright test --config playwright.integration.config.ts
+  e2e/integrated/dashboard.spec.ts e2e/integrated/filters.spec.ts
+  e2e/integrated/complete-results.spec.ts e2e/integrated/aggregate-export.spec.ts
+  --output=test-results/query7-https-final`: **14/14**, sem skips,
+  **2,4 minutos**. HTTPS/proxy, React compilado, API e PG/grants reais; perfis,
+  todos os projetos/páginas, 105 registros, filtro reduzido, RT nulo, outros
+  instrumentos, detalhe e CSV confrontados com dados sintéticos. API/PG não
+  modificados; não testa ainda o futuro POST analysis/query ou EXPORT7 avançado.
+- `python3 scripts/verify_web_docs.py`, sete testes
+  `python3 -m unittest tests.test_verify_web_docs -q` e `git diff --check`:
+  aprovados, 11 marcos/56 tarefas/75 requisitos/15 riscos/cinco decisões,
+  **37 aceitos**, 90 documentos, 727 links/112 âncoras, grafo acíclico.
+  Nova evidência não aumenta o numerador. Inspeção visual de screenshot sintético
+  390 px realizada; sem alegar campanha UX7-AA ou aprovação visual do proprietário.
+
+Regressão adicional após investigar o aviso: em `web/`,
+`WEB_TEST_PORT=4290 npx playwright test e2e/applied-query.spec.ts
+ e2e/navigation.spec.ts e2e/administration.spec.ts e2e/research-filters.spec.ts
+ --workers=2 --trace=off --output=test-results/query7-auth-final`: **42/42**;
+mesmo aviso Firefox preservado. Não altera os 76 passes da campanha anterior.
+Scanner `.venv/bin/python scripts/verify_web_ci.py sources`: **426 fontes
+versionadas verificadas**, sem achado; dados/histórico fora do escopo. Container
+PG sintético criado nesta sessão removido após a integração, sem tocar qualquer
+outro container/volume. Artefatos de teste permanecem ignorados.
+
+Falhas intermediárias preservadas: 328/329 Vitest antes de revisar o teste que
+aplicava Limpar automaticamente; 331/332 por Response única reutilizada na
+fixture de opções (corrigida para resposta nova por fetch); dois dos quatro
+novos testes de consumidor falharam por seletores que supunham aria-label na
+tabela/texto do botão (corrigidos para classe/label reais). Primeira campanha
+filtros/exportação falhou por nomes de busca/listbox ambíguos e expectativa
+antiga após 403; corrigidas as receitas sem reduzir isolamento, 26/26 aprovados.
+Regressão intermediária 31/34 detectou seletor de preparação omitido em três
+perfis/estados; restaurado em todos, preservando sua independência do recorte.
+Campanha seguinte 42/44 falhou no seletor exato implícito de precisão; corrigido
+para nome/papel acessível real, dez novos casos passaram nos dois navegadores.
+
+Primeira integração: **seis passes, três falhas, um interrompido e quatro não
+executados**, parada por SIGINT no processo de teste da sessão após confirmar
+causas corrigíveis. Instrumento era retirado do próprio catálogo ao selecioná-lo
+(corrigido fetch de opções); erro de opções desabilitava Aplicar indefinidamente
+(corrigido sem burlar autorização servidor); alerta de opções e alerta da consulta
+exigiam escopo explícito na assertiva. Um diagnóstico isolado com trace sintético
+ignorando servidor novo localizou a primeira falha; não é aceite. Campanha
+final integral dos 14 casos passou após correções, sem aumentar timeouts/gates.
+Duas tentativas de comando usaram prefixo web/ duplicado dentro de web e falharam
+antes de criar o arquivo temporário pretendido; corrigidos os caminhos, sem
+alterar ambiente operacional. Artefatos/traces sintéticos somente ignorados ou
+em /tmp; nenhum log/export/coleta versionado. Suíte Python funcional completa e
+auditorias de dependência não reexecutadas localmente (sem alteração backend/locks);
+Actions verify da entrega tem estado próprio, registrado no fechamento Git.
+
+#### Fechamento Git desta unidade
+
+Entrega em **`07473b906f75982cb37f53ee778b33fd99fcdba5`**, branch
+`feat/m8-consulta-aplicada-unica`, push com upstream confirmado por igualdade
+HEAD/upstream/ls-remote. **20 arquivos da tarefa**, sem App (experimento
+revertido), dependências, dados ou material de deploy. Build/tipos e 336 testes
+Vitest reexecutados após o commit, todos aprovados; CSS emitido preserva mesmo
+hash `index-mVgr7SNY.css` e bundle `index-6EHd1uPz.js` da campanha HTTPS final.
+
+[PR #19](https://github.com/thiagorraposo/stroop-test-web/pull/19) **draft aberto**
+para main; auto-merge desabilitado. `verify` em **IN_PROGRESS** na SHA 07473b9
+na consulta desta sessão, execução [43124268881](https://github.com/thiagorraposo/stroop-test-web/actions/runs/43124268881).
+Não é CI aprovada, e o fechamento documental posterior recebe seu próprio check.
+PR #18 conferido aberto em `67dfbf7`, sem auto-merge; nenhum merge por esta
+branch, para não integrar indiretamente sua ancestralidade. Sem deploy/tag/release.
+
+WEB-050 continua **EM_ANDAMENTO**, progresso 37/56 e M8 2/12 preservados.
+Próxima ação técnica: completar catálogo de seleção e serialização normalizada
+conforme contrato alvo, com capacidades/rejeição explícita dos recortes ainda
+não suportados; conferir UX7-AA da ficha antes do aceite. Não declarar WEB-051
+pronta por código parcial. WEB-048 continua independente e PRONTA; WEB-031
+continua bloqueada por recursos/autorização externos, impedindo WEB-032.
+Fechamento documental identificável por `git log -1 --format=%H
+--grep='docs(web): registra unidade parcial de WEB-050 e PR de revisão'`;
+confirmar envio por HEAD/upstream/remoto, sem commit artificial de autorreferência.
+
+#### Continuação — multisseleção de instrumentos, 2026-11-11
+
+Novo `continue o projeto` mantém o escopo em M8 e retoma WEB-050 na mesma
+branch, inicialmente em `b4382e6`, alinhada ao upstream após fetch. Main e
+origin/main em `b5fccbb`; `.deploy-hostgator/` preexistente preservado sem leitura
+ou staging. PR #19 permanece draft: a proibição de integrar a ancestralidade
+do PR #18 continua vigente e impede merge mesmo se os checks passarem.
+
+Entrega **`7f43295423e994d2bca9684187391a5723c2a95a`**:
+
+- Instrumento passa a listbox múltiplo pesquisável, com selecionados preservados
+  durante busca, chip removível e publicação somente ao aplicar. A identidade
+  local normaliza ordem/duplicatas e torna string única/lista unitária equivalentes.
+- API/listagem e persistência SELECT recebem até 100 instrumentos como OR no
+  mesmo recorte. Não são consultas paralelas nem filtro posterior local.
+  Cursor e snapshot vinculam a seleção completa; reordenação é equivalente,
+  troca de instrumento recusa reaproveitamento. Valores inválidos e excesso
+  retornam 422. Facetas mantêm contrato anterior com instrumento único.
+- CSV agregado recebe a mesma seleção integral e revalida todos os vínculos;
+  clientes antigos com `test_code` string continuam compatíveis. A projeção
+  existente segue por instrumento; a UI não habilita CSV agregado de instrumentos
+  mistos. Sem mudança de fórmulas, 21 colunas, motor, CSS, dependências ou schema.
+
+Verificações locais, ambiente de EV-M8-050 preservado, sem instalações:
+
+- `npm --prefix web test -- --reporter=dot`: **340/340**, 28 arquivos, sem skips;
+  `npm --prefix web run build`: tipos e Vite aprovados, aviso de chunk >500 kB
+  preservado (540,07 kB), CSS mantém `index-mVgr7SNY.css`.
+- `TEST_DATABASE_URL` exclusivamente sintético,
+  `.venv/bin/python -m unittest tests.test_web_assessments -q`: **21/21**, sem
+  skips, em 22,768 s. Inclui união de dois instrumentos, paginação reordenada,
+  recorte/cursor incompatível, snapshot/CSV, compatibilidade string/lista,
+  limites e revogação; demais contratos de consulta regressados.
+- Em `web/`, `WEB_TEST_PORT=4291 npx playwright test
+  e2e/applied-query.spec.ts e2e/research-filters.spec.ts
+  e2e/aggregate-export.spec.ts e2e/dashboard.spec.ts e2e/complete-results.spec.ts
+  --workers=2 --trace=off --output=test-results/m8-multi-instrument`:
+  **50/50**, Chromium/Firefox, 32,2 s; HTTP double, sem alegar integração real.
+- Em `web/`, `TEST_DATABASE_URL` sintético, `npx playwright test
+  --config playwright.integration.config.ts e2e/integrated/complete-results.spec.ts
+  e2e/integrated/filters.spec.ts e2e/integrated/aggregate-export.spec.ts
+  --output=test-results/m8-multi-instrument-https`: **8/8**, Chromium/Firefox,
+  58,5 s; HTTPS/API/PG e grants reais. Confere seis avaliações de dois instrumentos
+  na mesma consulta, rascunho/busca/seleção preservada, separação das tabelas e
+  downloads incompatíveis desabilitados; regressa CSV, múltiplos projetos e
+  revogação. PG 17.6 descartável em tmpfs no container próprio
+  `stroop_etapa4_test_m8_continue`, banco homônimo, loopback porta efêmera 32769.
+- Validador documental, sete testes do validador e `git diff --check` aprovados;
+  scanner de secrets: **426 fontes versionadas**, sem achados. Somente fixtures
+  sintéticas; nenhum dado operacional, secret ou material de deploy lido.
+
+CI anterior conferida nesta sessão: `verify` da SHA **b4382e6** falhou na execução
+[43124371410](https://github.com/thiagorraposo/stroop-test-web/actions/runs/43124371410),
+com **45/46** integrações aprovadas. O caso CSP Chromium não encontrou o estímulo
+principal em 8 s; Python, frontend, auditorias e navegadores isolados passaram
+naquele run. Isso não prova regressão CSP nem explica a causa. Diagnóstico local
+na base b4382e6: `npx playwright test --config playwright.integration.config.ts
+e2e/integrated/security.spec.ts --repeat-each=3
+--output=test-results/m8-csp-diagnostic`: **12/12**, 2,5 min, sem retries/skips,
+nos dois navegadores, com HTTPS/API/PG reais. Nenhum timeout, gate científico,
+CSP ou teste afrouxado; falha remota e ausência de causa comprovada preservadas.
+
+WEB-050 permanece **EM_ANDAMENTO**, sem novo aceite e sem promover WEB-051.
+Esta unidade resolve a multisseleção de instrumentos, mas ainda faltam condição/
+resposta, serialização/integração ao POST normalizado do contrato alvo e UX7-AA
+integral. WEB-048 continua PRONTA, WEB-031 bloqueada externamente; global 37/56,
+M8 2/12.
+
+Regressão integral: `TEST_DATABASE_URL` no banco descartável acima,
+`.venv/bin/python scripts/verify_web_ci.py python`: **449/449**, sem skips,
+141,875 s, exit 0. Inclui API base, auth, sessões, resultados, domínio, grants,
+exportações e migrações sintéticas; não aplica migrações operacionais. O runner
+rejeita skips; mensagens internas de auditoria sintética recusada pertencem aos
+testes negativos do próprio runner, não a uma auditoria de dependências desta
+sessão. Auditoria de dependências não reexecutada localmente (locks intactos).
+Container descartável próprio removido ao final; demais containers preservados.
+
+Fechamento desta continuação: commit funcional `7f43295`; commit documental
+identificável por `git log -1 --format=%H
+--grep='docs(web): registra multisseleção validada e continuidade de M8'`.
+Envio e estado do check da SHA final devem ser conferidos por
+HEAD/upstream/`git ls-remote` e PR #19, sem commit artificial de autorreferência.
+O novo `verify` permanece pendente até seu resultado por SHA; não transferir
+os passes locais nem o diagnóstico CSP para aceite de Actions. PR #19 e PR #18
+continuam abertos sem merge, auto-merge desabilitado. Sem deploy/tag/release.
+
+
+#### Continuação — condição/resposta e reflow da consulta, 2026-11-11
+
+Autorização renovada por `continue o projeto`; WEB-050 continua no marco M8 e
+na branch `feat/m8-consulta-aplicada-unica`, base inicial `fc487cb`, alinhada ao
+upstream após fetch. Main/origin/main `b5fccbb`. `.deploy-hostgator/` preexistente
+preservada sem leitura/staging. Proibição específica de integrar PR #18 mantida,
+inclusive pela ancestralidade do PR #19, que continua draft sem merge.
+
+Entrega desta unidade:
+
+- Catálogo pesquisável passa a usar multisseleções de condições congruente/
+  incongruente e respostas canônicas hit/omission/commission/correct_rejection.
+  Rascunho, chips, limpar, descartar e publicação explícita mantêm a mesma
+  geração; normalização ordena/deduplica as duas dimensões. Resumo aplicado
+  identifica ambas. Erro de capacidade é anunciado e associado ao formulário.
+- GET de listagem aceita esses dois campos com allowlists e teto de 100 valores;
+  exige instrumento Stroop explícito/exclusivo, recusando capacidade ausente ou
+  mista com 422. Não cria suporte fictício em outros instrumentos nem nominal
+  em URL. Cursor/snapshot vinculam o recorte integral com reautorização SELECT.
+- PostgreSQL aplica **um único EXISTS main**: condição E resposta devem ocorrer
+  na mesma tentativa, OR dentro de cada campo. Alternativas de classificação
+  derivam de `stroop.domain.stroop.expected_outcome`, sem nova fórmula ou
+  dependência de flags redundantes de acerto/erro. Prática excluída. Hidratação
+  preserva métricas oficiais da avaliação inteira. Removida a aproximação React
+  por totais de Go/No-Go/respostas, que não comprovava a conjunção em tentativa.
+- Agregado legado recusa condição/resposta no servidor (422) e continua
+  desabilitado na UI para esse recorte; não produz arquivo com filtros ignorados.
+  Individual continua explicitamente o CSV oficial completo da avaliação.
+- Corrigido reflow: grade de filtros permite coluna menor que 280 px, controles
+  administrativos não impõem largura intrínseca e cabeçalho profissional quebra
+  linha quando necessário. Seletores delimitados à administração; nenhuma
+  alteração de DOM/tempos/HUD/estímulos do motor. Sem schema, migration,
+  dependência, dados reais, configuração operacional, deploy, tag ou release.
+
+Ambiente observado: Linux `7.0.0-42-generic`, Python 3.12.3, Node 24.15.0,
+npm 11.16.0, Chromium 156.0.8078.4 e Firefox 157.0; dependências existentes.
+PG 17.6 em container próprio `stroop_etapa4_test_m8_trials`, tmpfs, banco
+homônimo, loopback porta efêmera 32770; somente fixtures sintéticas.
+
+Validações desta unidade:
+
+- `npm --prefix web test -- --reporter=dot`: **342/342**, 28 arquivos, sem skips;
+  inclui equivalência de conjuntos, transporte integral, capacidade, seleção
+  preservada na busca e rascunho/aplicação/descarte. `npm --prefix web run build`:
+  TypeScript/Vite aprovados. Aviso de chunk >500 kB preservado (540,27 kB), sem
+  alterar dependência/limite para ocultá-lo.
+- `TEST_DATABASE_URL` exclusivamente no PG descartável acima,
+  `.venv/bin/python scripts/verify_web_ci.py python`: **452/452**, sem skips,
+  159,569 s, exit 0. Inclui três novos casos PG: oito combinações confrontadas
+  com detalhe canônico, OR, mesma tentativa, prática excluída, flags redundantes
+  inconsistentes, métricas completas, cursor reordenado/incompatível, mutação
+  com mesma cardinalidade, exportação recusada, capacidade inválida e revogação.
+  Regressão integral de API/auth/sessões/resultados/domínio/grants/CSV preservada.
+- Em `web/`, `WEB_TEST_PORT=4292 npx playwright test e2e/applied-query.spec.ts
+  e2e/research-filters.spec.ts e2e/aggregate-export.spec.ts e2e/dashboard.spec.ts
+  e2e/complete-results.spec.ts e2e/presentation.spec.ts --workers=2 --trace=off
+  --output=test-results/m8-trial-filters-browser`: **56/56**, 38,8 s, dois
+  navegadores, HTTP double. Campanha anterior à correção CSS; não prova PG.
+- Após CSS, em `web/`, `WEB_TEST_PORT=4293 npx playwright test
+  e2e/research-filters.spec.ts e2e/presentation.spec.ts --workers=2 --trace=off
+  --output=test-results/m8-trial-filters-layout-corrected`: **20/20**, 18,3 s.
+  Inclui cinco larguras 360/768/1024/1366/1920, viewport de reflow 320, ampliação
+  CSS 200% em 1366/1920 e 400% em 1280, foco/seleção e erro associado. Ampliação
+  CSS é evidência automatizada limitada, não revisão manual de zoom nativo.
+  Dez cores/centro/contorno e prática sem precisão regressados nos dois browsers.
+  Quatro screenshots sintéticos de filtros (360 e 1366, por navegador) em
+  diretório ignorado; inspeção visual de Chromium 360 e Firefox 1366 realizada.
+  Não concede revisão visual do proprietário nem conformidade WCAG integral.
+- Em `web/`, `TEST_DATABASE_URL` no banco descartável acima, `npx playwright
+  test --config playwright.integration.config.ts e2e/integrated/trial-filters.spec.ts
+  e2e/integrated/filters.spec.ts e2e/integrated/aggregate-export.spec.ts
+  --output=test-results/m8-trial-filters-https-final`: **8/8**, sem skips, 50,3 s,
+  HTTPS/proxy/React compilado/API/PG/grants reais em Chromium/Firefox. Confere
+  recorte impossível vazio, OR, seleção conservada, métricas completas, contexto
+  aplicado, exportação bloqueada, múltiplos projetos/páginas e revogação.
+  Build final usa CSS `index-Cd1eQ5rm.css` e JS `index-8UK2m2v9.js`.
+- `python3 scripts/verify_web_docs.py`, sete testes do validador e
+  `git diff --check`: aprovados; 11 marcos/56 tarefas/75 requisitos/15 riscos/
+  cinco decisões, 37 aceitos, 90 documentos/727 links/112 âncoras, sem ciclos.
+  Scanner `.venv/bin/python scripts/verify_web_ci.py sources`: **427 fontes
+  versionadas**, sem achados. Auditorias de dependências não reexecutadas
+  localmente; locks intactos. Só artefatos sintéticos ignorados, sem export/coleta
+  versionados. Container descartável próprio removido após os ensaios, sem tocar
+  containers/volumes preexistentes.
+
+Falhas intermediárias preservadas: primeira execução focada PG teve **23 passes
+e um erro** na fixture que tentava gravar error_type fora da constraint. Ajustada
+para valor válido porém incoerente (`omission`), sem alterar constraints/domínio;
+regressão integral acima passou. Primeira matriz de layout falhou **2/2** em 320
+nos dois browsers; diagnóstico Chromium confirmou coluna mínima 280 maior que
+espaço do formulário. Após correção da grade, outra execução falhou **2/2** na
+ampliação CSS 400%; diagnóstico Chromium localizou overflow no cabeçalho público
+profissional. Correção delimitada de flex-wrap e campanha final 20/20, sem remover
+asserções, ocultar overflow global ou reduzir requisitos. Aviso React histórico
+`flushSync` reapareceu em cenários negativos Firefox; na campanha CSS houve
+também `Cannot update ProfessionalAccess while rendering ResultsTable`. Causa
+não comprovada, não suprimida nem declarada resolvida; testes passaram, mas isso
+permanece limite de lifecycle a investigar na homologação integrada.
+
+WEB-050 segue **EM_ANDAMENTO**. Multisseleção de instrumento/condição/resposta
+está materializada, porém ainda faltam integração ao POST normalizado alvo,
+capacidades/agregação integral servidor e UX7-AA completa (revisão critério a
+critério, contraste, espaçamento/estados e leitor de tela efetivamente utilizado).
+Orca 46.1 disponível localmente; sua versão consultada não equivale a ensaio com
+leitor de tela. Não antecipar WEB-051/053 ou aceite integrado. Próxima ação exata:
+materializar contrato normalizado do POST e sua capacidade explícita para os
+recortes restantes, mantendo os gates de WEB-051 e revisão UX7-AA. WEB-048 segue
+independente e PRONTA; WEB-031 bloqueada externamente. Global **37/56**, M8
+**2/12**, sem novo aceite.
+
+Git desta unidade identificável por `git log -1 --format=%H
+--grep='feat(web): filtra condição e resposta na mesma tentativa'`.
+Commit/push/PR/check por SHA no fechamento posterior; não inferir CI de testes
+locais. Na consulta anterior ao novo envio, `verify` de **fc487cb** ainda estava
+IN_PROGRESS na execução 43131698618 (integração HTTPS), sem aprovação atribuída.
+PR #19 draft e PR #18 abertos, sem auto-merge/merge. Nenhum deploy/tag/release.
+
+Fechamento Git da unidade de condição/resposta: entrega funcional/documental em
+**`9c6c9dfb70486ab2d3b37dd9e54d1906746651f1`**, **18 arquivos**, push confirmado
+por HEAD/upstream/ls-remote na mesma SHA. [PR #19](https://github.com/thiagorraposo/stroop-test-web/pull/19)
+permanece draft aberto, descrição atualizada, auto-merge desabilitado; sem merge
+pela restrição do PR #18. `verify` da entrega **QUEUED** na consulta, execução
+[43134541360](https://github.com/thiagorraposo/stroop-test-web/actions/runs/43134541360),
+sem atribuir aprovação. Fechamento documental posterior tem check próprio,
+identificável por `git log -1 --format=%H
+--grep='docs(web): registra seleção por tentativa e limites de M8'`;
+conferir envio por HEAD/upstream/remoto, sem commit artificial de autorreferência.
+Worktree final só conserva `.deploy-hostgator/` preexistente fora de escopo.
+Sem deploy/tag/release; estado e próxima ação de WEB-050 preservados acima.
+
+#### Continuação — entrada POST normalizada com capacidades parciais, 2026-11-11
+
+Novo `continue o projeto` mantém autorização em M8. Base `ca8a114`, branch
+`feat/m8-consulta-aplicada-unica`, inicialmente alinhada ao upstream após fetch;
+main/origin/main `b5fccbb`. Material `.deploy-hostgator/` preservado sem leitura
+ou staging. PR #18 aberto sem merge; a mesma restrição alcança PR #19 por
+ancestralidade, independentemente do resultado de CI.
+
+Implementado `POST /api/v1/analysis/query` com RequestModel estrito em todos os
+níveis, Origin/CSRF, sessão profissional e DSN SELECT sem fallback. Normaliza
+aliases de datas/código/plataforma, ordena/deduplica seleções e recusa aliases
+contraditórios. O contexto público inclui consulta canônica, capacidades,
+identificadores, prazo, fingerprints, contagens completas e página. Suporte
+inicial: categorias/datas existentes, status valid, seleção explícita,
+condição/resposta Stroop, quatro ordenações e agrupamento assessment/project
+somente com contagens operacionais. Busca, faixas métricas, status operacionais,
+IDs cadastrais, plataforma legacy sem proveniência própria e demais agrupamentos
+retornam 422 sanitizado. Não são aceitos/ignorados.
+
+A seleção ocorre em uma única transação REPEATABLE READ/READ ONLY: reautoriza
+todos os projetos, limita A a 5.000, aplica seleção explícita antes do limite e
+recusa IDs fora do recorte. Ambiguidade de legado em dois projetos falha fechada.
+Condição/resposta mantém EXISTS na mesma tentativa; T conta somente main que
+passam ambos. Métricas em items continuam da avaliação completa, pelo domínio
+oficial. Participantes/visitas são contados por projeto/código, com definição
+explícita; não é deduplicação cadastral ou união nominal entre projetos.
+Fingerprints incluem conteúdo pseudonimizado relevante, inclusive estímulo;
+cursor assinado vincula identidade, consulta, ordenação, conteúdo e prazo de
+15 minutos. Alteração de mesma cardinalidade/expiração recusa paginação com 409;
+limite/erro nunca produz 200 com prefixo parcial. Sem novo cálculo científico.
+
+**Limites:** o React ainda consome GET e os filtros avançados locais históricos.
+Não há integração ao POST da consulta aplicada na UI, catálogo integral ou
+contexto de busca/exportação v2. A resposta informa exports=false; query_id
+não autoriza downloads. Esta unidade não conclui WEB-050/051 e não concede
+aceite AA ou funcional integrado. Avisos históricos de lifecycle permanecem
+sem diagnóstico; frontend de produto/motor/CSS/bundle preservados.
+
+Ambiente de EV-M8-050 preservado: Linux 7.0.0-42-generic, Python 3.12.3,
+Node 24.15.0/npm 11.16.0, Chromium 156.0.8078.4/Firefox 157.0. PG 17.6 no
+container próprio `stroop_etapa4_test_m8_post`, tmpfs, banco homônimo, porta
+loopback efêmera 32771. Só fixtures sintéticas; sem dependências instaladas,
+schema/migration novos, acesso operacional, deploy, tag ou release.
+
+Validações:
+
+- `TEST_DATABASE_URL` exclusivamente no PG descartável acima,
+  `.venv/bin/python scripts/verify_web_ci.py python`: **456/456**, sem skips,
+  168,138 s, exit 0. Inclui esquema fechado, aliases/capacidades, seleção vazia,
+  subconjunto explícito em universo maior que 5.000, rejeição de 5.001 sem
+  truncamento, paginação, identidade, expiração, conteúdo mutado, projetos
+  inacessíveis/revogação, CSRF e ausência de DSN SELECT. Mensagens de auditoria
+  sintética recusada e pipeline aborted pertencem aos testes negativos; o
+  runner concluiu com todos os testes aprovados.
+- Foco anterior `.venv/bin/python -m unittest tests.test_web_assessments -q`:
+  **27/27**, 37,035 s; teste de normalização puro adicional aprovado. Primeira
+  rodada focada teve **26 passes/um erro** por atributo inexistente no helper
+  de revogação; corrigido para opaque_user_id e PUT real com active=false,
+  sem alterar autorização. Nenhuma falha funcional omitida.
+- `npm --prefix web run build`: tipos e Vite aprovados; bundle de produto
+  idêntico à base (`index-Cd1eQ5rm.css`, `index-8UK2m2v9.js`). Aviso de chunk
+  >500 kB preservado (540,27 kB). Vitest/browser double não reexecutados:
+  nenhum fonte React/runtime experimental mudou.
+- Em `web/`, `TEST_DATABASE_URL` sintético, `npx playwright test --config
+  playwright.integration.config.ts e2e/integrated/analysis-query.spec.ts
+  e2e/integrated/trial-filters.spec.ts
+  --output=test-results/m8-normalized-post-https`: **4/4**, sem skips, 16,7 s.
+  HTTPS/proxy/API/PG/grants reais em Chromium/Firefox; POST executado no browser
+  autenticado, sem interceptação. Confere aliases, métricas completas, T,
+  capacidades, recusa nominal/CSRF, revogação e storage vazio; regressa filtros
+  React existentes. Não comprova migração da UI ao POST ou campanha UX7-AA.
+- Verificação documental, sete testes do validador e diff check aprovados;
+  scanner e Git registrados no fechamento abaixo. Auditorias de dependências
+  não reexecutadas localmente; locks intactos. Artefatos/log temporário de teste
+  somente ignorados ou em /tmp, nenhum export/coleta versionado.
+
+WEB-050 permanece **EM_ANDAMENTO**; global **37/56**, M8 **2/12**. Próxima ação:
+ampliar capacidades de seleção e migrar consumidores React ao POST único,
+eliminando filtros locais históricos com capacidades explícitas e verificando
+UX7-AA; WEB-048 continua PRONTA. WEB-031 bloqueada externamente impede WEB-032,
+sem impedir esse ramo. Nenhum avanço a M9.
+
+Entrega identificável por `git log -1 --format=%H
+--grep='feat(web): adiciona entrada analítica normalizada com capacidades explícitas'`.
+Conferir SHA/envio/check no fechamento desta unidade e HEAD/upstream/remoto;
+PR #19 continua draft, auto-merge desabilitado e nenhum merge autorizado.
+
+Fechamento desta unidade: entrega **`ee852f11f482af97ef0f4c460e8fcea9547957e3`**,
+11 arquivos da tarefa; push com upstream confirmado por HEAD/upstream/ls-remote
+na mesma SHA. Scanner: **430 fontes versionadas**, sem achados. Foco final de
+contrato/reautorização após ajustar a adulteração do cursor para byte significativo:
+**2/2 aprovados**, 1,642 s; evita dependência dos bits de padding base64 na fixture.
+Container descartável próprio removido após os testes, demais recursos preservados.
+
+[PR #19](https://github.com/thiagorraposo/stroop-test-web/pull/19) atualizado,
+draft, auto-merge desabilitado. `verify` da SHA ee852f1 **IN_PROGRESS** na consulta
+final, execução [43136318278](https://github.com/thiagorraposo/stroop-test-web/actions/runs/43136318278).
+Não é CI aprovada. O fechamento documental posterior recebe seu próprio check;
+consultar o SHA final, sem transferir aprovação local ou de outro commit.
+Nenhum merge, publicação, tag ou release. Registro de fechamento identificável
+por `git log -1 --format=%H
+--grep='docs(web): registra POST analítico validado e continuidade de M8'`;
+confirmar seu envio por HEAD/upstream/remoto, sem commit artificial de autorreferência.
+
+#### Continuação — React na consulta POST única e seleção no servidor, 2026-11-12
+
+Novo `continue o projeto` autoriza continuidade de M8 deixando WEB-031 pendente.
+Base `d6d9dbb57310cc517f81e4d6a7d32a0b1fc4f0c3`; fetch confirmou main/origin/main
+`b5fccbb` e branch/upstream sem divergência. Reutilizada
+`feat/m8-consulta-aplicada-unica`, inicialmente no mesmo HEAD da branch
+`feat/web031-receptor-mint`. Alterações locais da WEB-031 e `.deploy-hostgator/`
+preservadas; somente hunks desta unidade entram no commit. Nenhum acesso à VPS,
+backup operacional, secret ou dado real. A restrição específica de merge do
+PR #18 continua alcançando a ancestralidade do PR #19.
+
+O dashboard agora aplica e pagina exclusivamente pelo POST analysis/query.
+Busca por substring literal do código do participante, precisão geral, faixas
+de RT mediano, exclusão explícita de RT ausente e ordenação são executadas no
+servidor, sobre métricas oficiais da avaliação completa hidratadas pelo domínio.
+Precisão e RT requerem instrumento Stroop exclusivo; limites inferiores são
+inclusivos, superiores exclusivos. RT nulo não vira zero; include_null_rt=true
+inclui essa população explicitamente, false exclui inclusive sem faixa. Busca
+não lê nome/iniciais e não faz pesquisa nominal, mesmo para administração.
+Status operacionais estão desabilitados na UI e seguem recusados pela API.
+Nenhuma mudança no motor, fórmulas, CSV científico, schema ou dependências.
+
+Cliente normaliza aliases e confere resposta fechada, consulta canônica,
+capacidades, contagens, IDs e metadados comuns entre páginas. Não publica totais
+até concluir todo conjunto. Fingerprint/query_id/prazo divergente, cursor
+repetido, duplicata, falha/limite ou expiração descartam o contexto completo;
+resposta atrasada não substitui outra geração. A expiração local também cancela
+detalhe/downloads e exige reaplicação, sem refresh silencioso. Navegar entre
+análise/histórico/exportação preserva contexto e rascunho somente em RAM.
+O consumidor deixou de aplicar filterAssessments/sortAssessments localmente;
+helpers antigos foram preservados para compatibilidade, sem uso nessa seleção.
+
+CSV básico preservado com legacy_export_context, tokens assinados das fontes de
+resumo obtidas na MESMA transação RO da consulta. Somente dimensões já suportadas
+pelo CSV v1 recebem esse contexto; busca/faixas/tentativas/exclusão de RT/seleção
+explícita não recebem token. Exports=false ainda identifica ausência de prévia/
+download v2. Não buscar snapshots por GET nem retirar filtros para exportar um
+conjunto maior. A rota antiga reautoriza e verifica suas fontes a cada download.
+
+Ambiente: Linux 7.0.0-42-generic, Python 3.12.3, Node 24.15.0/npm 11.16.0,
+Playwright 1.64.1, Chromium 156.0.8078.4/Firefox 157.0. PG 17.6 em container próprio
+`stroop_etapa4_test_m8_client`, tmpfs/porta loopback efêmera 32770, bancos
+`stroop_etapa4_test_m8_client` (HTTPS) e `stroop_etapa4_test_m8_regression` (Python).
+Todos exclusivamente sintéticos. Recursos temporários próprios serão removidos
+após a conferência; não instalar/atualizar pacotes nem acessar produção.
+
+Validações desta unidade:
+
+- `npm --prefix web test -- --reporter=dot`: **356/356**, 29 arquivos, zero skips.
+  Inclui parser fechado, transporte, ausência de fallback, faixas/aliases,
+  expiração e consumidores com respostas que ignoram cancelamento.
+- `npm --prefix web run build`: tipos/Vite aprovados; bundle
+  `index-B6iIW6SI.js`, CSS `index-Cd1eQ5rm.css`. Aviso histórico de chunk >500 kB
+  preservado (544,08 kB), sem mudar limites/dependências para escondê-lo.
+- Em web/, `WEB_TEST_PORT=4289 npx playwright test e2e/applied-query.spec.ts
+  e2e/research-filters.spec.ts e2e/dashboard.spec.ts e2e/aggregate-export.spec.ts
+  e2e/complete-results.spec.ts e2e/invitations.spec.ts e2e/imports.spec.ts
+  --workers=2 --trace=off --output=test-results/m8-post-query`: **78/78**, zero
+  skips, 1,6 min. Doubles HTTP; não são prova de autorização PG. Inclui larguras
+  360/768/1024/1366/1920, reflow 320, zoom 200%/400% nos filtros, sem constituir
+  checklist AA integral. Aviso histórico flushSync em Firefox persiste; também
+  observado aviso de atualização de ProfessionalAccess durante renderização em
+  fixture de sessão. Nenhum foi suprimido ou declarado corrigido nesta unidade.
+- `TEST_DATABASE_URL` no banco sintético de regressão,
+  `.venv/bin/python scripts/verify_web_ci.py python`: **461/461**, zero skips,
+  369,496 s. Resultado da árvore de trabalho com os arquivos locais preexistentes
+  da WEB-031; validação da versão exata enviada tem registro próprio no fechamento.
+- Em web/, `TEST_DATABASE_URL` no banco sintético HTTPS, `npx playwright test
+  --config playwright.integration.config.ts e2e/integrated/analysis-query.spec.ts
+  e2e/integrated/filters.spec.ts e2e/integrated/trial-filters.spec.ts
+  e2e/integrated/dashboard.spec.ts e2e/integrated/complete-results.spec.ts
+  e2e/integrated/aggregate-export.spec.ts
+  --output=test-results/m8-post-query-https-confirmed`: **20/20**, zero skips,
+  3,5 min, Chromium/Firefox. React compilado, HTTPS/proxy/API/PG/grants reais;
+  105 registros, projetos/páginas, alias, recorte misto, busca por código/faixas/
+  RT ausente, mesma tentativa, métricas completas, navegação sem reconsulta,
+  CSRF/revogação e CSV básico confrontados. Sem interceptar respostas.
+- Scanner `.venv/bin/python scripts/verify_web_ci.py sources`: **433 fontes
+  versionadas**, sem achados. Documentação/links/grafo, sete testes do verificador
+  e git diff --check: aprovados na árvore de trabalho; conferência do índice e fechamento abaixo.
+
+Falhas intermediárias preservadas: testes antigos ainda esperavam rejeição de
+patient_search/accuracy_min/include_null_rt no schema; agora verificam capacidades
+atuais e recusas residuais, além de novos casos de fronteira reais. Vitest inicial
+teve 337/342 por mocks GET antigos, seletor de placeholder e prazo sintético 2099
+que excedia timeout do browser; fixtures migradas ao POST e prazo de 15 min,
+342/342 antes dos novos testes e 356/356 na campanha final. Build seguinte recusou
+tipos platform inferidos como string nos doubles novos; fixadas as fixtures com
+literais, sem afrouxar tipos do produto. Primeiro teste de conflito do CSV alterava
+word, fora das fontes do resumo; corrigido para alterar RT que afeta o CSV.
+Foco API/schema final: **4/4**, 7,925 s, sem skips.
+Primeira integração interrompida após identificar espera antiga pelo GET:
+6 passes, timeout em complete-results e preparação de filters interrompida por
+SIGINT (10 não executados). Campanha seguinte teve 18 passes/2 falhas no teste
+novo que procurava a tabela de dashboard dentro de resultados; o módulo usa
+cartão de contagem próprio. Corrigida a assertiva por superfície, preservando
+contagens e exigência de não emitir nova consulta ao navegar. Sem aumentar
+limites/timeouts ou reduzir gates.
+
+Limites: catálogo residual inclui status operacionais, Go/No-Go, precisão Go/No-Go,
+RT médio e IDs cadastrais; campos sem capacidade são recusados, não ignorados.
+Busca nominal depende de seus gates próprios. Limite de 5.000 também vale para
+candidatos antes das faixas métricas: servidor recusa universo maior, não trunca.
+Não há novo dicionário/agregação científica ou exportação v2. Checklist UX7-AA,
+contraste e revisão com leitor de tela ainda não executados integralmente;
+Orca 46.1 disponível não significa revisão realizada. WEB-050 continua
+**EM_ANDAMENTO**, WEB-051 permanece PENDENTE e nenhum aceite é antecipado.
+Global **37/56**, M8 **2/12**. Próxima ação: completar catálogo/capacidades da
+WEB-050 e seu checklist UX7-AA antes do aceite; WEB-048 permanece independente
+PRONTA. WEB-031 segue bloqueada externamente e impede WEB-032; não avançar M9.
+
+#### Fechamento Git e conferência da entrega isolada — 2026-11-12
+
+Entrega **`7cc3562e4daef7220000b160121105bba45a509c`**, 32 arquivos, na branch
+`feat/m8-consulta-aplicada-unica`; push com upstream confirmado por igualdade
+HEAD/upstream/ls-remote. Nenhum arquivo/hunk da WEB-031, material de deploy,
+backup, credencial ou coleta entrou no commit. A evidência local anterior da
+WEB-031 permanece na árvore de trabalho; somente as atualizações desta unidade
+foram extraídas para o índice nos documentos compartilhados.
+
+Conferência adicional em checkout separado, exatamente **7cc3562**, sem os
+arquivos alterados da WEB-031: `TEST_DATABASE_URL` no banco descartável de
+regressão, `.venv/bin/python scripts/verify_web_ci.py python`: **459/459**,
+zero falhas/skips, **356,455 s**. Os **461/461** acima pertencem à árvore com
+trabalho preexistente; não são a contagem desse commit. Documentação do checkout:
+**88 documentos/727 links/112 âncoras**, sete testes do validador aprovados,
+diff check limpo. No índice antes do commit, catálogo/links também conferidos
+por leitura dos blobs indexados; a árvore com material local adicional contou
+90 documentos/729 links/114 âncoras, sem transferir esses arquivos à entrega.
+Fontes api/stroop/web e os testes desta unidade permaneceram idênticos ao commit
+após os testes frontend/HTTPS. Capturas sintéticas de filtros em Chromium 360 e
+Firefox 1366 inspecionadas; não equivalem ao checklist AA integral. Nenhuma
+baseline visual atualizada para esconder achado.
+
+Container PG, seus dois bancos sintéticos e checkout temporário próprios
+removidos após a validação. Cliente/timer/arquivos locais da WEB-031 e demais
+recursos preexistentes preservados. Sem deploy, tag, release, dados reais ou M9.
+
+[PR #19](https://github.com/thiagorraposo/stroop-test-web/pull/19) atualizado,
+**draft aberto**, auto-merge desabilitado. `verify` de **7cc3562** estava
+**IN_PROGRESS** na consulta de fechamento, execução
+[43300961985](https://github.com/thiagorraposo/stroop-test-web/actions/runs/43300961985).
+Não é CI aprovada. O commit documental de fechamento recebe check próprio;
+consultar o SHA final sem transferir aprovação de outra revisão. PR #18 continua
+aberto sem merge; sua ancestralidade não foi integrada indiretamente. A base
+d6d9dbb teve verify SUCCESS (run 43136417744), preservado apenas historicamente.
+
+Registro de fechamento identificável por `git log -1 --format=%H
+--grep='docs(web): registra validação isolada da consulta POST'`; confirmar
+HEAD/upstream/remoto sem commit artificial de autorreferência. WEB-050 segue
+EM_ANDAMENTO, global 37/56 e M8 2/12. Próxima ação funcional preservada: catálogo
+residual/capacidades e UX7-AA antes do aceite; WEB-048 independente PRONTA e
+WEB-031 BLOQUEADA externamente.
 
 ### WEB-051 — Consolidar seleção analítica autorizada e agregações no servidor
 
@@ -3089,7 +3859,148 @@ não inferir ausência de problema por falta de reprodução PG nesta missão.
 
 ## Retomada
 
-### Retomada vigente — replanejamento integrado CHG-007, 2026-11-11
+### Retomada vigente — integração GitHub Flow das pendências, 2026-11-12
+
+Solicitação explícita do proprietário: executar o GitHub Flow completo até o
+merge na main de todas as entregas pendentes. Esta autorização substitui as
+orientações anteriores de manter PR #18 aberto e PR #19 draft, sem antecipar
+aceites funcionais, M9 ou deploy. PR #18 integrado por Merge Commit tradicional
+`19c22286de7e4dbc3171e36c5d6b44475eca7e88`, após verify aprovado na revisão
+`67dfbf7`. Auto-merge permanece desabilitado.
+
+Branch de integração reutilizada `feat/m8-consulta-aplicada-unica`. Preparação
+local WEB-031 versionada em `469e2cf`, após 43 testes de backup/replicação/
+monitoramento/configuração/documentação aprovados sem skips, documentação
+válida e scanner de 434 fontes aprovado. Evidências anteriores da WEB-031
+permanecem históricas; instalador/timer não foram executados nesta sessão.
+`.deploy-hostgator/` preservado e ignorado, fora do staging e do envio por ser
+material operacional local. Nenhum dado, backup ou credencial versionado.
+
+PR #19 consolida os commits originais dos PRs #16/#17 por merge normal, além
+da consulta POST e da preparação WEB-031. Conflitos no dashboard resolvidos
+mantendo filtros/aplicação/CSV do POST e as visualizações do redesign.
+Conflito no backlog preserva os registros anteriores como históricos.
+Revisão encontrou no #17 dispensa de vínculo por projeto para administradores
+e concessão automática a todos os projetos no bootstrap/recovery; essas
+alterações foram retiradas da árvore integrada conforme a fronteira canônica
+de acesso por projeto. Teste negativo comprova recusa de cadastro/listagem
+sem vínculo, inclusive para administrador. A falha anterior do #17 em
+`test_upgrade_preserva_identidades_e_vinculos_historicos` fica registrada;
+o teste original permanece integral, sem afrouxar sua asserção.
+
+Validação local da integração: 361 testes Vitest, tipos/build e 11 testes de
+deploy/rollback sintéticos aprovados. Build mantém aviso de bundle acima de
+500 kB. Primeira rodada focada Chromium/Firefox: 70 aprovados e duas falhas
+de reflow. Corrigidas colunas mínimas dos gráficos/cartões sem ocultar conteúdo;
+reexecução dos dois casos em 320px e zoom 400% aprovada nos dois navegadores.
+Suíte Python integral via `verify_web_ci.py python`: 473 testes aprovados em
+179,327 s, sem falhas/skips, com PostgreSQL 17.6 descartável
+`stroop_etapa4_test_flow`. Scanner final: 441 fontes aprovadas. Documentação:
+89 documentos/736 links/114 âncoras, sem ciclos. CI do PR consolidado ainda não
+executada nesta revisão; conferir o SHA final antes do merge.
+
+Continuação da integração: push de `7659bcd5222af82be6bc78c7b4c5fc2df9e28bbc`
+confirmado no upstream, PR #19 pronto para revisão e auto-merge nulo. A execução
+[43328289129](https://github.com/thiagorraposo/stroop-test-web/actions/runs/43328289129)
+aprovou scanner, Python, frontend/build, auditorias e navegadores, mas falhou
+em HTTPS: 50 aprovados e dois timeouts do teste de resultados completos.
+Causa conferida: o redesign alterou o nome acessível do seletor longitudinal.
+Restaurado o rótulo anterior “Participante para evolução”; o teste também
+exercita explicitamente a navegação para a aba de visitas. Primeira tentativa
+local só com navegação continuou esperando o rótulo anterior e foi interrompida;
+após restaurá-lo, os dois testes HTTPS/API/PostgreSQL reais passaram, Chromium
+6,3 s e Firefox 10,2 s (20,4 s total). Nenhuma asserção ou timeout reduzido.
+Vitest reexecutado: 361/361 aprovados; tipos/build aprovados.
+
+CI do merge #18 na main aprovada na execução
+[43327628320](https://github.com/thiagorraposo/stroop-test-web/actions/runs/43327628320).
+A revisão corrigida seguirá no mesmo PR. Resultado final de envio, SHA, check
+e Merge Commit tradicional verificável no
+[PR #19](https://github.com/thiagorraposo/stroop-test-web/pull/19) e na execução
+WEB validada do SHA integrado na main; a falha anterior não foi omitida ou
+substituída por passe de outro SHA. Este registro não antecipa o resultado
+remoto da correção. O fechamento Git é identificável por
+`git log -1 --format=%H --grep='fix(web): preserva rótulo acessível da evolução no redesign'`;
+confirmar HEAD/upstream antes do merge. Não gerar commit de autorreferência.
+
+Progresso permanece 37/56 e M8 2/12. WEB-050 EM_ANDAMENTO (catálogo residual e
+UX7-AA), WEB-048 PRONTA, WEB-031 BLOQUEADA (origem/hostkey, aprovação/custódia e
+medição externa), WEB-032 PENDENTE. Próxima ação desta sessão: concluir testes,
+enviar integração, aguardar verify e fazer merge tradicional; depois main
+local por fast-forward. Próxima implementação segue essas fichas mediante
+continuidade autorizada; nenhuma operação na VPS decorre desta integração.
+
+### Retomada anterior — continuidade M8 e consulta POST integrada, 2026-11-12
+
+Encerramento explícito solicitado pelo proprietário após a entrega: encerrar a
+execução sem aguardar CI; deixar o GitHub executar e conferir os resultados em
+outra sessão. Commits `7cc3562` (implementação) e `b10015e` (validação/fechamento)
+enviados, HEAD/upstream/remoto conferidos em b10015e antes deste registro.
+PR #19 permanece draft e sem merge; auto-merge desabilitado. CI final não
+reconsultada neste encerramento, sem alegar aprovação. Na próxima retomada,
+conferir os checks da revisão enviada antes de decidir qualquer integração.
+Este registro será enviado na mesma branch; a CI correspondente segue no GitHub,
+sem monitoramento ou execução local mantida aberta. WEB-031 local preservada.
+
+Novo `continue o projeto` retoma M8 pela WEB-050 e mantém WEB-031 pendente.
+React passou a aplicar/paginar pelo POST único; filtros disponíveis e ordenação
+executados no servidor, com expiração e integridade entre páginas. CSV básico
+preservado por snapshots da mesma leitura; recortes avançados sem fallback.
+Evidências, comandos, falhas e limites na continuação EV-M8-050 de 2026-11-12.
+WEB-050 EM_ANDAMENTO: completar catálogo residual/capacidades e UX7-AA antes de
+aceitar. WEB-048 continua PRONTA e independente; WEB-031 BLOQUEADA por origem,
+autorização, custódia e medição externas, sem impedir esse ramo. WEB-032 pendente.
+37/56 aceitos, M8 2/12; nenhuma autorização de M9, deploy ou dados reais.
+
+Branch reutilizada feat/m8-consulta-aplicada-unica, base d6d9dbb; alterações locais
+da WEB-031 preservadas sem staging/commit/envio e .deploy-hostgator/ intacto.
+PR #18 permanece aberto sem merge; PR #19 draft, sem integrar essa ancestralidade.
+Consultar fechamento da evidência para SHA/push/check próprios da entrega.
+
+### Retomada anterior — WEB-031 local autorizada, 2026-11-12
+
+Proprietário autorizou notebook Mint como receptor temporário, configuração
+local e ensaios exclusivamente sintéticos; vedou mudanças na VPS sem aprovação
+específica. Preparação e provas em EV-M8-031-MINT. Timer local habilitado com
+Linger; origem ainda não configurada, alerta esperado de indisponibilidade.
+**WEB-031 BLOQUEADA** por origem/hostkey, instalação SSH restrita a aprovar,
+custódia e medição externas. Notebook intermitente não comprova RPO 24 h;
+RTO 4 h não presumido. Procedimento/pacote concretos prontos para aprovação.
+Não conectar/alterar a VPS nem promover configuração sintética a operacional
+por inferência. Próxima ação dependente: proprietário fornece dados públicos
+da conexão/fingerprint e aprova os passos do runbook; continuar o ensaio
+sintético externo somente após isso. Reinício real do notebook não ensaiado.
+
+Branch `feat/web031-receptor-mint`, base `d6d9dbb`; sem commit/push/PR/CI/merge
+nesta unidade, alterações disponíveis para revisão. Mantidos PR #18 sem merge,
+PR #19 draft e `.deploy-hostgator/`; Ambulatório CPS intacto. WEB-050 conserva
+seu trabalho e próximo passo da retomada anterior; WEB-048 independente.
+37/56 aceitos e M8 2/12 preservados, sem autorização de M9/deploy/dados reais.
+
+### Retomada anterior — execução M8 autorizada, 2026-11-11
+
+Novo `continue o projeto` autoriza M8 e suas tarefas prontas e sucessoras,
+sem avançar M9 ou autorizar operações externas. WEB-050 EM_ANDAMENTO: núcleo de
+consulta aplicada/cancelamento, multisseleção de instrumentos e condição/resposta
+na mesma tentativa implementados; entrada POST com capacidades parciais disponível.
+Completar migração React, catálogo integral e UX7-AA antes do aceite.
+Evidências e fechamento em EV-M8-050; próximo trabalho exato é ampliar as
+capacidades do seletor e migrar consumidores React ao POST único, preservando
+rejeição explícita dos recortes sem suporte; completar UX7-AA da ficha.
+WEB-048 continua disponível independentemente.
+Unidades `07473b9`, `7f43295`, condição/resposta e entrada POST normalizada; evidência atual em EV-M8-050. PR #19 draft aberto,
+sem merge; verify anterior b4382e6 falhou no caso CSP Chromium (diagnóstico local
+12/12 não explica a causa). Consultar fechamento atual para push/check por SHA.
+Não integrar indiretamente a ancestralidade do PR #18.
+WEB-048 permanece PRONTA; WEB-031 BLOQUEADA pelo destino externo/custódia.
+37/56 aceitos preservados; nenhum aceite concedido no início da execução.
+Branch `feat/m8-consulta-aplicada-unica` deriva de `67dfbf7` (CHG-007), pois
+as fichas/contratos ainda não estão em main. PR #18 permanece aberto **sem
+merge**, conforme instrução específica preservada; não integrar indiretamente
+sua ancestralidade por outro PR. PRs #16/#17 e `.deploy-hostgator/` preservados.
+
+
+### Retomada anterior — replanejamento integrado CHG-007, 2026-11-11
 
 Missão atual: `replanejar`, **somente documentação**. M0–M7 mantêm aceites;
 M8 passa a 2/12, M9 0/4 e M10 0/5. Global 37/56 (66,1%), 19 sem aceite,
@@ -3111,6 +4022,34 @@ Instrução final do proprietário: **manter PR #18 aberto, sem merge**, mesmo s
 verify aprovar. Retomada da implementação depende da autorização posterior já
 indicada; integração deste PR requer nova instrução explícita.
 
+### Retomada anterior — implementação de mecanismos de deploy controlado na VPS HostGator (GitHub Flow), 2026-11-09
+
+Implementação e documentação dos mecanismos de implantação para a VPS HostGator (`strooptest.thiagorraposo.dev`),
+integrados ao GitHub Flow adotado pelo projeto Stroop:
+**Branch → Commit → Push → Pull Request → CI verify → Merge Commit na main → Deploy controlado**.
+
+Entregáveis técnicos implementados:
+1. **Pipeline de Deploy no GitHub Actions:** workflow [deploy.yml](../.github/workflows/deploy.yml) protegido
+   pelo Environment `production`, acionado exclusivamente sob demanda (`workflow_dispatch`), sem duplicar os testes da CI
+   (`web.yml`) e sem gatilho automático pós-merge.
+2. **Utilitário Canônico de Deploy e Validação:** script [`scripts/deploy_vps.py`](../scripts/deploy_vps.py) com subcomandos
+   `validate`, `deploy`, `rollback` e `healthcheck`. Valida o SHA exato de 40 dígitos, confirma se o commit pertence à `main`
+   e se o check `verify` foi aprovado com sucesso na CI do GitHub antes de autorizar qualquer operação. Suporta modo simulação
+   (`--dry-run`), snapshot pré-deploy, atualização atômica de symlink e rollback automático em falha de healthcheck.
+3. **Mecanismo de Rollback da Aplicação WEB:** script [`deploy/vps-web-rollback.sh`](../deploy/vps-web-rollback.sh) para reversão
+   rápida de release (RTO < 30s) na VPS, preservando integralmente o PostgreSQL, volumes persistentes, certificados e secrets.
+4. **Documentação Operacional Canônica:** atualização completa de [DEPLOY_WEB_VPS](operacao/DEPLOY_WEB_VPS.md), detalhando a
+   configuração de Secrets e proteção do Environment `production`, execução manual de deploy, verificação de SHA, investigação
+   de falhas e critérios técnicos/metodológicos para habilitar Continuous Deployment no futuro.
+
+Progresso global do projeto: **37/48 entregáveis aceitos (77,1%)**, 11 sem aceite.
+Os marcos **M8** (2/4 aceitos, `WEB-031` bloqueada, `WEB-032` pendente), **M9** (0/4) e **M10** (0/5) permanecem estritamente
+preservados com seus estados e critérios originais. A implantação de releases em ambiente de produção permanece reservada ao marco M10.
+
+Próxima ação exata: aprovação do Pull Request da branch `feat/deploy-vps-github-flow`, merge via Merge Commit tradicional na `main`,
+e posterior autorização formal do responsável pelo repositório para início das tarefas pendentes de **M8** (`WEB-031` e `WEB-032`).
+
+Git da entrega: branch `feat/deploy-vps-github-flow`.
 
 ### Retomada anterior — conclusão do marco M7: Integração, compatibilidade histórica e transição (WEB-025 a WEB-028), 2026-11-09
 
@@ -4093,7 +5032,7 @@ Escopo: nove documentos Markdown; nenhuma suite funcional reexecutada.
 CI da branch consultada: nenhuma execução; não equivale a aprovação funcional.
 Sem PR, merge, deploy, instalação, migration ou acesso a dados reais.
 
-Checkout de desenvolvimento: `/home/raposo/Projetos/experimentos-psicopy/stroop-cognifit`.
+Checkout de desenvolvimento: `/home/raposo/Projetos/experimentos-psicopy/stroop-test-web`.
 Worktree sintética M1 `/tmp/stroop-m1-baseline-20261104` preservada em HEAD
 destacada; não repetir baseline global sem divergência concreta.
 

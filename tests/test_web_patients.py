@@ -445,6 +445,20 @@ class WebPatientsPostgresTests(unittest.TestCase):
             422,
         )
 
+    def test_administrador_sem_vinculo_nao_acessa_cadastros_do_projeto(self) -> None:
+        with psycopg.connect(self.database_url) as connection:
+            connection.execute(
+                "DELETE FROM web_project_members WHERE subject = %s",
+                (helpers.ADMIN,),
+            )
+        created = self.h.admin.post(
+            "/api/v1/patients",
+            json={"full_name": "Paciente sintetico sem autorizacao"},
+        )
+        self.assertEqual(created.status_code, 403, created.text)
+        listed = self.h.admin.get("/api/v1/patients")
+        self.assertEqual(listed.status_code, 403, listed.text)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -5,10 +5,10 @@ export type ScopedAssessment = Assessment & { project_id: string }
 export function ResultsTable({ rows, projects, onDetail }: {
   rows: ScopedAssessment[]; projects: Project[]; onDetail(row: ScopedAssessment): void
 }) {
-  const stroop = rows[0]?.test_code === 'stroop_go_nogo_ptbr'
+  const stroop = rows.length > 0 && rows.every(row => row.test_code === 'stroop_go_nogo_ptbr')
   return <div className="table-scroll"><table className={stroop ? 'results-table stroop-results' : 'results-table'}>
     <caption>Avaliações filtradas</caption>
-    <thead><tr><th>Projeto</th><th>Participante</th><th>Visita</th><th>Início</th><th>Plataforma</th><th>Avaliador</th><th>Versão</th>
+    <thead><tr><th>Projeto</th><th>Participante</th><th>Visita</th><th>Início</th><th>Plataforma</th><th>Avaliador</th><th>Instrumento</th><th>Versão</th>
       {stroop && <><th>Precisão (%)</th><th>Precisão Go (%)</th><th>Precisão No-Go (%)</th><th>Omissões</th><th>Comissões</th><th>Acertos</th><th>Rejeições corretas</th><th>RT mediano (s)</th></>}
       <th>Detalhe</th></tr></thead>
     <tbody>{rows.map(row => <tr key={`${row.project_id}:${row.assessment_id}`}>
@@ -22,7 +22,7 @@ export function ResultsTable({ rows, projects, onDetail }: {
         </span>
       </td>
       <td>{row.evaluator_id ?? 'Legado sem identificação técnica'}</td>
-      <td className="tabular-nums">{row.test_version}</td>
+      <td>{row.test_code}</td><td className="tabular-nums">{row.test_version}</td>
       {stroop && 'accuracy' in row.summary && <>
         <td className="tabular-nums">{number(row.summary.accuracy, 1)}</td>
         <td className="tabular-nums">{number(row.summary.accuracy_go_trials, 1)}</td>

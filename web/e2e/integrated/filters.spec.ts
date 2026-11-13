@@ -14,9 +14,11 @@ test('filtros combinados entre projetos contam codigos coincidentes e descartam 
   const prepared = manage({})
   await context.addCookies([{ name: prepared.cookie_name, value: prepared.token, domain: '127.0.0.1', path: '/', secure: true, httpOnly: true, sameSite: 'Lax' }])
   const requests: URL[] = []
+  const queries: { query: { projects: string[]; filters: Record<string, unknown> }; page: { cursor?: string } }[] = []
   page.on('request', request => {
     const url = new URL(request.url())
     if (url.pathname.includes('/assessments')) requests.push(url)
+    if (url.pathname === '/api/v1/analysis/query') queries.push(request.postDataJSON())
   })
   await page.goto('/equipe')
   await page.getByRole('combobox', { name: 'Projeto', exact: true }).selectOption(prepared.projects[0]!)
@@ -45,13 +47,14 @@ test('filtros combinados entre projetos contam codigos coincidentes e descartam 
   await page.evaluate(() => { document.documentElement.style.zoom = '' })
   await page.setViewportSize({ width: 1280, height: 720 })
   await expect(card('Participantes únicos')).toHaveText('103')
-  expect(requests.some(url => url.searchParams.has('cursor'))).toBe(true)
+  expect(queries.some(body => body.page.cursor)).toBe(true)
   expect(requests.filter(url => url.pathname.endsWith('/assessments/options')).length).toBeGreaterThanOrEqual(2)
 
+  await form.getByText('Filtros avançados e ordenação', { exact: true }).click()
   await form.getByLabel('Data inicial', { exact: true }).fill('2026-10-01')
   await form.getByLabel('Data final', { exact: true }).fill('2026-10-03')
-  await expect(form.getByLabel('Instrumento da consulta')).toContainText('stroop_go_nogo_ptbr')
-  await form.getByLabel('Instrumento da consulta').selectOption('stroop_go_nogo_ptbr')
+  await expect(form.getByRole('listbox', { name: 'Instrumento da consulta', exact: true })).toContainText('stroop_go_nogo_ptbr')
+  await form.getByRole('listbox', { name: 'Instrumento da consulta', exact: true }).selectOption('stroop_go_nogo_ptbr')
   await form.getByRole('listbox', { name: 'Participantes (códigos)', exact: true }).selectOption(['P_SINTETICO_W15'])
   await form.getByRole('listbox', { name: 'Visitas', exact: true }).selectOption(['V_SINTETICA'])
   await form.getByRole('listbox', { name: 'Avaliadores (identificação técnica)', exact: true }).selectOption(['LEGADO_NAO_MAPEADO'])
@@ -74,17 +77,18 @@ test('filtros combinados entre projetos contam codigos coincidentes e descartam 
   await page.locator('.dashboard-cards').screenshot({ path: '/tmp/stroop-w15a-cards.png' })
   await expect(table).toContainText('2026-10-01T12:00:00')
   await expect(table).toContainText('2026-10-03T12:00:00')
-  const combined = requests.filter(url => url.pathname.endsWith('/assessments') && url.searchParams.get('test_version') === 'synthetic.1')
-  expect(new Set(combined.map(url => url.pathname.split('/')[4])).size).toBe(2)
-  for (const url of combined) {
-    expect(Object.fromEntries(url.searchParams)).toMatchObject({ start_date: '2026-10-01', end_date: '2026-10-03',
-      test_code: 'stroop_go_nogo_ptbr', participant_id: 'P_SINTETICO_W15', visit: 'V_SINTETICA',
-      evaluator_id: 'LEGADO_NAO_MAPEADO', test_version: 'synthetic.1', platform: 'psychopy' })
+  const combined = queries.filter(body => (body.query.filters.test_version as string[] | undefined)?.includes('synthetic.1'))
+  expect(combined.length).toBeGreaterThan(0)
+  for (const body of combined) {
+    expect(new Set(body.query.projects)).toEqual(new Set(prepared.projects))
+    expect(body.query.filters).toMatchObject({ date_from: '2026-10-01', date_to: '2026-10-03',
+      test_code: ['stroop_go_nogo_ptbr'], participant_code: ['P_SINTETICO_W15'], visit: ['V_SINTETICA'],
+      evaluator_id: ['LEGADO_NAO_MAPEADO'], test_version: ['synthetic.1'], platform: ['psychopy_local'] })
   }
   // A primeira consulta ainda funciona; falha real no segundo projeto invalida tudo.
   manage({ action: 'membership', project_id: prepared.projects[1], subject: prepared.subject, active: false })
   await form.getByRole('button', { name: 'Aplicar filtros', exact: true }).click()
-  await expect(page.getByRole('alert')).toContainText('O recurso solicitado não está disponível.')
+  await expect(page.locator('.professional-dashboard > p[role=alert]')).toHaveText('O recurso solicitado não está disponível.')
   await expect(table).toHaveCount(0)
   await expect(page.locator('.dashboard-cards')).toHaveCount(0)
   manage({ action: 'membership', project_id: prepared.projects[1], subject: prepared.subject, active: true })
@@ -97,5 +101,7 @@ test('filtros combinados entre projetos contam codigos coincidentes e descartam 
   await expect(page.getByText('Nenhuma avaliação corresponde aos filtros.', { exact: true })).toBeVisible()
   await expect(table).toHaveCount(0)
   await form.getByRole('button', { name: 'Limpar filtros', exact: true }).click()
+  await expect(table).toHaveCount(0)
+  await form.getByRole('button', { name: 'Aplicar filtros', exact: true }).click()
   await expect(table.locator('tbody tr')).toHaveCount(102)
 })

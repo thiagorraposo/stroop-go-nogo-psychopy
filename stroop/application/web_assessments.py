@@ -1,6 +1,7 @@
 """Consulta profissional com projecoes fechadas e exportacao minimizada."""
 from __future__ import annotations
 
+from datetime import datetime
 from uuid import UUID
 
 from stroop.domain.auth import AppUser
@@ -140,3 +141,81 @@ def session_status(database_url, project_id, session_id, actor):
     if item is None:
         raise MissingError
     return item
+
+
+def analysis_query(database_url, actor, *, query, filters, sort, offset, size, snapshot=None):
+    """Projeção de A/T sem combinar métricas oficiais entre instrumentos."""
+    from stroop.domain.stroop import expected_outcome
+    allowed, rows, trials, content, sources = persistence.analysis_selection(
+        database_url, [UUID(project) for project in query['projects']], actor.issuer, actor.subject,
+        filters=filters, assessment_ids=query.get('assessment_ids'))
+    if not allowed:
+        raise MissingError
+    if snapshot is not None and snapshot != content:
+        raise SnapshotConflict
+    # Métricas oficiais de TODA a avaliação já hidratadas pelo domínio, sem
+    # calcular precisão/RT sobre o recorte de tentativas ou ler nomes.
+    criteria = query['filters']
+    def eligible(row):
+        summary = row['summary']
+        for lower, upper, field, factor in (
+                ('accuracy_min', 'accuracy_max', 'accuracy', 1),
+                ('rt_median_min_ms', 'rt_median_max_ms', 'response_time_seconds', 1000)):
+            if lower not in criteria and upper not in criteria:
+                continue
+            value = summary.get(field)
+            if value is None:
+                if field == 'response_time_seconds' and criteria.get('include_null_rt', True):
+                    continue
+                return False
+            if lower in criteria and value * factor < criteria[lower]:
+                return False
+            if upper in criteria and value * factor >= criteria[upper]:
+                return False
+        return criteria.get('include_null_rt', True) or summary.get('response_time_seconds') is not None
+    rows = [row for row in rows if eligible(row)]
+    selected_ids = {row['assessment_id'] for row in rows}
+    if query.get('assessment_ids') is not None and not set(query['assessment_ids']) <= selected_ids:
+        raise SnapshotConflict
+    selected_trials = []
+    for trial in trials:
+        if trial['assessment_id'] not in selected_ids:
+            continue
+        if filters.get('condition') and trial['condition'] not in filters['condition']:
+            continue
+        if filters.get('response_type'):
+            outcome = expected_outcome({'condition': trial['condition'], 'key_pressed': trial['key_pressed'] or ''})
+            if outcome is None or outcome[2] not in filters['response_type']:
+                continue
+        selected_trials.append(trial)
+    counts = {
+        'participants': len({(str(row['project_id']), row['participant_id']) for row in rows}),
+        'visits': len({(str(row['project_id']), row['participant_id'], row['visit']) for row in rows}),
+        'assessments': len(rows), 'trials': len(selected_trials),
+    }
+    # Desempate estável; nenhuma identidade é unida por nome/código.
+    rows.sort(key=lambda row: (str(row['project_id']), row['assessment_id']))
+    def date_key(row):
+        value = datetime.fromisoformat(persistence.iso_utc(row['started_at']).replace('Z', '+00:00'))
+        # iso_utc normaliza valores com fuso e preserva legado sem fuso.
+        return (value.year, value.month, value.day, value.hour, value.minute, value.second, value.microsecond)
+    key = {'participant_code_asc': lambda row: row['participant_id'],
+           'participant_code_desc': lambda row: row['participant_id'],
+           'visit_asc': lambda row: row['visit']}.get(sort, date_key)
+    if sort.startswith(('accuracy_', 'response_time_')):
+        field = 'accuracy' if sort.startswith('accuracy_') else 'response_time_seconds'
+        # Ausentes sempre ao fim, em ambas as direções; preserva desempate.
+        present = [row for row in rows if row['summary'].get(field) is not None]
+        absent = [row for row in rows if row['summary'].get(field) is None]
+        present.sort(key=lambda row: row['summary'][field], reverse=sort.endswith('_desc'))
+        rows = present + absent
+    else:
+        rows.sort(key=key, reverse=sort.endswith('_desc'))
+    aggregates = []
+    for project in query['projects']:
+        scoped = [row for row in rows if str(row['project_id']) == project]
+        ids = {row['assessment_id'] for row in scoped}
+        aggregates.append({'project_id': project, 'assessments': len(scoped),
+                           'trials': sum(trial['assessment_id'] in ids for trial in selected_trials)})
+    return {'content_fingerprint': content, 'legacy_snapshots': sources, 'counts': counts, 'aggregates': aggregates,
+            'items': [{**_base(row), 'project_id': str(row['project_id'])} for row in rows[offset:offset + size]]}

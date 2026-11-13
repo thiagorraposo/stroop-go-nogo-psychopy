@@ -4,6 +4,104 @@ Fatos datados; estado/aceite vigentes somente no [backlog canônico](Projeto%20S
 Entradas antigas preservam política e evidências de suas datas; não constituem
 comandos atuais nem resultados reexecutados.
 
+## 2026-11-12 — Consolidação das entregas pendentes pelo GitHub Flow
+
+Solicitação explícita de integrar as pendências à main por Merge Commit
+tradicional. Consolidados redesign, mecanismos manuais de deploy, consulta
+POST e preparação de réplica, preservando os commits originais. Resolvidos
+conflitos de apresentação/consulta e preservado o acesso por vínculo de
+projeto, inclusive para administradores. Corrigido reflow dos gráficos em
+telas estreitas/zoom sem reduzir verificações existentes. Resultados por SHA,
+PRs, CI, limites e continuidade registrados somente no backlog canônico.
+Nenhum deploy, configuração operacional ou aceite funcional novo implícito.
+
+## 2026-11-12 — Consulta aplicada React pelo POST analítico
+
+Dashboard migrou a aplicação/paginação para o POST único, com validação de
+contexto completo, descarte de páginas inconsistentes e expiração em RAM.
+Busca por código, faixas de precisão/RT mediano, RT ausente e ordenação agora
+selecionam no servidor usando métricas oficiais da avaliação inteira. CSV
+básico preservado por tokens do mesmo snapshot; recortes novos sem fallback
+para exportar população maior. Estados sem suporte permanecem indisponíveis.
+
+Testes de estado/parser/consumidor, navegador e integração HTTPS/API/PostgreSQL
+sintética registrados em EV-M8-050 no backlog canônico, com falhas e limites.
+Sem alteração de protocolo/fórmula/migration/dependência ou acesso operacional;
+trabalho local anterior da réplica preservado.
+
+## 2026-11-12 — Receptor Mint e provas sintéticas da WEB-031
+
+Preparado receptor privado com chave SSH exclusiva, cliente instalado em
+release identificada por conteúdo e timer systemd horário, retomada no boot,
+prioridade reduzida e limites de CPU/memória. Último resultado sanitizado
+persistido atomicamente para identificar falhas sem serviço externo. Origem
+SSH não configurada; conexão e qualquer alteração na VPS aguardam os dados e
+a aprovação específica exigida pelo proprietário.
+
+Ensaio de recuperação ampliado para cadastros/vínculos e comparação de conteúdo
+em 21 tabelas. SSH real local, idempotência, hostkey incorreta, timer/alertas,
+restauração positiva/negativa, rollback e recuperação de senha/sessões testados
+exclusivamente em recursos sintéticos descartáveis. Medidas, falhas anteriores,
+limitações do notebook intermitente e condições de continuidade registrados
+em EV-M8-031-MINT no backlog canônico. Nenhuma alteração em dados reais,
+serviços/certificados/bancos operacionais, migrations ou dependências do host.
+
+Na mesma data, a pedido do proprietário, a entrega foi desfeita de forma
+reversível e depois recuperada integralmente da cópia privada. Arquivos,
+release, permissões, branch e timer local conferidos; imagem de teste
+reconstruída por cache com runtime idêntico e nova atestação. Os ensaios
+funcionais anteriores não foram repetidos; nenhuma conexão à VPS ocorreu.
+
+## 2026-11-11 — Entrada analítica normalizada por POST (WEB-050)
+
+Adicionada entrada fechada de consulta com aliases canônicos, capacidades
+explícitas, seleção de avaliações e paginação assinada. O seletor reautoriza todos
+os projetos em uma transação somente leitura, distingue avaliações completas de
+tentativas filtradas e preserva o cálculo oficial. Campos sem suporte são
+recusados; não habilita busca nominal ou exportação v2. Adicionados testes de
+contrato, PostgreSQL e HTTPS nos dois navegadores. Contrato e matriz atualizados;
+evidências, limites e continuidade somente no backlog canônico.
+
+## 2026-11-11 — Condição e resposta na mesma tentativa (WEB-050)
+
+A consulta aplicada recebe multisseleções pesquisáveis de condição congruente/
+incongruente e das quatro respostas canônicas. A seleção é feita no PostgreSQL
+por uma única tentativa principal, com classificação derivada do domínio Python
+oficial. Retirado o filtro React que usava totais da avaliação como aproximação.
+Métricas da avaliação completa preservadas; prática não participa. Capacidade
+inicial exige instrumento Stroop explícito e exclusivo; recortes não suportados
+e exportação agregada legada com esses campos são recusados. Cursor e snapshot
+vinculam a seleção integral. Testes sintéticos cobrem conjunção, OR, paginação,
+mutação, revogação e fluxo HTTPS nos dois navegadores. Contrato e matriz alinhados;
+evidências, limites e continuidade somente no backlog canônico. Sem alteração de
+paradigma, fórmulas, schema, dependências ou recursos operacionais.
+
+## 2026-11-11 — Multisseleção de instrumentos na consulta aplicada (WEB-050)
+
+O catálogo React passa a selecionar vários instrumentos com busca, mantendo
+rascunho/aplicada e chips. API e SQL tratam os instrumentos como alternativas
+na mesma consulta, com o recorte completo vinculado a cursor e snapshot.
+O CSV agregado conserva esse vínculo e a projeção por instrumento; clientes
+anteriores com instrumento único permanecem compatíveis. Testes negativos
+cobrem troca de recorte, limite de opções e revogação. Motor, fórmulas, schema
+e dependências preservados. Resultados e limites do aceite no backlog canônico.
+
+## 2026-11-11 — Consulta aplicada compartilhada (WEB-050)
+
+Autorização posterior de M8 inicia implementação de CHG-007. Consulta e rascunho
+em RAM passam a ser compartilhados entre os módulos analíticos; limpar/remover
+chips exige Aplicar, com descarte explícito. Instrumento/versão/plataforma
+pertencem ao mesmo recorte. Cancelamento impede respostas e downloads antigos;
+falhas invalidam o conjunto completo. Multisseleção ganha busca de opções e
+filtros avançados ficam sob expansão. Projeto de preparação mantém contexto
+separado. Exportação agregada recusa filtros avançados não suportados e a UI
+avançada fica desabilitada até vínculo servidor/seleção em WEB-051/053.
+
+Sem novo payload/endpoint, fórmula, dependência, migration ou CSS experimental.
+Testes de estado/consumidor e jornadas existentes acompanham a nova aplicação
+explícita; evidências, aceite, limites e Git somente no backlog canônico.
+PR documental #18 preservado aberto sem merge; nenhum deploy decorrente.
+
 ## 2026-11-11 — Replanejamento integrado CHG-007
 
 Missão documental do proprietário integra identidade pública Stroop Test Web,

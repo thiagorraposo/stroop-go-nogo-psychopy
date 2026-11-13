@@ -11,6 +11,7 @@ import argparse
 from hashlib import sha256
 import io
 import json
+import os
 from pathlib import Path
 import secrets
 import socket
@@ -18,12 +19,15 @@ import subprocess
 import sys
 import tempfile
 import time
+import traceback
+from datetime import datetime, timedelta, timezone
 
 if __package__ in {None, ''}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from scripts.backup_postgres import create_backup, generate_key, restore_isolated
 from scripts.migrations import discover_migrations
 from scripts.smoke_web_compose import API_IMAGE, PROXY_IMAGE, SYNTHETIC_DATABASE, WebComposeSmoke
+from scripts.smoke_web_recovery import RecoveryComposeSmoke, recovery_snapshot
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -33,6 +37,14 @@ def run(arguments, *, expected=0, timeout=180):
     if result.returncode != expected:
         raise RuntimeError('Comando sintetico recusado')
     return result.stdout.strip()
+
+
+def measured(arguments, temporary, name):
+    resources = temporary / (name + '-resources.json')
+    output = run(['/usr/bin/time', '-f',
+                  '{"user_seconds":%U,"system_seconds":%S,"max_rss_kib":%M,"elapsed_seconds":%e}',
+                  '-o', str(resources), *arguments])
+    return json.loads(output), json.loads(resources.read_text())
 
 
 def scheduled(config: Path, temporary: Path, *, expected: int) -> dict:
@@ -63,7 +75,17 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--api-image', default=API_IMAGE)
     parser.add_argument('--proxy-image', default=PROXY_IMAGE)
+    parser.add_argument('--synthetic-backup-directory', type=Path)
+    parser.add_argument('--synthetic-key-file', type=Path)
     options = parser.parse_args(argv)
+    if bool(options.synthetic_backup_directory) != bool(options.synthetic_key_file):
+        parser.error('Informe os dois destinos sinteticos separados ou nenhum')
+    if options.synthetic_backup_directory:
+        from scripts.backup_postgres import ensure_separate
+        if not all(path.is_absolute() and not path.is_symlink()
+                   for path in (options.synthetic_backup_directory, options.synthetic_key_file)):
+            parser.error('Destinos sinteticos devem ser absolutos e sem links')
+        ensure_separate(options.synthetic_key_file, options.synthetic_backup_directory)
     # Dockerfile FROM receives only a Docker image reference, never shell text.
     import re
     if any(not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._/@:-]*', image)
@@ -131,10 +153,11 @@ LogLevel VERBOSE
             backup_key = temporary / 'backup.key'
             generate_key(backup_key)
             with tempfile.TemporaryDirectory(prefix='stroop-synthetic-replica-source-') as stack_directory:
-                stack = WebComposeSmoke(Path(stack_directory), False,
+                stack = RecoveryComposeSmoke(Path(stack_directory), False,
                     api_image=options.api_image, proxy_image=options.proxy_image)
                 try:
                     stack.run()
+                    snapshot = recovery_snapshot(stack)
                     source = create_backup(compose_file=ROOT / 'compose.web.yaml',
                         key_file=backup_key, output_directory=remote,
                         database=SYNTHETIC_DATABASE, user='stroop_owner', service='web-postgres',
@@ -183,7 +206,7 @@ LogLevel VERBOSE
             cli = [sys.executable, str(ROOT / 'scripts/replicate_web_backup.py'), '--config', str(config)]
             stage = 'copy-and-idempotency'
             started = time.monotonic()
-            first = json.loads(run(cli))
+            first, copy_resources = measured(cli, temporary, 'copy')
             copy_seconds = round(time.monotonic() - started, 3)
             target = destination / name
             if first['status'] != 'copied' or first['alert'] or target.read_bytes() != ciphertext:
@@ -191,14 +214,26 @@ LogLevel VERBOSE
             if sha256(target.read_bytes()).hexdigest() != digest:
                 raise RuntimeError('Checksum divergente')
             stage = 'restore-replicated-copy'
-            migrations, assessments = restore_isolated(target, backup_key, verify_web=True)
+            restore_started = time.monotonic()
+            migrations, assessments = restore_isolated(target, backup_key, verify_web=True,
+                                                        expected_snapshot=snapshot)
+            restore_seconds = round(time.monotonic() - restore_started, 3)
             if migrations != len(discover_migrations()) or assessments != 1:
                 raise RuntimeError('Copia restaurada divergente')
             stage = 'idempotency'
             inode = target.stat().st_ino
-            second = json.loads(run(cli))
+            second, current_resources = measured(cli, temporary, 'current')
             if second['status'] != 'already_current' or second['copied'] or target.stat().st_ino != inode:
                 raise RuntimeError('Idempotencia divergente')
+            stage = 'hostkey-rejection'
+            trusted = known.read_text()
+            try:
+                known.write_text(f'[127.0.0.1]:{port} ' + client_key.with_suffix('.pub').read_text())
+                untrusted = json.loads(run(cli, expected=1))
+                if untrusted['status'] != 'unavailable' or not untrusted['alert']:
+                    raise RuntimeError('Identidade incorreta do servidor aceita')
+            finally:
+                known.write_text(trusted)
             # Same real forced command must refuse arbitrary shell requests.
             from scripts.replicate_web_backup import ReplicationError, _fetch, configuration
             try:
@@ -215,6 +250,29 @@ LogLevel VERBOSE
                 raise RuntimeError('Copia agendada divergente')
             if (Path(values['destination']) / name).read_bytes() != ciphertext:
                 raise RuntimeError('Bytes agendados divergentes')
+            if options.synthetic_backup_directory:
+                stage = 'preserve-synthetic-qualification-artifact'
+                artifacts = options.synthetic_backup_directory
+                artifacts.mkdir(mode=0o700, parents=True, exist_ok=False)
+                options.synthetic_key_file.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+                for path, contents in (
+                    (artifacts / name, ciphertext),
+                    (artifacts / (name + '.sha256'), (digest + '  ' + name + '\n').encode()),
+                    (options.synthetic_key_file, backup_key.read_bytes()),
+                ):
+                    descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+                    with os.fdopen(descriptor, 'wb') as output:
+                        output.write(contents)
+            stage = 'scheduled-stale-alert'
+            stale_name = 'stroop-' + (datetime.now(timezone.utc) - timedelta(hours=25)).strftime('%Y%m%dT%H%M%SZ') + '.dump.enc'
+            source.rename(remote / stale_name)
+            source.with_suffix(source.suffix + '.sha256').unlink()
+            stale_sidecar = remote / (stale_name + '.sha256')
+            stale_sidecar.write_text(digest + '  ' + stale_name + '\n')
+            stale_sidecar.chmod(0o644)
+            stale = scheduled(config, temporary, expected=1)
+            if stale['status'] != 'stale' or not stale['alert'] or stale['backup_age_seconds'] <= 86400:
+                raise RuntimeError('Backup desatualizado sem alerta')
             stage = 'scheduled-outage-alert'
             run(['docker', 'stop', container])
             outage = scheduled(config, temporary, expected=1)
@@ -223,12 +281,19 @@ LogLevel VERBOSE
             print(json.dumps({'status':'passed', 'real_ssh_copy':True, 'bytes':len(ciphertext),
                 'checksum_verified':True, 'idempotency_verified':True, 'forced_command_rejected_shell':True,
                 'scheduled_copy_verified':True, 'scheduled_outage_alert':True,
+                'scheduled_stale_alert':True, 'wrong_hostkey_rejected':True,
+                'copy_resources':copy_resources, 'already_current_resources':current_resources,
                 'backup_age_seconds':first['backup_age_seconds'], 'copy_seconds':copy_seconds,
                 'restored_migrations':migrations, 'restored_assessments':assessments,
+                'restore_seconds':restore_seconds,
+                'registry_links_metrics_audit_snapshot_verified':True,
+                'restored_table_counts':{name: value['count'] for name, value in snapshot.items()},
                 'restored_receipt_verified':True, 'external_rpo_not_measured':True}))
         return 0
     except Exception as error:
         print(f'Ensaio de replica falhou em {stage} ({type(error).__name__}); detalhes suprimidos.', file=sys.stderr)
+        for frame in traceback.extract_tb(error.__traceback__):
+            print(f'[replication] local: {Path(frame.filename).name}:{frame.lineno} ({frame.name})', file=sys.stderr)
         if started_container:
             diagnostic = subprocess.run(['docker', 'logs', container], capture_output=True, text=True)
             for marker in ('bad ownership', 'not allowed because', 'Permission denied',

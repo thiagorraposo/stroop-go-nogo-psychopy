@@ -13,7 +13,7 @@ import psycopg
 from psycopg.rows import dict_row
 
 from stroop.persistence.auth import PersistenceError
-from stroop.domain.stroop import calculate_metrics, expected_outcome
+from stroop.domain.stroop import ALLOWED_CONDITIONS, ALLOWED_KEYS, calculate_metrics, expected_outcome
 
 
 REQUIRED_COLUMNS = {
@@ -141,6 +141,9 @@ class FacetLimitError(Exception):
 
 def _filters(filters):
     clauses, values = [], []
+    if filters.get('patient_search'):
+        clauses.append('AND position(%s in lower(a.participant_id)) > 0')
+        values.append(filters['patient_search'])
     columns = {'participant_id': 'a.participant_id', 'visit': 'a.visit', 'test_version': 'a.test_version',
                'platform': "COALESCE(wa.platform,'psychopy')",
                'evaluator_id': "COALESCE(CASE WHEN wa.assessment_id IS NULL THEN NULL ELSE a.evaluator END,'LEGADO_NAO_MAPEADO')"}
@@ -153,8 +156,28 @@ def _filters(filters):
             clauses.append(f'AND a.assessment_date {operator} %s')
             values.append(filters[key])
     if filters.get('test_code'):
-        clauses.append('AND a.test_code=%s')
-        values.append(filters['test_code'])
+        clauses.append('AND a.test_code=ANY(%s)')
+        instruments = filters['test_code']
+        values.append([instruments] if isinstance(instruments, str) else list(instruments))
+    if filters.get('condition') or filters.get('response_type'):
+        # Resolve outcome categories through the official domain. One EXISTS
+        # requires condition AND response on the SAME main trial; metrics below
+        # continue to hydrate the full assessment.
+        conditions = filters.get('condition') or ALLOWED_CONDITIONS
+        responses = filters.get('response_type')
+        pairs = []
+        for condition in sorted(ALLOWED_CONDITIONS):
+            for key in sorted(ALLOWED_KEYS):
+                outcome = expected_outcome({'condition': condition, 'key_pressed': key})
+                if outcome and condition in conditions and (not responses or outcome[2] in responses):
+                    pairs.append((condition, key))
+        if not pairs:
+            clauses.append('AND FALSE')
+        else:
+            alternatives = " OR ".join("(tr.condition=%s AND COALESCE(tr.key_pressed,'')=%s)" for _ in pairs)
+            clauses.append("AND EXISTS (SELECT 1 FROM trial_results tr WHERE tr.assessment_id=a.assessment_id "
+                           "AND tr.block='main' AND (" + alternatives + '))')
+            values.extend(value for pair in pairs for value in pair)
     return ' '.join(clauses), values
 
 
@@ -479,5 +502,49 @@ def session_status(database_url, project_id, session_id, issuer, subject):
                 'checkpoint':{'confirmed_through':row['confirmed_through'] or 0,
                               'prefix_hash':row['prefix_hash'],'received_at':iso_utc(row['received_at'])},
             }
+    except psycopg.Error as exc:
+        raise PersistenceError from exc
+
+
+def analysis_selection(database_url, projects, issuer, subject, *, filters, assessment_ids=None):
+    """Universo autorizado em uma transação RO; nunca publicar prefixo de 5.001."""
+    if not 1 <= len(projects) <= 20:
+        raise FacetLimitError
+    try:
+        with _connect(database_url) as connection:
+            _validate_schema(connection)
+            # Reautorizar TODOS antes de ler/popular qualquer resultado.
+            if not all(_authorized_project(connection, project, issuer, subject) for project in projects):
+                return False, [], [], None, []
+            selected, sources = [], []
+            for project in projects:
+                base, params = _scoped_query(project, issuer, subject, filters)
+                if assessment_ids is not None:
+                    base += ' AND a.assessment_id=ANY(%s)'
+                    params.append(assessment_ids)
+                rows, fingerprint = _snapshot(connection, base, params)
+                selected.extend((project, row) for row in rows)
+                sources.append((str(project), fingerprint))
+                if len(selected) > 5000:
+                    raise FacetLimitError
+            if len({row['assessment_id'] for _, row in selected}) != len(selected):
+                # Vínculos legados ambíguos não podem duplicar o universo A/T.
+                raise SnapshotConflict
+            eligible = {row['assessment_id'] for _, row in selected}
+            if assessment_ids is not None:
+                if not set(assessment_ids) <= eligible:
+                    raise SnapshotConflict
+                selected = [(project, row) for project, row in selected if row['assessment_id'] in assessment_ids]
+            result = []
+            for project in projects:
+                result.extend(_hydrate(connection, [row for scope, row in selected if scope == project], project))
+            # Apenas colunas pseudonimizadas disponíveis ao papel SELECT.
+            ids = sorted({row['assessment_id'] for row in result})
+            trials = connection.execute('''SELECT assessment_id,trial_number,condition,word,ink_color,
+                correct_response,key_pressed,reaction_time,correct,error_type FROM trial_results
+                WHERE assessment_id=ANY(%s) AND block='main' ORDER BY assessment_id,trial_number''', (ids,)).fetchall() if ids else []
+            content = hashlib.sha256(json.dumps([sources, result, trials], sort_keys=True, default=str,
+                                               separators=(',', ':')).encode()).hexdigest()
+            return True, result, trials, content, sources
     except psycopg.Error as exc:
         raise PersistenceError from exc

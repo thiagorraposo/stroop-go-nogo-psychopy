@@ -188,6 +188,41 @@ class EncryptedBackupReplicationTests(unittest.TestCase):
                          {'status': 'unavailable', 'alert': True, 'error': 'replication_failed'})
         self.assertNotIn(str(self.root), output.getvalue())
 
+    def test_status_privado_registra_sucesso_atraso_e_falha_sem_segredos(self):
+        status = self.root / 'status'
+        status.mkdir(mode=0o700)
+        last = status / 'last-result.json'
+        config = self.root / 'pull.json'
+        config.write_text(json.dumps(self.config))
+        config.chmod(0o600)
+        reports = [dict(status='already_current', alert=False, copied=False),
+                   dict(status='stale', alert=True, backup_age_seconds=90000)]
+        for report in reports:
+            with patch.object(pull, 'run_once', return_value=report), patch('sys.stdout', io.StringIO()):
+                self.assertEqual(pull.main(['--config', str(config), '--status-file', str(last)]), int(report['alert']))
+            stored = json.loads(last.read_text())
+            self.assertIn('checked_at', stored)
+            self.assertEqual(stored['status'], report['status'])
+            self.assertEqual(last.stat().st_mode & 0o777, 0o600)
+        with patch.object(pull, 'run_once', side_effect=OSError('private-secret')), patch('sys.stdout', io.StringIO()):
+            self.assertEqual(pull.main(['--config', str(config), '--status-file', str(last)]), 1)
+        self.assertEqual(json.loads(last.read_text())['error'], 'replication_failed')
+        self.assertNotIn('private-secret', last.read_text())
+        self.assertEqual(list(status.glob('.replication-status-*')), [])
+
+    def test_status_nao_segue_symlink_nem_usa_diretorio_publico(self):
+        self.root.chmod(0o700)
+        target = self.root / 'preserved'
+        target.write_text('preserved')
+        link = self.root / 'last-result.json'
+        link.symlink_to(target)
+        with self.assertRaises(pull.ReplicationError):
+            pull.save_status(link, {'alert': False})
+        self.assertEqual(target.read_text(), 'preserved')
+        self.root.chmod(0o755)
+        with self.assertRaises(pull.ReplicationError):
+            pull.save_status(self.root / 'new.json', {'alert': False})
+
 
 if __name__ == '__main__':
     unittest.main()

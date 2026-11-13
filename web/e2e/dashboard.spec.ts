@@ -1,3 +1,4 @@
+import { analysisFixture } from '../src/test/analysis-fixture'
 /** Doubles HTTP sinteticos: UI profissional, sem reivindicar integracao real. */
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
@@ -35,7 +36,7 @@ for (const [role, label] of [['consulta', 'Consulta'], ['importacao', 'Coleta e 
     const errors: string[] = []
     page.on('pageerror', error => errors.push(error.name))
     await access(page, role)
-    await page.route(`**${base}?*`, route => route.fulfill({ json: { items: [first, second], next_cursor: null } }))
+    await page.route('**/api/v1/analysis/query', route => route.fulfill({ json: analysisFixture(route.request().postDataJSON(), [first, second]) }))
     await page.goto('/equipe')
     await expect(page.locator('.role-badge')).toHaveText(label!)
     await expect(card(page, 'Avaliações')).toHaveText('2')
@@ -63,19 +64,19 @@ test('aguarda todas as paginas e descarta subconjunto em falha', async ({ page }
   let release!: () => void
   const gate = new Promise<void>(resolve => { release = resolve })
   let fail = false
-  await page.route(`**${base}?*`, async route => {
-    const cursor = new URL(route.request().url()).searchParams.get('cursor')
-    if (!cursor) return route.fulfill({ json: { items: [first], next_cursor: 'synthetic_next' } })
+  await page.route('**/api/v1/analysis/query', async route => {
+    const body = route.request().postDataJSON(), cursor = body.page.cursor
+    if (!cursor) return route.fulfill({ json: analysisFixture(body, [first, second], { items: [{ ...first, project_id: projectId }], next_cursor: 'synthetic_next' }) })
     expect(cursor).toBe('synthetic_next'); await gate
     return fail ? route.fulfill({ status: 403, json: { error: { code: 'permission_denied', message: 'SYNTHETIC_SECRET' } } })
-      : route.fulfill({ json: { items: [second], next_cursor: null } })
+      : route.fulfill({ json: analysisFixture(body, [first, second], { items: [{ ...second, project_id: projectId }] }) })
   })
   await page.goto('/equipe')
   await expect(page.getByText(/^Carregando avaliações/)).toContainText('1 recebidas')
   await expect(page.locator('.dashboard-cards')).toHaveCount(0)
   release(); await expect(card(page, 'Avaliações')).toHaveText('2')
   fail = true; await page.getByRole('button', { name: 'Aplicar filtros' }).click()
-  await expect(page.getByRole('alert')).toHaveText('Seu perfil não permite esta operação.')
+  await expect(page.getByRole('button', { name: 'Entrar', exact: true })).toBeVisible()
   await expect(page.locator('.dashboard-cards')).toHaveCount(0)
   await expect(page.getByRole('table')).toHaveCount(0)
   await expect(page.getByRole('main')).not.toContainText('SYNTHETIC_SECRET')
@@ -83,20 +84,22 @@ test('aguarda todas as paginas e descarta subconjunto em falha', async ({ page }
 test('separa instrumento/plataforma e aplica filtros vazios pelo teclado', async ({ page }) => {
   await access(page)
   let filtered = false
-  await page.route(`**${base}?*`, route => {
-    const query = new URL(route.request().url()).searchParams
-    if (query.has('participant_id')) {
-      expect(query.get('participant_id')).toBe('P_SINTETICO_AUSENTE'); expect(query.get('visit')).toBe('V2'); filtered = true
-      return route.fulfill({ json: { items: [], next_cursor: null } })
+  await page.route('**/api/v1/analysis/query', route => {
+    const body = route.request().postDataJSON(), query = body.query.filters
+    if (query.participant_code) {
+      expect(query.participant_code).toEqual(['P_SINTETICO_AUSENTE']); expect(query.visit).toEqual(['V2']); filtered = true
+      return route.fulfill({ json: analysisFixture(body, []) })
     }
-    return route.fulfill({ json: { items: [first, second, generic], next_cursor: null } })
+    return route.fulfill({ json: analysisFixture(body, [first, second, generic].filter(row => !query.test_code || query.test_code.includes(row.test_code))) })
   })
-  await page.goto('/equipe'); await expect(card(page, 'Avaliações')).toHaveText('2')
-  await page.getByRole('combobox', { name: /^Instrumento$/ }).selectOption(generic.test_code)
+  await page.goto('/equipe'); await expect(card(page, 'Avaliações')).toHaveText('3')
+  await page.getByRole('listbox', { name: 'Instrumento da consulta', exact: true }).selectOption(generic.test_code)
+  await page.getByRole('button', { name: 'Aplicar filtros' }).click()
   await expect(card(page, 'Avaliações')).toHaveText('1')
   await expect(page.getByText('Precisão média', { exact: true })).toHaveCount(0)
   await expect(page.getByRole('table', { name: 'Avaliações filtradas' })).toContainText(generic.participant_id)
-  await page.getByLabel('Participantes (códigos)').selectOption('P_SINTETICO_AUSENTE')
+  await page.getByText('Filtros avançados e ordenação', { exact: true }).click()
+  await page.getByLabel('Participantes (códigos)', { exact: true }).selectOption('P_SINTETICO_AUSENTE')
   await page.getByRole('listbox', { name: 'Visitas', exact: true }).selectOption('V2')
   await page.getByRole('button', { name: 'Aplicar filtros' }).focus(); await page.keyboard.press('Enter')
   await expect(page.getByText('Nenhuma avaliação corresponde aos filtros.', { exact: true })).toBeVisible()
@@ -104,7 +107,7 @@ test('separa instrumento/plataforma e aplica filtros vazios pelo teclado', async
 })
 test('abre detalhe pelo teclado, exporta CSV e trata revogacao segura', async ({ page }) => {
   await access(page)
-  await page.route(`**${base}?*`, route => route.fulfill({ json: { items: [first], next_cursor: null } }))
+  await page.route('**/api/v1/analysis/query', route => route.fulfill({ json: analysisFixture(route.request().postDataJSON(), [first]) }))
   await page.route(`**${base}/${first.assessment_id}`, route => route.fulfill({ json: detail }))
   let denied = false
   await page.route(`**${base}/${first.assessment_id}/export`, route => denied

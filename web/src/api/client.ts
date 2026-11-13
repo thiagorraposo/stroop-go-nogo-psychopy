@@ -115,7 +115,7 @@ async function responseError(response: Response): Promise<ApiError> {
   return new ApiError(code, response.status, retryAfter(response), candidates);
 }
 
-export type ApiPath = '/api/v1/assessments/export' | '/api/v1/admin/users' | `/api/v1/admin/users?${string}` | `/api/v1/admin/users/${string}` |
+export type ApiPath = '/api/v1/analysis/query' | '/api/v1/assessments/export' | '/api/v1/admin/users' | `/api/v1/admin/users?${string}` | `/api/v1/admin/users/${string}` |
   '/api/v1/patients' | `/api/v1/patients?${string}` | `/api/v1/patients/${string}` |
   '/api/v1/evaluators' | `/api/v1/evaluators?${string}` | `/api/v1/evaluators/${string}` |
   `/api/v1/projects/${string}/imports/${string}` |

@@ -1,3 +1,5 @@
+import { analysisFixture } from '../test/analysis-fixture'
+import type { Assessment } from '../api/assessments'
 // @vitest-environment jsdom
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -46,8 +48,9 @@ beforeEach(() => {
   fetchMock = vi.fn<typeof fetch>()
   vi.stubGlobal('fetch', fetchMock)
 
-  fetchMock.mockImplementation(async input => {
+  fetchMock.mockImplementation(async (input, init) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+    if (url === '/api/v1/analysis/query') return jsonResponse(analysisFixture(JSON.parse(init!.body as string), []))
     if (url.includes('/api/v1/projects') && !url.includes('/assessments')) {
       return jsonResponse({ items: [mockProject], next_cursor: null })
     }
@@ -242,8 +245,9 @@ test('no módulo histórico exibe lista de avaliações e abre detalhe com tenta
     ],
   }
 
-  fetchMock.mockImplementation(async input => {
+  fetchMock.mockImplementation(async (input, init) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+    if (url === '/api/v1/analysis/query') return jsonResponse(analysisFixture(JSON.parse(init!.body as string), [assessmentRow as Assessment]))
     if (url.includes(`/assessments/${assessmentRow.assessment_id}`)) {
       return jsonResponse(assessmentDetail)
     }

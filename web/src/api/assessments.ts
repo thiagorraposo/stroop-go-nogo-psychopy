@@ -22,7 +22,10 @@ export type AssessmentDetail = Assessment & { project_id: string; session_id: st
   completed_at: string | null; metrics: Metric[]; frame_period_ms: number | null; trials: Trial[] };
 export type PageOptions = { cursor?: string; limit?: number; signal?: AbortSignal };
 export type AssessmentFacetOptions = { start_date?: string; end_date?: string; test_code?: string; signal?: AbortSignal };
-export type AssessmentOptions = PageOptions & AssessmentFacetOptions & {
+export type AssessmentOptions = PageOptions & Omit<AssessmentFacetOptions, 'test_code'> & {
+  condition?: readonly ('congruent' | 'incongruent')[];
+  response_type?: readonly ('hit' | 'omission' | 'commission' | 'correct_rejection')[];
+  test_code?: string | readonly string[];
   participant_id?: string | readonly string[]; visit?: string | readonly string[];
   evaluator_id?: readonly string[]; test_version?: readonly string[]; platform?: readonly ('web' | 'psychopy')[];
 };
@@ -98,6 +101,8 @@ function assessment(x: unknown, detail = false): Assessment {
     || !Object.entries(x.summary.metrics).every(([k, v]) => nonempty(k) && finite(v))) return invalid();
   return x as unknown as Assessment;
 }
+/** Projeção comum às listagens GET e à consulta analítica POST. */
+export function decodeAssessment(x: unknown): Assessment { return assessment(x); }
 function metric(x: unknown): Metric {
   if (!closed(x, 'metric_code metric_label metric_value unit') || !nonempty(x.metric_code)
     || !nonempty(x.metric_label) || !text(x.unit) || !nullableNumber(x.metric_value)) return invalid();
@@ -156,6 +161,9 @@ export function listProjects(options: PageOptions = {}): Promise<Page<Project>> 
   return json(path('/api/v1/projects', query(options)), (x) => page(x, project), options.signal);
 }
 const filterPatterns = {
+  condition: /^(?:congruent|incongruent)$/,
+  response_type: /^(?:hit|omission|commission|correct_rejection)$/,
+  test_code: labelPattern,
   participant_id: /^[^\x00-\x1f\x7f]{1,512}$/, visit: /^[^\x00-\x1f\x7f]{1,512}$/,  evaluator_id: /^[A-Za-z0-9_-]{1,512}$/,
   test_version: /^[A-Za-z0-9_.+-]{1,64}$/, platform: /^(?:web|psychopy)$/,
 };
@@ -164,12 +172,11 @@ function civilDate(value: unknown): value is string {
     && Number.isFinite(Date.parse(`${value}T00:00:00Z`))
     && new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value;
 }
-function contextQuery(options: AssessmentFacetOptions, params = new URLSearchParams()): URLSearchParams {
+function contextQuery(options: Omit<AssessmentFacetOptions, 'test_code'>, params = new URLSearchParams()): URLSearchParams {
   for (const key of ['start_date', 'end_date'] as const) if (options[key] !== undefined) {
     input(civilDate(options[key])); params.set(key, options[key]);
   }
   input(!options.start_date || !options.end_date || options.start_date <= options.end_date);
-  if (options.test_code !== undefined) { input(labelPattern.test(options.test_code)); params.set('test_code', options.test_code); }
   return params;
 }
 export function assessmentFilterParams(options: AssessmentOptions = {}): URLSearchParams {
@@ -197,7 +204,9 @@ export function listAssessments(projectId: string, options: AssessmentOptions = 
   }, options.signal);
 }
 export function getAssessmentOptions(projectId: string, options: AssessmentFacetOptions = {}): Promise<AssessmentFacets> {
-  return json(path(`${assessmentPath(projectId)}/options`, contextQuery(options)), x => {
+  const params = contextQuery(options);
+  if (options.test_code !== undefined) { input(labelPattern.test(options.test_code)); params.set('test_code', options.test_code); }
+  return json(path(`${assessmentPath(projectId)}/options`, params), x => {
     if (!closed(x, 'participant_id visit evaluator_id test_version platform test_code')) return invalid();
     for (const key of ['participant_id', 'visit', 'evaluator_id', 'test_version', 'platform', 'test_code'] as const) {
       const values = x[key];

@@ -1,3 +1,4 @@
+import { analysisFixture } from '../src/test/analysis-fixture'
 import { expect, test } from '@playwright/test'
 
 const projectId = '11111111-1111-4111-8111-111111111111'
@@ -13,7 +14,7 @@ async function access(page: import('@playwright/test').Page) {
     participant_id: [], visit: [], evaluator_id: [], test_version: [], platform: ['psychopy'],
     test_code: ['stroop_go_nogo_ptbr'],
   } }))
-  await page.route('**/api/v1/projects/*/assessments?*', route => route.fulfill({ json: { items: [], next_cursor: null } }))
+  await page.route('**/api/v1/analysis/query', route => route.fulfill({ json: analysisFixture(route.request().postDataJSON(), []) }))
 }
 
 test('EXP-CSV-01: comprova ausencia de painel e comandos de importacao CSV na UI do produto', async ({ page }) => {

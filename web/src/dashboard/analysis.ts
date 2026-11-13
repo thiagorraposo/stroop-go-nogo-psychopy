@@ -68,8 +68,6 @@ export type AdvancedFilterCriteria = {
   accuracyRange?: 'all' | 'under50' | '50to80' | '80plus'
   rtRange?: 'all' | 'under500ms' | '500to1000ms' | '1000to1500ms' | '1500msPlus'
   includeNullRt?: boolean
-  condition?: 'all' | 'congruent' | 'incongruent' | 'go' | 'nogo'
-  responseType?: 'all' | 'hits' | 'omissions' | 'commissions' | 'correct_rejections'
   sortBy?: 'date' | 'participant' | 'accuracy' | 'response_time'
   sortOrder?: 'asc' | 'desc'
 }
@@ -200,24 +198,6 @@ export function filterAssessments<T extends Assessment & { project_id?: string; 
         if (criteria.rtRange === '1000to1500ms' && (rt < 1.0 || rt >= 1.5)) return false
         if (criteria.rtRange === '1500msPlus' && rt < 1.5) return false
       }
-    }
-
-    // 5. Tipo de resposta / erro (aplicável a Stroop)
-    if (criteria.responseType && criteria.responseType !== 'all') {
-      if (!('hits' in row.summary)) return false
-      const s = row.summary
-      if (criteria.responseType === 'hits' && s.hits <= 0) return false
-      if (criteria.responseType === 'omissions' && s.omission_errors <= 0) return false
-      if (criteria.responseType === 'commissions' && s.commission_errors <= 0) return false
-      if (criteria.responseType === 'correct_rejections' && s.correct_rejections <= 0) return false
-    }
-
-    // 6. Condição experimental predominante/específica
-    if (criteria.condition && criteria.condition !== 'all') {
-      if (!('total_go_trials' in row.summary)) return false
-      const s = row.summary
-      if (criteria.condition === 'go' && s.total_go_trials <= 0) return false
-      if (criteria.condition === 'nogo' && s.total_no_go_trials <= 0) return false
     }
 
     return true

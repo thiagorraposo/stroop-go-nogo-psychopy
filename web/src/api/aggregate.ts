@@ -5,8 +5,8 @@ import type { AssessmentOptions } from './assessments'
 export type ExportProject = { project_id: string; snapshot: string }
 export type ExportContext = { projects: ExportProject[]; filters: AssessmentOptions }
 export type ExportView = { test_code: string; platform?: 'web' | 'psychopy' }
-const multi = ['participant_id', 'visit', 'evaluator_id', 'test_version', 'platform'] as const
-const singles = ['start_date', 'end_date', 'test_code'] as const
+const multi = ['participant_id', 'visit', 'evaluator_id', 'test_version', 'platform', 'test_code'] as const
+const singles = ['start_date', 'end_date'] as const
 const instruments = ['stroop_go_nogo_ptbr', 'instrumento_sintetico_demo']
 export function exportAssessmentView(context: ExportContext, view: ExportView, csrf: string, signal?: AbortSignal): Promise<{ filename: string; blob: Blob }> {
   const fail = (): never => { throw new ApiError('invalid_request', 422) }

@@ -50,8 +50,10 @@ que os commits originais são ancestrais de `origin/main` e registre o resultado
 Se a worktree tiver alterações alheias, preserve-as antes da troca; nunca use
 reset destrutivo ou force push. Não use `--admin` para contornar proteções.
 Exclua somente branches temporárias integradas. Não existe branch de integração
-permanente adicional. Deploy, tags e operações destrutivas exigem autorização específica;
-merge não faz deploy.
+permanente adicional. Deploy, tags e operações destrutivas exigem autorização específica; merge não faz deploy.
+A publicação controlada na VPS HostGator é realizada sob demanda através do workflow
+[Deploy VPS HostGator](.github/workflows/deploy.yml) (`workflow_dispatch`), protegido pelo
+Environment `production` e documentado em [DEPLOY_WEB_VPS](docs/operacao/DEPLOY_WEB_VPS.md).
 
 ## Validação e CI
 

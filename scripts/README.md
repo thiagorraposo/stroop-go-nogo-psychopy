@@ -56,3 +56,10 @@ administrativa autenticada. Consulte
 transmite `pg_dump` diretamente para AES-256-GCM, mantem 30 geracoes e restaura
 em PostgreSQL isolado e descartavel. Operacao e limites:
 [hardening de producao](../docs/operacao/HARDENING_PRODUCAO.md).
+
+`install_web_backup_receiver.py` prepara receptor Linux privado, identidade SSH
+exclusiva e timer systemd de usuário com retomada no boot. Não conecta nem muda
+a VPS. `replicate_web_backup.py --config ... --status-file ...` reutiliza o
+transporte de ciphertext e publica o último resultado sanitizado. Preparação,
+verificação da origem, aprovação específica e limites do notebook:
+[recuperação WEB](../docs/operacao/WEB_RECUPERACAO.md#receptor-temporário-linux-mint).

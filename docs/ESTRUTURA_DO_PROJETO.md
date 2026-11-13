@@ -10,7 +10,7 @@ o plano legado foi congelado como referência histórica da operação preservad
 ## Arvore funcional
 
 ```text
-stroop-cognifit/
+stroop-test-web/
 ├── stroop_go_nogo_ptbr.psyexp    # entrada PsychoPy preservada
 ├── condicoes/                  # CSVs-fonte e snapshot WEB compartilhado
 ├── assets/                     # material proprio

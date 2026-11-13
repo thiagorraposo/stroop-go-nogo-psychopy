@@ -20,6 +20,7 @@ from api.evaluators import router as evaluators_router
 from api.imports import router as imports_router
 from api.patients import router as patients_router
 from api.exports import router as exports_router
+from api.analysis import router as analysis_router
 
 
 def create_app(config: APIConfig | None = None) -> FastAPI:
@@ -43,6 +44,7 @@ def create_app(config: APIConfig | None = None) -> FastAPI:
     app.include_router(administration_router)
     app.include_router(imports_router)
     app.include_router(exports_router)
+    app.include_router(analysis_router)
     app.add_exception_handler(HTTPException, http_exception_handler)
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_middleware(RequestBoundary, config=config)

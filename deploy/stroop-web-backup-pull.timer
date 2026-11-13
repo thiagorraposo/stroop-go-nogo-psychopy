@@ -2,6 +2,7 @@
 Description=Verifica replica externa WEB a cada hora
 
 [Timer]
+OnStartupSec=2m
 OnCalendar=hourly
 Persistent=true
 RandomizedDelaySec=5m
